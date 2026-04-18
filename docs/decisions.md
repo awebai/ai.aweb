@@ -6,6 +6,33 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-18 — Resume-from-partial bootstrap, not awid DID cleanup
+
+**Commits:**
+- aweb: epic aweb-aajw, subtask aweb-aajw.13
+
+**Decision maker:** Juan
+
+On the API-key persistent bootstrap, awid registration now happens
+BEFORE /workspaces/init (aajw.6). If /workspaces/init fails after
+awid registration succeeds, a naive retry generates a fresh keypair
+and orphans the first did:aw at awid. Dave surfaced this in his
+review of 2b2e16f.
+
+Chose option 2 of three: the CLI persists the signing key and
+derived identity material to a local partial-init file BEFORE
+calling awid, then reuses it on retry. Successful completion
+removes the file. awid stays append-only — no cleanup endpoint.
+
+Rejected alternatives:
+- Accept the orphans for pre-launch and add operational cleanup
+  later — leaves unbounded drift at awid.
+- Add an awid endpoint to delete unbound did:aw entries — violates
+  the append-only audit-log property and expands protocol surface
+  for a problem the CLI can solve locally.
+
+---
+
 ## 2026-04-18 — Replace/Archive multi-address policy
 
 **Commits:**
