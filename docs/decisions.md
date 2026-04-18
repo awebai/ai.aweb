@@ -6,6 +6,32 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-18 — Replace/Archive multi-address policy
+
+**Commits:**
+- aweb: epic aweb-aajw, subtask aweb-aajw.12
+
+**Decision maker:** Juan (on Jack's recommendation, from Alice's audit)
+
+A persistent DID can hold multiple addresses across namespaces. The
+cloud's Replace and Archive lifecycle flows must honor that:
+
+- **Replace**: reassign every cloud-managed address for the old DID
+  to the new DID, atomically. BYOD addresses are left untouched — the
+  cloud does not hold the namespace controller key for those, so it
+  has no authority to migrate them.
+- **Archive**: delete every cloud-managed address for the DID. BYOD
+  addresses are left untouched for the same reason.
+- **Reachability** stays per-address. A DID can carry different
+  reachability per address. The dashboard presents the team-managed
+  address as primary for now.
+
+Affects: `ac/backend/src/aweb_cloud/routers/agent_lifecycle.py` and
+the six `list_did_addresses[0]` sites surfaced in Alice's audit
+(agent_addressing.py, init.py, onboarding.py, agent_lifecycle.py).
+
+---
+
 ## 2026-04-18 — Split awid identity registration from address binding
 
 **Commits:**
