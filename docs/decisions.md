@@ -6,6 +6,69 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-18 — Split awid identity registration from address binding
+
+**Commits:**
+- aweb: (pending) — `docs/awid-sot.md` Identity operations section,
+  Addresses precondition, `did_aw_mappings` schema update;
+  `docs/trust-model.md` identity vs address authority;
+  `docs/identity-guide.md` two-step flow
+
+**Decision maker:** Juan
+
+awid's `POST /v1/did` bundled identity registration (`did_aw ↔ did_key`)
+with an address claim into a single signed envelope. This forced a
+cycle for managed addresses: a self-custodial identity holder had to
+sign over an address they did not yet own, while the namespace
+controller (the hosted operator) had no way to pre-register the
+identity before assigning the address. Juan's 2026-04-17 precheck
+`15aab802 "Require awid registration before managed addresses"` made
+the invariant explicit on the server side but could not be satisfied
+by the existing CLI flow — mechanically impossible.
+
+Chosen resolution: split the awid protocol into two separately
+authorized operations.
+
+- `register_did` — identity holder signature only, binds
+  `did_aw ↔ did_key`. No address in envelope or state hash.
+- Address binding stays at `POST /v1/namespaces/{domain}/addresses`,
+  namespace controller signature, with awid rejecting the call if
+  `did_aw` is not already registered.
+
+Rationale: identity and address are semantically independent facts
+with different authorities. Bundling them collapses the authority
+model, forces pre-launch protocol band-aids, and makes cross-namespace
+memberships awkward. Splitting them makes the "identity before address"
+invariant structural, gives each party the authority it legitimately
+holds, and matches the log-based identity model already sketched in
+`aweb/docs/vectors/identity-log-v1.json`.
+
+Cost: awid schema migration (drop address/server/handle from
+`did_aw_mappings`; drop denormalized `current_did_key` from
+`public_addresses` and resolve via JOIN so a DID can hold multiple
+addresses without rotation cascades), CLI two-step flow in
+`aw id create` and the API-key bootstrap path, server-side obligation
+for the hosted operator to submit the two ops in order. Estimated
+3–5 days.
+
+Alternatives rejected:
+- Two-phase CLI "prepare" endpoint — a workaround for the coupling,
+  not a fix; bakes the bug into the protocol.
+- Server registers DID on behalf using the public key in the
+  payload — requires extending awid to accept controller-authorized
+  identity registrations, which breaks the authority model.
+- Revert the precheck — loses the invariant (managed addresses
+  pointing at DIDs awid doesn't know), which is foundational.
+
+Affects: awid server and schema, `aw` CLI identity creation + bootstrap,
+`ac` hosted operator init flow, identity-log conformance vectors.
+Launch-blocker for the API-key persistent bootstrap; Juan's
+2026-04-18 attempt to re-provision `juan.aweb.ai/avi` surfaced this.
+
+Source of truth: [`aweb/docs/awid-sot.md` — Identity operations](https://awid.ai/awid-sot.md#identity-operations).
+
+---
+
 ## 2026-04-11 — Content publishing split
 
 **Commits:**
