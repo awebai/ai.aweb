@@ -6,6 +6,31 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-18 — Idempotent address registration at awid
+
+**Commits:**
+- aweb: `3b264f0` (awid-sot §Addresses Idempotency); epic aweb-aajw,
+  subtask aweb-aajw.15
+
+**Decision maker:** Juan
+
+Symmetric with the resume-from-partial decision on register_did:
+`POST /v1/namespaces/{domain}/addresses` becomes idempotent on
+exact (domain, name, did_aw, current_did_key) match. Any mismatch
+stays 409. Dave surfaced the gap in his aajw.8 review — if awid
+accepts an address but the cloud transaction commit then fails, the
+retry driven by aajw.13's resume path would 409 without this
+behavior, orphaning the address at awid.
+
+Rejected alternatives:
+- Server-side pre-check via GET before register — extra round-trip
+  on every init, more code on the cloud side.
+- Accept for pre-launch with operational cleanup later — reverses
+  the parallel decision we took on register_did and leaves
+  retry-after-failure unusable.
+
+---
+
 ## 2026-04-18 — Resume-from-partial bootstrap, not awid DID cleanup
 
 **Commits:**
