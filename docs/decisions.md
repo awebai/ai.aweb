@@ -6,6 +6,45 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-21 — Amy gets a second address at aweb.ai/amy
+
+**Decision maker:** Juan
+
+Amy's persistent `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ` now holds two
+public addresses: the original `juan.aweb.ai/amy` and the new
+`aweb.ai/amy`. Both have reachability `public`. Amy is the canonical
+support address for aweb; routing `aweb.ai/amy` to her makes the
+public-facing address match the company domain.
+
+Steps taken (all on Juan's workstation, 2026-04-21 21:47 UTC):
+1. Verified `aweb.ai` is BYOD at awid; controller `did:key:z6Mkgpop…EuVn`
+   matches `_awid.aweb.ai` TXT.
+2. Installed the controller seed from `ac/.env.production`
+   (`AWEB_PARENT_CONTROLLER_KEY`) at
+   `~/.config/aw/controllers/aweb.ai.key`, overwriting a stale key
+   (backed up as `.bak-2026-04-21`).
+3. `aw id namespace assign-address --domain aweb.ai --name amy
+   --did-aw did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ --reachability public`
+   → address_id `69c4346c-a2d6-4c0d-b626-359884467eff`.
+4. Created team `aweb:aweb.ai` (team did:key `z6MkhSLsj1bk…NiH2`)
+   and issued Amy a persistent cert with `member_address=aweb.ai/amy`
+   (certificate_id `30324a6d-e8e3-432a-bc31-5943875bc51d`). Cert saved
+   at `agents/support/.aw/team-certs/aweb__aweb.ai.pem`; membership
+   added to `teams.yaml`.
+
+What's live: inbound to `aweb.ai/amy` routes to Amy's `did:aw`.
+
+What's dormant: the `aweb:aweb.ai` team membership exists but is not
+the active team, and no aweb-side coordination workspace has been
+provisioned for it. Amy's outbound sender address stays
+`juan.aweb.ai/amy`. Activating outbound-as-`aweb.ai/amy` requires
+`aw init` against the new team on Juan's decision; that's a separate
+step because it changes Amy's visible sender identity.
+
+Affects: support agent (`agents/support/`).
+
+---
+
 ## 2026-04-18 — Idempotent address registration at awid
 
 **Commits:**
@@ -143,7 +182,8 @@ Affects: awid server and schema, `aw` CLI identity creation + bootstrap,
 Launch-blocker for the API-key persistent bootstrap; Juan's
 2026-04-18 attempt to re-provision `juan.aweb.ai/avi` surfaced this.
 
-Source of truth: [`aweb/docs/awid-sot.md` — Identity operations](https://awid.ai/awid-sot.md#identity-operations).
+Source of truth: [`aweb/docs/awid-sot.md` — Identity
+operations](https://awid.ai/awid-sot.md#identity-operations).
 
 ---
 

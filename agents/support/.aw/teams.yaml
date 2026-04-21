@@ -4,3 +4,7 @@ memberships:
       alias: amy
       cert_path: team-certs/aweb__juan.aweb.ai.pem
       joined_at: "2026-04-20T11:36:46Z"
+    - team_id: aweb:aweb.ai
+      alias: amy
+      cert_path: team-certs/aweb__aweb.ai.pem
+      joined_at: "2026-04-21T21:49:36Z"

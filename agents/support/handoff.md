@@ -7,6 +7,16 @@ Last updated: 2026-04-21
 Amy is active as `juan.aweb.ai/amy` (persistent, self-custodial).
 Chat and mail with cross-team senders working as of 2026-04-21.
 
+**Second address (2026-04-21):** `aweb.ai/amy` is now bound to the
+same `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ`. Inbound to
+`aweb.ai/amy` routes to Amy. Reachability is `public`. A team
+`aweb:aweb.ai` exists and a persistent cert with
+`member_address=aweb.ai/amy` is installed at
+`.aw/team-certs/aweb__aweb.ai.pem`, but the active team remains
+`aweb:juan.aweb.ai` and no aweb-side workspace is provisioned for
+the new team. Outbound sender address is unchanged. See
+`../../docs/decisions.md` 2026-04-21 for the full procedure.
+
 ## Known issues
 
 1. **IDENTITY MISMATCH on outbound messages** — Amy's messages arrive
