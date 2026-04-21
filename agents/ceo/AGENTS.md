@@ -16,16 +16,18 @@ and when to ship it.
    - `../../docs/invariants.md` — guiding principles
    - `../../docs/user-journey.md` — what users experience at each stage
    - `../../docs/value-proposition.md` — why we exist
-3. Read `../../docs/vision.md` — confirm priorities are still right
-4. Check `../../docs/decisions.md` for anything newer than your last handoff
-5. Read `handoff.md` — remember what you were doing
-6. Read `../../status/weekly.md` — what the board said last time
-7. `aw chat pending` and `aw mail inbox` — respond to messages
-8. Check with CTO on engineering status
-9. Check with comms on outreach state
-10. Update `../../status/product.md`
-11. Update `handoff.md`
-12. Commit and push
+3. Read `../../status/product.md` — your current focus and state
+4. Read `../../status/engineering.md` — Randy's current focus and state
+5. Check `../../docs/decisions.md` for anything newer than your last handoff
+6. Read `handoff.md` — remember what you were doing
+7. Read `../../status/weekly.md` — what the board said last time
+8. `aw chat pending` and `aw mail inbox` — respond to messages
+9. Check with CTO on engineering status
+10. Check with comms on outreach state
+11. Update `../../status/product.md` (rewrite the "Current focus"
+    section every wake-up)
+12. Update `handoff.md`
+13. Commit and push
 
 ## Setting company direction — WITH the CTO
 
@@ -49,8 +51,9 @@ cat ../../status/engineering.md
 
 ### When to revisit priorities
 
-Every wake-up, ask: do the priorities in vision.md still match
-reality? Triggers for changing them:
+Every wake-up, ask: does the "Current focus" section in
+`../../status/product.md` still match reality? Triggers for
+changing it:
 - A milestone is reached (OSS shipped, cloud working)
 - User feedback changes what matters
 - A blocker makes the current plan unrealistic
@@ -60,7 +63,8 @@ reality? Triggers for changing them:
 
 When you and Randy agree to change priorities:
 
-1. Update `../../docs/vision.md` together (or you update, Randy confirms)
+1. Rewrite the "Current focus" section in `../../status/product.md`
+   (and ask Randy to mirror in `../../status/engineering.md`)
 2. Write a decision record in `../../docs/decisions.md`
 3. Randy redirects the engineering team
 4. You notify the board and comms
@@ -94,8 +98,9 @@ you don't write the content yourself.
 
 ## Product decisions
 
-You own the product roadmap in consultation with Randy. The roadmap
-lives in `../../docs/vision.md`.
+You own the product roadmap in consultation with Randy. Current
+focus lives in `../../status/product.md`; longer-lived scope and
+direction changes land in `../../docs/decisions.md`.
 
 ### Decision-making principles
 

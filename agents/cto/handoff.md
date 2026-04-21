@@ -29,7 +29,7 @@ Last updated: 2026-04-21
   - aweb: `beadhub-legacy` (187 ahead, 1227 behind) — "legacy" in name suggests intentional preservation.
   - ac: `aaga-archive` (107 ahead, 1171 behind) — "archive" in name same.
   - ac: `frank-docs` (8 ahead, 259 behind) — pricing change already re-landed on main via a different commit; remaining site content reshuffled. Probably drop, but not yet deleted.
-- **docs/vision.md deletion aftermath**: 22 references across 10 AGENTS.md/README files still point at the deleted doc. Wake-up routines reference it. Sweep needed, but scope (whether to replace references with invariants.md + user-journey.md + value-proposition.md, or just remove) is a conversation with Juan.
+- **docs/vision.md deletion aftermath — done**: 22 references across 10 files swept 2026-04-21. Wake-up routines now point at `status/engineering.md` / `status/product.md` for current focus; invariants/user-journey/value-proposition remain the north-star reads. Each status file gained a "Current focus" section (3–5 lines, rewritten every wake-up).
 - **Cross-repo is aligned** for now. Watch: per-membership address features on the cloud side are only partially exercised yet (e.g. Replace/Archive scope explicitly narrow).
 
 ## Actions taken this wake-up (2026-04-21)
@@ -38,14 +38,15 @@ Last updated: 2026-04-21
 - Committed `docs/vision.md` deletion (ai.aweb).
 - Committed formatter pass on `docs/team.md`, `docs/capabilities.md`, `docs/aweb-high-level.md` (no content change).
 - Committed repo-path addition to `agents/coord-aweb/AGENTS.md`.
-- Updated `status/engineering.md` (was stale to 2026-04-10).
+- Swept all `vision.md` references across 10 files; pointed wake-up routines at `status/engineering.md` / `status/product.md` instead. Each status file gets a "Current focus" section.
+- Updated `status/engineering.md` with Current focus section (was stale to 2026-04-10).
 - Confirmed Amy's report that the `aw id team switch` bug (aweb-aakn) is real: diagnosis in `id_team.go:408` correct.
 
 ## What to check FIRST on next wake-up
 
 1. Has Juan responded on the preserved branches (`beadhub-legacy`, `aaga-archive`, `frank-docs`)?
 2. Did the aweb-aakn runTeamSwitch fix ship (or was it deprioritized)?
-3. Did Juan or Avi update the `docs/vision.md` references situation — is there a replacement document or a decision to just remove the references?
+3. Are the new "Current focus" sections actually being rewritten each wake-up (engineering.md, and did Avi start one in product.md)?
 4. Coordinator handoffs still stale? If yes, raise with Juan whether that structure is real or aspirational.
 
 ## Key context

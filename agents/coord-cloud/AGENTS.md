@@ -28,7 +28,7 @@ to catch these problems.
    - `../../docs/invariants.md` — guiding principles
    - `../../docs/user-journey.md` — what users experience
    - `../../docs/value-proposition.md` — why we exist
-   - `../../docs/vision.md` — current priorities
+   - `../../status/engineering.md` — current focus and state (Randy's)
 3. Check `../../docs/decisions.md` for anything newer than your last handoff
 4. Read `../../status/weekly.md` — what the board said
 5. Read `handoff.md` — remember what you were tracking
@@ -41,9 +41,12 @@ to catch these problems.
 
 ### Read recent history
 
+The ac repo is symlinked as `ac/` right here in your dir — read
+through it without `cd`-ing away:
+
 ```bash
-cd ../../../ac && git log --oneline -20
-cd ../../../ac && git diff HEAD~5..HEAD --stat
+git -C ac log --oneline -20
+git -C ac diff HEAD~5..HEAD --stat
 ```
 
 ### Review against invariants

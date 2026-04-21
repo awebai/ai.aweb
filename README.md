@@ -17,7 +17,7 @@ Start here:
 | [docs/invariants.md](docs/invariants.md) | Guiding principles for every design decision |
 | [docs/user-journey.md](docs/user-journey.md) | What users experience at each stage |
 | [docs/value-proposition.md](docs/value-proposition.md) | Why aweb exists, who it's for |
-| [docs/vision.md](docs/vision.md) | Current priorities and state |
+| [status/](status/) | Current focus and state (engineering, product, outreach, weekly) |
 
 For specific topics:
 

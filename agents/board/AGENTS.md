@@ -18,8 +18,7 @@ tunnel vision.
    - `../../docs/invariants.md` — guiding principles
    - `../../docs/user-journey.md` — what users experience at each stage
    - `../../docs/value-proposition.md` — why we exist
-3. Read `../../docs/vision.md` — what the company says it's doing
-4. Read `../../status/engineering.md` — what Randy says is happening
+3. Read `../../status/engineering.md` — what Randy says is happening
 5. Read `../../status/product.md` — what Avi says is happening
 6. Read `../../status/outreach.md` — what Charlene says is happening
 7. Check `../../docs/decisions.md` for anything newer than your last handoff
@@ -82,7 +81,9 @@ the feedback isn't flowing. Ask both about it.
 
 ### Are priorities aligned?
 
-- Does what engineering is building match vision.md priorities?
+- Does what engineering is building match the "Current focus" in
+  `../../status/engineering.md`? Does that focus match what
+  `../../status/product.md` says Avi is after?
 - Are Avi and Randy aligned on direction? (They decide together —
   check for one overriding the other)
 - Would Juan agree with the current priorities if he looked?

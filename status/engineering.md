@@ -1,6 +1,12 @@
 # Engineering Status
 Last updated: 2026-04-21 (Randy)
 
+## Current focus
+
+1. **Ship the runTeamSwitch fix (aweb-aakn, P2)** — Amy reproduced today during `aweb.ai/amy` activation. Small patch in `cli/go/cmd/aw/id_team.go:runTeamSwitch`. Pre-launch severity; doesn't block v1.16.0 users who only have one team but is a paper-cut for anyone with multiple addresses (which is now a real flow).
+2. **Keep cross-repo pin discipline** — ac moved to aweb>=1.16.0 today; watch that per-membership address behavior (new in 1.16.0) gets exercised by ac integration tests, not just pinned.
+3. **Coordinator handoffs unfreshed since 2026-04-11** — decide with Juan whether the coordinator structure is real or aspirational before asking John/Tom/Goto to update.
+
 ## aweb OSS
 - **Status**: Shipping. v1.16.0 server + CLI, awid-service v0.4.0.
 - **Recent releases** (since 2026-04-11): 1.11.0, 1.12.0, 1.13.0, 1.14.0, 1.15.0, 1.16.0; awid 0.3.0, 0.3.1, 0.4.0.
@@ -45,4 +51,3 @@ Last updated: 2026-04-21 (Randy)
 ## Next milestones
 - Ship the runTeamSwitch fix (aweb patch release).
 - Decide on remaining branches (beadhub-legacy, aaga-archive, frank-docs).
-- Sweep AGENTS.md files that still reference the now-deleted `docs/vision.md` (22 references across 10 files).

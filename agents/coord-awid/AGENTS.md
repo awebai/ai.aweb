@@ -29,7 +29,7 @@ these wrong before.
    - `../../docs/invariants.md` — guiding principles (especially #1, #2, #3)
    - `../../docs/user-journey.md` — what users experience
    - `../../docs/value-proposition.md` — why we exist
-   - `../../docs/vision.md` — current priorities
+   - `../../status/engineering.md` — current focus and state (Randy's)
 3. Read `../../docs/aweb-high-level.md` — the full identity architecture.
    This is your primary reference. Know it deeply.
 4. Check `../../docs/decisions.md` for anything newer than your last handoff
@@ -41,13 +41,15 @@ these wrong before.
 
 ## Checking the awid code
 
-awid lives at `../../../aweb/awid/`.
+awid lives in the aweb repo, at `aweb/awid/`. It's symlinked as
+`awid/` right here in your dir — read through it without `cd`-ing
+away:
 
 ### Read recent history
 
 ```bash
-cd ../../../aweb && git log --oneline -20 -- awid/
-cd ../../../aweb && git diff HEAD~5..HEAD -- awid/ --stat
+git -C awid log --oneline -20 -- .
+git -C awid diff HEAD~5..HEAD -- . --stat
 ```
 
 ### Review against the identity architecture

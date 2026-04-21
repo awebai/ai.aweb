@@ -62,7 +62,9 @@ Read in this order:
    every design decision.
 3. **`docs/user-journey.md`** — What users experience at each stage.
 4. **`docs/value-proposition.md`** — Why aweb exists, who it's for.
-5. **`docs/vision.md`** — Current priorities and state.
+5. **`status/` files for your area** — Current focus and state.
+   Each status file (engineering, product, outreach, weekly) leads
+   with a "Current focus" section that says what matters right now.
 
 **Read when relevant to your role:**
 - `docs/audiences.md` — Who uses aweb, what their day looks like,
@@ -85,7 +87,6 @@ co.aweb/
 │   ├── invariants.md      # Guiding principles
 │   ├── user-journey.md    # What users experience
 │   ├── value-proposition.md # Why we exist
-│   ├── vision.md          # Current priorities and state
 │   ├── audiences.md       # Who uses aweb and why
 │   ├── capabilities.md    # What aweb provides (feature reference)
 │   ├── aweb-high-level.md # Protocol architecture (reference)
@@ -123,7 +124,8 @@ directory. Shared documents are at `../../` relative to the agent.
 
 1. `git pull` — get latest shared state
 2. Read the docs listed above (team, invariants, user journey, value
-   prop, vision) — paths from agent dirs are `../../docs/<file>`
+   prop) and your relevant status file — paths from agent dirs are
+   `../../docs/<file>` and `../../status/<file>`
 3. Check `../../docs/decisions.md` for entries newer than your last handoff
 4. Read `../../status/weekly.md` — what the board said last time
 5. Read your `handoff.md` — remember what you were doing
@@ -145,8 +147,8 @@ instance pick up seamlessly.
 - Open questions you haven't answered yet
 
 **What does NOT go in handoff.md:**
-- Information that's in vision.md, status files, or decision records
-  (just reference those)
+- Information that's in status files or decision records (just
+  reference those)
 - Full conversation history (summarize, don't transcribe)
 
 Update handoff.md **whenever something significant changes**, not just
@@ -178,7 +180,7 @@ carry information.
 - Pull before reading shared docs
 - Commit and push after updating your files
 - Each agent owns their own files: handoff.md, their status file
-- To edit shared files (vision.md, decisions.md), coordinate first
+- To edit shared files (decisions.md, team.md), coordinate first
 - Never commit .aw/signing.key changes without a reason
 
 ## Sibling repos
@@ -193,8 +195,17 @@ All repos live as siblings in one parent directory:
 | ac | `../ac/` | Cloud: auth, billing, dashboard, SaaS | Private |
 
 From agent subdirectories (`agents/X/`), sibling repos are at
-`../../../<repo>/`. For bash commands, use the repo-root-relative
-form: `cd ../../../aweb && git log`.
+`../../../<repo>/`. Coordinators and the CTO also have the relevant
+sibling repo symlinked into their own agent dir for convenience:
+
+- `agents/coord-aweb/aweb` → `../../../aweb`
+- `agents/coord-cloud/ac` → `../../../ac`
+- `agents/coord-awid/awid` → `../../../aweb/awid`
+- `agents/cto/aweb`, `agents/cto/ac`
+
+Prefer `git -C aweb log` over `cd ../../../aweb && git log` — the
+symlink keeps your CWD anchored in your own agent dir, which keeps
+`aw` commands using your own workspace identity.
 
 You can read sibling repos freely. Do NOT run `aw` from them — that
 would use a different workspace identity. All `aw` commands run from

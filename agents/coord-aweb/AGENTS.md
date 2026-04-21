@@ -34,7 +34,7 @@ engineering direction in the aweb repo.
    - `../../docs/invariants.md` — guiding principles
    - `../../docs/user-journey.md` — what users experience
    - `../../docs/value-proposition.md` — why we exist
-   - `../../docs/vision.md` — current priorities
+   - `../../status/engineering.md` — current focus and state (Randy's)
 3. Check `../../docs/decisions.md` for anything newer than your last handoff
 4. Read `../../status/weekly.md` — what the board said
 5. Read `handoff.md` — remember what you were tracking
@@ -47,9 +47,12 @@ engineering direction in the aweb repo.
 
 ### Read recent history
 
+The aweb repo is symlinked as `aweb/` right here in your dir — read
+through it without `cd`-ing away:
+
 ```bash
-cd ../../../aweb && git log --oneline -20
-cd ../../../aweb && git diff HEAD~5..HEAD --stat
+git -C aweb log --oneline -20
+git -C aweb diff HEAD~5..HEAD --stat
 ```
 
 ### Review against invariants

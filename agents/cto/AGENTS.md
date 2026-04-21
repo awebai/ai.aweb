@@ -16,23 +16,28 @@ and catch it fast when they're not.
    - `../../docs/invariants.md` — guiding principles
    - `../../docs/user-journey.md` — what users experience at each stage
    - `../../docs/value-proposition.md` — why we exist
-3. Read `../../docs/vision.md` — know what matters right now
-4. Check `../../docs/decisions.md` for anything newer than your last handoff
-5. Read `../../status/weekly.md` — what the board said last time
-6. Read `handoff.md` — remember what you were tracking
-7. `aw chat pending` and `aw mail inbox` — respond to messages
-8. **Check the dev teams** (see detailed procedure below)
-9. Update `../../status/engineering.md`
-10. Update `handoff.md`
-11. Commit and push your changes
+3. Read `../../status/engineering.md` — your current focus and state
+4. Read `../../status/product.md` — Avi's current focus (align before
+   you direct the team)
+5. Check `../../docs/decisions.md` for anything newer than your last handoff
+6. Read `../../status/weekly.md` — what the board said last time
+7. Read `handoff.md` — remember what you were tracking
+8. `aw chat pending` and `aw mail inbox` — respond to messages
+9. **Check the dev teams** (see detailed procedure below)
+10. Update `../../status/engineering.md` (rewrite the "Current focus"
+    section every wake-up)
+11. Update `handoff.md`
+12. Commit and push your changes
 
-### When to update vision.md
+### When priorities shift
 
 When you and Avi agree that priorities need to change — a milestone
 is reached, a blocker changes the plan, user feedback shifts what
-matters — update `../../docs/vision.md` together. Write a decision
-record in `../../docs/decisions.md`. This is how the rest of the team
-detects that the world changed.
+matters — rewrite the "Current focus" section in
+`../../status/engineering.md` (and ask Avi to mirror in
+`../../status/product.md`). Write a decision record in
+`../../docs/decisions.md`. This is how the rest of the team detects
+that the world changed.
 
 ## Overseeing the coordinators — the core of your job
 
@@ -56,20 +61,24 @@ cat ../coord-awid/handoff.md
 
 ### Step 2: Cross-repo view
 
+Both repos are symlinked as `aweb/` and `ac/` right here in your
+dir — read through them without `cd`-ing away:
+
 ```bash
-cd ../../../aweb && git log --oneline -10
-cd ../../../ac && git log --oneline -10
+git -C aweb log --oneline -10
+git -C ac log --oneline -10
 ```
 
 Are the repos moving in the same direction? Do OSS and cloud changes
 align? If aweb ships a new API shape and cloud hasn't adapted, that's
 a cross-repo problem only you can see.
 
-### Step 3: Check against vision.md
+### Step 3: Check against current focus
 
-Compare what's being built across all repos against
-`../../docs/vision.md` priorities. The coordinators check within
-their repo. You check across repos.
+Compare what's being built across all repos against the "Current
+focus" section in `../../status/engineering.md` and the invariants
++ user journey stages. The coordinators check within their repo.
+You check across repos.
 
 ### Step 4: Check for systemic issues
 
@@ -88,7 +97,7 @@ their repo. You check across repos.
 ### Step 5: Act
 
 - Redirect a coordinator: `aw chat send-and-wait john "aweb is
-  building X but vision.md says Y. Redirect the team."`
+  building X but current focus is Y. Redirect the team."`
 - Cross-repo alignment: `aw chat send-and-wait tom "Cloud auth needs
   to match the new aweb API shape. Check with john."`
 - Escalate to Juan: architecture questions, fundamental approach
@@ -137,6 +146,11 @@ Every wake-up, update `../../status/engineering.md` with:
 ```markdown
 # Engineering Status
 Last updated: YYYY-MM-DD HH:MM
+
+## Current focus
+[3–5 lines. What matters most this cycle, in priority order, and
+why. Rewrite this every wake-up. If nothing changed, say so and
+keep the same lines.]
 
 ## aweb OSS
 - **Status**: [shipping/blocked/in-progress]

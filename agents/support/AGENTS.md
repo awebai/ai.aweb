@@ -22,7 +22,8 @@ coordination, identity, and setup.
    - `../../docs/invariants.md` — guiding principles
    - `../../docs/user-journey.md` — what users experience at each stage
    - `../../docs/value-proposition.md` — why we exist
-3. Read `../../docs/vision.md` — current product state
+3. Read `../../status/engineering.md` — current product state
+   (so you know what just shipped and what's in flight)
 4. Read your knowledge base (see below)
 5. Read `handoff.md` — remember ongoing conversations
 6. `aw chat pending` and `aw mail inbox` — respond to messages

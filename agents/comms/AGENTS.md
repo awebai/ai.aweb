@@ -18,7 +18,8 @@ company selling a product.
    - `../../docs/invariants.md` — guiding principles
    - `../../docs/user-journey.md` — what users experience
    - `../../docs/value-proposition.md` — why we exist
-3. Read `../../docs/vision.md` — current priorities and product state
+3. Read `../../status/engineering.md` and `../../status/product.md`
+   — current focus and product state
 4. Read `../../publishing/voice.md` — how we talk (internalize this)
 5. Read `handoff.md` — remember what you were doing
 6. `aw chat pending` and `aw mail inbox` — respond to messages
