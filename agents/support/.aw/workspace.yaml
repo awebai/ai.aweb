@@ -1,6 +1,6 @@
 aweb_url: https://app.aweb.ai/api
 api_key: aw_sk_75a9270f60d9a0694cbd53cae7e6f5b31c8d0ebf932a86e01aeffd4654896f49
-active_team: aweb:juan.aweb.ai
+active_team: aweb:aweb.ai
 memberships:
     - team_id: aweb:juan.aweb.ai
       alias: amy
@@ -8,9 +8,14 @@ memberships:
       workspace_id: f758e6e9-4731-4944-a104-052995c2a3af
       cert_path: team-certs/aweb__juan.aweb.ai.pem
       joined_at: "2026-04-20T11:36:46Z"
+    - team_id: aweb:aweb.ai
+      alias: amy
+      workspace_id: ad83997e-5380-49a8-9867-aea3b31ebbd2
+      cert_path: team-certs/aweb__aweb.ai.pem
+      joined_at: "2026-04-21T21:49:36Z"
 human_name: juanre
 agent_type: agent
 canonical_origin: github.com/awebai/ai.aweb
-hostname: Mac.c.is
+hostname: altair.local
 workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/support
-updated_at: "2026-04-20T11:36:46Z"
+updated_at: "2026-04-21T21:56:22Z"

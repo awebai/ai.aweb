@@ -32,16 +32,27 @@ Steps taken (all on Juan's workstation, 2026-04-21 21:47 UTC):
    at `agents/support/.aw/team-certs/aweb__aweb.ai.pem`; membership
    added to `teams.yaml`.
 
-What's live: inbound to `aweb.ai/amy` routes to Amy's `did:aw`.
+Later the same day (2026-04-21 ~21:56 UTC), at Juan's direction,
+activated outbound-as-`aweb.ai/amy`:
+5. `aw id team switch aweb:aweb.ai`.
+6. `aw init --aweb-url https://app.aweb.ai/api` → aweb auto-provisioned
+   a second workspace for the new team, `workspace_id
+   ad83997e-5380-49a8-9867-aea3b31ebbd2`. Both memberships now carry
+   workspace_ids in `workspace.yaml`.
 
-What's dormant: the `aweb:aweb.ai` team membership exists but is not
-the active team, and no aweb-side coordination workspace has been
-provisioned for it. Amy's outbound sender address stays
-`juan.aweb.ai/amy`. Activating outbound-as-`aweb.ai/amy` requires
-`aw init` against the new team on Juan's decision; that's a separate
-step because it changes Amy's visible sender identity.
+Active sender is now `aweb.ai/amy`. Inbound for both addresses
+continues to reach Amy: mail is keyed by `did_aw` on the aweb side,
+so `aw mail inbox` returns the same envelope list regardless of which
+team is active. Switching is cosmetic (changes the cert the CLI
+presents, and thus the `from_address` in outbound messages).
 
-Affects: support agent (`agents/support/`).
+CLI gotcha surfaced during activation: `aw id team switch` updates
+`.aw/teams.yaml` but not `.aw/workspace.yaml.active_team`, so
+coordination commands continue using the old team until workspace.yaml
+is edited. Reported to Randy; workaround in Amy's handoff.md.
+
+Affects: support agent (`agents/support/`), `aw` CLI
+(`runTeamSwitch` in `cli/go/cmd/aw/id_team.go`).
 
 ---
 

@@ -4,18 +4,35 @@ Last updated: 2026-04-21
 
 ## Current state
 
-Amy is active as `juan.aweb.ai/amy` (persistent, self-custodial).
-Chat and mail with cross-team senders working as of 2026-04-21.
+Amy is `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ` (persistent, self-custodial).
+Two addresses, both `public`:
+- `aweb.ai/amy` — ACTIVE sender; team `aweb:aweb.ai`,
+  workspace_id `ad83997e-5380-49a8-9867-aea3b31ebbd2`
+- `juan.aweb.ai/amy` — inbound still routes here; team
+  `aweb:juan.aweb.ai`, workspace_id `f758e6e9-4731-4944-a104-052995c2a3af`
 
-**Second address (2026-04-21):** `aweb.ai/amy` is now bound to the
-same `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ`. Inbound to
-`aweb.ai/amy` routes to Amy. Reachability is `public`. A team
-`aweb:aweb.ai` exists and a persistent cert with
-`member_address=aweb.ai/amy` is installed at
-`.aw/team-certs/aweb__aweb.ai.pem`, but the active team remains
-`aweb:juan.aweb.ai` and no aweb-side workspace is provisioned for
-the new team. Outbound sender address is unchanged. See
-`../../docs/decisions.md` 2026-04-21 for the full procedure.
+Inbox is per-identity (did_aw), so mail to either address shows up
+in `aw mail inbox` regardless of active team. Outbound uses the
+active team's cert `member_address`, so messages Amy initiates
+now say `from: aweb.ai/amy`.
+
+### Switching sender address
+
+Both addresses point to the same `did:aw`, so switching is
+cosmetic — no trust or identity change. But two files must stay in
+sync. `aw id team switch <team_id>` updates `.aw/teams.yaml` and the
+cert `aw id cert show` serves, but does NOT update
+`.aw/workspace.yaml.active_team`. Coordination commands
+(`aw mail send`, `aw chat send-*`) read workspace.yaml, so they keep
+the old address until workspace.yaml is also edited. Until this is
+fixed (see Known issues below), a switch requires:
+
+```
+aw id team switch <team_id>
+# then edit .aw/workspace.yaml: set active_team to the same value
+```
+
+See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Known issues
 
@@ -24,7 +41,21 @@ the new team. Outbound sender address is unchanged. See
    Dave suspects stale TOFU pins from a previous key. Not blocking
    but erodes trust signal.
 
-2. **Channel plugin auto-acks mail** — The aweb channel plugin
+2. **`aw id team switch` leaves workspace.yaml stale** —
+   teams.yaml.active_team and the cert served by `aw id cert show`
+   flip, but workspace.yaml.active_team does not. Coordination
+   commands read workspace.yaml, so the switch is silently partial
+   until workspace.yaml is also updated. Filed as task
+   `aweb-aakn` (#761, team `aweb:juan.aweb.ai`). Fix: make
+   runTeamSwitch also load and save workspace.yaml via
+   applyTeamStateToWorkspaceCache.
+
+3. **`aw whoami` prints stale address when active team differs from
+   home namespace** — `address` is read from identity.yaml
+   (`juan.aweb.ai/amy`) while `domain` is read from the active team
+   (`aweb.ai`), producing a self-inconsistent record. Low priority.
+
+4. **Channel plugin auto-acks mail** — The aweb channel plugin
    acknowledges mail on delivery, so `aw mail inbox` shows nothing.
    Workaround: use `aw mail inbox --show-all` or read mail from
    channel events in real time. Dave flagged as design question for
