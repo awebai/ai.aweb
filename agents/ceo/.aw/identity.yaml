@@ -1,0 +1,8 @@
+did: did:key:z6MkqN4NE1xhXS8kr7hypSzzJ4nTXQi4qpWtqof7hKzd7g7h
+stable_id: did:aw:ToaaJKQU4yNUN7dB17wBPiB5fsy
+address: juan.aweb.ai/avi
+custody: self
+lifetime: persistent
+registry_url: https://api.awid.ai
+registry_status: registered
+created_at: "2026-04-21T22:23:43Z"

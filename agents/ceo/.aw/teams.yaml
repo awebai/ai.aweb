@@ -1,0 +1,6 @@
+active_team: aweb:juan.aweb.ai
+memberships:
+    - team_id: aweb:juan.aweb.ai
+      alias: avi
+      cert_path: team-certs/aweb__juan.aweb.ai.pem
+      joined_at: "2026-04-21T22:23:43Z"
