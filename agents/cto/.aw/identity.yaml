@@ -1,0 +1,8 @@
+did: did:key:z6MkpfXL8ijUSkuwevHQhYJaUwoD46EekWmdRc6jX7p5bmEm
+stable_id: did:aw:2TdFnyW1MyzkH5x8Q3hM7Pgx98Mn
+address: juan.aweb.ai/randy
+custody: self
+lifetime: persistent
+registry_url: https://api.awid.ai
+registry_status: registered
+created_at: "2026-04-21T22:01:35Z"

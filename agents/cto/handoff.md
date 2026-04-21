@@ -1,40 +1,54 @@
 # CTO Handoff
 
-Last updated: 2026-04-11
+Last updated: 2026-04-21
 
 ## Current state
 
-### aweb OSS (coordinator: John)
-- Close to shippable
-- Active work: identity-scoped messaging, CLI+server alignment
-- Ephemeral agents: dave, henry, ivy
+### aweb OSS — shipping
+- v1.16.0 server + CLI, awid-service v0.4.0.
+- Six server releases and three awid releases since 2026-04-11.
+- Identity/address split (2026-04-18 decision) complete on both aweb and ac sides.
+- Per-membership addresses live (v1.16.0) — the `aw init` for a second team auto-provisions a second workspace; the whole aweb.ai/amy activation today exercised this.
 
-### aweb-cloud (coordinator: Tom)
-- Mid-migration: auth bridge HMAC/API-key → team certificates
-- Not yet working end-to-end
-- Ephemeral agents: alice, bob
+### aweb-cloud (ac) — shipping
+- v0.5.3, pinned to `aweb>=1.16.0` and `awid-service>=0.4.0`.
+- Dashboard nav redesigned; admin cleanup tools are soft-delete + renamed to "retire".
+- Replace/Archive multi-address policy partially enforced (scoped to managed-assigned addresses for this release).
 
-### awid (coordinator: Goto)
-- Mid-migration alongside aweb
-- SOT rewritten April 6
+### awid
+- 0.4.0. Cert member-address validation live. DID registration split from address binding. Address registration idempotent. Migrations consolidated into 001_registry.sql.
+
+### Team structure — reality vs docs
+- Git log: every recent commit on both aweb and ac is authored by Juan with Claude Opus co-authorship. Branches (`henry`, `ivy`, `jack`, `bob`, `frank`, `leo`, `eve`) are workstream sandboxes inside Claude Code sessions.
+- `docs/team.md` describes a coordinator-oversees-ephemeral-devs structure that git history doesn't reflect. Coordinator handoffs (John/Tom/Goto) are stale to 2026-04-11. Unresolved — worth a conversation with Juan.
 
 ## Active concerns
 
-- Auth bridge refactor is subtle — cloud JWT → OSS team cert is not
-  a simple swap. Tom should be watching for shortcuts.
-- Cross-repo alignment: aweb and cloud must evolve together during
-  the migration. Check that John and Tom are communicating.
-- Coordinators are new — verify they're actually reading company docs
-  and catching invariant violations, not just rubber-stamping commits.
+- **runTeamSwitch bug (aweb-aakn, P2)**: Amy reproduced today. Real fix documented (add workspace-cache update after SaveTeamState in `cli/go/cmd/aw/id_team.go:runTeamSwitch`).
+- **Branch preservation pending decision**:
+  - aweb: `beadhub-legacy` (187 ahead, 1227 behind) — "legacy" in name suggests intentional preservation.
+  - ac: `aaga-archive` (107 ahead, 1171 behind) — "archive" in name same.
+  - ac: `frank-docs` (8 ahead, 259 behind) — pricing change already re-landed on main via a different commit; remaining site content reshuffled. Probably drop, but not yet deleted.
+- **docs/vision.md deletion aftermath**: 22 references across 10 AGENTS.md/README files still point at the deleted doc. Wake-up routines reference it. Sweep needed, but scope (whether to replace references with invariants.md + user-journey.md + value-proposition.md, or just remove) is a conversation with Juan.
+- **Cross-repo is aligned** for now. Watch: per-membership address features on the cloud side are only partially exercised yet (e.g. Replace/Archive scope explicitly narrow).
+
+## Actions taken this wake-up (2026-04-21)
+
+- Pruned stale branches: aweb `henry`, `ivy`, `jack`, `fix/apikey-bootstrap-rebuild`, `deploy-awid-landing`; ac `bob`, `deploy-landing`, `eve`, `frank`, `leo` (remote + local).
+- Committed `docs/vision.md` deletion (ai.aweb).
+- Committed formatter pass on `docs/team.md`, `docs/capabilities.md`, `docs/aweb-high-level.md` (no content change).
+- Committed repo-path addition to `agents/coord-aweb/AGENTS.md`.
+- Updated `status/engineering.md` (was stale to 2026-04-10).
+- Confirmed Amy's report that the `aw id team switch` bug (aweb-aakn) is real: diagnosis in `id_team.go:408` correct.
+
+## What to check FIRST on next wake-up
+
+1. Has Juan responded on the preserved branches (`beadhub-legacy`, `aaga-archive`, `frank-docs`)?
+2. Did the aweb-aakn runTeamSwitch fix ship (or was it deprioritized)?
+3. Did Juan or Avi update the `docs/vision.md` references situation — is there a replacement document or a decision to just remove the references?
+4. Coordinator handoffs still stale? If yes, raise with Juan whether that structure is real or aspirational.
 
 ## Key context
 
-- Crypto identity migration was a deliberate architectural choice.
-  Don't let anyone revert to API-key patterns.
-- The 2+2 rule is enforced by coordinators, but verify they're doing it.
-
-## Next check priorities
-
-1. Check in with John, Tom, Goto — are they catching issues?
-2. Cross-repo view: are aweb and cloud aligned?
-3. Vision.md priorities still match what's being built?
+- Crypto identity migration is complete end-to-end. The 2026-04-06 decision has landed in full.
+- The identity/address split (2026-04-18) is the most subtle recent architectural change — the CLI/cloud flow is two-step now (register_did then bind address) with a local partial-init file for resume-from-partial. Watch for anyone re-bundling these in future work.
