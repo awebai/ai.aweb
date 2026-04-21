@@ -1,28 +1,49 @@
 # Support (Amy) Handoff
 
-Last updated: 2026-04-18
+Last updated: 2026-04-21
 
 ## Current state
 
-Not yet active. Activation preconditions:
+Amy is active as `juan.aweb.ai/amy` (persistent, self-custodial).
+Chat and mail with cross-team senders working as of 2026-04-21.
 
-1. aweb-cloud operational (custodial identity for Amy at `aweb.ai/amy`) — in progress pre-launch
-2. OSS shippable so `aw init` works for requesters — on track; aweb main is post-v1.9.0
-3. Trigger model: claude channels (confirmed with Juan)
-4. At least one requester to exist
+## Known issues
 
-Amy is contacted by agents, not by humans directly. Reply format
-accordingly: lead with the CLI command or doc ref, prose follows.
+1. **IDENTITY MISMATCH on outbound messages** — Amy's messages arrive
+   at other agents marked `IDENTITY MISMATCH` / `verified=false`.
+   Dave suspects stale TOFU pins from a previous key. Not blocking
+   but erodes trust signal.
 
-## Knowledge base status
+2. **Channel plugin auto-acks mail** — The aweb channel plugin
+   acknowledges mail on delivery, so `aw mail inbox` shows nothing.
+   Workaround: use `aw mail inbox --show-all` or read mail from
+   channel events in real time. Dave flagged as design question for
+   Juan. Two options discussed: (a) channel stops auto-acking, agent
+   acks explicitly; (b) add a "recently delivered" view.
 
-- `agent-guide.txt` was renamed to `agent-guide.md` in aweb — CLAUDE.md
-  now points at the correct path.
-- Added `../../docs/support/agent-identity-recovery.md`, synced from
-  `../ac/docs/support/` via `make docs-sync` at the ai.aweb root.
-  Re-run after any ac-side edits to the runbook.
-- Identity docs in aweb are newly rewritten (v1.8.1+): `identity-guide.md`
-  and `trust-model.md` are the current sources.
+## Resolved issues
+
+1. **Cross-team chat addressing** (fixed 2026-04-20) — Senders from
+   other teams now show fully qualified address in
+   `aw chat pending --json` `participant_addresses` field. Reply
+   using full address: `aw chat send-and-wait <domain>/<alias> "msg"`
+
+2. **Cross-team mail from_address** (fixed 2026-04-21) — Mail
+   `from_address` now shows fully qualified address instead of raw
+   `did:key`. Root cause was identity-auth path lacking team context;
+   henry fixed the derivation.
+
+3. **Channel event from attribute** (fixed 2026-04-21) — Channel
+   events now show `from="gsk.aweb.ai/gsk"` instead of bare alias.
+
+## Conversations
+
+### gsk (gsk.aweb.ai/gsk)
+- First contact 2026-04-20. Juan asked them to reach out.
+- Onboarding stage 1 — getting oriented, no active tasks yet.
+- Answered: mail vs chat, workspace status commands, team conventions,
+  getting-started steps. Replied to intro mail.
+- No open questions.
 
 ## Escalation cheat sheet
 
@@ -30,7 +51,7 @@ accordingly: lead with the CLI command or doc ref, prose follows.
 |-------|-------|
 | Bugs / UX / features / stories | Avi |
 | Identity / namespace / team recovery | Tom first, Randy if slow |
-| Engineering / CLI / protocol | Randy |
+| Engineering / CLI / protocol | Randy (or dave for OSS) |
 | Needs `ac` access | Tom |
 | Needs `co.aweb` access | Avi |
 | Urgent, no response | Juan |
@@ -38,9 +59,21 @@ accordingly: lead with the CLI command or doc ref, prose follows.
 Amy does API-first triage on identity recovery cases but does not
 execute dashboard Replace — that is a human action.
 
-## When requesters start arriving, track
+## Knowledge base status
 
-- Common questions (patterns suggest doc or product improvements)
-- Bugs reported and whether they reached Avi
-- Identity recovery cases and whether they reached Tom or Randy
-- Feature requests reported and whether they reached Avi
+- `agent-guide.md` in aweb is the current path.
+- `../../docs/support/agent-identity-recovery.md` synced from ac via
+  `make docs-sync`. Re-run after any ac-side edits.
+- Identity docs in aweb are v1.8.1+: `identity-guide.md` and
+  `trust-model.md` are current sources.
+
+## Patterns to watch
+
+- Cross-team senders must have a registered address at awid to be
+  reachable for replies. If `from_address` shows bare alias or
+  raw `did:key`, the sender may lack a registered address or be
+  running an old CLI.
+- Sessions created before server fixes may cache stale data — a fresh
+  session may be needed.
+- With channel plugin active, always use `aw mail inbox --show-all`
+  to see all mail, since the channel auto-acks on delivery.

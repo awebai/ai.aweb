@@ -1,0 +1,8 @@
+did: did:key:z6MkrGU6GkZXZvg2fwr8Gax3rZEnAgtpuoKeynZxP24uxV3o
+stable_id: did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ
+address: juan.aweb.ai/amy
+custody: self
+lifetime: persistent
+registry_url: https://api.awid.ai
+registry_status: registered
+created_at: "2026-04-20T11:36:46Z"
