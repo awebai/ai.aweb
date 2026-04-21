@@ -6,27 +6,27 @@ How aweb.ai is organized. Every agent reads this on wake-up.
 
 ### Company agents (permanent, run from co.aweb)
 
-| Role | Who | Owns |
-|------|-----|------|
-| CTO | Randy | Engineering quality, dev team oversight, architecture decisions |
-| CEO | Avi | Product direction (with Randy), approves content/outreach |
-| Comms | Charlene | Content pipeline, writing, outreach monitoring, voice |
-| Board | Enoch | Oversight, keeps Avi and Randy accountable |
-| Support | Amy | User-facing help, feedback routing |
+| Role    | Who      | Owns                                                            |
+|---------|----------|-----------------------------------------------------------------|
+| CTO     | Randy    | Engineering quality, dev team oversight, architecture decisions |
+| CEO     | Avi      | Product direction (with Randy), approves content/outreach       |
+| Comms   | Charlene | Content pipeline, writing, outreach monitoring, voice           |
+| Board   | Enoch    | Oversight, keeps Avi and Randy accountable                      |
+| Support | Amy      | User-facing help, feedback routing                              |
 
 ### Repo coordinators (permanent, run from co.aweb, review code in repos)
 
-| Role | Who | Repo | Owns |
-|------|-----|------|------|
-| Coord aweb | John | ../aweb | Code review, invariant enforcement, owns main |
-| Coord cloud | Tom | ../ac | Code review, cloud/OSS alignment, owns main |
-| Coord awid | Goto | ../aweb/awid/ | Code review, identity architecture integrity |
+| Role        | Who  | Repo          | Owns                                          |
+|-------------|------|---------------|-----------------------------------------------|
+| Coord aweb  | John | ../aweb       | Code review, invariant enforcement, owns main |
+| Coord cloud | Tom  | ../ac         | Code review, cloud/OSS alignment, owns main   |
+| Coord awid  | Goto | ../aweb/awid/ | Code review, identity architecture integrity  |
 
 ### Founders (human)
 
-| Who | Owns |
-|-----|------|
-| Juan | Final calls on architecture, strategy, direction |
+| Who     | Owns                                                 |
+|---------|------------------------------------------------------|
+| Juan    | Final calls on architecture, strategy, direction     |
 | Eugenie | Business development, outreach execution, publishing |
 
 ## How direction gets set
@@ -94,12 +94,12 @@ Enoch writes `status/weekly.md`. Everyone reads it.
 
 Each role maintains a status file that others read:
 
-| File | Maintained by | Read by |
-|------|--------------|---------|
-| `status/engineering.md` | Randy | Avi, Enoch, Charlene (for content) |
-| `status/product.md` | Avi | Enoch, Charlene |
-| `status/outreach.md` | Charlene | Avi, Enoch |
-| `status/weekly.md` | Enoch | Everyone |
+| File                    | Maintained by | Read by                            |
+|-------------------------|---------------|------------------------------------|
+| `status/engineering.md` | Randy         | Avi, Enoch, Charlene (for content) |
+| `status/product.md`     | Avi           | Enoch, Charlene                    |
+| `status/outreach.md`    | Charlene      | Avi, Enoch                         |
+| `status/weekly.md`      | Enoch         | Everyone                           |
 
 ## Reaching humans
 
@@ -148,11 +148,11 @@ design mistakes.
 
 ### Current dev agents (ephemeral)
 
-| Repo | Agents | Overseen by |
-|------|--------|-------------|
-| aweb | dave (coordinator), henry, ivy (developers) | John |
-| ac | alice (coordinator), bob (developer) | Tom |
-| aweb/awid | (shared with aweb agents) | Goto |
+| Repo      | Agents                                      | Overseen by |
+|-----------|---------------------------------------------|-------------|
+| aweb      | dave (coordinator), henry, ivy (developers) | John        |
+| ac        | alice (coordinator), bob (developer)        | Tom         |
+| aweb/awid | (shared with aweb agents)                   | Goto        |
 
 Randy oversees the coordinators. The coordinators oversee the
 ephemeral agents.
