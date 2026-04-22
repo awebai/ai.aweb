@@ -1,55 +1,67 @@
 # CTO Handoff
 
-Last updated: 2026-04-21
+Last updated: 2026-04-22
 
 ## Current state
 
-### aweb OSS — shipping
-- v1.16.0 server + CLI, awid-service v0.4.0.
-- Six server releases and three awid releases since 2026-04-11.
-- Identity/address split (2026-04-18 decision) complete on both aweb and ac sides.
-- Per-membership addresses live (v1.16.0) — the `aw init` for a second team auto-provisions a second workspace; the whole aweb.ai/amy activation today exercised this.
+### Active epic: aweb-aakq (Collapse duplicate SoTs for active-team and active-address)
 
-### aweb-cloud (ac) — shipping
-- v0.5.3, pinned to `aweb>=1.16.0` and `awid-service>=0.4.0`.
-- Dashboard nav redesigned; admin cleanup tools are soft-delete + renamed to "retire".
-- Replace/Archive multi-address policy partially enforced (scoped to managed-assigned addresses for this release).
+Filed 2026-04-21. 9 subtasks (.1–.9). Grace (juan.aweb.ai/grace) owns implementation; John (juan.aweb.ai/john, coord-aweb) owns code review.
 
-### awid
-- 0.4.0. Cert member-address validation live. DID registration split from address binding. Address registration idempotent. Migrations consolidated into 001_registry.sql.
+- **.1, .2 shipped** on main (commits fcbcc00, 05c46b2): channel-plugin + CLI precedence flips. aako-half is fixed pending the 1.17.0 / channel 1.3.0 release.
+- **.3, .4 in flight, NO-GO from John**: Grace's initial refactor deleted `migrateTeamStateFromWorkspace` from `LoadTeamState`. That's the upgrade bridge for users on 1.11.0-1.15.0 with only workspace.yaml. Grace is reinstating the migration path; workspace.yaml.active_team parsed for migration only, not runtime authority; positive test asserts upgrade flow works. John delta-reviews on her signal.
+- **.5, .6** (runTeamSwitch cleanup, doctor migration) depend on .3/.4.
+- **.7** (e2e): spec tightened 2026-04-22 after John flagged that Phase 12d's `aw init`-after-switch masks aakn. Target is `scripts/e2e-oss-user-journey.sh` Phase 12d or 12e; must-fail-on-1.16.0 + must-pass-on-full-Shape-A as acceptance.
+- **.8** (release): acceptance now requires `make test-e2e` green per Juan's 2026-04-22 standing release-gate policy.
+- **.9** (follow-up from John's review of .2): surface cert-load errors in finalizeWorkspaceSelection instead of silent fallback. P2, blocks .8.
 
-### Team structure — reality vs docs
-- Git log: every recent commit on both aweb and ac is authored by Juan with Claude Opus co-authorship. Branches (`henry`, `ivy`, `jack`, `bob`, `frank`, `leo`, `eve`) are workstream sandboxes inside Claude Code sessions.
-- `docs/team.md` describes a coordinator-oversees-ephemeral-devs structure that git history doesn't reflect. Coordinator handoffs (John/Tom/Goto) are stale to 2026-04-11. Unresolved — worth a conversation with Juan.
+### Policies codified today
+
+- `docs/decisions.md` entry (commit 8f5baf3): release gate — no release of anything without full e2e user journey green. Standing rule, all repos, all agents.
+- `agents/coord-*/AGENTS.md` + `agents/cto/AGENTS.md` (commit de9d11c): review workflow uses the symlinked shared working tree (`git -C aweb/ac/awid log|show`), not chat-pasted diffs. Dev commits locally, coordinator reads from their own agent dir, chats go/no-go, dev pushes on approval.
+
+### New open question (not blocking anything)
+
+John surfaced a follow-on architectural concern: teams.yaml.memberships and workspace.yaml.memberships share four fields (team_id, alias, cert_path, joined_at). Same class of drift risk as aakq.active_team, lower impact because nothing routinely mutates them after join. I asked John to file as a P4 task-candidate (not epic) on the aweb tracker, with both framings open (drop-from-teams.yaml vs. workspace-becomes-derived-view). Architectural commit needs Juan buy-in before spec-writing. John writes the task.
+
+### Team dynamics observed today
+
+- 2+2 loop functioning: Grace and John both independently caught the migration-path break in aakq.3/.4.
+- John's review rigor: caught a real spec defect (aakq.9, cert-load error swallow), verified architectural claim I made against awid-sot.md (found I was wrong in one direction — cross-namespace membership is designed-for, not validation-blocked), flagged the membership-field overlap one level up.
+- Grace's TDD discipline: failing tests first on every subtask; scope-clean commits; honest commit messages (explicitly called out the adjacent helpers.go fix in .2).
+- Both agents respect the aweb repo convention (no WIP branches, stay on main, self-review + sync).
 
 ## Active concerns
 
-- **runTeamSwitch bug (aweb-aakn, P2)**: Amy reproduced today. Real fix documented (add workspace-cache update after SaveTeamState in `cli/go/cmd/aw/id_team.go:runTeamSwitch`).
-- **Branch preservation pending decision**:
-  - aweb: `beadhub-legacy` (187 ahead, 1227 behind) — "legacy" in name suggests intentional preservation.
-  - ac: `aaga-archive` (107 ahead, 1171 behind) — "archive" in name same.
-  - ac: `frank-docs` (8 ahead, 259 behind) — pricing change already re-landed on main via a different commit; remaining site content reshuffled. Probably drop, but not yet deleted.
-- **docs/vision.md deletion aftermath — done**: 22 references across 10 files swept 2026-04-21. Wake-up routines now point at `status/engineering.md` / `status/product.md` for current focus; invariants/user-journey/value-proposition remain the north-star reads. Each status file gained a "Current focus" section (3–5 lines, rewritten every wake-up).
-- **Cross-repo is aligned** for now. Watch: per-membership address features on the cloud side are only partially exercised yet (e.g. Replace/Archive scope explicitly narrow).
+- **Migration bridge for aakq.3/.4**: Grace is restoring `migrateTeamStateFromWorkspace`. Must verify on delta-review that the second LoadTeamState after upgrade still works (teams.yaml actually written to disk, not just in-memory).
+- **aakq.8 release gate**: coordinator (John) must own verifying `make test-e2e` green before the release commit lands. Not yet set up; note to raise with John when we're closer to .8.
+- **Coordinator reality**: John is running and working well. Tom (coord-cloud) and Goto (coord-awid) status unknown — haven't seen activity from them in this session. When aakq work touches ac (it doesn't directly; only ac's aweb dep pin bumps), Tom needs to be online. Flag if we hit .8 without Tom around.
 
-## Actions taken this wake-up (2026-04-21)
+## Actions taken this session (2026-04-22)
 
-- Pruned stale branches: aweb `henry`, `ivy`, `jack`, `fix/apikey-bootstrap-rebuild`, `deploy-awid-landing`; ac `bob`, `deploy-landing`, `eve`, `frank`, `leo` (remote + local).
-- Committed `docs/vision.md` deletion (ai.aweb).
-- Committed formatter pass on `docs/team.md`, `docs/capabilities.md`, `docs/aweb-high-level.md` (no content change).
-- Committed repo-path addition to `agents/coord-aweb/AGENTS.md`.
-- Swept all `vision.md` references across 10 files; pointed wake-up routines at `status/engineering.md` / `status/product.md` instead. Each status file gets a "Current focus" section.
-- Updated `status/engineering.md` with Current focus section (was stale to 2026-04-10).
-- Confirmed Amy's report that the `aw id team switch` bug (aweb-aakn) is real: diagnosis in `id_team.go:408` correct.
+- Filed epic aweb-aakq + 8 subtasks + all dependencies.
+- Added aakq.9 after John's review of .2 surfaced the cert-load error swallow.
+- Tightened aakq.7 and aakq.8 descriptions after John identified Phase 12d masks aakn.
+- Committed `docs/decisions.md` entry for Juan's release-gate policy (commit 8f5baf3).
+- Committed review-via-symlink workflow corrections across four AGENTS.md files (commit de9d11c).
+- Briefed John (now coord-aweb), handed off full review authority to him starting .3.
+- Responded to Grace's pre-commit question on .2 (helpers.go sanitized-return fix), approved.
+- Responded to John's architectural check on domain/address consistency (cross-namespace membership is designed-for; saved as project memory).
+- Responded to John's NO-GO flip (Grace adjusting; reiterated the removal-of-compat-shim is Juan-level framing).
+- Asked John to file the membership-field overlap observation as P4 task-candidate.
 
 ## What to check FIRST on next wake-up
 
-1. Has Juan responded on the preserved branches (`beadhub-legacy`, `aaga-archive`, `frank-docs`)?
-2. Did the aweb-aakn runTeamSwitch fix ship (or was it deprioritized)?
-3. Are the new "Current focus" sections actually being rewritten each wake-up (engineering.md, and did Avi start one in product.md)?
-4. Coordinator handoffs still stale? If yes, raise with Juan whether that structure is real or aspirational.
+1. `aw task list | grep aakq` — status of all 9 subtasks. Expected: .1, .2 closed; .3, .4 open or in_progress pending Grace's migration-path fix.
+2. `git -C aweb log --oneline -10` — what shipped on main today (after this handoff writes).
+3. John's handoff — any delta-review he did on Grace's adjusted .3/.4.
+4. Grace's status in the task tracker — any new subtask claims.
+5. Any new aweb-aak* tasks John filed for the membership-field overlap.
 
 ## Key context
 
-- Crypto identity migration is complete end-to-end. The 2026-04-06 decision has landed in full.
-- The identity/address split (2026-04-18) is the most subtle recent architectural change — the CLI/cloud flow is two-step now (register_did then bind address) with a local partial-init file for resume-from-partial. Watch for anyone re-bundling these in future work.
+- aakq is Shape A (architecturally clean, correct over fast), not Shape B (read-through cache). Juan chose correct.
+- Per-membership address model (aweb 1.16.0, 2026-04-21 decision) is what made aakn/aako user-visible. Same class of bug exists latent in the membership-fields overlap (flagged by John).
+- Cross-namespace team membership is designed-for: cert.member_address is NOT constrained to team namespace. When reviewing anything that equates team-namespace with member-address, check it holds for cross-namespace members (memory: aweb_cross_namespace_membership.md).
+- Review workflow: shared working tree via symlink, no diff-paste (memory: feedback_review_via_symlink.md).
+- Juan's standing release-gate: full e2e user journey green before any release. Applies to every repo (decisions.md 2026-04-22).
