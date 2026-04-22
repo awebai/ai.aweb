@@ -6,6 +6,36 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-22 — Release gate: full e2e user journey must pass
+
+**Decision maker:** Juan (relayed via John / coord-aweb)
+
+No release of anything (aweb server, aw CLI, awid-service,
+@awebai/claude-channel, aweb-cloud) is cut before the full e2e user
+journey test passes green. In the aweb repo, that's
+`scripts/e2e-oss-user-journey.sh` run via `make test-e2e`. The full
+phase suite must run clean — no skipped phases, no warnings-only
+passes. In-flight tasks that change user-facing behavior must land
+their coverage inside that journey, not alongside it as a separate
+test file.
+
+Why: two coordinated bugs (aweb-aakn, aweb-aako) shipped as part of
+v1.16.0 without the multi-team flow being covered end-to-end. The
+per-membership address phase (Phase 12d, commit 89449f1) called
+`aw init` after every `aw id team switch`, which masked aakn by
+rewriting workspace.yaml. A proper regression test has to exercise
+what real users do, not what tests do for convenience.
+
+Applies to: every release, every repo, every agent doing release
+work. This is a standing rule, not a one-off for the aweb-aakq
+epic that surfaced it.
+
+Affects: `aweb-aakq.8` release acceptance criteria (explicit gate);
+future release subtasks inherit the same gate. Coordinators (John,
+Tom, Goto) enforce in their respective repos.
+
+---
+
 ## 2026-04-21 — Amy gets a second address at aweb.ai/amy
 
 **Decision maker:** Juan
