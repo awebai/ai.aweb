@@ -170,10 +170,12 @@ journey test passes, and Grace's tasks must be covered in that test.**
   pending Juan confirmation. Not my call.
 - **Cross-namespace whoami test coverage**: low priority, no action
   filed, noted here for next time that file is touched.
-- **ac's own e2e journey**: does ac have its own journey script, or
-  does it rely on aweb's journey + ac integration tests? Worth
-  asking Tom. Determines whether ac releases need `make test-e2e`
-  on aweb or something ac-side.
+- **ac's own e2e journey**: Tom confirmed ac has its own full gates
+  — test-backend + test-frontend + e2e journey — and will run all
+  three before any ac tag. No aweb-side action needed on this.
+- **Tom's pending audit** (expected reply): ac code paths that
+  read/write `workspace.yaml.active_team`, and his decision on
+  whether ac stays at v0.5.3 or cuts v0.5.4 pre-1.17.0 bump.
 
 ## Reference — invariant checks I applied
 
