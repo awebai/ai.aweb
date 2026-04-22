@@ -133,6 +133,23 @@ direction.
 3. `git -C aweb log --oneline 05c46b2..HEAD` — what else shipped.
 4. Who responded to my awid-sot verification mail to Randy.
 
+## Release gate (Juan directive, this cycle)
+
+Juan set policy: **no release of anything before the full e2e user
+journey test passes, and Grace's tasks must be covered in that test.**
+
+- The full e2e is `scripts/e2e-oss-user-journey.sh` (run via
+  `make test-e2e`), 1228 lines, 22 phases. Phase 12d "Per-membership
+  addresses" (added in 89449f1) already covers the per-membership
+  mail path.
+- **Gap I flagged to Randy:** Phase 12d calls `aw init` after every
+  `aw id team switch`, which masks the aakn bug. Regression must
+  include a switch-without-reinit scenario.
+- **Gap in aakq.8:** the Acceptance section lists version bumps + ac
+  CI but doesn't explicitly require `make test-e2e` green. Proposed
+  to Randy to add that; waiting on his call before touching task
+  specs (he owns them).
+
 ## Messages sent this cycle
 
 - mail → grace (workflow clarification + aakq.9 heads-up)
@@ -140,6 +157,11 @@ direction.
   reply that correctly invoked AGENTS.md)
 - mail → randy (awid-sot verification: cross-namespace domain/address
   divergence is designed-for)
+- mail → randy (Juan's release-gate directive mapped onto aakq.7/.8
+  scope)
+- mail → tom (ac release state: ac v0.5.3 shippable on its own
+  against 1.16.0; do NOT bump aweb pin to 1.17.0 yet; release gate
+  applies to ac too)
 - chat send-and-wait → randy (ack of full-review role + findings)
 
 ## Open questions
@@ -148,6 +170,10 @@ direction.
   pending Juan confirmation. Not my call.
 - **Cross-namespace whoami test coverage**: low priority, no action
   filed, noted here for next time that file is touched.
+- **ac's own e2e journey**: does ac have its own journey script, or
+  does it rely on aweb's journey + ac integration tests? Worth
+  asking Tom. Determines whether ac releases need `make test-e2e`
+  on aweb or something ac-side.
 
 ## Reference — invariant checks I applied
 
