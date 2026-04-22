@@ -1,0 +1,16 @@
+aweb_url: https://app.aweb.ai/api
+api_key: aw_sk_23539d2526340474fa3a8d34283946aca6c36daa5ce5c9ec39f374acc1c1436e
+active_team: aweb:juan.aweb.ai
+memberships:
+    - team_id: aweb:juan.aweb.ai
+      alias: tom
+      role_name: coordinator
+      workspace_id: 89645a85-e3ba-4180-a14e-e2bb0dc82866
+      cert_path: team-certs/aweb__juan.aweb.ai.pem
+      joined_at: "2026-04-22T07:37:23Z"
+human_name: juanre
+agent_type: agent
+canonical_origin: github.com/awebai/ai.aweb
+hostname: altair.local
+workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/coord-cloud
+updated_at: "2026-04-22T07:37:23Z"
