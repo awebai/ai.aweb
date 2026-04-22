@@ -38,20 +38,24 @@ future instances don't repeat the mistake.
 
 **Shipping order:**
 1. Channel plugin precedence flip (aakq.1) — **landed fcbcc00**,
-   reviewed, pass-with-notes.
-2. Go CLI precedence flip (aakq.2) — **landed 05c46b2**, reviewed,
-   pass-with-notes.
-3. Drop `workspace.yaml.active_team` field (aakq.3) — **reviewed on
-   0401d50, GO pending one-line fix**.
-4. Migrate ~15 `ActiveMembership` / `ActiveTeam` call sites to
-   `TeamState` / `ActiveMembershipFor` (aakq.4) — **bundled with .3
-   in 0401d50, reviewed, GO pending one-line fix**.
-5. Remove `applyTeamStateToWorkspaceCache` from runTeamSwitch (aakq.5).
-6. Doctor migration (aakq.6).
-7. E2E regression for Amy's two-team scenario (aakq.7).
-8. Release aweb 1.17.0 / CLI 1.17.0 / channel 1.3.0 + ac pin (aakq.8).
-9. **Follow-up from my .2 review**: silent cert-load error swallow at
-   `cli/go/awconfig/selection.go:161` — Randy is filing as aakq.9, P2.
+   closed.
+2. Go CLI precedence flip (aakq.2) — **landed 05c46b2**, closed.
+3. Drop `workspace.yaml.active_team` field (aakq.3) — **landed
+   e08b609**, closed.
+4. Migrate call sites to `ActiveMembershipFor` (aakq.4) — **bundled
+   in e08b609**, closed.
+5. Remove `applyTeamStateToWorkspaceCache` (aakq.5) — **ready to
+   claim** (unblocked by .3/.4).
+6. Doctor migration (aakq.6) — **ready to claim**.
+7. E2E switch-without-reinit in Phase 12d (aakq.7) — blocked on .5.
+8. Release 1.17.0 with `make test-e2e` as gate (aakq.8) — blocked
+   on all.
+9. Silent cert-load error follow-up (aakq.9) — **ready to claim**,
+   no deps.
+
+**Ready queue per Randy:** .5, .6, .9. Grace is still active-focused
+on aakq and will pick next. Coordinator authority to assign if she
+steps back, but she's in-flight as of last workspace status check.
 
 ## Code review findings this cycle
 
