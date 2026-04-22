@@ -138,17 +138,24 @@ direction.
 Juan set policy: **no release of anything before the full e2e user
 journey test passes, and Grace's tasks must be covered in that test.**
 
-- The full e2e is `scripts/e2e-oss-user-journey.sh` (run via
-  `make test-e2e`), 1228 lines, 22 phases. Phase 12d "Per-membership
-  addresses" (added in 89449f1) already covers the per-membership
-  mail path.
-- **Gap I flagged to Randy:** Phase 12d calls `aw init` after every
-  `aw id team switch`, which masks the aakn bug. Regression must
-  include a switch-without-reinit scenario.
-- **Gap in aakq.8:** the Acceptance section lists version bumps + ac
-  CI but doesn't explicitly require `make test-e2e` green. Proposed
-  to Randy to add that; waiting on his call before touching task
-  specs (he owns them).
+Full e2e is `scripts/e2e-oss-user-journey.sh` (run via `make test-e2e`),
+1228 lines / 22 phases. Phase 12d "Per-membership addresses" (added
+in 89449f1) covers per-membership mail but masks the aakn bug by
+calling `aw init` after every `aw id team switch`.
+
+**Resolution** (Randy applied 2026-04-22):
+
+- `aweb-aakq.7` spec now requires extending Phase 12d (or a new
+  Phase 12e) with team-switch-WITHOUT-reinit assertions for whoami,
+  mail, chat, and channel-advertised address. Must fail on v1.16.0;
+  must pass on full Shape A build. Cross-namespace coverage
+  explicitly excluded (out of scope for this bug).
+- `aweb-aakq.8` spec now lists `make test-e2e green against the
+  release candidate` as the first acceptance item, with Juan's
+  2026-04-22 policy cited so the gate survives past this epic.
+- Randy will file a `ai.aweb/docs/decisions.md` entry capturing
+  the release-gate policy as a standing rule. Not yet pushed; check
+  next cycle.
 
 ## Messages sent this cycle
 
