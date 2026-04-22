@@ -127,6 +127,26 @@ reviewer or tell the agent to pause until one is available.
 The exception: trivial fixes (typos, config changes, one-line bugs)
 don't need the full 2+2 process.
 
+## How reviews work in this codebase
+
+Dev agents commit directly to the shared working tree (repo AGENTS.md
+files in aweb and ac forbid WIP branches — everyone stays on their
+assigned branch or main). Coordinators have the relevant repo
+symlinked into their own agent dir (e.g., `coord-aweb/aweb`,
+`coord-cloud/ac`, `coord-awid/awid`), which is literally the same
+working tree the dev is committing to.
+
+When a dev wants pre-push review, they commit locally and ping
+their coordinator. The coordinator reads the commit directly via
+`git -C <repo> log` / `git -C <repo> show`. No diff-paste step.
+Coordinator chats go/no-go; dev pushes on approval.
+
+Do NOT tell devs to paste diffs into chat as part of the review
+protocol. The symlinked shared working tree makes diff-paste
+redundant and loses git context (commit message, parent, author).
+Each coordinator's AGENTS.md under "How to review dev agents' work"
+has the specific `git -C <repo>` invocations.
+
 ## Communication
 
 | To | When | How |

@@ -88,6 +88,32 @@ aw workspace status
 - Are two agents touching the same area without coordination?
 - Is anyone stuck (long time since last commit)?
 
+### How to review dev agents' work
+
+Dev agents commit directly to the shared working tree (aweb repo's
+AGENTS.md forbids WIP branches — everyone stays on their assigned
+branch or on main). The aweb repo is symlinked into your dir as
+`aweb/`, so you read their commits from your own workspace:
+
+```bash
+git -C aweb log --oneline -10          # what they shipped
+git -C aweb show <commit>              # full diff of one commit
+git -C aweb diff <sha>..HEAD           # stack of changes
+```
+
+When a dev agent wants pre-push review (the pattern for anything
+larger than a trivial fix), they commit locally and ping you. You
+read the commit from your shared working tree, chat go/no-go, they
+push on approval.
+
+**Do NOT ask devs to paste diffs into chat.** They've already
+committed; you can already see it. Pasting is duplicate work and
+loses git context (commit message, parent, author).
+
+If the commit is missing from `git -C aweb log` even though the
+dev pinged you, it means they haven't committed locally yet — tell
+them to commit before the review, not after.
+
 ### Act on what you find
 
 - Design violation → `aw chat send-and-wait <agent> "This change

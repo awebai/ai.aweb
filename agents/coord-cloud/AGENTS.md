@@ -83,6 +83,28 @@ aw workspace status
 - Is the auth bridge work progressing or stuck?
 - Is anyone building dashboard features when the auth bridge isn't done?
 
+### How to review dev agents' work
+
+Dev agents commit directly to the shared working tree (ac repo's
+AGENTS.md forbids WIP branches — everyone stays on their assigned
+branch or on main). The ac repo is symlinked into your dir as
+`ac/`, so you read their commits from your own workspace:
+
+```bash
+git -C ac log --oneline -10            # what they shipped
+git -C ac show <commit>                # full diff of one commit
+git -C ac diff <sha>..HEAD             # stack of changes
+```
+
+When a dev agent wants pre-push review (the pattern for anything
+larger than a trivial fix), they commit locally and ping you. You
+read the commit from your shared working tree, chat go/no-go, they
+push on approval.
+
+**Do NOT ask devs to paste diffs into chat.** They've already
+committed; you can already see it. Pasting is duplicate work and
+loses git context (commit message, parent, author).
+
 ### Act on what you find
 
 Same patterns as John (coord-aweb): message agents directly for

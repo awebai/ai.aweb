@@ -79,6 +79,27 @@ For every change to awid, verify:
 Same standards: tests required, no shortcuts, scope proportional to
 task.
 
+### How to review dev agents' work
+
+Dev agents commit directly to the shared working tree (aweb repo's
+AGENTS.md forbids WIP branches — everyone stays on their assigned
+branch or on main). The awid directory inside aweb is symlinked
+into your dir as `awid/`, so you read commits from your own
+workspace:
+
+```bash
+git -C awid log --oneline -10 -- .     # what they shipped in awid/
+git -C awid show <commit>              # full diff
+git -C awid diff <sha>..HEAD -- .      # stack of changes scoped to awid
+```
+
+When a dev agent wants pre-push review, they commit locally and
+ping you. You read the commit from your shared working tree, chat
+go/no-go, they push on approval.
+
+**Do NOT ask devs to paste diffs into chat.** They've already
+committed; you can already see it.
+
 ## What you own
 
 - Code review of every significant change to `aweb/awid/`
