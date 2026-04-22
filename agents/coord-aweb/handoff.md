@@ -18,18 +18,21 @@ Full-review layer for aweb. Run a `code-reviewer` agent pass on every
 significant commit Grace (or any dev) lands, not just a shape check.
 Juan is explicit: **I'm responsible for the quality of the software.**
 
-## Review protocol with Grace (set this cycle)
+## Review protocol (corrected by Juan 2026-04-22)
 
-- Grace stages .3/.4 locally on main (aweb AGENTS.md forbids WIP
-  branches).
-- Pastes the `git diff main...HEAD` into chat to me.
-- I respond go/no-go in chat.
-- She pushes to main on approval.
+- Grace commits locally on main (aweb AGENTS.md forbids WIP branches).
+- The aweb/ symlink in this coord dir IS her working tree — I read
+  her unpushed commits directly via `git -C aweb log`. No diff-paste
+  needed.
+- I chat go/no-go.
+- She pushes on approval.
 - Escalation: architecture → Randy; direction → Juan; bugs surfaced
   mid-review → file as aakq subtask or standalone aweb-aak bug.
 
-I had offered her a "feature branch PR" option — that was wrong; she
-correctly flagged the AGENTS.md rule.
+I originally offered her a "feature branch PR" option and later a
+"paste diff in chat" option — both wrong. Juan asked Randy to update
+coord-aweb/CLAUDE.md and the dev-agent docs so this is codified and
+future instances don't repeat the mistake.
 
 ## Active work: aweb-aakq (P1 epic)
 
@@ -38,11 +41,11 @@ correctly flagged the AGENTS.md rule.
    reviewed, pass-with-notes.
 2. Go CLI precedence flip (aakq.2) — **landed 05c46b2**, reviewed,
    pass-with-notes.
-3. Drop `workspace.yaml.active_team` field (aakq.3) — **pending,
-   awaiting Grace's diff**.
+3. Drop `workspace.yaml.active_team` field (aakq.3) — **reviewed on
+   0401d50, GO pending one-line fix**.
 4. Migrate ~15 `ActiveMembership` / `ActiveTeam` call sites to
-   `TeamState` / `ActiveMembershipFor` (aakq.4) — pending, paired
-   with .3.
+   `TeamState` / `ActiveMembershipFor` (aakq.4) — **bundled with .3
+   in 0401d50, reviewed, GO pending one-line fix**.
 5. Remove `applyTeamStateToWorkspaceCache` from runTeamSwitch (aakq.5).
 6. Doctor migration (aakq.6).
 7. E2E regression for Amy's two-team scenario (aakq.7).
@@ -78,6 +81,64 @@ correctly flagged the AGENTS.md rule.
 - Missing-test cases (non-blocking): empty `CertPath`, cert with
   empty-string member_address.
 - No `MemberAddress` cache on `WorktreeMembership`. ✓
+
+### Scope-creep rule (added 2026-04-22 after Juan flagged)
+
+**Migrations are no-touch unless the task spec explicitly scopes them.**
+This covers both database/SQL migrations AND in-process client-side
+migration helpers (e.g., `migrateTeamStateFromWorkspace` in
+`cli/go/awconfig/team_state.go`, which lazily synthesizes teams.yaml
+from a legacy workspace.yaml on first load). Removing an existing
+backward-compat shim is the inverse of adding one and is equally
+Juan-level — it needs explicit approval, not architectural-logic
+justification.
+
+Add this check to every future review: if the diff touches a file
+whose existence is about bridging old → new on-disk or on-DB state,
+confirm the task description scoped that work. If not → NO-GO with
+scope-creep flag.
+
+### 0401d50 — aakq.3+.4 (Shape A refactor) — NO-GO, revision in progress
+
+Scope: drops `WorktreeWorkspace.ActiveTeam` field, deletes
+`WorktreeWorkspace.ActiveMembership()` method, replaces with package-
+level `ActiveMembershipFor(ws, ts)`, new `LoadWorkspaceAndTeamState`,
+deletes `migrateTeamStateFromWorkspace` path. 28 files, ~250 lines net.
+
+All five invariant checks pass:
+- `grep ws\.ActiveMembership|workspace\.ActiveTeam` → 0 hits.
+- No new method on WorktreeWorkspace taking *TeamState.
+- Legacy `active_team` parses-and-discards; workspace.yaml not rewritten.
+- LoadWorkspaceAndTeamState does NOT synthesize from workspace.yaml.
+- ActiveMembershipFor is package-level, not a method.
+
+**Upgrade-break I was worried about: non-issue.** f51e178
+(team_state.go + migration) is ancestor of server-v1.11.0. Every
+active 1.11.0+ install auto-healed teams.yaml on first `aw init` /
+`aw id team switch`. Blast radius: effectively zero.
+
+**Pre-push fix (1 line, no architectural change):**
+- `doctor_fix_local.go` teamStateRepairFromWorkspaceMemberships is
+  missing `filepath.ToSlash` on CertPath. Deleted migration had it;
+  new helper doesn't. Safe today (normalize runs on load) but
+  fragile on Windows. Requested fix before push.
+
+**Soft notes (Grace's call for this PR vs follow-up):**
+- `workspaceMembershipForSelection` returns (nil, nil) when
+  `sel.WorkingDir` empty. Unreachable in production but test-brittle.
+- `runRoleNameSet` workspace-membership lookup now correctly passes
+  sel but has no test coverage. Worth a minimal test.
+
+**Release-notes-grade (not this PR):**
+- Fresh checkouts with workspace.yaml but no teams.yaml yield raw
+  `open .aw/teams.yaml: no such file or directory` on some paths
+  (`aw id team list` has a friendlier message). Consolidate before
+  1.17.0 tags.
+
+**Test suite health:** Grace reported DNS-only failures in
+`go test ./cmd/aw` (127.0.0.1.nip.io, _awid.myteam.aweb.ai).
+Confirmed pre-existing flakes in `init_apikey_test.go`; that file
+is not in 0401d50's changed-file list. Unrelated.
 
 ### Architectural verification: cross-namespace domain/address
 - `aw whoami` after aakq.2: for cross-namespace members (bob at
