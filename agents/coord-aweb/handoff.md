@@ -98,7 +98,37 @@ whose existence is about bridging old → new on-disk or on-DB state,
 confirm the task description scoped that work. If not → NO-GO with
 scope-creep flag.
 
-### 0401d50 — aakq.3+.4 (Shape A refactor) — NO-GO, revision in progress
+### e08b609 — aakq.3+.4 (Shape A refactor) — shipped
+
+**Review history:** 0401d50 was the first attempt; got a NO-GO
+from me (after reviewer-agent said GO, Randy and Grace independently
+flagged the migration deletion, I flipped). Grace amended to e08b609
+with the migration restored.
+
+**Delta-review on e08b609: GO.** All four migration cases handled,
+consume-once semantics with disk-persistence assertion, workspace.yaml
+not rewritten on migration, `filepath.ToSlash` fix landed, no
+regression of prior review items. 28 files touched, all flow from
+the refactor; no scope creep.
+
+**Soft items left non-blocking** (Grace's call for future touch):
+- `workspaceMembershipForSelection` returns `(nil, nil)` when
+  `sel.WorkingDir` empty. Unreachable in production but test-brittle.
+- `runRoleNameSet` workspace-membership lookup path has no test.
+
+### aweb-aakr filed (P4, standalone, not under aakq)
+
+Surfaced during e08b609 delta review and Juan's "is workspace.yaml
+really legacy?" pushback. After aakq removes active_team, the two
+files STILL duplicate team_id/alias/cert_path/joined_at across their
+memberships lists. Same cached-copy pattern, lower impact (fields
+rarely mutate).
+
+Per Randy: filed as P4 task-candidate (not epic), framed open with
+two candidate framings (narrow teams.yaml vs. derive workspace.yaml
+from teams.yaml for shared fields), no pre-commitment to direction.
+Architectural commitment is Juan-level. Task-comment added on aakq
+for lineage.
 
 Scope: drops `WorktreeWorkspace.ActiveTeam` field, deletes
 `WorktreeWorkspace.ActiveMembership()` method, replaces with package-
@@ -238,6 +268,24 @@ calling `aw init` after every `aw id team switch`.
   pending Juan confirmation. Not my call.
 - **Cross-namespace whoami test coverage**: low priority, no action
   filed, noted here for next time that file is touched.
+- **Membership-field duplication between workspace.yaml and
+  teams.yaml** (raised by me this cycle, flagged to Randy): Tom
+  confirmed workspace.yaml is CLI-side only (ac doesn't read it),
+  so not an ac concern. But team_id/alias/cert_path/joined_at exist
+  in BOTH files' memberships lists, which is the same cached-copy
+  pattern aakq just fixed for active_team. Proposed future cleanup
+  (not this epic): teams.yaml.memberships becomes team-ids only;
+  worktree-bound fields live in workspace.yaml.memberships;
+  identity-level operations without a workspace need a separate
+  mechanism. Waiting for Randy's read on whether to file as a
+  future task.
+- **"Legacy" language I was using imprecisely**: workspace.yaml is
+  NOT legacy as a file. It's the CLI-side worktree↔aweb-server
+  binding and owns aweb_url, workspace_id/role_name per membership,
+  repo/host metadata. Only its team-state fields (active_team, and
+  eventually the membership-list duplication above) are migrating
+  out. I've noted this to Juan and will use sharper language going
+  forward.
 - **ac's own e2e journey**: Tom confirmed ac has its own full gates
   — test-backend + test-frontend + e2e journey — and will run all
   three before any ac tag. No aweb-side action needed on this.
