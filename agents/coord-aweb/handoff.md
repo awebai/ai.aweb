@@ -45,15 +45,69 @@ future instances don't repeat the mistake.
 5. aakq.5 remove applyTeamStateToWorkspaceCache — **landed 0b24ad1**,
    closed.
 6. aweb-aaku (non-Go consumers fix: channel + e2e + docs) — **landed
-   4b15d3d**, closed. Includes anti-regression test locking the
-   teams.yaml-is-SoT invariant against future reintroduction.
-7. aakq.6 doctor migration — **ready to claim**.
-8. aakq.7 e2e switch-without-reinit in Phase 12d — **ready to claim**
-   (was blocked on .5 and aaku; both now in).
-9. aakq.8 release 1.17.0 — blocked on .6, .7, .9.
-10. aakq.9 silent cert-load error — **ready to claim**, no deps.
+   4b15d3d**, closed. Anti-regression test locks the SoT invariant.
+7. aakq.7 e2e switch-without-reinit in Phase 12d — **reviewed GO as
+   d2d59a5, push pending**. Both arms independently verified (see
+   below). 139 PASS 0 FAIL on Shape A; 4 FAIL 135 PASS on v1.16.0
+   (the exact aakn drift assertions). Regression proof valid.
+8. aakq.6 doctor migration — **ready to claim**.
+9. aakq.9 silent cert-load error — **ready to claim**, no deps.
+10. aakq.8 release 1.17.0 — blocked on .6, .7-push, .9.
 
-**Ready queue:** .6, .7, .9 in any order (no deps between them).
+**Ready queue:** .6, .9 in any order. Grace will pick next after
+pushing .7.
+
+## Both-arm verification artifacts for aakq.8 gate log
+
+- `/tmp/aakq-aaku-shape-a-arm.log` — full make test-e2e on
+  `4b15d3d` (current HEAD after aakq.1-.5 + aaku). 125 PASS 0 FAIL.
+  That log predates .7 and is superseded by the 139-pass run that
+  Grace captured on d2d59a5 (and I verified independently).
+- `/tmp/aakq7-v116-arm.log` — make test-e2e on `/tmp/aweb-v116-e2e`
+  (git worktree at `server-v1.16.0` + d2d59a5's script patched in).
+  4 FAIL, 135 PASS. The 4 failures are the new switch-without-reinit
+  assertions — whoami address after switch (got stale `test.local/alice`
+  instead of `partner.local/alice`), whoami domain after round-trip,
+  mail from_address, chat from_address. Exact aakn drift surfaces.
+- Worktree `/tmp/aweb-v116-e2e` kept in place for the .8 gate log
+  run (will re-run at release-candidate tag time).
+
+## aakq.8 gate log + SOT analysis — sent to Randy 2026-04-23
+
+All three behavioral gates run and captured on release-candidate HEAD
+(`25cf3f5`):
+
+- **Gate 1 (make test):** 3m10s, exit 0. server 365 passed; awid 140
+  passed; cli `./cmd/aw` + `./run` ok; channel 72 passed. Log:
+  `/tmp/gate-maketest.log`.
+- **Gate 2 (make test-e2e HEAD):** 1m18s, exit 0, ALL PASSED 139
+  tests. Log: `/tmp/gate-e2e-head.log`.
+- **Gate 3 (make test-e2e v1.16.0 regression arm):** 58s, exit 2,
+  **4 FAIL exactly the 4 new aakq.7 assertions** + 135 PASS.
+  Regression proof valid. Worktree at `/tmp/aweb-v116-e2e`. Log:
+  `/tmp/gate-e2e-v116.log`.
+- **Gate 4 (make release-all-check):** pending — runs after version
+  bumps, before tag.
+
+Full gate log + SOT analysis mailed to Randy as message_id
+`01cbb776-37ee-42bc-b9cd-1840de1902ce`. Draft source:
+`/tmp/randy-mail-body.md`. Decision record draft:
+`/tmp/decision-record-draft.md`.
+
+SOT analysis found: 1 mandatory release-note item (aw doctor check
+id rename), 2 informational release-note items, 3 future SOT-doc
+polishing items (non-blocking), 0 regressions beyond the deliberate
+aakn/aako fixes, cross-namespace case verified clean end-to-end.
+
+**Awaiting Randy's written approval before:**
+1. Committing version bumps (aweb server 1.17.0, aw CLI 1.17.0,
+   channel 1.3.0) on main.
+2. Running Gate 4 (`make release-all-check`).
+3. Tagging `server-v1.17.0`, `aw-v1.17.0`, `channel-v1.3.0`.
+4. `npm publish` CLI + channel.
+5. Committing the 2026-04-23 decision record to
+   `ai.aweb/docs/decisions.md`.
+6. Mailing Tom that 1.17.0 is tagged.
 
 ## Critical finding 2026-04-23 — aweb-aaku filed
 
