@@ -99,15 +99,54 @@ id rename), 2 informational release-note items, 3 future SOT-doc
 polishing items (non-blocking), 0 regressions beyond the deliberate
 aakn/aako fixes, cross-namespace case verified clean end-to-end.
 
-**Awaiting Randy's written approval before:**
-1. Committing version bumps (aweb server 1.17.0, aw CLI 1.17.0,
-   channel 1.3.0) on main.
-2. Running Gate 4 (`make release-all-check`).
-3. Tagging `server-v1.17.0`, `aw-v1.17.0`, `channel-v1.3.0`.
-4. `npm publish` CLI + channel.
-5. Committing the 2026-04-23 decision record to
-   `ai.aweb/docs/decisions.md`.
-6. Mailing Tom that 1.17.0 is tagged.
+## Current blocker: aweb-aaks (2026-04-23)
+
+Randy returned a **NO-GO on the aakq.8 tag** — but not because of
+anything in aakq. The miss is scope: `aweb-aaks` is wired as a
+dependency of aakq.8 in the tracker (Randy added it yesterday after
+Juan's "finish everything then ship" directive, without briefing me
+in writing — he owns the miss).
+
+aaks is the `aw work active` HTTP 500 bug (server-side Python, ~15
+min fix in `tasks_service.py:577` where a query references a
+nonexistent column). Juan chose Option 1: wait for aaks, ship
+everything together. **Grace has been dispatched to aaks.**
+
+Gate artifacts stay valid. When Grace's aaks lands:
+- Re-run Gate 1 (`make test`) + Gate 2 (`make test-e2e HEAD`) on the
+  post-aaks HEAD. Should still be green.
+- **Gate 3 (v1.16.0 regression pair) stays valid** — aaks doesn't
+  touch any aakq surface; `/tmp/gate-e2e-v116.log` is still
+  authoritative.
+- Gate 4 (`make release-all-check`) still pending post-version-bumps.
+
+Release-commit bodies drafted:
+- `/tmp/release-commit-body.md` — aweb server + aw CLI 1.17.0 tag
+  commit body. Includes breaking (doctor rename), fixed (aakn, aako,
+  aaks), improved (aakq.9), architectural (teams.yaml SoT), E2E
+  regression-pair note, aakr open-followup flag.
+- `/tmp/channel-release-commit-body.md` — `@awebai/claude-channel`
+  1.3.0 commit body. New-user break fix, cert precedence re-statement,
+  anti-regression test, aweb 1.17.0 min dep.
+
+Repo convention check: CHANGELOG.md stopped being updated after
+v1.8.1; recent releases (1.14-1.16) put notes in the commit body
+only. Drafts follow current convention.
+
+**Awaiting (in order):**
+1. Grace's aaks ready-for-review ping.
+2. My delta-review + re-run Gates 1+2 on new HEAD.
+3. Re-mail Randy with updated gate log (Gates 1+2 fresh, Gate 3
+   reused, Gate 4 still pending). Request approval.
+4. Randy's written approval.
+5. Commit version bumps with the drafted bodies.
+6. Run Gate 4 (`make release-all-check`).
+7. Tag `server-v1.17.0`, `aw-v1.17.0`, `channel-v1.3.0`; push.
+8. `npm publish` CLI + channel.
+9. Commit the 2026-04-23 decision record to
+   `ai.aweb/docs/decisions.md` (draft at
+   `/tmp/decision-record-draft.md`, hashes to fill in post-tag).
+10. Mail Tom that 1.17.0 is tagged.
 
 ## Critical finding 2026-04-23 — aweb-aaku filed
 
