@@ -6,6 +6,82 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-23 — aweb-cloud v0.5.4 ships; picks up aweb 1.17.0
+
+**Commits (ac):**
+- `feee297c` Align admin managed namespace env lookup (aweb-aakw)
+- `14821e47` test(e2e): read active_team from teams.yaml, not workspace.yaml (aweb 1.17.0) (aweb-aakx)
+- `33a4c089` release: v0.5.4, aweb 1.17.0 + awid-service 0.4.0 deps (tagged `v0.5.4`)
+
+Two earlier fixes shipped on top of v0.5.3 before the v0.5.4 bump and
+are also carried by this release:
+- `2f0c42cc` Fix JWT revocation UTC handling (aweb-aakv)
+- `2425cc7e` Stabilize backend tests under make env (aweb-aakt)
+
+**Decision maker:** Randy (written tag-approval) + Tom (coord-cloud)
+
+**Decision.** v0.5.4 is a dependency-alignment + test-infra release.
+It picks up aweb 1.17.0 (aakq epic — active_team moved from
+workspace.yaml to teams.yaml on the CLI side) and aweb 1.17.0's
+server-side aaks fix (tasks_service.py no longer SELECTs the
+nonexistent `w.current_branch` column, so `aw work active` at
+app.aweb.ai stops 500-ing). awid-service pin is tightened from
+`>=0.3.1` to `>=0.4.0` to match the version already resolving
+transitively. Two ac-side corrections land alongside: aakw
+consolidates admin.py to read the same env-var name pydantic
+Settings reads (`MANAGED_NAMESPACE_BASE_DOMAIN`, unprefixed),
+and aakx updates the two-service e2e fixtures to read active_team
+from teams.yaml per 1.17.0. Zero customer-visible feature change;
+prod behavior improves on the latent aaks 500.
+
+**Release protocol exercised end-to-end for the first time:**
+1. Per-gate log (one mail per gate) — ran all 6 release-ready
+   gates (release-verify-remote, release-verify-model,
+   release-verify-migrations, test-backend, test-frontend,
+   test-two-service) against post-bump `.venv` (aweb==1.17.0,
+   awid-service==0.4.0 resolved from PyPI). 1170 backend tests
+   passed, 94 frontend tests passed, 9 two-service tests passed.
+2. SOT analysis mail — walked aweb-sot, awid-sot, trust-model,
+   ac/sot for drift. None found. Operator edge on aakw named
+   honestly in release notes (anyone who had set only the
+   AWEB_-prefixed env var form loses the override).
+3. CTO written approval.
+4. Manual `git push origin main` then `git tag -a v0.5.4 && git
+   push origin v0.5.4` — explicitly NOT `make ship` because
+   `ship-tag` auto-pushes the tag, which would short-circuit the
+   approval step.
+
+Two process-lesson memories got banked for future coord-cloud
+instances during the run:
+- Reproduce the exact invocation path (`make X` not the underlying
+  tool directly); a simplified harness silently strips env-file
+  loading, cwd, and fixture wiring.
+- Trust the Makefile as the authoritative gate chain; a skill doc
+  can list adjacent targets that are not in the `release-ready`
+  chain (we chased `test-cloud-user-journeys-local-aw` for two
+  hours when the actual gate was `test-two-service`).
+
+**Closes:**
+- `aweb-aakv` (test_user_revoke_before_rejected_with_db failed under
+  non-UTC postgres sessions — naive datetime written to timestamptz)
+- `aweb-aakt` (test suite not env-baseline-isolated from developer
+  `.env.dev`; session-autouse scrub added)
+- `aweb-aakw` (admin.py env-var consolidation — single source of
+  truth with pydantic Settings)
+- `aweb-aakx` (two-service e2e read active_team from teams.yaml
+  per aweb 1.17.0)
+- `aweb-aaks` (reaches hosted users via the aweb pin pickup — fix
+  is internal to aweb server; ac gains it for free via >=1.17.0)
+
+**Still open:**
+- `aweb-aakr` (P4, teams.yaml/workspace.yaml memberships overlap —
+  CLI architectural question, not ac-owned).
+
+**GHA:** release tag push triggered aweb-cloud CI/CD run
+`24859523654`. Image publish to GHCR follows on green.
+
+---
+
 ## 2026-04-23 — Collapse duplicate SoT for active-team and active-address (aakq epic)
 
 **Commits (aweb):**
