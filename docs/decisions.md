@@ -6,6 +6,58 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-23 — Collapse duplicate SoT for active-team and active-address (aakq epic)
+
+**Commits (aweb):**
+- `fcbcc00` fix(channel): prefer cert member address (aakq.1)
+- `05c46b2` fix(cli): prefer cert member address in selection (aakq.2)
+- `e08b609` refactor(cli): move active team selection to teams state (aakq.3 + .4)
+- `0b24ad1` fix(cli): stop syncing team switch to workspace cache (aakq.5)
+- `4b15d3d` fix(channel): read active team from teams state (aweb-aaku)
+- `d2d59a5` test(e2e): cover team switch without reinit (aakq.7)
+- `f120888` fix(cli): surface active cert load errors (aakq.9)
+- `25cf3f5` fix(cli): move doctor active team to teams state (aakq.6)
+- `cb8f7f5` release: aweb server 1.17.0, aw CLI 1.17.0 (tagged `server-v1.17.0`, `aw-v1.17.0`)
+- `bb668be` release: @awebai/claude-channel 1.3.0 (tagged `channel-v1.3.0`)
+
+**Decision maker:** Juan (architectural framing from Randy, driven end-to-end by Grace + John)
+
+**Decision.** `teams.yaml` is now the single source of truth for active-team and active-address selection. `workspace.yaml` is the aweb coordination binding only (aweb_url, workspace_id per membership, repo/host metadata). The previous arrangement — where both files carried `active_team` and some CLI paths read one while others read the other — created silent drift. Amy's 2026-04-21 two-team activation surfaced it as user-visible: `aw whoami` reported hybrid identity, `aw id team switch` left workspace.yaml stale, outbound `from_address` drifted, channel plugin advertised the wrong address.
+
+**What changed structurally:**
+1. `WorktreeWorkspace.ActiveTeam` field and `WorktreeWorkspace.ActiveMembership()` method removed (aakq.3 + .4). Call sites migrated to package-level `ActiveMembershipFor(ws, ts)` that forces callers to hold both.
+2. `applyTeamStateToWorkspaceCache` helper removed (aakq.5). `aw id team switch` writes only teams.yaml.
+3. Channel plugin reads `active_team` from teams.yaml (aaku). Anti-regression test locks the invariant.
+4. `aw doctor` check id `local.workspace.active_team` renamed to `local.teams.active_team` (aakq.6). Fix writes teams.yaml.
+5. E2E journey (`scripts/e2e-oss-user-journey.sh`) extended with switch-without-reinit assertions that fail on v1.16.0 and pass on Shape A (aakq.7). Release-gate regression coverage.
+6. Active-cert load errors are now surfaced (aakq.9) instead of silently swallowed.
+
+**Lazy-migration preserved.** A user upgrading from ≤ v1.10.3 who has workspace.yaml with `active_team` but no teams.yaml still works: `LoadTeamState` synthesizes teams.yaml from the legacy workspace.yaml on first read and saves it to disk. workspace.yaml is not rewritten; the legacy field stays on disk but is ignored by all post-1.17 consumers. Removing the migration path was attempted (0401d50) but flipped to NO-GO after Grace's and John's independent traces surfaced the dormant-install case; the restored path and a positive migration test are in e08b609.
+
+**User-visible changes for release notes:**
+- `aw doctor --json` check id rename `local.workspace.active_team` → `local.teams.active_team`. Covers the same failure class; consumers parsing the old id should update.
+- `aw id team switch` now takes effect immediately for all coordination commands (mail, chat, whoami) without needing `aw init`. Matches how users already expected it to behave.
+- Active-cert corruption now surfaces as a clear error instead of silent fallback to `identity.yaml.address`.
+
+**Closes:**
+- `aweb-aakq` (epic — collapse duplicate sources of truth)
+- `aweb-aakn` (workspace.yaml.active_team drift after team switch)
+- `aweb-aako` (identity.yaml.address preferred over cert.member_address)
+- `aweb-aaku` (non-Go consumers — channel, e2e script, docs — broken by aakq.3's field removal)
+
+**Still open (as design questions, not bugs):**
+- `aweb-aakr` (P4): `team_id`, `alias`, `cert_path`, `joined_at` appear in both `teams.yaml.memberships` and `workspace.yaml.memberships` — same cached-copy pattern aakq just fixed for `active_team`, lower mutation rate. Two candidate framings (narrow teams.yaml vs. derive workspace.yaml for shared fields). Architectural commitment is Juan-level; not committed to a direction.
+
+**Release mechanics:**
+- aweb server + aw CLI: 1.16.0 → **1.17.0**
+- @awebai/claude-channel: 1.2.0 → **1.3.0**
+- ac aweb pin: `aweb>=1.16.0` → **`aweb>=1.17.0`** (Tom handles in ac v0.5.4 after aweb 1.17.0 tags)
+- awid-service: stays at **0.4.0** (no aakq changes)
+
+**Gate log + SOT analysis** mailed to Randy before tag per the 2026-04-22 + 2026-04-23 pre-ship protocols. `make test-e2e` green on Shape A (139 PASS); aakq.7 regression pair logged (PASS on Shape A, 4 FAIL on v1.16.0 — the 4 failing assertions are exactly the aakn drift surfaces, proving the test works). CTO approval in writing before tag; approval recorded with the release commits.
+
+---
+
 ## 2026-04-22 — Release gate: full e2e user journey must pass
 
 **Decision maker:** Juan (relayed via John / coord-aweb)
