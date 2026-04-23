@@ -37,25 +37,74 @@ future instances don't repeat the mistake.
 ## Active work: aweb-aakq (P1 epic)
 
 **Shipping order:**
-1. Channel plugin precedence flip (aakq.1) — **landed fcbcc00**,
+1. aakq.1 channel precedence flip — **landed fcbcc00**, closed.
+2. aakq.2 Go CLI precedence flip — **landed 05c46b2**, closed.
+3. aakq.3 drop workspace.yaml.active_team field — **landed e08b609**,
    closed.
-2. Go CLI precedence flip (aakq.2) — **landed 05c46b2**, closed.
-3. Drop `workspace.yaml.active_team` field (aakq.3) — **landed
-   e08b609**, closed.
-4. Migrate call sites to `ActiveMembershipFor` (aakq.4) — **bundled
-   in e08b609**, closed.
-5. Remove `applyTeamStateToWorkspaceCache` (aakq.5) — **ready to
-   claim** (unblocked by .3/.4).
-6. Doctor migration (aakq.6) — **ready to claim**.
-7. E2E switch-without-reinit in Phase 12d (aakq.7) — blocked on .5.
-8. Release 1.17.0 with `make test-e2e` as gate (aakq.8) — blocked
-   on all.
-9. Silent cert-load error follow-up (aakq.9) — **ready to claim**,
-   no deps.
+4. aakq.4 migrate call sites — **bundled in e08b609**, closed.
+5. aakq.5 remove applyTeamStateToWorkspaceCache — **reviewed GO as
+   0b24ad1, push pending**. Code-reviewer clean. Pre-existing 4 e2e
+   failures (from .3/.4's non-Go consumer regression, see aaku) not
+   fault of .5.
+6. aakq.6 doctor migration — **ready to claim**.
+7. aakq.7 e2e switch-without-reinit in Phase 12d — blocked on .5
+   (now .5-GO, unblockable on push).
+8. aakq.8 release 1.17.0 — **now blocked on aaku** (see below) in
+   addition to .5-.7 and .9.
+9. aakq.9 silent cert-load error — **ready to claim**, no deps.
+10. **aweb-aaku** (P1, standalone — see "Critical finding" below).
 
-**Ready queue per Randy:** .5, .6, .9. Grace is still active-focused
-on aakq and will pick next. Coordinator authority to assign if she
-steps back, but she's in-flight as of last workspace status check.
+**Ready queue:** aaku (CRITICAL, new blocker), .6, .9.
+
+## Critical finding 2026-04-23 — aweb-aaku filed
+
+Ran `make test-e2e` as my new per-review discipline the moment Docker
+was available. **Main has been e2e-broken for ~24h from aakq.3/.4**:
+4 failures in Phase 21 and Phase 22 of
+scripts/e2e-oss-user-journey.sh from bash reads of
+`workspace.yaml.active_team` (removed by aakq.3).
+
+**Grep for non-Go readers** (per Randy's hint) uncovered this is not
+just the bash script — it's a NEW-USER BREAK in production code:
+
+- `channel/src/config.ts:63` reads `workspace.active_team` at
+  runtime. After 1.17.0 ships, new `aw init` writes workspace.yaml
+  WITHOUT active_team (aakq.3's MarshalYAML strips it on save).
+  Channel then throws "worktree workspace binding is missing
+  aweb_url, active_team, or the active membership alias" at line
+  67-68.  **Every new user after 1.17.0 breaks.** Existing users
+  survive only because lazy migration doesn't rewrite workspace.yaml,
+  so the legacy field stays on disk.
+- Stale docs: aweb-sot.md:1013, identity.md:110, cli/go/README.md:151.
+
+**Scope of aweb-aaku:**
+1. scripts/e2e-oss-user-journey.sh lines 1147, 1195 → read from
+   teams.yaml.
+2. channel/src/config.ts:63-68 → load teams.yaml, derive activeTeam.
+3. channel/test/config.test.ts fixtures (lines 68, 109, 140, 166) —
+   update to post-1.17.0 shape.
+4. Docs — aweb-sot.md ~1011-1044, identity.md:110, cli/go/README.md:151.
+5. Regression test in channel: workspace.yaml WITHOUT active_team +
+   teams.yaml WITH active_team + valid cert → resolveConfig succeeds.
+
+**aaku is THE release blocker for aakq.8.** Without it 1.17.0
+cannot ship.
+
+## My review discipline (promoted to spec by Randy 2026-04-23)
+
+- `make test-e2e` on EVERY subtask review, not just at .8. Randy is
+  updating .5, .6, .7, .9 specs to include this as acceptance.
+- Before .8 tag: formatted gate log per named gate to Randy
+  (exact command, pass/fail/skipped with reason, duration). Both
+  .7 regression pairs logged (pass-on-Shape-A + fail-on-1.16.0).
+- Before .8 tag: SOT analysis walking user-facing surfaces against
+  aweb-sot/awid-sot/trust-model. Mail findings to Randy.
+- Migrations no-touch unless spec scopes them.
+- Scope-creep watch: any file outside the task's Where list is
+  flagged before anything else.
+- After a field removal: grep across ALL file types (bash, TS,
+  Python, docs), not just compilation consumers (my lesson + Randy's
+  self-feedback from aaku).
 
 ## Code review findings this cycle
 
