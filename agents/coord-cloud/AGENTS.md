@@ -49,6 +49,27 @@ git -C ac log --oneline -20
 git -C ac diff HEAD~5..HEAD --stat
 ```
 
+### Running `make` targets in ac
+
+The ac Makefile uses relative paths like `../aweb/server`,
+`../aweb/awid`, `../aweb` for sibling-repo locations. These resolve
+against the logical shell cwd, not the physical one, so invoking
+`make` from the symlinked `ac/` path here breaks those lookups
+(`../aweb` from `agents/coord-cloud/ac` resolves to
+`agents/coord-cloud/aweb`, which doesn't exist).
+
+**Always run `make` targets from the physical ac repo path:**
+
+```bash
+cd /Users/juanre/prj/awebai/ac && make test-backend
+cd /Users/juanre/prj/awebai/ac && make release-ready
+```
+
+Tracked for a proper fix (Makefile should use `$(realpath ...)` so
+symlinked invocations work too): see the open P3 task in the aweb
+tracker for the Makefile realpath refactor. Until that fix ships,
+the physical-path habit is the workaround.
+
 ### Review against invariants
 
 For every significant change, ask:
