@@ -42,19 +42,18 @@ future instances don't repeat the mistake.
 3. aakq.3 drop workspace.yaml.active_team field — **landed e08b609**,
    closed.
 4. aakq.4 migrate call sites — **bundled in e08b609**, closed.
-5. aakq.5 remove applyTeamStateToWorkspaceCache — **reviewed GO as
-   0b24ad1, push pending**. Code-reviewer clean. Pre-existing 4 e2e
-   failures (from .3/.4's non-Go consumer regression, see aaku) not
-   fault of .5.
-6. aakq.6 doctor migration — **ready to claim**.
-7. aakq.7 e2e switch-without-reinit in Phase 12d — blocked on .5
-   (now .5-GO, unblockable on push).
-8. aakq.8 release 1.17.0 — **now blocked on aaku** (see below) in
-   addition to .5-.7 and .9.
-9. aakq.9 silent cert-load error — **ready to claim**, no deps.
-10. **aweb-aaku** (P1, standalone — see "Critical finding" below).
+5. aakq.5 remove applyTeamStateToWorkspaceCache — **landed 0b24ad1**,
+   closed.
+6. aweb-aaku (non-Go consumers fix: channel + e2e + docs) — **landed
+   4b15d3d**, closed. Includes anti-regression test locking the
+   teams.yaml-is-SoT invariant against future reintroduction.
+7. aakq.6 doctor migration — **ready to claim**.
+8. aakq.7 e2e switch-without-reinit in Phase 12d — **ready to claim**
+   (was blocked on .5 and aaku; both now in).
+9. aakq.8 release 1.17.0 — blocked on .6, .7, .9.
+10. aakq.9 silent cert-load error — **ready to claim**, no deps.
 
-**Ready queue:** aaku (CRITICAL, new blocker), .6, .9.
+**Ready queue:** .6, .7, .9 in any order (no deps between them).
 
 ## Critical finding 2026-04-23 — aweb-aaku filed
 
