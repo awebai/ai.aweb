@@ -1,51 +1,48 @@
 # Engineering Status
-Last updated: 2026-04-23 (Randy, post-1.17.0 ship)
+Last updated: 2026-04-24 (Randy, post-v0.5.4 ship)
 
 ## Current focus
 
-1. **ac v0.5.4 — one blocker left**: aakt (37-test cumulative pollution in `make test-backend`). Mia is on it under Tom's coord. Investigation path: pytest-randomly → conftest.py fixture audit → per-test isolation. Tom reports per-gate log when aakt closes and v0.5.4 sequence runs.
-2. **aweb 1.17.0 shipped**. Decision record on main (commit `b98a331` in ai.aweb). Downstream consumers pick up via `npm install -g @awebai/aw@1.17.0`, `@awebai/claude-channel@1.3.0`, and (pending) `ac>=0.5.4`.
-3. **Post-ship followups pending your call** (not blocking): aakr (P4 membership-field-overlap design question), branch cleanup (`aweb/beadhub-legacy`, `ac/aaga-archive`).
+1. **Both releases shipped, prod live.** aweb 1.17.0 + aw CLI 1.17.0 + @awebai/claude-channel 1.3.0 (tagged 2026-04-23) and ac v0.5.4 (tagged 2026-04-23T21:22Z). GHA success on all four publish runs; `app.aweb.ai/api/health` returns 200; `aw work active` against prod returns 6 items (confirms the aaks 500 fix is live in production).
+2. **Team environment alignment**: each permanent agent needs to confirm their local `aw` CLI is on 1.17.0 and channel plugin on 1.3.0 (where used). Mine is on 1.17.0 (`aw version` reports `aw 1.17.0, commit e275743, built 2026-04-23T16:02:03Z`). Amy, Avi, Charlene, Enoch, Goto: their responsibility to upgrade locally; only once they're on 1.17.0 do they actually benefit from the fixes we just shipped.
+3. **Doc drift sweep**: Amy's `agents/support/handoff.md` still lists aakn as a Known Issue with a manual workspace.yaml workaround. Mailed Amy to refresh. Other permanent-agent handoffs (Avi, Charlene, Enoch, Goto) are their own owners' responsibility.
 
-## aweb OSS — 1.17.0 released
+## aweb OSS — 1.17.0 shipped
+- **Tags**: `server-v1.17.0`, `aw-v1.17.0` (cb8f7f5), `channel-v1.3.0` (bb668be). GHA publish runs 24845435273, 24845435464, 24845435673 all success.
+- **Closes**: aakq epic (aakn, aako, aaku, aaks). Full decision record in `docs/decisions.md` 2026-04-23 entry.
+- **Open branches**: `beadhub-legacy` only (intentional archive, keep per Juan).
+- **Blockers**: none.
 
-- **Tagged**: `server-v1.17.0`, `aw-v1.17.0` (`cb8f7f5`), `channel-v1.3.0` (`bb668be`). GHA handles npm + pypi publish.
-- **Closes in 1.17.0**: aakq (epic — SoT collapse), aakn (team switch drift), aako (address split between identity vs cert), aaku (non-Go consumers of workspace.yaml.active_team), aaks (`aw work active` 500).
-- **Breaking change** (release-noted): `aw doctor --json` check id renamed from `local.workspace.active_team` → `local.teams.active_team`. Consumers parsing the old id must update.
-- **Gate discipline outcome**: two NO-GO rounds on the first tag attempt (first because aaks wasn't in the release; second because gate Grace's initial aakq.3 broke non-Go consumers in the e2e script and channel plugin). Third pass cleared all gates green. SOT analysis caught the mandatory release-note item that would otherwise have shipped un-announced.
-- **Open branches**: `beadhub-legacy` only (intentional archive, pending Juan confirmation).
-- **Blockers**: None — product is shipping.
-
-## aweb-cloud (ac) — v0.5.4 in flight
-
-- **Status**: unreleased; blocked on aakt.
-- **Landed today**: `2f0c42cc` Fix JWT revocation UTC handling (aweb-aakv — closed).
-- **Remaining blocker**: `aweb-aakt` — 37-test cumulative pollution in `make test-backend` aggregate. Pre-existing tech debt exposed by the 2026-04-22 release-gate discipline. Mia is investigating under Tom's coord (pytest-randomly → fixture audit path).
-- **Ready once aakt clears**: bump `aweb>=1.17.0`, `awid-service>=0.4.0`; full gate run; CTO approval; tag v0.5.4.
-- **Team in ac**: Mia (dev, new), Tom (coord-cloud, reviews).
-- **Open branches**: `aaga-archive` only (intentional archive, pending Juan confirmation).
+## aweb-cloud (ac) — v0.5.4 shipped
+- **Tag**: `v0.5.4` (33a4c089). GHA run 24859523654 success in 12m13s. GHCR publish completed.
+- **Five commits v0.5.3 → v0.5.4**: aakv (JWT revocation UTC), aakt (env-leak fix), aakw (admin.py env-var consolidation), aakx (two-service test align), 33a4c089 (version + pin bumps).
+- **Pins**: `aweb>=1.17.0`, `awid-service>=0.4.0`.
+- **Prod**: deployed and healthy. `aw work active` works (was aaks 500).
+- **Open branches**: none. aaga-archive deleted 2026-04-23.
+- **Blockers**: none.
 
 ## awid
-- Shipped with aweb 1.17.0. awid-service 0.4.0 current. No open work.
+- 0.4.0 shipped with aweb 1.17.0. Live on PyPI. No open work.
 
 ## Cross-repo alignment
-
-- ac still pins `aweb>=1.16.0`, `awid-service>=0.3.1`. v0.5.4 bumps both.
-- After v0.5.4 ships, ac will pull aweb 1.17.0's aakq fixes + aaks fix to hosted users. Until then, hosted app.aweb.ai runs the prior deployment.
+- ac pins: `aweb>=1.17.0`, `awid-service>=0.4.0` — aligned.
+- Decision records up to date: 2026-04-23 aakq/aweb-1.17.0 entry + 2026-04-23 ac-v0.5.4 entry in `docs/decisions.md`.
 
 ## Concerns
-
-- **aakt is pre-existing tech debt, not a regression**. The gate discipline surfaced it on its first full aggregated run — which is exactly what the discipline is for. Not a process critique; a process win.
-- **Route-via-coordinator discipline**: I bypassed John twice today (once on aako fix specifics to Grace, once on aaks dispatch to Grace). Juan caught both. Saved as feedback memory (`feedback_dispatch_via_coordinator.md`). Not a recurring risk — the symptom pattern is now named and catchable.
+- **Amy's handoff Known-Issue #2** is stale (aakn workaround documented as active — actually fixed in 1.17.0). Mailed her to update.
+- **Amy's Known-Issue #1** (IDENTITY MISMATCH on outbound) — unknown post-1.17.0 status. Asked Amy to confirm resolve-or-reproduce.
+- **Local aw CLI versions across permanent agents** not centrally tracked. Each agent's own responsibility to upgrade.
+- **`test-cloud-user-journeys-local-aw` symlink wrinkle** (the CURDIR-from-symlink path issue) — documented as workaround in `agents/coord-cloud/AGENTS.md`, proper fix tracked as `aweb-aaky` (P3 Makefile realpath refactor). Not urgent.
 
 ## Policies standing
-
-- **Release gate** (2026-04-22): full e2e user journey green before any release. SOT analysis required before tag. `make test-e2e` green + CTO written approval + coordinator tag. Per-gate log with name/command/outcome/duration, running view not batched.
-- **Review via shared working tree** (2026-04-22): coordinators read dev commits via `git -C <repo>`; no chat-pasted diffs.
-- **Route dev-agent dispatch through coordinator** (2026-04-23): when directive names a dev, brief the coordinator, not the dev.
+- **Release gate** (2026-04-22): full gate log + SOT analysis + CTO written-and-mailed approval before any tag.
+- **Review via shared working tree** (2026-04-22): coordinators read commits via `git -C <repo>`, no chat-pasted diffs.
+- **Route dev-agent dispatch through coordinator** (2026-04-23): dev dispatch goes via John/Tom/Goto, not directly.
+- **Trust the Makefile's release-ready chain** (2026-04-23): release gate list comes from `make release-ready` deps, not parallel skill-docs.
+- **Written approval via mail** (2026-04-23): "GO" is not GO until `aw mail send --to <approvee>` has fired.
 
 ## Next milestones
-
-- Mia + Tom close aakt.
-- Tom's v0.5.4 per-gate log + SOT analysis → CTO approval → tag.
-- Juan: branch-preservation decision (`beadhub-legacy`, `aaga-archive`); aakr architectural direction when ready.
+- Amy refreshes her handoff; confirm IDENTITY-MISMATCH Known-Issue status post-1.17.0.
+- aakr architectural question sits filed-open as P4 (deferred by earlier agreement; no pending direction).
+- aaky (ac Makefile realpath refactor) — P3, picks up whenever someone has ac-Makefile context.
+- aakw-related: nothing — aakw shipped in v0.5.4.
