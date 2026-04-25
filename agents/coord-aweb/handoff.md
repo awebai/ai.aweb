@@ -108,9 +108,25 @@ race, low cost, but symptomatic of when announcement timing matters.
 - **aakz framing accepted** — aala.7 is a SUPERSET of aakz, both stay
   open until aala.7 ships, then aakz closes as covered.
 - **aakr is orthogonal to aala** per Grace; no Shape choice forced.
-- **Grace currently working** on aala.1 (SOT) + aala.2 (awid storage)
-  in parallel. Juan's "implement, don't wait on reviews" directive
-  applies; she'll ping me when slices become coherent for review.
+- **Grace state 2026-04-25 (per her mail 3e73c9f1):** code in-tree
+  for aala.2/.3/.4/.5/.7 plus SOT/docs updates in
+  `docs/awid-sot.md`, `docs/identity.md`, `docs/aweb-sot.md`. **NOT
+  PUSHED** — she's holding push on .2 per the dep edge until .1 SOT
+  is reviewed and any changes folded back. Focused Python + Go test
+  suites green so far. Addressing all 3 BLOCKERs before SOT review
+  ping:
+  - A: SOT draft already in 3 docs; folding overwrite rule + one
+    wording pass before ping.
+  - B: confirmed awid registration is single-INSERT (blob + metadata
+    + signature validation in one transaction, no split write path).
+    She'll make this explicit in SOT wording.
+  - D: had refuse-overwrite wrong (was overwriting); fixing to
+    refuse-by-default with --force opt-in now.
+- **NOTEs status (C/E/F/G/H):** Grace didn't mention these in her
+  status update. Likely fine — F (aala.6 redesign-vs-rename fork)
+  hasn't started yet so the fork decision isn't bypassed. Others are
+  during-review-fixable. Watch for them when each child surfaces for
+  review.
 - **Randy mailed**: technical review summary + ask to review aala.1
   SOT when it lands + confirm the .1→.2 dep edge.
 - **Tom mailed**: aala.10 (ac alignment) heads-up; suggested he scope
