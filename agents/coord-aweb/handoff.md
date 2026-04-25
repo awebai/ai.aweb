@@ -156,6 +156,43 @@ this slice):
 4. ✓ Fetch-envelope certificate field pinned: base64 of exact UTF-8
    team certificate JSON.
 
+## SHIPPED 2026-04-25: aweb 1.18.0 + aw CLI 1.18.0 + awid-service 0.5.0
+
+Release commit `898556d` on origin/main with 4 tags pushed:
+- `server-v1.18.0` — PyPI publish via GHA server-release.yml (aweb 1.18.0)
+- `aw-v1.18.0` — npm publish via GHA aw-release.yml (@awebai/aw)
+- `awid-v0.5.0`
+- `awid-service-v0.5.0` — PyPI publish via GHA awid-pypi-release.yml
+
+Gate log (mailed to Randy 5da4621a, approved 2a2f344a):
+- Gate 1 (make test on ba133d4): 368+144+cli+72 green; 4m20s logical CPU.
+- Gate 2 (make test-e2e on ba133d4): 159 PASS, exit 0, all 22 phases. 1m24s.
+- Gate 3 (v1.17.0 regression arm with aala e2e script): exit 2, 1 FAIL on `erin add-member prints fetch-cert` (expected — cross-machine guidance doesn't exist in v1.17.0). Regression proof valid.
+- Gate 4 (release-all-check on bumped tree): exit 0, 5m47s. All checks passed.
+
+Decision record: `c858c98` ai.aweb/docs/decisions.md 2026-04-25 entry.
+
+Tom mailed (7d0150e9) — ac v0.5.5 unblocked on aweb side; PyPI propagating; he'll bump and ship under his discipline. Side note for ac release notes: `aw id team accept-invite` semantic shift to same-machine helper (ac doesn't surface but worth banking).
+
+## Coord-flow violation 2026-04-25: resolved via authorized cross-coord borrow
+
+Grace started uncommitted ac edits in aala.10 territory after I redirected her ("stand down — aala.10 is Tom's lane, Mia dispatched"). Five ac files modified locally on her side, not pushed. Two-step recovery:
+
+1. **Strong stop signal** (chat) — required: don't push, git stash, ack. Grace acked: stashed as `stash@{0} On main: aala.10 BYOIT cert pickup WIP from grace`, ac clean against origin/main. Verified.
+2. **Juan inverted Tom's insight-option call** — authorized cross-coord borrow: Grace works in ac under Tom's coord for aala.10 scope. Mia stands down. Grace unstashed under Tom's authorization and continued. Tom now reviews her ac commits per his discipline.
+
+Lessons banked:
+- `feedback_prohibition_language.md` saved to shared project memory + entry in MEMORY.md.
+- One-paragraph "Cross-coordinator dispatch and lane discipline" subsection added under `docs/team.md` "How engineering works." Codifies authorized-cross-coord-borrow + insight-transfer-without-code as the two valid cross-repo patterns + names the prohibition-language requirement when redirecting. (`3f59d81`)
+- Distinct from Randy's `feedback_dispatch_via_coordinator.md` (CTO-side); these are complementary halves of the same protocol.
+
+## What's up next for me
+
+- aweb 1.18.0 is shipped. ac v0.5.5 is Tom's track from here.
+- Grace picked up `aweb-aajp` (API key bootstrap → add-worktree → mail round-trip, P0 pre-existing). My lane. Will review when she pings with a concrete commit.
+- Standing by for any aala.10 follow-up needing aweb-side input (Tom will mail).
+- **aweb-aakr** still open as future design question (membership-field duplication, Juan-level call).
+
 ## 9b2eed3 LANDED on origin/main 2026-04-25 (slice 2 of aala)
 
 Grace pushed `9b2eed3 Add cross-machine fetch-cert e2e` directly
