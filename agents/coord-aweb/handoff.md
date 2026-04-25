@@ -127,6 +127,43 @@ race, low cost, but symptomatic of when announcement timing matters.
   hasn't started yet so the fork decision isn't bypassed. Others are
   during-review-fixable. Watch for them when each child surfaces for
   review.
+
+## NO-GO 2026-04-25: aala e2e regression (held push)
+
+After review of Grace's aala slice working tree (.1 SOT + .2/.3/.4/.5/.7),
+gates ran:
+- `make test`: GREEN. server 367 (+2), awid 143 (+3 her new tests),
+  cli ok, channel 72. 4m20s.
+- `make test-e2e`: **EXIT 2**. Script dies silently mid-Phase-12d
+  between line 1045 (last PASS "alice restored whoami address after
+  switch") and line 1051 (next assertion "alice restored primary-team
+  mail exit"). Log says "ALL PASSED: 97 tests" but that's misleading —
+  it's the count to the death point, after which trap-EXIT cleanup
+  fires and 42 assertions in Phases 13-22 never run. exit=2 from make.
+
+Most likely cause: aala.7's auth-path change on multi-team-alice mail
+send. Phase 12d sets up alice with two active team memberships
+(devteam:test.local + main:partner.local) for the aakq.7 switch-
+without-reinit assertions. Line 1046's `aw mail send` to bob runs
+against multi-team alice — exactly the scenario aala.7 is supposed
+to fix. Unit tests passed (no fixture exercises multi-active-local-
+agent state); e2e is the only integration gate that catches this.
+
+Same class of miss as aakq.3 / aaku — focused tests green, integration
+regresses.
+
+Held actions:
+- .2 push gated. No push of any aala child until aala.7 regression
+  resolved AND make test-e2e green to 22-phase completion.
+- Grace investigating; she'll re-ping once fixed.
+- Code-reviewer earlier passed all 3 BLOCKERs in static review; the
+  bug is in test-coverage-of-the-fix, not in the architectural
+  contracts. aala.7 unit fix shape is correct; the wiring through to
+  the specific Phase-12d path is the gap.
+- Mailed Randy the finding (74c1b733) — relevant to his SOT review
+  of the aala.7 auth contract: test_messages_http needs a fixture
+  with two active local-agent rows on the same DID before this slice
+  ships. Otherwise the next auth-path touch reintroduces the bug.
 - **Randy mailed**: technical review summary + ask to review aala.1
   SOT when it lands + confirm the .1→.2 dep edge.
 - **Tom mailed**: aala.10 (ac alignment) heads-up; suggested he scope
