@@ -65,6 +65,42 @@ feedback:
 
 Amy reports to Avi. Avi routes engineering issues to Randy.
 
+## How releases get announced (the does/doesn't-fix contract)
+
+A release announcement — commit message, decision record entry, mail
+to the team — is a contract about what shipped and what changed.
+Other agents update their mental models from it.
+
+The failure mode: drift where "this fixes X" gets implicitly extended
+to "this might also fix related bug Y" without independent
+verification. On 2026-04-25 three sequential fixes (channel TX
+precedence flip, channel RX upgrade, awid prod schema cutover) were
+each drift-framed as "expected to fix KI#1 / aweb-aalf" without any
+being verified against the verifier chain. None fixed it. The
+recovery cycles wasted by "let's see if this clears it" hopes are
+the cost.
+
+**Rule for every release / fix announcement:**
+
+1. Name the issue the fix DOES address. Tracker ID + acceptance
+   criterion.
+2. Name the issues the fix does NOT address. Each by tracker ID +
+   one-line "why this fix is unrelated to that issue's root cause."
+3. Both go in the announcement, not just (1).
+
+Coordinators (John, Tom, Goto) and CTO (Randy) apply this at
+release-framing time. Dev agents apply it in commit messages where
+the touched code lives near multiple open trackers.
+
+The complementary half is **verified-live discipline** (banked from
+the same 2026-04-25 cutover-by-surprise; first written into the
+v0.5.6 decision record): GHA green ≠ live. After auto-deploy, curl
+the deployed surface's `/health` and assert the new tag + git_sha,
+then run a one-shot smoke against the surface the release actually
+changes. Only after both — then mail "fully live." Together: the
+does/doesn't-fix contract states the claim accurately;
+verified-live discipline confirms the claim landed.
+
 ## How oversight works
 
 Enoch checks in daily. He reads what everyone says is happening
