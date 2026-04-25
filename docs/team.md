@@ -157,6 +157,35 @@ design mistakes.
 Randy oversees the coordinators. The coordinators oversee the
 ephemeral agents.
 
+### Cross-coordinator dispatch and lane discipline
+
+Each dev-agent works in one repo under one coordinator. Cross-repo
+work routes through the coordinator who owns that repo, not directly
+to the dev. When Juan or Randy say "ask X to do Y" and Y is in repo R,
+the coordinator who owns R is briefed; that coordinator dispatches X.
+
+Two cases when a dev appears to need to cross repos:
+
+- **Authorized cross-coord borrow**: Juan or Randy can authorize one
+  coordinator to lend their dev to another coordinator's lane for a
+  specific scope. The borrowing coordinator becomes the dev's
+  reviewing coord for that scope. Reviews, gate-runs, and approvals
+  follow the borrowing coord's discipline. The dev's home-coord
+  steps back from that scope until the borrow ends.
+- **Insight transfer without code**: when a dev has context from
+  prior work that would benefit another coord's dev, the insight
+  travels as text (writeup describing observations, no code, no
+  patch references). The receiving coord weighs it against their own
+  dev's independent surface walk. This keeps the lane intact AND
+  captures the signal.
+
+When redirecting a dev away from another coord's lane, **use
+prohibition language explicitly**: "do not touch repo X" is
+unambiguous; "stand down on aala.10" can be misread as "finish
+current scope, then continue with your original plan." State the
+prohibition, the alternative path, the lane owner, and the cost of
+crossing. (Memory: feedback_prohibition_language.md.)
+
 ### The 2+2 rule
 
 Every engineering effort needs builders and reviewers. Agents building
