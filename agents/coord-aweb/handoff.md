@@ -82,23 +82,54 @@ race, low cost, but symptomatic of when announcement timing matters.
 
 ## What's up next
 
-- **aweb-aala P0 launch epic filed by Grace 2026-04-25** (12 child
-  tasks, BYOIT cross-machine team join + multi-membership hardening).
-  Design from Juan per Grace: awid stores full signed public cert
-  blobs. New awid endpoint + schema change + CLI add-member redesign
-  + accept-invite redesign + ac cloud alignment + E2E matrix + migration
-  plan. Beyond my approval lane; needs Randy's architectural review
-  on aala.1 (SOT) before .2-.5 implement. **Held off escalating to
-  Randy/Juan/Tom until Grace answers 5 clarifying questions** in my
-  mail e7d2a6cf — superseding aakz, sequencing, Juan-scope-known,
-  aakr-overlap, time-shape.
-- **aweb-aakz** (multi-membership mail 409, dispatched to Grace
-  earlier today): aala.7 explicitly says "Fix the aweb-aakz class of
-  failures" — pending Grace's confirmation that aala.7 supersedes
-  it and aakz can close as duplicate.
-- **Grace**: working on invite/add-member/bootstrap survey for Juan
-  (her direct dispatch); filed aala epic from that survey. Currently
-  reading the aakr context I forwarded earlier today.
+- **aweb-aala P0 launch epic — IN FLIGHT, time-shape ~2 days per
+  Juan 2026-04-25.** 12 child tasks, BYOIT cross-machine team join +
+  multi-membership hardening. Design (awid stores full signed public
+  cert blobs) approved by Juan directly with Grace. Quality bar: no
+  regression, no tech debt. Implementation protocol: Grace implements
+  without waiting on reviews per Juan's directive; my pre-push
+  GO/NO-GO leverage is gone. Compensating with explicit BLOCKER vs
+  NOTE classification on review concerns.
+- **My 3 BLOCKERs filed with Grace** (must resolve in spec/SOT before
+  the affected child pushes to main):
+  - **A**: aala.1 (SOT) blocks aala.2 (awid schema push). Dep graph
+    didn't have this edge; I've told Grace to gate .2's push on .1
+    being reviewed-and-agreed by me + Randy. Asked Randy to confirm.
+  - **B**: aala.2 atomicity — blob upload + metadata + signature
+    validation is one atomic transaction at awid. No orphan blobs.
+  - **D**: aala.5 fetch-cert refuses to overwrite an existing local
+    cert by default; `--force` opt-in. Prevents stale awid blob from
+    silently kicking out a working local install.
+- **5 NOTEs sent to Grace** (fix during review, not push-blocking):
+  C narrow .3 to subject-only fetch; E heads-up Tom on .10; F resolve
+  .6 redesign-vs-rename fork before impl; G clarify aakm vs aala.8
+  scope; H aakr touch-during-aala.4 logged as observations not silent
+  fold.
+- **aakz framing accepted** — aala.7 is a SUPERSET of aakz, both stay
+  open until aala.7 ships, then aakz closes as covered.
+- **aakr is orthogonal to aala** per Grace; no Shape choice forced.
+- **Grace currently working** on aala.1 (SOT) + aala.2 (awid storage)
+  in parallel. Juan's "implement, don't wait on reviews" directive
+  applies; she'll ping me when slices become coherent for review.
+- **Randy mailed**: technical review summary + ask to review aala.1
+  SOT when it lands + confirm the .1→.2 dep edge.
+- **Tom mailed**: aala.10 (ac alignment) heads-up; suggested he scope
+  ac sub-tasks in parallel with the aweb side.
+- **Time-shape risk**: aala.11 (E2E matrix) sits at the bottom of the
+  dep graph. If it doesn't run green by launch-minus-12h, the call
+  to slip-launch vs ship-partial is Juan's. I'll surface ~24h before
+  launch with data.
+
+## Recent unscheduled hotfixes
+
+- `5b6a5ce` channel 1.3.1 — fixed `.mcp.json` `mcpServers` wrapper
+  shape (broken in 1.1.0-1.3.0; Juan landed directly).
+- `be0dfdb` release-channel skill: bump marketplace.json on release
+  (silent-update bug fix; Juan landed directly).
+- **Gap surfaced for follow-up**: `make test-e2e` doesn't validate
+  channel/.mcp.json shape against the Claude Code plugin schema.
+  Worth a 5-line CI check so 3 broken minors don't ship in a row
+  again. Filed mention in Randy mail.
 - **aweb-aakr** sits as a future design task. No action unless Juan
   wants to revisit the architectural question.
 - **Tom's v0.5.4 cycle: shipped and deployed.** Tag `33a4c089`
