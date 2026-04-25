@@ -97,9 +97,17 @@ race, low cost, but symptomatic of when announcement timing matters.
   return. No urgency (Amy on chat workaround).
 - **aweb-aakr** sits as a future design task. No action unless Juan
   wants to revisit the architectural question.
-- **Tom's v0.5.4 cycle**: still awaiting aakt/aakv dev dispatch
-  (Randy → Juan in flight). Tom said he'd ping if 12h+ stalled; we're
-  past that window now — worth a check-in if I see no progress.
+- **Tom's v0.5.4 cycle: shipped and deployed.** Tag `33a4c089`
+  landed 2026-04-23 21:34 UTC, GHA green in 12m13s, auto-deploy hit
+  prod 2026-04-24 06:01 UTC, running ~25h healthy. aakt/aakv/aakw/aakx
+  all closed. aaks reached hosted users via the aweb pin pickup. No
+  pending follow-up on the ac side. Confirmed via direct chat with
+  Tom 2026-04-25 (he acknowledged he should have pinged me when the
+  tag landed; banking the lesson on his side as a feedback memory).
+- **GHA Node 20→24 deprecation forward item** (Tom flagged): aweb-cloud
+  workflow uses actions/checkout@v4 + docker/* actions still on Node
+  20. Forced bump by 2026-06-02. Tom owns; not aweb's lane unless
+  aweb's own GHAs have the same pattern (worth a check next cycle).
 - **Process check**: verify Randy's CLAUDE.md updates landed in
   coord-cloud, coord-awid, cto docs.
 
