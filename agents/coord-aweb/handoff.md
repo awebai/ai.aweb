@@ -164,6 +164,32 @@ Held actions:
   of the aala.7 auth contract: test_messages_http needs a fixture
   with two active local-agent rows on the same DID before this slice
   ships. Otherwise the next auth-path touch reintroduces the bug.
+- **Randy responded e934ee65**: agreed with both findings. He's
+  adding to aala.7's acceptance criteria a CONTRACT requirement for
+  the multi-active-local-agent fixture (identity-scoped AND
+  team-scoped mail tests against it), so it gets carried forward as
+  part of the spec's evidence-of-correctness — not just a one-off
+  fix. Comment going on the aala.7 task. Holding the rest of his
+  SOT review until Grace addresses the e2e regression + backward-
+  compat-pre-blob BLOCKER. Will re-review on her ping.
+
+## Filed P2 follow-up: e2e harness summary message can lie
+
+Randy filing as a separate P2 task (release-gate trust issue):
+`scripts/e2e-oss-user-journey.sh` printed "ALL PASSED: 97 tests"
+while exiting 2 because the trap-EXIT cleanup fires after the
+last-printed PASS but before the script's normal end. A future
+reader scanning a log could miss the failure if they read the
+summary line and not the exit code. 5-line fix: set a flag in the
+trap to suppress/override the summary.
+
+Class-related implication for regression-pair verification: when
+running aakq.7-style "must-fail-on-old-version" arms (and we'll
+need this for aala too at tag time), verification must be by exit
+code, not by the printed summary message. Tom did this correctly
+during 1.17.0 by discipline; harness fix removes the discipline
+dependency. Worth banking in my review checklist: **always check
+exit code first, summary text second, when reading e2e logs.**
 - **Randy mailed**: technical review summary + ask to review aala.1
   SOT when it lands + confirm the .1→.2 dep edge.
 - **Tom mailed**: aala.10 (ac alignment) heads-up; suggested he scope
