@@ -1,158 +1,167 @@
 # Coordinator aweb-cloud (Tom) — Handoff
 
-Last updated: 2026-04-25 (v0.5.5 tagged + GHA in flight)
+Last updated: 2026-04-25 (v0.5.6 tagged + GHA in flight)
 
 ## Current state
 
-**ac v0.5.5 tagged** at `bc35ce5a` and pushed. GHA aweb-cloud CI/CD
-run `24933534665` is in progress (started 2026-04-25T14:52:40Z;
-v0.5.4 took 12m13s, expecting similar for the GHCR publish).
+**ac v0.5.6 tagged** at `e5f58ce5` and pushed (closes
+`aweb-aaja.6` P0 launch blocker — cross-repo Docker e2e for hosted
+MCP OAuth verified mail; custody.py canonical_payload SIGNED_FIELDS
+filter alignment). GHA aweb-cloud CI/CD run `24937821668` in
+progress; v0.5.5 went 13m54s, expecting similar.
 
-Origin/main HEAD is `bc35ce5a`. Pinned `aweb>=1.18.1`,
-`awid-service>=0.5.1`.
+**ac v0.5.5 prod-roll status:** as of this handoff, prod was still
+on v0.5.4 per /health (auto-window pending). v0.5.5 may auto-roll
+or v0.5.6 may roll directly — depends on the deploy mechanism's
+"latest tag" vs "tag-by-tag" behavior. Either way, the next coord
+should verify against /health.
 
-**Production is still on v0.5.4** as of this handoff (auto-deploy
-runs on its own schedule a few hours after image publish). Next
-coord-cloud should verify v0.5.5 reached prod via:
+Origin/main HEAD: `e5f58ce5` (v0.5.6 bump on top of Grace's
+`18021ff9`). Pinned `aweb>=1.18.1`, `awid-service>=0.5.1`.
 
-```bash
-curl -sS https://app.aweb.ai/health | python3 -m json.tool
-```
+## Verified-live discipline (NEW 2026-04-25, banked from awid cutover)
 
-Expect `release_tag: v0.5.5`, `git_sha: bc35ce5a...`,
-`aweb_version: 1.18.1`, `awid_service_version: 0.5.1`.
+For v0.5.6 onwards, GHA-green is NOT the same as feature-live. The
+release sequence now ends with:
 
-## v0.5.5 ship summary
+1. After GHA green + auto-deploy: curl `app.aweb.ai/health`. Assert
+   `release_tag` matches the just-tagged version, `git_sha` matches
+   the bump commit, dep versions match the pin.
+2. One-shot smoke against the surface the release actually changed
+   (for v0.5.6: hosted MCP OAuth + send_mail signed-payload-verifies
+   path against deployed prod).
+3. Only AFTER both: mail Randy + Juan + John "v0.5.6 fully live."
 
-Three-commit delta from v0.5.4 (the canonical scope per Randy):
+This was banked because the awid-prod 0.3.1 stale-deployment incident
+(earlier today) showed that PyPI publish + tag push + GHA green can
+all be true while the running service is on a much older version. The
+trust-the-running-service step is what catches that gap.
 
-| SHA       | Ticket          | Purpose                                           |
-|-----------|-----------------|---------------------------------------------------|
-| `eb8e388d` | aweb-aala.10   | BYOIT certificate pickup documented (UI + docs)   |
-| `343f40f8` | aweb-aala.10   | Split-stack BYOIT e2e (3 HOMEs + bonus seed fix)  |
-| `bc35ce5a` | (release bump)  | aweb 1.18.1 + awid-service 0.5.1 + version 0.5.5  |
+## v0.5.6 ship summary
 
-Closes `aweb-aala.10` (P1, ac alignment with the BYOIT cross-machine
-cert contract). Picks up via the aweb pin bump:
-- aala epic (BYOIT cross-machine cert lifecycle: awid stores full
-  signed cert blobs; authenticated GET fetch endpoint; identity-scoped
-  mail tolerates multi-team DID membership)
-- aweb-aajs (BYOD wizard identity-lifetime prompt fix; CLI-side, zero
-  ac surface impact)
-- aweb-aakk (task-claim dashboard event publishing fix; positive ac
-  inherit on the dashboard event feed)
+Single-commit functional delta from v0.5.5:
+| SHA       | Ticket          | Purpose                                        |
+|-----------|-----------------|------------------------------------------------|
+| `18021ff9` | aweb-aaja.6     | Hosted MCP OAuth signed mail e2e + custody.py canonical_payload swap |
+| `e5f58ce5` | (release bump)  | version 0.5.5 → 0.5.6, no pin change           |
 
-Full narrative in `ai.aweb/docs/decisions.md` 2026-04-25 entry.
+Pre-bump bisect: tested against pure aweb 1.18.1 sibling (`b0b2b27`
+checkout, dropping 2e6156b aajg/aajh + ed4fa89 awid tooling) — 10
+passed. The aajg `canonical_signed_payload` alignment in 2e6156b is
+real and ships in aweb 1.18.2 (John's timeline), but ac's hosted MCP
+signing path doesn't depend on it. Symmetric canonicalization on
+either side of the wire converges; cleaning up either end alone is
+sufficient.
 
-## Coord-borrow precedent set this release
+Full narrative in `ai.aweb/docs/decisions.md` 2026-04-25 entry titled
+"aweb-cloud v0.5.6 ships; closes aaja.6 (P0 launch blocker)".
 
-aala.10 implementation was authored by Grace (John's dev) under
-Tom's coord-borrow. Sequence:
-1. Grace started ac changes unsupervised (lane incursion).
-2. John redirected once; she partially complied, then continued.
-3. John relayed to Tom; Tom proposed insight-option (text-only
-   writeup, code stashed).
-4. Juan pushed back: "is it not better to let Grace just do ac
-   work as well and you code review?"
-5. Randy concurred: "authorized cross-coord borrow is not what the
-   dispatch-via-coord memory was banked against."
-6. Tom briefed Grace explicitly (Juan-greenlit, Tom is ac-lane
-   coord, ac questions to Tom + aweb questions to John).
-7. Grace unstashed and worked under Tom's delta-review.
-8. Same gate discipline (per-gate log + SOT + CTO mailed approval)
-   as v0.5.4. Worked clean.
+## Coord-borrow precedent extends to v0.5.6
 
-The pattern is now established: **authorized cross-coord borrow is
-fine**; **unauthorized cross-coord work is not**. Difference is
-explicit founder/CTO greenlight + the lane coord taking review
-ownership.
+Grace authored 18021ff9 under continuing coord-borrow. Same pattern
+as v0.5.5 (aala.10) — Juan-greenlit cross-coord borrow, Tom owns
+ac-side review + gate discipline, John remains aweb-coord for
+Grace's other tracks. The borrow is now a first-class operating
+mode, not an exception.
 
-Banked as `feedback_close_the_loop_at_tag_time.md` lesson on the
-sender side and `feedback_dispatch_via_coordinator.md` clarification
-on the receiver side.
+## Pending verification chain
 
-## Release protocol locked in (v0.5.4 + v0.5.5 confirms it)
+1. GHA `24937821668` green for v0.5.6.
+2. Auto-deploy of v0.5.6 (and v0.5.5 if it hasn't rolled — though
+   deploy might skip straight to v0.5.6 as the latest tag).
+3. /health verification.
+4. Hosted MCP OAuth + send_mail smoke against deployed prod.
+5. Mail Randy + Juan + John "v0.5.6 fully live."
+6. John fires his queued prod-awid BYOIT smoke (controller add-member
+   uploads cert blob → joining-machine fetch via authenticated GET +
+   wrong-DID 403). One mail to Randy with both legs confirmed.
 
-Every future release from here on:
+## Release protocol locked in (3 cycles, v0.5.4 + v0.5.5 + v0.5.6)
 
-1. Verify PyPI has the dep versions before bumping pyproject.toml.
+For every future release:
+
+1. Pre-bump bisect when pin decisions are ambiguous.
 2. Bump commit (pyproject.toml + uv.lock).
-3. `uv sync` to pull post-bump deps into `.venv`.
+3. `uv sync` post-bump.
 4. `make release-ready` against post-bump `.venv`. Per-gate log
-   mailed to Randy as a single composite (or per-gate if any go
-   red).
-5. SOT analysis mail to Randy — walk aweb-sot, awid-sot,
-   trust-model, ac/sot for drift; name operator-visible edges in
-   release notes; check vs prior version for regression.
-6. CTO written-and-mailed approval. Prose in conversation does not
-   count.
+   mailed to Randy.
+5. SOT analysis mail. Walk aweb-sot, awid-sot, identity.md, ac/sot
+   for drift; check vs prior version for regression; map acceptance
+   criteria for any tickets being closed.
+6. CTO written-and-mailed approval.
 7. Explicit `git push origin main` + `git tag -a vX.Y.Z` + `git
-   push origin vX.Y.Z`. Do NOT use `make ship` (auto-pushes tag,
-   short-circuits approval).
-8. Verify GHA green after tag push. If red, stop and mail Randy.
-9. Tag-time ping to John (close-the-loop) and any other affected
-   coord. Don't make peers git-log to find out.
-10. Decision record to `ai.aweb/docs/decisions.md` mirroring
-    aweb-side structure.
+   push origin vX.Y.Z`. Do NOT use `make ship`.
+8. Verify GHA green.
+9. Tag-time pings to all coords whose work fed the release.
+10. **Verified-live**: /health + smoke against deployed prod.
+11. Final "fully live" mail when verified.
+12. Decision record entry to `ai.aweb/docs/decisions.md`.
 
-## Memory file count for next coord-cloud
+## Memory bank for next coord-cloud
 
-Eight feedback memories accumulated in
+11 feedback memories in
 `/Users/juanre/.claude/projects/-Users-juanre-prj-awebai-ai-aweb/memory/`:
 - aweb_cross_namespace_membership.md (reference)
-- feedback_review_via_symlink.md (review via shared tree)
-- feedback_spec_scope_all_consumers.md (grep all file types)
-- feedback_gut_over_confident_agent.md (verify before approving)
-- feedback_dispatch_via_coordinator.md (route through coord)
-- feedback_reproduce_exact_invocation.md (run the same harness)
-- feedback_approval_via_mail.md (CTO approval via mail not prose)
-- feedback_makefile_is_authoritative_gate_chain.md (Makefile wins
-  over skill-doc gate lists; corollary on target body vs name)
-- feedback_close_the_loop_at_tag_time.md (ping cross-coord peers)
-- feedback_mail_body_escaping.md (heredoc-single-quote for mail
-  bodies; backticks get command-substituted otherwise)
+- feedback_review_via_symlink.md
+- feedback_spec_scope_all_consumers.md
+- feedback_gut_over_confident_agent.md
+- feedback_dispatch_via_coordinator.md
+- feedback_reproduce_exact_invocation.md
+- feedback_approval_via_mail.md
+- feedback_makefile_is_authoritative_gate_chain.md (with corollary
+  on target body vs name from 2026-04-25)
+- feedback_close_the_loop_at_tag_time.md
+- feedback_mail_body_escaping.md
+
+Pending bank candidates from today's incidents:
+- "GHA-green ≠ feature-live" / verified-live discipline. Could fold
+  into close_the_loop_at_tag_time as a corollary, or stand alone.
+- "404 ≠ data missing; verify endpoint shape against a known-good
+  record before drawing inferences." Same family as
+  reproduce_exact_invocation; could fold there.
+Decision deferred to next handoff cycle.
 
 ## Dev agents (ephemeral, in the ac repo)
 
-| alias | last seen   | notes                                              |
-|-------|-------------|----------------------------------------------------|
-| grace | active today | Authored eb8e388d + 343f40f8 under Tom's borrow.  |
-| mia   | offline 2d   | Closed aakv/aakt/aakw/aakx in v0.5.4 cycle.       |
-| bob   | offline 9d+  | aweb-aakh stale claim; un-claim if still stale.   |
-| leo   | offline 5d+  | (none)                                             |
-| ivy   | offline 6d+  | (none)                                             |
-| eve   | offline 8d+  | (none)                                             |
-
-Mia's queued surface-walk dispatch was made moot by Grace's borrow;
-her queue still has it, but she should treat it as stand-down on
-return.
+| alias | last seen     | notes                                                 |
+|-------|---------------|-------------------------------------------------------|
+| grace | active today  | Authored eb8e388d + 343f40f8 + 18021ff9 under borrow. |
+| mia   | offline 2d+   | aakv/aakt/aakw/aakx via v0.5.4. Stand down still.     |
+| bob   | offline 9d+   | aweb-aakh stale claim; un-claim if no movement.       |
+| leo   | offline 5d+   | (none)                                                |
+| ivy   | offline 6d+   | (none)                                                |
+| eve   | offline 8d+   | (none)                                                |
 
 ## Open ac branches
 
-- `main` at `bc35ce5a` (v0.5.5).
+- `main` at `e5f58ce5` (v0.5.6).
 - `aaga-archive` — remote-only; preserved per Randy's note.
 
-## Known follow-up (carried from v0.5.4 handoff, still time-bound)
+## Time-bound follow-up (carried)
 
-GHA workflow uses several actions still on Node.js 20:
-`actions/checkout@v4`, `docker/build-push-action@v6`,
-`docker/login-action@v3`, `docker/metadata-action@v5`,
-`docker/setup-buildx-action@v3`, `docker/setup-qemu-action@v3`.
-GitHub forces Node 24 by **2026-06-02** and fully removes Node 20
-on **2026-09-16**. Pre-2026-06 task: bump action versions in
-`.github/workflows/*.yml`. v0.5.5 GHA run still triggered the
-deprecation annotation; not blocking.
+GHA workflow uses Node.js 20 actions. GitHub forces Node 24 by
+**2026-06-02** and removes Node 20 by **2026-09-16**. Pre-2026-06
+task to bump action versions in `.github/workflows/*.yml`.
 
 ## What to check FIRST on next wake-up
 
-1. GHA run `24933534665` outcome — did v0.5.5 publish cleanly to
-   GHCR? If red, diagnose and escalate to Randy.
-2. Prod deploy state — is v0.5.5 serving `app.aweb.ai`?
-3. Mail Randy + Juan + John with "v0.5.5 fully published" once both
-   GHA and prod-roll are confirmed green. John specifically asked
-   for this signal to close the aala epic on his side.
-4. After prod-roll: spot-check the BYOIT flow against hosted prod
-   (the new fetch-cert command, ByoitIdentitySetupFlow dashboard
-   page, accept-invite same-machine framing).
-5. `bob` stale claim on aweb-aakh.
-6. Anything new on Juan/Randy side (mail inbox first).
+1. GHA `24937821668` outcome. Diagnose if red.
+2. Prod /health: `curl -sS https://app.aweb.ai/health`. Confirm
+   `release_tag: v0.5.6`, `git_sha: e5f58ce5...`. If still on
+   v0.5.4 or v0.5.5, deploy is lagging — check Render dashboard
+   indirectly via Juan if needed.
+3. Hosted MCP OAuth smoke against deployed prod. Replicate the
+   key path of TestHostedMCPOAuth manually: register an OAuth
+   client, complete the PKCE flow, send_mail via /mcp/, fetch
+   the message, verify the signature against the canonical
+   bytes. If any step fails, escalate to Randy before signaling
+   live.
+4. Mail Randy + Juan + John "v0.5.6 fully live" once steps 2+3
+   pass. That's the signal John waits for to fire his queued
+   prod-awid BYOIT cross-machine smoke.
+5. v0.5.5 prod-roll status — if v0.5.5 was skipped in favor of
+   going direct to v0.5.6, no action; if both deployed in
+   sequence, the v0.5.5 fully-live mail is pending too (could
+   bundle with v0.5.6 mail).
+6. `bob` stale claim on aweb-aakh.
+7. Anything new from Juan/Randy/John (mail inbox first).

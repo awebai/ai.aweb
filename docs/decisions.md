@@ -6,6 +6,110 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-25 — aweb-cloud v0.5.6 ships; closes aaja.6 (P0 launch blocker)
+
+**Commits (ac):**
+- `18021ff9` Add hosted MCP OAuth signed mail e2e (aweb-aaja.6, custody.py canonical_payload swap + cross-repo Docker e2e)
+- `e5f58ce5` release: v0.5.6, aweb-aaja.6 hosted MCP OAuth verified mail (tagged `v0.5.6`)
+
+**Decision maker:** Randy (written tag-approval) + Tom (coord-cloud)
+
+**Decision.** v0.5.6 closes `aweb-aaja.6` (P0 launch blocker — cross-repo
+Docker e2e for hosted MCP OAuth verified mail). Single-commit functional
+delta from v0.5.5. Pin unchanged (`aweb>=1.18.1`, `awid-service>=0.5.1`).
+Implementation track: Grace authored `18021ff9` under Tom's continuing
+coord-borrow (same shape as aala.10 yesterday/today). Tom committed the
+bump after a pre-bump bisect against pure aweb 1.18.1 sibling confirmed
+the canonical_payload swap is sufficient by itself — no aweb 1.18.2
+cycle required for the ac side.
+
+**What changed in custody.py (the product fix).** `sign_hosted_mcp_message`
+now computes `signed_payload = canonical_payload(dict(payload))` instead
+of `canonical_json_bytes(dict(payload))`. The two functions live in
+`awid.signing`; `canonical_payload` filters to the awid-defined
+`SIGNED_FIELDS` set (the message fields that participate in
+cryptographic identity), `canonical_json_bytes` serializes the entire
+dict. Receivers (awid + aweb verifiers) reconstruct against
+`canonical_payload`, so the prior implementation produced signatures
+that didn't verify when the input dict carried any non-SIGNED-FIELDS
+key (e.g. transport-only routing metadata). After the swap, hosted
+MCP OAuth-routed mail produces `signed_payload` bytes that verify
+correctly end to end.
+
+**What the new e2e covers** (TestHostedMCPOAuth in
+`backend/tests/test_two_service_e2e.py`): full OAuth code+PKCE
+handshake against `/oauth/{register,authorize,token}` (asserts the
+`mcpa_` access-token prefix), `/mcp/` initialize, `tools/call`
+send_mail + check_inbox, message lookup by subject, and
+`verify_did_key_signature` against the received `signed_payload` —
+asserts `verified=True`. Real cloud + real mounted aweb + real awid
+(Docker two-service stack).
+
+**Pre-bump bisect.** `make test-two-service` executed twice:
+1. Against aweb sibling at `b0b2b27` (pure 1.18.1 release commit;
+   `2e6156b` "Harden hosted MCP proxy signing" / aajg + `ed4fa89`
+   awid-prod-tooling intentionally dropped from worktree): 10 passed
+   in 4.28s, including TestHostedMCPOAuth.
+2. Against aweb sibling at main (post-aajg): 10 passed in 4.24s.
+Both green. The aajg `canonical_signed_payload` alignment is a real
+fix and will land in aweb 1.18.2 on John's timeline, but ac's hosted
+MCP signing path doesn't depend on it. Worth banking — symmetric
+canonicalization on either side of the wire is convergent: cleaning
+up either end alone converges, both is just earlier.
+
+**Trust model + invariants check:**
+- DNS anchors trust → unchanged. Signature still authenticates the
+  custodial sender's `did:key`.
+- Custody choice → unchanged. Hosted MCP OAuth is custodial; v0.5.6
+  makes that signature USEFUL, not nearly-correct.
+- Coordination is the product → direct positive. Hosted-MCP-routed
+  mail is now provably verifiable on the receiving end.
+- Progressive disclosure / distribution / open+portable → unchanged.
+
+**Verified-live discipline established** (banked from the awid 0.3.1
+cutover-by-surprise earlier today). For v0.5.6 and every release from
+here on:
+1. GHA green ≠ feature live.
+2. After auto-deploy, curl `app.aweb.ai/health` and assert
+   `release_tag` matches the just-tagged version + `git_sha` matches
+   the bump commit.
+3. Run a one-shot smoke against the deployed surface that the
+   release actually changes (for v0.5.6: hosted MCP OAuth + send_mail
+   path + signature verification).
+4. Only after both confirm — then mail "fully live."
+
+**Release protocol exercised again** (3rd time this week — v0.5.4 +
+v0.5.5 + v0.5.6 all under the same shape):
+1. Pre-bump bisect to settle pin requirements (new step this release;
+   bisect against pure 1.18.1 confirmed no 1.18.2 dependency).
+2. Bump commit (pyproject.toml only this time; uv.lock minor change).
+3. uv sync.
+4. make release-ready against post-bump `.venv`. 6 gates green:
+   release-verify-remote/model/migrations + test-backend
+   (1170 passed/10 deselected) + test-frontend (25 files/96 tests)
+   + test-two-service (10 passed including new TestHostedMCPOAuth).
+5. SOT analysis mailed.
+6. CTO written-and-mailed approval.
+7. Manual `git push origin main` + `git tag -a v0.5.6` + `git push
+   origin v0.5.6`.
+8. Verified-live (pending — GHA in flight, prod auto-roll after).
+
+**Closes:**
+- `aweb-aaja.6` (P0 launch blocker, cross-repo Docker e2e for hosted
+  MCP OAuth verified mail).
+
+**Open under aaja epic:**
+- `aweb-aaja.7` and other aaja subtasks (signing-path unification,
+  trusted-proxy header restoration in ../aweb MCP auth, shared
+  hosted-custodial signing hook). aaja parent stays open. Tom's
+  audit comment from earlier today still stands.
+
+**GHA:** release tag push triggered aweb-cloud CI/CD run
+`24937821668`. Verified-live mail to Randy + Juan + John follows
+on GHA-green + prod-roll + smoke-test pass.
+
+---
+
 ## 2026-04-25 — awid prod registry cutover from 0.3.1 to 0.5.1
 
 **Commits (aweb):**
