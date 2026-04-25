@@ -156,7 +156,62 @@ this slice):
 4. ✓ Fetch-envelope certificate field pinned: base64 of exact UTF-8
    team certificate JSON.
 
-## SHIPPED 2026-04-25: aweb 1.18.0 + aw CLI 1.18.0 + awid-service 0.5.0
+## SHIPPED 2026-04-25 (v1.18.1 republish): aweb 1.18.1 + aw CLI 1.18.1 + awid-service 0.5.1
+
+**Live on PyPI + npm**:
+- PyPI `aweb 1.18.1` ✓
+- PyPI `awid-service 0.5.1` ✓
+- npm `@awebai/aw@1.18.1` ✓ (downstream awebai/aw repo workflow 2m47s)
+- All 5 aweb-side GHA workflows fired clean (Server Release, aw Sync and Release, Awid Release GHCR, Awid Service Release PyPI, Server CI).
+
+**Release commit**: `b0b2b27` "release: aweb server 1.18.1, aw CLI 1.18.1, awid-service 0.5.1 (fixes 1.18.0 ghost-tag publish; includes aweb-aajs and aweb-aakk)"
+
+**Includes**: 1.18.0 aala bundle (898556d) + aweb-aajs BYOD wizard fix (4623979) + aweb-aakk dashboard task-claim events fix (3bc296e). Both Randy-approved scope-extensions on the same shape (small, real-gap, tracker-evidence-clean, found via tracker-hygiene scanning).
+
+**Coordinated**:
+- Tom mailed (`4edf68e3`) with unblock + final pin targets (aweb>=1.18.1, awid-service>=0.5.1).
+- Randy mailed (`89552454`) with ship confirmation; he had banked feedback_push_tags_individually.md during the recovery.
+
+## 1.18.0 → 1.18.1 ghost-tag detour (lessons banked)
+
+**What happened**: Tagged 1.18.0 + pushed all 4 tags in a single batched `git push`. Zero of the 4 GHA tag-triggered publish workflows fired (compared to 5 on 1.16.0 and 1.17.0). PyPI/npm never received 1.18.0/0.5.0; 1.18.0 became a ghost tag (commit + tags exist on origin but no artifacts).
+
+**Recovery (Option B, Randy-approved)**: bump versions to 1.18.1/0.5.1, fold in aajs + aakk on the same release commit, push tags **individually one-by-one** to defeat any GitHub batch-coalesce / event-dedup. Worked. All 5 workflows fired identical-pattern to prior releases.
+
+**1.18.0 ghost tag stays in origin** as audit history per Randy's call.
+
+**Memories banked** (shared project memory dir):
+- `feedback_prohibition_language.md` (mine, 2026-04-25 morning, from the Grace lane-cross resolution).
+- `feedback_push_tags_individually.md` (Randy's, 2026-04-25 afternoon, from this ghost-tag recovery).
+- Distinct lessons; both apply going forward.
+
+## Tracker audit pass (Randy-asked, 2026-04-25 afternoon)
+
+Walked Randy's list of 12 + aais epic. Net: **0 closures from his list**. 2 were already-closed pre-audit (aaki, aakg). 10 + aais's 9 subtasks all real-still-open work, not stale-shipped. Audit-result mail to Randy: `abbd81fd`.
+
+Methodology limit: I grep'd commit subjects + bodies for task-refs and bug-keywords; commits that landed without naming the task slip past. Randy's converging pass catches those.
+
+aweb-aajv (Dashboard lifecycle bypasses OSS mutation hooks) noted: Randy re-opened after Tom's pin-bump close was premature. Re-open canonical.
+
+aais (P1 epic, Hugo site + cloud docs alignment) — explicit site/ walk-through is Charlene/Avi/Eugenie's lane, not coord-aweb's audit. Hedged accordingly.
+
+## Final state of aweb-aala epic
+
+- 11 of 12 child tasks closed: `.1, .2, .3, .4, .5, .7, .6, .8, .9, .11, .12`.
+- 1 still open: `.10` (cloud aweb-cloud alignment) — Tom's lane via authorized cross-coord borrow with Grace. Pin updates land in ac v0.5.5.
+- Plus 2 epic-adjacent items shipped in 1.18.1:
+  - aweb-aajs (BYOD wizard) — tracker-hygiene scan find, fixed.
+  - aweb-aakk (dashboard task-claim events) — same.
+- Open as design question: `aweb-aakr` (membership-field duplication; Juan-level architectural call).
+
+## What's up next for me
+
+- Standing by for Tom's ac v0.5.5 tag mail.
+- Standing by for Randy's converging-pass on the audit (might re-open or close items).
+- Grace continuing tracker-hygiene scans + real implementation under my coord. Same protocol.
+- aweb-aald (BYOD ephemeral re-init observation Grace filed from my aajs review): future P? task, not actively scheduled.
+
+## SHIPPED 2026-04-25 (mid-day, ghost-tag): aweb 1.18.0 + aw CLI 1.18.0 + awid-service 0.5.0
 
 Release commit `898556d` on origin/main with 4 tags pushed:
 - `server-v1.18.0` — PyPI publish via GHA server-release.yml (aweb 1.18.0)
