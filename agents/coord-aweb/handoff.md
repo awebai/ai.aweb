@@ -82,16 +82,26 @@ race, low cost, but symptomatic of when announcement timing matters.
 
 ## What's up next
 
+- **aweb-aakz dispatched to Grace 2026-04-25** (multi-membership mail
+  409). P1 per Randy. Surfaced by Amy 2026-04-24 — two-membership
+  did:aw gets 409 on `aw mail send`, chat works. Latent bug newly
+  reachable via the per-membership flow aakq enabled. Server-side
+  analysis from Randy: `identity_auth_deps.py:126` raises on
+  multi-row; `:130` has the disambiguating `get_messaging_auth` that
+  chat uses but mail doesn't. Investigation order I gave Grace:
+  (1) check if cli/go/cmd/aw/mail.go sends X-AWID-Team-Certificate
+  the way chat does, (2) check which auth dep the mail handler uses,
+  (3) pick fix shape A/B/CLI. Same release protocol as 1.17.0;
+  Randy will signal whether ship is 1.17.1 (patch) or 1.18.0.
+- **Grace**: dispatched to aakz via chat. Offline 2d; will see on
+  return. No urgency (Amy on chat workaround).
 - **aweb-aakr** sits as a future design task. No action unless Juan
   wants to revisit the architectural question.
-- **Tom's v0.5.4 cycle**: Tom will mail when he tags. I may get
-  looped in if ac needs aweb-side context, but mostly his lane.
-- **Grace**: stood down after pushing .6/.7/.9/aaks. Earned a break.
-  She's the current de facto primary aweb dev; next epic will
-  likely pull her back in.
-- **Process check next wake-up**: verify Randy's CLAUDE.md updates
-  landed in coord-cloud, coord-awid, cto docs (he committed to
-  update them after Juan's 2026-04-22 workflow correction).
+- **Tom's v0.5.4 cycle**: still awaiting aakt/aakv dev dispatch
+  (Randy → Juan in flight). Tom said he'd ping if 12h+ stalled; we're
+  past that window now — worth a check-in if I see no progress.
+- **Process check**: verify Randy's CLAUDE.md updates landed in
+  coord-cloud, coord-awid, cto docs.
 
 ## Messages sent this cycle (retrospective)
 
