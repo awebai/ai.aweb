@@ -151,6 +151,20 @@ them to commit before the review, not after.
 | Comms (Charlene) | When a milestone ships in aweb | `aw mail send --to charlene --body "Shipped: ..."` |
 | Support (Amy) | When a user-reported bug is fixed | `aw mail send --to amy --body "Fixed: ..."` |
 
+## Release framing
+
+Every release / fix announcement (commit message, decision record entry,
+ship mail) follows the does/doesn't-fix contract: name what the fix
+DOES address (tracker ID + acceptance criterion) AND what it does NOT
+address (each by tracker ID + one-line "why unrelated to that issue's
+root cause"). When reviewing dev-agent commits whose touched code
+lives near multiple open trackers, require the dev to disclaim
+unrelated trackers explicitly.
+
+See `../../docs/team.md` "How releases get announced" for the
+canonical rule and the 2026-04-25 KI#1 incident that surfaced it,
+plus the complementary verified-live discipline.
+
 ## Handoff discipline
 
 Update `handoff.md` after every review cycle. A fresh instance should

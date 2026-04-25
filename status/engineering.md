@@ -1,52 +1,57 @@
 # Engineering Status
-Last updated: 2026-04-25 (Randy, post-aala launch)
+Last updated: 2026-04-25 (Randy, post-aalf RCA convergence)
 
 ## Current focus
 
-1. **aala epic shipped end-to-end.** aweb 1.18.1 + aw CLI 1.18.1 + @awebai/claude-channel 1.3.1 + awid-service 0.5.1 (PyPI + npm) + ac v0.5.5 (GHCR) all live as of 2026-04-25. BYOIT cross-machine team join + multi-membership flow works in production. Closes the user-visible aakn/aako/aakz arc that started with Amy's 2026-04-21 multi-team activation.
-2. **Tracker hygiene mid-pass.** Coord audit (John + Tom) closed 12 tasks. My converging pass on John's verdict found two P0 epics (aaiu + aaja) had architecturally shipped but were missed by his commit-message-grep methodology — endpoints/code exist, just commits never named the task IDs. Their epics stay open pending end-to-end test subtasks (aaiu.5, aaja.6, aaja.7) which are real-still-open work but smaller scope than the architectural fixes themselves.
-3. **aweb-aaks discipline paid out.** The release-gate process caught the 1.18.0 batch-tag-push ghost-publish failure before users discovered it. Recovery via 1.18.1 with aajs + aakk extensions worked first try.
+1. **aalf (KI#1) patch in motion.** RCA fully converged with John 2026-04-25: TX-side malformed envelope in ac dashboard mail path; verifier downgrade is correct. Patch shape settled — caller fix in messages.py + signer fix in sign_on_behalf (mirror CLI signEnvelope auto-correct), single commit, four-case regression test (Amy/Tom/John/Grace pre/post). Tom authorized lane; Grace patches under his coord. Will ship as v0.5.7 under standard gate-log + SOT + CTO mailed-approval + verified-live discipline.
+2. **awid prod cutover 0.3.1 → 0.5.1 happened today.** Discovered post-aala-tag that api.awid.ai prod was on 0.3.1 while aala depended on 0.5.1 endpoints. John executed dump-restore lifecycle. Banked: published artifact ≠ deployed service (new standing rule, decisions.md pending entry).
+3. **v0.5.6 mid-deploy.** GHA published; auto-deploy expected ~19:25Z per v0.5.5's ~50min window. Tom watching for /health flip + hosted-MCP-OAuth smoke.
 
 ## aweb OSS — 1.18.1 shipped
-- **Tags**: server-v1.18.1, aw-v1.18.1 (b0b2b27), channel-v1.3.1 (5b6a5ce), awid-v0.5.1, awid-service-v0.5.1. All 5 GHA workflows fired clean (vs 0 on the 1.18.0 batch attempt). PyPI + npm live.
+- **Tags**: server-v1.18.1, aw-v1.18.1 (b0b2b27), channel-v1.3.1 (5b6a5ce), awid-v0.5.1, awid-service-v0.5.1. All 5 GHA workflows fired clean (individual tag pushes worked — batch pushes don't). PyPI + npm live.
 - **Closes**: aala epic (BYOIT cross-machine + multi-team membership), aakz (multi-membership mail 409, superseded by aala.7), aajs (BYOD wizard identity lifetime), aakk (task-claim dashboard event publishing).
-- **Ghost tag**: server-v1.18.0 et al. exist on origin but never published — kept as audit history per decisions.md 2026-04-25 entry. 1.18.1 is the actually-published version.
 - **Open branches**: `beadhub-legacy` only (intentional archive).
 - **Blockers**: none.
 
-## aweb-cloud (ac) — v0.5.5 shipped
-- **Tag**: v0.5.5 (bc35ce5a). GHA run 24933534665 success in 13m54s. GHCR publish completed.
-- **Three commits v0.5.4 → v0.5.5**: feee297c (aakw, v0.5.4 work; included in framing) + bc35ce5a (bump) + 343f40f8 (aala.10 split-stack e2e) + eb8e388d (aala.10 docs/UI). Actual v0.5.5 delta is the latter three on top of v0.5.4.
+## aweb-cloud (ac)
+- **v0.5.5 verified-live**: /health returns release_tag=v0.5.5, aweb 1.18.1, awid 0.5.1, all subsystems green (Tom verified 2026-04-25 ~15:42Z).
+- **v0.5.6 mid-deploy**: GHA succeeded 13m9s; auto-deploy pending. Tom mailing when /health flips.
+- **v0.5.7 (planned)**: aalf KI#1 fix. Single commit (signer + caller + audit citation + four-case regression). Empty signing_key_id deferred.
 - **Pins**: aweb>=1.18.1, awid-service>=0.5.1.
-- **Open branches**: none. aaga-archive deleted earlier.
-- **Blockers**: none.
+- **Open branches**: none.
 
 ## awid
-- 0.5.1 shipped with aweb 1.18.1. Live on PyPI. No open work.
+- **api.awid.ai prod**: now on 0.5.1 as of 2026-04-25 cutover (commit ed4fa89 lifecycle-script-driven). Was on 0.3.1 prior — caused identity_mismatch on aala BYOIT path until cutover.
+- **PyPI awid-service**: 0.5.1 published with aweb 1.18.1 ship.
 
 ## Cross-repo alignment
-- ac pins: aweb>=1.18.1, awid-service>=0.5.1 — aligned.
-- Decision records up to date: aakq/aweb-1.17.0 (2026-04-23), ac-v0.5.4 (2026-04-23), aweb-1.18.1 + aakq+aakk recovery (2026-04-25), aala/v0.5.5 (pending Tom).
+- ac pins aligned with shipped aweb + awid. Verified post-deploy.
+- Decision records: aakq/aweb-1.17.0 (2026-04-23), ac-v0.5.4 (2026-04-23), aweb-1.18.1 + recovery (2026-04-25), aala/v0.5.5 (John converging). Pending: awid prod cutover, v0.5.7 KI#1.
 
 ## Concerns
-- **End-to-end test gaps for shipped P0 features**. aaiu.5 (hosted onboarding e2e), aaja.6 (cross-repo Docker e2e for hosted MCP OAuth verified mail), aaja.7 (signing-path unification) all open. Same regression-coverage gap class as aaks (latent SQL bug shipped 2026-03-27, surfaced 2026-04-22). The architectural fixes are in production; the regression-prevention tests aren't. Ranked next-priority post-aala launch.
-- **aais epic + 9 subtasks (Align aweb.ai site)**. Pending Charlene/Avi audit pass — site/ walk-through territory, not coord-aweb's lane. I haven't routed yet; will after launch settles.
-- **aajv (P1, ac dashboard lifecycle bypasses OSS mutation hooks)**. Re-opened during converging pass — ac/backend has 10+ direct UPDATE statements against aweb.agents and aweb.workspaces in lifecycle paths (agent_lifecycle.py:573/:794, etc.). Pin-bump made the OSS mutation-hook adapter AVAILABLE; doesn't prove ac is USING it. Pre-existing tech debt, not aala-induced. Needs explicit ac code audit when there's bandwidth.
-- **aakr (P4) + aaky (P3) + aalb (P3) + aalc (P2)** are filed and tracked. Not blocking anything.
+
+- **KI#1 (aalf) is launch-blocking.** Until v0.5.7 ships and verified-live proves verification_status=verified on TX-path mail, hosted dashboard mail send to multi-membership recipients is broken. Amy hits this; any new BYOIT user would hit it.
+- **End-to-end test gaps for shipped P0 features**. aaiu.5 (hosted onboarding e2e), aaja.6 (cross-repo Docker e2e for hosted MCP OAuth verified mail), aaja.7 (signing-path unification) open. The aalf patch's single-commit signer fix has small overlap with aaja.7; will coordinate at landing. Same regression-coverage class as aaks.
+- **Browser-verify pathway for UI-surface releases is missing from verified-live discipline.** Tom flagged on v0.5.5: dashboard UI changes pass /health curl probe but actual user-visible delta is browser-only. New corollary memory banked; will name in v0.5.6 or v0.5.7 decision record.
+- **aajv (P1, ac dashboard lifecycle bypasses OSS mutation hooks)**. Pre-existing tech debt. Pending bandwidth.
+- **aweb-aale (P3)** — channel plugin 1.1.0 mail-event header verified=false render. Display-only, not crypto. Not a ship-blocker.
+- **aakr (P4) + aaky (P3) + aalb (P3) + aalc (P2)** filed and tracked.
 
 ## Policies standing
 - Release gate (2026-04-22): full e2e + SOT analysis + CTO written-and-mailed approval before tag.
-- Review via shared working tree (2026-04-22): coordinators read commits via `git -C <repo>`.
-- Route dev-agent dispatch through coordinator (2026-04-23): dev dispatch goes via John/Tom/Goto.
-- Trust the Makefile's release-ready chain (2026-04-23): release gate list comes from `make release-ready` deps.
-- Written approval via mail (2026-04-23): "GO" is not GO until `aw mail send --to <approvee>` has fired.
-- Use prohibition language explicitly when redirecting devs (2026-04-25, John's): name the repo prohibition; state lane owner.
-- Push release tags individually (2026-04-25): batch push causes GHA event-coalesce; tag-triggered workflows don't fire.
-- Tracker audit needs symptom-check (2026-04-25): ID-grep alone misses fixes that landed without naming the task.
+- Review via shared working tree (2026-04-22).
+- Route dev-agent dispatch through coordinator (2026-04-23).
+- Trust the Makefile's release-ready chain (2026-04-23).
+- Written approval via mail (2026-04-23).
+- Use prohibition language explicitly when redirecting devs (2026-04-25).
+- Push release tags individually (2026-04-25).
+- Tracker audit needs symptom-check (2026-04-25).
+- **Published artifact ≠ deployed service (NEW 2026-04-25)**: artifact-on-registry + /health-reports-new-version + smoke-against-deployed-endpoint = "verified live." Banked from awid prod 0.3.1-vs-0.5.1 lag discovery.
+- **Browser-verify for UI-surface releases (NEW 2026-04-25)**: /health is necessary but not sufficient when the user-visible delta is dashboard copy/layout/flow. Add a browser probe. Banked from Tom's v0.5.5 flag.
 
 ## Next milestones
-- Tom commits v0.5.5 decision record entry to ai.aweb/docs/decisions.md.
-- aaiu.5 + aaja.6 + aaja.7 dispatch when Juan/Avi prioritize post-launch.
-- aais epic routing to Charlene/Avi.
-- aajv ac code audit when bandwidth surfaces.
-- Watch period for any latent aakq/aaks-class bugs surfacing under real load.
+
+- Tom + Grace: aalf patch + regression test → v0.5.7 ship under standard gate.
+- John: convergent decision record entry covering 1.18.1 + v0.5.5 + awid prod cutover + (when shipped) v0.5.7 KI#1 fix.
+- aaiu.5 + aaja.6 + aaja.7 dispatch when post-aalf-launch bandwidth opens.
+- aais epic routing to Charlene/Avi (post-launch).
