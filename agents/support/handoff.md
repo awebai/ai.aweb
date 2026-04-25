@@ -67,13 +67,25 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
      authority to dig.
    - Local↔awid binding INTACT (no rotation, both addresses bind
      to same did:key — ruled out as cause).
-   - Operational impact: my outbound mail arrives readable but
-     unverified to recipients. Chat path unaffected.
+   - Operational impact: my outbound mail AND outbound chat both
+     arrive identity_mismatch on the server (14/14 of my chat sends
+     to Randy in the live session, per `aw chat history --json`).
+     Earlier "chat unaffected" assumption was wrong — that was based
+     only on inbound-from-Randy headers rendering verified=true in
+     my channel; we never checked the server-recorded status for
+     amy→randy chats. Chat-event header on RX still reads
+     verified=true (likely session-cached trust or different
+     renderer path), but if any future authorization gate reads
+     server-side verification_status on chat, my coordination
+     breaks silently.
    - Investigation packet mailed to Randy 2026-04-25 (msg
-     83b35955) — self-contained for forwarding to John.
+     83b35955) — self-contained for forwarding to John. Bonus
+     chat-also-affected finding mailed 2026-04-25 (msg 198cbdfd).
    - Closure protocol: after CLI residual fix ships, send Randy
-     fresh CLI mail unchanged config; verified → closes; still
-     identity_mismatch → still residual scope.
+     fresh CLI mail AND fresh CLI chat under unchanged
+     cross-team config; both verification_status=verified on
+     server → closes; either still identity_mismatch → still
+     residual scope.
 
 2. **Channel plugin auto-acks mail** — The aweb channel plugin
    acknowledges mail on delivery, so `aw mail inbox` shows nothing.
