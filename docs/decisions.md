@@ -6,6 +6,69 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-25 — BYOIT cross-machine team join + multi-membership launch hardening (aala epic)
+
+**Commits (aweb):**
+- `ff92358` Implement cross-machine team cert fetch (aala.1 SOT + aala.2/.3/.4/.5/.7)
+- `9b2eed3` Add cross-machine fetch-cert e2e (aala.6/.8/.9/.11/.12)
+- `ba133d4` Fix BYOIT certificate pickup guidance (aala.9 follow-up)
+- `898556d` release: aweb server 1.18.0, aw CLI 1.18.0, awid-service 0.5.0 (tagged `server-v1.18.0`, `aw-v1.18.0`, `awid-v0.5.0`, `awid-service-v0.5.0`)
+
+**Decision maker:** Juan (architectural framing on awid storing signed public cert blobs; Grace executed the work breakdown end to end)
+
+**Decision.** Pre-aala, BYOIT cross-machine team join was structurally broken: `aw id team add-member` signed a certificate in memory, registered metadata only at awid, and lost the blob. From a different machine, `aw id team fetch-cert` had nothing to fetch, and `aw id team accept-invite` required local controller state. aala makes the cert lifecycle truly cross-machine: awid stores the full signed cert blob, controller-side `add-member` uploads it after signing, invitee-side `fetch-cert` downloads + verifies + installs.
+
+**What changed structurally:**
+
+1. **awid persists full signed cert blobs.** `public_certificates` table gains a nullable `certificate TEXT` column (additive migration). RegisterCertificate now validates the blob's signature against the team public key + the caller's controller signature in one atomic transaction at INSERT time; either the whole record lands or none does. (aala.2)
+
+2. **New authenticated awid fetch endpoint.** `GET /v1/namespaces/{domain}/teams/{name}/certificates/{cert_id}` returns the signed blob in a JSON envelope (base64 of exact UTF-8 team certificate JSON). Path-signature auth using the caller's identity DID key. Authorization is subject-only: caller must equal the cert's member_did_aw. Pre-blob records return 409 with reissue guidance. (aala.3)
+
+3. **CLI add-member uploads the blob and prints fetch-cert.** No invitee-side state is written from the controller's machine. (aala.4)
+
+4. **CLI fetch-cert is the cross-machine cert install path.** Verifies signature + member_did_aw + team_id locally before writing `.aw/team-certs/{team_id}/certificate.pem`. Refuses to overwrite an existing different cert by default; `--force` opt-in. Same-cert idempotent. (aala.5)
+
+5. **accept-invite is a same-machine helper for the controller's own machine.** Conservative path per Grace's call: fork between "redesign" and "rename + clarify" resolved as the latter. Help text + error messages updated; cross-machine flows go through request → add-member → fetch-cert. (aala.6)
+
+6. **Identity-scoped messaging tolerates multi-team DID membership.** `lookup_identity_agent_context` no longer raises 409 when an identity-scoped request finds multiple active local-agent rows for the same DID. Team-scoped (cert-auth alias-scoped) sends still reject ambiguity. test_messages_http carries a fixture with two active local-agent rows on the same DID exercising BOTH identity-scoped AND team-scoped paths (test contract Randy added during review). (aala.7, supersedes aweb-aakz)
+
+7. **CLI help text + aw init reality.** Stale references to impossible certificate locations removed. Error strings on `aw init` and `aw run` point cross-machine users at `request → add-member → fetch-cert`, not at the accept-invite path that fails for invitees. (aala.9 + ba133d4 follow-up)
+
+**Trust model preserved:**
+- awid stores public cert blobs (signed offline by team controller; uploaded as inert bytes).
+- awid never holds the team controller private key.
+- awid validates blob signatures against the team public key it already has.
+- DNS still anchors trust; crypto verifies it. Invariant #2 holds.
+
+**User-visible changes for release notes:**
+- New: `aw id team request` and `aw id team fetch-cert` commands; new awid fetch endpoint.
+- Behavioral change: `aw id team accept-invite` is now a same-machine helper for the controller. Cross-machine flows use the new request/fetch-cert path.
+- Fixed: `aw mail send` no longer 409s for persistent did:aw with multiple team memberships.
+- Schema: awid `public_certificates` gains nullable `certificate TEXT`. Pre-1.18 rows return 409 with reissue guidance from the fetch endpoint (no silent reconstruction).
+
+**Closes:**
+- `aweb-aala` (epic — BYOIT cross-machine + multi-membership launch hardening)
+- `aweb-aala.1` through `.9` + `.11` + `.12`
+- `aweb-aakz` (multi-membership mail 409, superseded by aala.7)
+- `aweb-aait` (fetch-cert from awid, superseded by aala.5)
+
+**Open under aala:**
+- `aweb-aala.10` — cloud `aweb-cloud` alignment (Tom's lane). ac v0.5.5 will pick up the new contract once aweb 1.18.0 tags. Mia is on the surface walk.
+
+**Open as design question (not in scope for aala):**
+- `aweb-aakr` (P4) — membership-field duplication between teams.yaml and workspace.yaml. Architectural commitment is Juan-level; deferred.
+
+**Release mechanics:**
+- aweb server: 1.17.0 → **1.18.0**
+- aw CLI: 1.17.0 → **1.18.0** (lockstep with server)
+- awid-service: 0.4.0 → **0.5.0** (cert blob storage + new fetch endpoint)
+- @awebai/claude-channel: stays at **1.3.1** (channel not touched in aala)
+- ac aweb pin: `aweb>=1.17.0` → `aweb>=1.18.0` + `awid-service>=0.4.0` → `awid-service>=0.5.0` (Tom handles in ac v0.5.5)
+
+**Gate log + SOT analysis** mailed to Randy 2026-04-25 (5da4621a). All gates green (Gate 1 unit/integration 368+144+cli+72; Gate 2 e2e 159 PASS all 22 phases; Gate 3 v1.17.0 regression arm correctly fails on Phase 11a's `add-member prints fetch-cert` assertion). CTO approval recorded with the release commit.
+
+---
+
 ## 2026-04-23 — aweb-cloud v0.5.4 ships; picks up aweb 1.17.0
 
 **Commits (ac):**
