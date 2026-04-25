@@ -146,16 +146,34 @@ After Grace's regression fix, all three gates verified:
 
 **Push approval covers**: aala.1, .2, .3, .4, .5, .7.
 
-**Four non-blocking follow-ups** captured for fix-before-tag:
-1. Randy's contract — multi-active-rows fixture's TEAM-SCOPED half
-   not in unit (e2e covers operationally). Most important to land —
-   prevents the regression-class re-emerging next auth-path touch.
-2. test_messages_http.py line 576 deleted `to_alias` assertion may
-   have been side-effect; verify intentional or restore.
-3. messages.py `from_alias_value` no longer falls back to
-   sender.alias for single-row identity-scoped sends. Verify alias
-   coverage exists for single-row case.
-4. Randy's SOT nit on fetch-envelope certificate-field shape.
+**Four non-blocking follow-ups** that Grace folded into the SAME
+commit before push (eliminating the post-push followup queue for
+this slice):
+1. ✓ Randy's multi-active-rows fixture team-scoped half — landed
+   (server suite 55 → 56 passed for this addition).
+2. ✓ Restored line 576 `to_alias` assertion.
+3. ✓ Confirmed single-row identity alias coverage.
+4. ✓ Fetch-envelope certificate field pinned: base64 of exact UTF-8
+   team certificate JSON.
+
+## ff92358 LANDED on origin/main 2026-04-25
+
+Single commit "Implement cross-machine team cert fetch" covers
+aala.1/.2/.3/.4/.5/.7 + the four follow-ups + Randy's new contract
+requirement. All 7 tracker tasks closed including aweb-aakz
+(superseded by aala.7 per Randy's framing — closes with pointer to
+aala.7's resolution).
+
+**Half the aala epic is in.** Remaining open:
+- .6 (accept-invite, conservative same-machine-helper path per
+  Grace's earlier decision)
+- .8 (per-membership address integration with cert issuance)
+- .9 (aw init + CLI help text reality)
+- .10 (cloud ac alignment — Tom's lane)
+- .11 (E2E test matrix expansion for full BYOIT cross-machine)
+- .12 (support and migration plan for pre-fix team certificates)
+
+Grace will pick at her pace; same review protocol per slice.
 
 ## NO-GO 2026-04-25 (earlier, resolved): aala e2e regression (held push)
 
