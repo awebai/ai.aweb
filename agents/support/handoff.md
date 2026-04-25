@@ -1,6 +1,6 @@
 # Support (Amy) Handoff
 
-Last updated: 2026-04-24
+Last updated: 2026-04-25
 
 ## Current state
 
@@ -35,11 +35,11 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Local versions (this workspace)
 
-- `aw`: 1.17.0 (commit e275743) ✓
-- channel plugin: **1.1.0** ✗ (need 1.3.0; pending `/plugin update`
-  by Juan + session restart). Until upgraded, channel events still
-  exhibit the pre-1.3.0 address-signing context that may be the root
-  cause of Known Issue #1.
+- `aw`: 1.18.1 (commit ff8161c) ✓ (upgraded 2026-04-25 via `aw upgrade`)
+- channel plugin: **1.1.0** ✗ (need 1.3.1; pending `/plugin update
+  aweb-channel@awebai-marketplace` by Juan + session restart). 1.3.1
+  carries both aakq.1 (precedence flip — likely fix for KI#1) and a
+  .mcp.json shape fix that was broken in 1.1.0-1.3.0.
 
 ## Known issues
 
@@ -49,7 +49,7 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    channel plugin is **1.1.0** (pre-aakq.1 fix to channel
    address-signing context). Randy's hypothesis: 1.1.0 signs with
    identity.yaml.address while the cert binds aweb.ai/amy, producing
-   the mismatch. Pending plugin upgrade to 1.3.0 + re-test before
+   the mismatch. Pending plugin upgrade to 1.3.1 + re-test before
    declaring resolve-or-reproduce.
 
 2. **Channel plugin auto-acks mail** — The aweb channel plugin
@@ -59,18 +59,14 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    Juan. Two options discussed: (a) channel stops auto-acking, agent
    acks explicitly; (b) add a "recently delivered" view.
 
-3. **`aw mail send` returns 409 for me** (aweb-aakz, P2, filed by
-   Randy 2026-04-25) — `aw mail send --to-address <full-address>`
-   returns `http 409: Authenticated DID matches multiple active
-   local agents`. Reproduces with and without `--team` override.
-   Chat path works fine. Hypothesis: server resolves my did:key to
-   two active local-agent rows (one per membership in
-   workspace.yaml) and the mail auth path doesn't disambiguate via
-   team header while chat does. **Workaround until fixed:** route
-   any agent-to-agent updates through `aw chat send-and-leave`
-   instead of mail. Affects routing feedback to Avi, Tom, Randy,
-   etc. Discovered 2026-04-24 trying to mail Randy a handoff-update
-   confirmation.
+3. **Inbound mail from Randy arrives `verified=false`** (observed
+   2026-04-25 on aweb-1.18.1+ec-v0.5.5 release-announcement mail).
+   Possibly Randy's mail address-signing path has the same shape
+   problem KI#1 has on the chat path, but on the mail side. Could
+   also be a TOFU pin issue from before Randy rotated. Worth a
+   targeted ping after my own KI#1 closes — if my outbound mail
+   arrives verified=true at Randy but his to me arrives
+   verified=false, that's asymmetric and points at his side.
 
 ## Resolved issues
 
@@ -99,7 +95,35 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    `aw whoami` shows Address=aweb.ai/amy, Domain=aweb.ai (consistent).
    Note: identity.yaml.address itself is still stale on disk
    (juan.aweb.ai/amy) — that's the input shape for the channel-plugin
-   side of aako, which channel 1.3.0 fixes.
+   side of aako, which channel 1.3.1 fixes.
+
+6. **`aw mail send` 409 multi-membership** (aakz, fixed in aweb 1.18.1
+   / aala.7 — identity_auth_deps.py identity-scoped path now tolerates
+   persistent did:aw rows with multiple active team memberships).
+   Confirmed 2026-04-25: `aw mail send --to-address juan.aweb.ai/randy`
+   succeeded (message_id 9f426014-8d27-4c53-bae6-84339a028d84). The
+   chat-fallback workaround documented yesterday is no longer needed.
+
+## Cross-machine BYOIT — answer for stage 4+ users
+
+When a user describes "team controller on machine A, agent on machine
+B" or asks how to add a remote agent to a team they own, the canonical
+flow as of aweb 1.18.1 is:
+
+1. **Joining agent (machine B):** `aw id team request` — prints the
+   command the controller needs to run, including the joining agent's
+   `did:key`.
+2. **Controller (machine A):** `aw id team add-member --did <member-did:key>`
+   — approves the remote member; output now includes the fetch-cert
+   hint for the joiner.
+3. **Joining agent:** `aw id team fetch-cert --namespace <domain> --team <team> --cert-id <id>`
+   — pulls the issued cert from awid.
+4. **Joining agent:** `aw init` (or re-init the workspace) — comes
+   online in the team.
+
+Sources: `aweb/docs/awid-sot.md` (Issuance flow) and
+`aweb/docs/identity.md` (BYOIT cross-machine paragraph). Read these
+when a user goes deep — don't paraphrase from memory.
 
 ## Conversations
 
