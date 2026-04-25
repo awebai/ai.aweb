@@ -43,33 +43,37 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Known issues
 
-1. **IDENTITY MISMATCH on outbound messages — verifier-side bug,
-   P1 filed by Randy 2026-04-25.** Confirmed reproduced under
-   current stack (aw 1.18.1, channel 1.3.1, awid prod 0.5.1) on
-   fresh mail 335a4c2b. Not a plugin-version, awid-version, or
-   stale-state issue. Triage trail:
-   - Local↔awid binding INTACT: `aw id show`, `aw id resolve`, `aw id addresses`
-     all agree my did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ ↔
-     did:key:z6MkrGU6...uxV3o, no rotation in awid log (single
-     register_did at seq 1, 2026-04-20T11:36:44Z), both addresses
-     (aweb.ai/amy and juan.aweb.ai/amy) bind to the same did:key.
-   - aakq.1 fix DID work: from_address now derives from cert
-     correctly (post-upgrade mails show from_address=aweb.ai/amy).
-   - Server-side: `verification_status: "identity_mismatch"`,
-     `signature_present: true`, `from_did` and `from_stable_id`
-     populated, but `signing_key_id: ''` (empty) — consistent across
-     four test mails today.
-   - Leading hypothesis: CLI verifier chain in
-     `aweb/cli/go/awid/client.go` (PinResolver/RegistryResolver/
-     recipient-binding) falls through to identity_mismatch when
-     signing_key_id is empty on cert-authenticated sends. Needs a
-     dispatched fix; Randy filed P1 for John to dispatch.
-   - Operational impact: my outbound mail still arrives and is
-     readable, but receivers see it marked unverified. Until the
-     verifier fix lands, treat any mail you send as "untrusted on
-     receipt" for the verification signal. Chat works (chat-side
-     verification path not affected, per Randy's earlier sender_leaving
-     chats showing verified=true on his side and mine).
+1. **IDENTITY MISMATCH on outbound — CLI cross-team-cert residual
+   (separate from v0.5.7 dashboard fix).** Status 2026-04-25
+   evening: v0.5.7 closes the ac dashboard mail TX path (Grace's
+   RCA, fix in ac/backend f5db375a). My reproductions are NOT on
+   that path — all 4 banked instances (4b4468ff, 9f426014,
+   d5e80f3b, 335a4c2b) are CLI `aw mail send`. Randy revised the
+   decision-record framing to "TX-shape root cause closed (dashboard);
+   CLI cross-team-cert empty-string signing_key_id residual
+   identified" and dispatched the CLI investigation to John.
+   - Empirical differential (this workspace, 2026-04-25): 18/18
+     inbound mails to me show `signing_key_id` ABSENT and verify
+     fine. Mine outbound shows `signing_key_id` EMPTY-STRING and
+     downgrades to `identity_mismatch`. Empty-string is exclusive
+     to my outbound — sender-side specific.
+   - Likely triggered by my cross-team config: active team's
+     cert.member_address (aweb.ai/amy) ≠ identity.yaml.address
+     (juan.aweb.ai/amy — stale home). Hypothesis points at signEnvelope
+     in aweb/cli/go/awid/client.go:40-97 — either the early return
+     at line 41 fires on this config and a downstream layer fills
+     FromDID without filling SigningKeyID, or a non-signEnvelope
+     path produces my wire envelope. John has the OSS contract
+     authority to dig.
+   - Local↔awid binding INTACT (no rotation, both addresses bind
+     to same did:key — ruled out as cause).
+   - Operational impact: my outbound mail arrives readable but
+     unverified to recipients. Chat path unaffected.
+   - Investigation packet mailed to Randy 2026-04-25 (msg
+     83b35955) — self-contained for forwarding to John.
+   - Closure protocol: after CLI residual fix ships, send Randy
+     fresh CLI mail unchanged config; verified → closes; still
+     identity_mismatch → still residual scope.
 
 2. **Channel plugin auto-acks mail** — The aweb channel plugin
    acknowledges mail on delivery, so `aw mail inbox` shows nothing.
