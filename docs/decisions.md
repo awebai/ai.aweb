@@ -6,6 +6,111 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-25 — awid prod registry cutover from 0.3.1 to 0.5.1
+
+**Commits (aweb):**
+- `ed4fa89` Add awid prod DB lifecycle script and Makefile targets
+
+**Decision maker:** Juan (cutover authorization) + John (coord-aweb, executed)
+
+**Decision.** Cut the awid registry production database (Neon Postgres,
+api.awid.ai) from schema-version 0.3.1 to 0.5.1 by dumping data,
+dropping the schema, re-applying the bundled `001_registry.sql` from
+0.5.1, and restoring data. Once the schema was at 0.5.1 form, Juan
+triggered a Render redeploy of the awid:0.5.1 image; pgdbm computed
+the matching checksum on boot, skipped migration, and api.awid.ai
+began reporting `version=0.5.1` with db+redis healthy.
+
+**Why a destructive cutover and not an additive migration.** awid uses
+a single consolidated migration file (`001_registry.sql`, since 0.3.0
+in commit `cd01fac`). The aala epic (1.18.0/1.18.1, 0.5.0/0.5.1) added
+the `team_certificates.certificate TEXT` column for BYOIT cross-machine
+cert-blob persistence by editing 001 in place. pgdbm hashes migration
+files (line-endings normalized + stripped, then SHA-256) and refuses
+to boot when the bundled-file checksum disagrees with the
+`schema_migrations.checksum` row from the prior apply. So a 0.5.1 pod
+booting against a 0.3.1-checksum-pinned database would have hit
+`MigrationError: Migration 001_registry.sql has been modified after
+being applied!` and refused to start.
+
+**The deployment lag that surfaced this.** awid 0.4.0 published to
+PyPI on 2026-04-21 but the Render-deployed pod stayed on 0.3.1 — the
+deploy is manual-only (no API key in `.env.awid-production`, no
+deploy hook configured) and version drift on `api.awid.ai/health` was
+not being monitored. When aala BYOIT tagged 2026-04-25 as aweb 1.18.0
+(ghost) and then 1.18.1 (published), prod awid was still on 0.3.1.
+Result: aala BYOIT had no production awid backend for the window
+between the aala tag and this fix (~hours; aala tagged earlier 2026-04-25,
+cutover completed 18:13:53 UTC the same day). The new
+`/v1/namespaces/{domain}/teams/{name}/certificates/{cert_id}` fetch
+endpoint and the `certificate` blob upload path were not actually
+serving in prod during that window.
+
+**Recovery encoded as a reusable artifact.** `aweb/awid/scripts/prod_db_reset.py`
+with subcommands `dump`, `drop-schema`, `migrate`, `restore`, `verify`,
+`reset` (orchestrator). Default `--env-file` is
+`aweb/.env.awid-production`; destructive paths gated on `--yes`.
+Wrapper Makefile targets: `awid-prod-verify`, `awid-prod-dump`,
+`awid-prod-restore DUMP=...`, `awid-prod-migrate`,
+`awid-prod-drop CONFIRM=yes`, `awid-prod-reset CONFIRM=yes`.
+
+Two PG-version-skew sanitizers are baked into the script and would
+have broken the cutover blind otherwise (host operator's `pg_dump` is
+17.x, Neon prod is PG 16):
+- Strip `SET transaction_timeout = 0;` from the dump (PG-17-only
+  parameter; PG 16 servers reject it as unknown).
+- Strip `schema_migrations` DML from the dump so the freshly-applied
+  migration row stays canonical instead of either colliding on the
+  primary key or restoring the stale 0.3.1 checksum.
+
+Both were caught in a local docker-postgres:16-alpine dry-run with a
+synthetic seed across all seven awid tables before going to prod.
+
+**Cutover verification:**
+- Pre/post row counts identical: 74/74/14/20/0/8/3 across
+  did_aw_mappings / did_aw_log / dns_namespaces / public_addresses /
+  replacement_announcements / teams / team_certificates.
+- New `team_certificates.certificate` column present and nullable.
+  Three pre-existing certs from the 0.3.x era have `certificate IS NULL`
+  (consistent — they predate the BYOIT blob).
+- `schema_migrations` reset to a single fresh row; checksum
+  `e6ea1d1b…` matches the bundled `001_registry.sql` under pgdbm's
+  normalization (raw `sha256(file)` is `eac20306…` and does NOT match;
+  pgdbm normalizes line endings + strips first).
+- `GET /v1/did/<did_aw>/head` returns real DID records from migrated
+  data. `GET /v1/namespaces/<domain>/addresses/<name>` resolves
+  verified+public addresses. Reachability gating still rejects
+  `org_only` to anonymous callers.
+- Dump preserved at `/tmp/awid-awid-reset-20260425T181335Z.sql` as
+  rollback safety net.
+
+**Migrations discipline lesson banked.** When a project uses a single
+consolidated migration file, every additive schema change goes in a
+NEW ordered file (`002_<name>.sql`, `003_<name>.sql`, …). Editing the
+existing consolidated file in place trips pgdbm's checksum guard and
+forces a destructive dump-restore cutover. Coordinators (John, Goto)
+flag PRs that touch the existing 001 file for anything other than
+comments/whitespace. Rule banked at the code-time-visible layer:
+`aweb/AGENTS.md` (added in this same coord cycle, separate aweb
+commit).
+
+**Open follow-ups:**
+- Smoke test of aala BYOIT cross-machine cert lifecycle against prod
+  awid (controller add-member uploads blob → joining agent fetches
+  via authenticated GET). Phase 11a passed against sibling 0.5.1 in
+  dev; prod was never exercised. Grace to run after pushing aaja.6;
+  John mails Randy with result.
+- awid prod redeploy is still manual via Render dashboard. No deploy
+  hook URL in repo; no API key in `.env.awid-production`. Worth a
+  Juan-level decision on whether to set up a deploy hook + version-drift
+  monitoring (e.g., a daily probe of api.awid.ai/health vs PyPI head
+  awid-service version) so the next aala-style mismatch is caught
+  before it becomes a launch-day cutover.
+
+**Closes:** none — this is operational recovery, not a tracker item.
+
+---
+
 ## 2026-04-25 — aweb-cloud v0.5.5 ships; picks up aweb 1.18.1 + completes aala.10
 
 **Commits (ac):**
