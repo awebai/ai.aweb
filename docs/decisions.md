@@ -12,7 +12,10 @@ handoff to detect that the world changed.
 - `ff92358` Implement cross-machine team cert fetch (aala.1 SOT + aala.2/.3/.4/.5/.7)
 - `9b2eed3` Add cross-machine fetch-cert e2e (aala.6/.8/.9/.11/.12)
 - `ba133d4` Fix BYOIT certificate pickup guidance (aala.9 follow-up)
-- `898556d` release: aweb server 1.18.0, aw CLI 1.18.0, awid-service 0.5.0 (tagged `server-v1.18.0`, `aw-v1.18.0`, `awid-v0.5.0`, `awid-service-v0.5.0`)
+- `898556d` release: aweb server 1.18.0, aw CLI 1.18.0, awid-service 0.5.0 — **GHOST TAG**. Tags `server-v1.18.0`, `aw-v1.18.0`, `awid-v0.5.0`, `awid-service-v0.5.0` were pushed to origin in a single batched `git push` command. All 4 tag-triggered GHA publish workflows failed to fire (likely event-coalescing on same-commit batched tags). PyPI/npm never received 1.18.0/0.5.0. Tags remain in origin as audit history; no actual publish.
+- `4623979` Fix BYOIT certificate pickup guidance (aweb-aajs follow-up): three stale CLI error strings in init.go/run.go pointing cross-machine users at accept-invite (which fails after the aala.6 conservative-helper rename) updated to point at the request → fetch-cert path.
+- `3bc296e` Publish task claim dashboard events (aweb-aakk): `_translate_team_event` and `_translate` now map task.claimed/task.unclaimed events to dashboard team-events and workspace events. Closes silent-loss of dashboard team-events for claim/unclaim.
+- `b0b2b27` release: aweb server 1.18.1, aw CLI 1.18.1, awid-service 0.5.1 — **PUBLISHED** (re-publish of 1.18.0 content + aajs + aakk; tags pushed individually one-by-one; all 5 GHA workflows fired). Tagged `server-v1.18.1`, `aw-v1.18.1`, `awid-v0.5.1`, `awid-service-v0.5.1`.
 
 **Decision maker:** Juan (architectural framing on awid storing signed public cert blobs; Grace executed the work breakdown end to end)
 
