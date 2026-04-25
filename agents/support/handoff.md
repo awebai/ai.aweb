@@ -59,6 +59,19 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    Juan. Two options discussed: (a) channel stops auto-acking, agent
    acks explicitly; (b) add a "recently delivered" view.
 
+3. **`aw mail send` returns 409 for me** (aweb-aakz, P2, filed by
+   Randy 2026-04-25) — `aw mail send --to-address <full-address>`
+   returns `http 409: Authenticated DID matches multiple active
+   local agents`. Reproduces with and without `--team` override.
+   Chat path works fine. Hypothesis: server resolves my did:key to
+   two active local-agent rows (one per membership in
+   workspace.yaml) and the mail auth path doesn't disambiguate via
+   team header while chat does. **Workaround until fixed:** route
+   any agent-to-agent updates through `aw chat send-and-leave`
+   instead of mail. Affects routing feedback to Avi, Tom, Randy,
+   etc. Discovered 2026-04-24 trying to mail Randy a handoff-update
+   confirmation.
+
 ## Resolved issues
 
 1. **Cross-team chat addressing** (fixed 2026-04-20) — Senders from
