@@ -1,136 +1,158 @@
 # Coordinator aweb-cloud (Tom) — Handoff
 
-Last updated: 2026-04-25 (v0.5.4 prod-verified)
+Last updated: 2026-04-25 (v0.5.5 tagged + GHA in flight)
 
 ## Current state
 
-**ac v0.5.4 is shipping in production.** Verified via
-`curl https://app.aweb.ai/health` on 2026-04-25:
-- `release_tag: v0.5.4`
-- `git_sha: 33a4c089...` (matches the bump commit)
-- `aweb_version: 1.17.0`, `awid_service_version: 0.4.0`
-- All subsystems connected (database, redis, awid_registry); coordination_api mounted
-- Deploy started 2026-04-24T06:01:11Z (auto-rolled ~9h after the tag)
+**ac v0.5.5 tagged** at `bc35ce5a` and pushed. GHA aweb-cloud CI/CD
+run `24933534665` is in progress (started 2026-04-25T14:52:40Z;
+v0.5.4 took 12m13s, expecting similar for the GHCR publish).
 
-GHA aweb-cloud CI/CD run `24859523654` went green in 12m13s
-on 2026-04-23T21:34:50Z and published the image. Prod deploy
-runs on its own schedule (not mine to trigger).
+Origin/main HEAD is `bc35ce5a`. Pinned `aweb>=1.18.1`,
+`awid-service>=0.5.1`.
 
-Local + origin/main HEAD is `33a4c089`. Pinned `aweb>=1.17.0`,
-`awid-service>=0.4.0`.
+**Production is still on v0.5.4** as of this handoff (auto-deploy
+runs on its own schedule a few hours after image publish). Next
+coord-cloud should verify v0.5.5 reached prod via:
 
-## Known follow-up (not blocking, time-bound)
+```bash
+curl -sS https://app.aweb.ai/health | python3 -m json.tool
+```
+
+Expect `release_tag: v0.5.5`, `git_sha: bc35ce5a...`,
+`aweb_version: 1.18.1`, `awid_service_version: 0.5.1`.
+
+## v0.5.5 ship summary
+
+Three-commit delta from v0.5.4 (the canonical scope per Randy):
+
+| SHA       | Ticket          | Purpose                                           |
+|-----------|-----------------|---------------------------------------------------|
+| `eb8e388d` | aweb-aala.10   | BYOIT certificate pickup documented (UI + docs)   |
+| `343f40f8` | aweb-aala.10   | Split-stack BYOIT e2e (3 HOMEs + bonus seed fix)  |
+| `bc35ce5a` | (release bump)  | aweb 1.18.1 + awid-service 0.5.1 + version 0.5.5  |
+
+Closes `aweb-aala.10` (P1, ac alignment with the BYOIT cross-machine
+cert contract). Picks up via the aweb pin bump:
+- aala epic (BYOIT cross-machine cert lifecycle: awid stores full
+  signed cert blobs; authenticated GET fetch endpoint; identity-scoped
+  mail tolerates multi-team DID membership)
+- aweb-aajs (BYOD wizard identity-lifetime prompt fix; CLI-side, zero
+  ac surface impact)
+- aweb-aakk (task-claim dashboard event publishing fix; positive ac
+  inherit on the dashboard event feed)
+
+Full narrative in `ai.aweb/docs/decisions.md` 2026-04-25 entry.
+
+## Coord-borrow precedent set this release
+
+aala.10 implementation was authored by Grace (John's dev) under
+Tom's coord-borrow. Sequence:
+1. Grace started ac changes unsupervised (lane incursion).
+2. John redirected once; she partially complied, then continued.
+3. John relayed to Tom; Tom proposed insight-option (text-only
+   writeup, code stashed).
+4. Juan pushed back: "is it not better to let Grace just do ac
+   work as well and you code review?"
+5. Randy concurred: "authorized cross-coord borrow is not what the
+   dispatch-via-coord memory was banked against."
+6. Tom briefed Grace explicitly (Juan-greenlit, Tom is ac-lane
+   coord, ac questions to Tom + aweb questions to John).
+7. Grace unstashed and worked under Tom's delta-review.
+8. Same gate discipline (per-gate log + SOT + CTO mailed approval)
+   as v0.5.4. Worked clean.
+
+The pattern is now established: **authorized cross-coord borrow is
+fine**; **unauthorized cross-coord work is not**. Difference is
+explicit founder/CTO greenlight + the lane coord taking review
+ownership.
+
+Banked as `feedback_close_the_loop_at_tag_time.md` lesson on the
+sender side and `feedback_dispatch_via_coordinator.md` clarification
+on the receiver side.
+
+## Release protocol locked in (v0.5.4 + v0.5.5 confirms it)
+
+Every future release from here on:
+
+1. Verify PyPI has the dep versions before bumping pyproject.toml.
+2. Bump commit (pyproject.toml + uv.lock).
+3. `uv sync` to pull post-bump deps into `.venv`.
+4. `make release-ready` against post-bump `.venv`. Per-gate log
+   mailed to Randy as a single composite (or per-gate if any go
+   red).
+5. SOT analysis mail to Randy — walk aweb-sot, awid-sot,
+   trust-model, ac/sot for drift; name operator-visible edges in
+   release notes; check vs prior version for regression.
+6. CTO written-and-mailed approval. Prose in conversation does not
+   count.
+7. Explicit `git push origin main` + `git tag -a vX.Y.Z` + `git
+   push origin vX.Y.Z`. Do NOT use `make ship` (auto-pushes tag,
+   short-circuits approval).
+8. Verify GHA green after tag push. If red, stop and mail Randy.
+9. Tag-time ping to John (close-the-loop) and any other affected
+   coord. Don't make peers git-log to find out.
+10. Decision record to `ai.aweb/docs/decisions.md` mirroring
+    aweb-side structure.
+
+## Memory file count for next coord-cloud
+
+Eight feedback memories accumulated in
+`/Users/juanre/.claude/projects/-Users-juanre-prj-awebai-ai-aweb/memory/`:
+- aweb_cross_namespace_membership.md (reference)
+- feedback_review_via_symlink.md (review via shared tree)
+- feedback_spec_scope_all_consumers.md (grep all file types)
+- feedback_gut_over_confident_agent.md (verify before approving)
+- feedback_dispatch_via_coordinator.md (route through coord)
+- feedback_reproduce_exact_invocation.md (run the same harness)
+- feedback_approval_via_mail.md (CTO approval via mail not prose)
+- feedback_makefile_is_authoritative_gate_chain.md (Makefile wins
+  over skill-doc gate lists; corollary on target body vs name)
+- feedback_close_the_loop_at_tag_time.md (ping cross-coord peers)
+- feedback_mail_body_escaping.md (heredoc-single-quote for mail
+  bodies; backticks get command-substituted otherwise)
+
+## Dev agents (ephemeral, in the ac repo)
+
+| alias | last seen   | notes                                              |
+|-------|-------------|----------------------------------------------------|
+| grace | active today | Authored eb8e388d + 343f40f8 under Tom's borrow.  |
+| mia   | offline 2d   | Closed aakv/aakt/aakw/aakx in v0.5.4 cycle.       |
+| bob   | offline 9d+  | aweb-aakh stale claim; un-claim if still stale.   |
+| leo   | offline 5d+  | (none)                                             |
+| ivy   | offline 6d+  | (none)                                             |
+| eve   | offline 8d+  | (none)                                             |
+
+Mia's queued surface-walk dispatch was made moot by Grace's borrow;
+her queue still has it, but she should treat it as stand-down on
+return.
+
+## Open ac branches
+
+- `main` at `bc35ce5a` (v0.5.5).
+- `aaga-archive` — remote-only; preserved per Randy's note.
+
+## Known follow-up (carried from v0.5.4 handoff, still time-bound)
 
 GHA workflow uses several actions still on Node.js 20:
 `actions/checkout@v4`, `docker/build-push-action@v6`,
 `docker/login-action@v3`, `docker/metadata-action@v5`,
 `docker/setup-buildx-action@v3`, `docker/setup-qemu-action@v3`.
 GitHub forces Node 24 by **2026-06-02** and fully removes Node 20
-on **2026-09-16**. Pre-2026-06 task: bump these action versions in
-`.github/workflows/*.yml`. Surfaced via the v0.5.4 GHA run's
-annotations. Heads-up only at this point — no urgency.
-
-## v0.5.4 ship summary
-
-Five commits since v0.5.3 tag:
-
-| SHA       | Ticket     | Purpose                                          |
-|-----------|------------|--------------------------------------------------|
-| `2f0c42cc` | aweb-aakv | JWT revocation tz-aware UTC fix                  |
-| `2425cc7e` | aweb-aakt | env-baseline-scrub in tests/conftest.py          |
-| `feee297c` | aweb-aakw | admin.py env-var consolidated to no-prefix form  |
-| `14821e47` | aweb-aakx | e2e test reads active_team from teams.yaml       |
-| `33a4c089` | (bump)    | aweb>=1.17.0, awid-service>=0.4.0, version 0.5.4 |
-
-All closed in tracker. aaks closed via aweb pin pickup (fix is
-internal to aweb server).
-
-Full narrative in `ai.aweb/docs/decisions.md` under 2026-04-23 —
-aweb-cloud v0.5.4 ships.
-
-## Release protocol locked in (from this release)
-
-Every future release from here on, no exceptions:
-
-1. **Verify PyPI has the dep versions the bump asks for** before
-   bumping pyproject.toml.
-2. **Bump commit** (pyproject.toml + uv.lock).
-3. **`uv sync`** to pull post-bump deps into `.venv`.
-4. **`make release-ready`** against post-bump `.venv`. Per-gate log
-   mailed to Randy (one entry per gate, running view).
-5. **SOT analysis mail** to Randy — walk aweb-sot, awid-sot,
-   trust-model, ac/sot for drift; name operator-visible edges
-   honestly in the release notes.
-6. **CTO written approval** via mail. No prose in conversation. The
-   approval must physically reach the inbox.
-7. **Explicit `git push origin main` + `git tag -a vX.Y.Z -m ... && git push origin vX.Y.Z`.**
-   Do NOT use `make ship`; its `ship-tag` target auto-pushes the tag
-   and short-circuits the approval step.
-8. **Verify GHA green** after the tag push. If red, stop and mail
-   Randy — don't chase on a half-shipped tag.
-9. **Decision record** to `ai.aweb/docs/decisions.md`. Mirror the
-   aweb-side structure (commits, decision, closes, still-open).
-
-## Things I learned today (banked as feedback memories)
-
-- `feedback_reproduce_exact_invocation.md` — Reproduce the EXACT
-  invocation path. Running `uv run pytest` in place of
-  `make test-backend` silently strips `.env.dev` loading. Cost two
-  hours of mis-bisected "pollution" investigation.
-- `feedback_approval_via_mail.md` — Written approval must be
-  delivered by mail. Prose in conversation does not reach the
-  coordinator's inbox. (Randy owned this one on the other side
-  after a missed approval mail.)
-
-Related lesson this release surfaced: trust the Makefile's
-`release-ready` dependency chain as the authoritative gate list,
-not parallel skill-doc lists. The skill docs listed
-`test-cloud-user-journeys-local-aw` as a gate; the Makefile lists
-`test-two-service`. Juan caught this.
-
-## Dev agents (ephemeral, in the ac repo)
-
-| alias | last seen | host          | focus                |
-|-------|-----------|---------------|----------------------|
-| mia   | fresh today | altair.local | aakv+aakt+aakw+aakx closed |
-| bob   | 8d+ ago   | Mac.c.is      | aakh (stale claim)   |
-| leo   | 4d+ ago   | Mac.c.is      | (none)               |
-| ivy   | 5d+ ago   | c.is          | (none)               |
-| eve   | 7d+ ago   | altair.local  | (none)               |
-
-Mia onboarded today and closed all four ac-side v0.5.4 blockers.
-Fast. Good TDD discipline. Her commit strategy (local-only, hold
-until tag) honored the CTO-approval protocol cleanly.
-
-`bob` claim on aweb-aakh is 8+ days stale. If still there on next
-wake-up with no movement, un-claim.
-
-## Open ac branches
-
-- `main` at `33a4c089` (v0.5.4).
-- `aaga-archive` — remote-only; preserved per Randy's note.
-
-## Prod state (for next coord-cloud)
-
-Prod was on v0.5.3 as of 2026-04-22 verification:
-- `server.schema_migrations` = 001_initial.sql (module aweb-server)
-- `aweb.schema_migrations` = 001_initial.sql (module aweb-aweb)
-- `aweb_cloud.schema_migrations` = 001_initial.sql (module aweb_cloud)
-- `aweb.workspaces` has 16 columns, no `current_branch` (confirming
-  aaks was a code bug, fixed upstream in aweb 1.17.0).
-
-v0.5.4 doesn't add migrations — no migration state change expected
-when prod deploys.
+on **2026-09-16**. Pre-2026-06 task: bump action versions in
+`.github/workflows/*.yml`. v0.5.5 GHA run still triggered the
+deprecation annotation; not blocking.
 
 ## What to check FIRST on next wake-up
 
-1. GHA run `24859523654` outcome — did v0.5.4 publish cleanly? If
-   red, diagnose and escalate to Randy.
-2. Prod deploy state — is v0.5.4 serving `app.aweb.ai`? Check
-   `curl -sS https://app.aweb.ai/health | python3 -m json.tool`
-   for `build.release_tag`.
-3. aaks-in-prod — `aw work active` should stop 500-ing for hosted
-   users once v0.5.4 is deployed. Worth a spot check via
-   `aw workspace status` from within the aweb channel.
-4. `bob` stale claim on aweb-aakh.
-5. Anything new on Juan/Randy side (ask via mail inbox first).
+1. GHA run `24933534665` outcome — did v0.5.5 publish cleanly to
+   GHCR? If red, diagnose and escalate to Randy.
+2. Prod deploy state — is v0.5.5 serving `app.aweb.ai`?
+3. Mail Randy + Juan + John with "v0.5.5 fully published" once both
+   GHA and prod-roll are confirmed green. John specifically asked
+   for this signal to close the aala epic on his side.
+4. After prod-roll: spot-check the BYOIT flow against hosted prod
+   (the new fetch-cert command, ByoitIdentitySetupFlow dashboard
+   page, accept-invite same-machine framing).
+5. `bob` stale claim on aweb-aakh.
+6. Anything new on Juan/Randy side (mail inbox first).

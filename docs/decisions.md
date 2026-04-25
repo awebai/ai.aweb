@@ -6,6 +6,114 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-25 — aweb-cloud v0.5.5 ships; picks up aweb 1.18.1 + completes aala.10
+
+**Commits (ac):**
+- `eb8e388d` Document BYOIT certificate pickup (aweb-aala.10, dashboard copy + sot.md custodial-shortcut framing + landing-and-onboarding flow)
+- `343f40f8` Test BYOIT fetch-cert in split stack (aweb-aala.10, three-HOME e2e + bonus self-seed fix on TestDataMigration order-dependence)
+- `bc35ce5a` release: v0.5.5, aweb 1.18.1 + awid-service 0.5.1 deps (tagged `v0.5.5`)
+
+**Decision maker:** Randy (written tag-approval) + Tom (coord-cloud)
+
+**Decision.** v0.5.5 closes aweb-aala.10 (cloud alignment with the aala
+BYOIT cross-machine certificate contract) and picks up aweb 1.18.1 plus
+awid-service 0.5.1 via the dependency pin bump. Three-commit delta
+above v0.5.4. Implementation track: Grace authored eb8e388d + 343f40f8
+under Tom's coord-borrow (Juan-greenlit cross-coord borrow after the
+unauthorized-incursion incident earlier in the day — see process notes
+below). Tom committed bc35ce5a after PyPI propagation of 1.18.1.
+
+**aala.10 acceptance criteria coverage:**
+1. Hosted onboarding can explain or initiate the BYOIT request →
+   add-member → fetch-cert flow — `eb8e388d`. Dashboard
+   `ByoitIdentitySetupFlow.tsx` corrects `aw team request` to
+   `aw id team request` and adds the fetch-cert step. New tests in
+   `ByoitIdentitySetupFlow.test.tsx` cover the flow strings and the
+   empty-team-id fallback.
+2. Auth bridge tests cover a fresh BYOIT user obtaining/installing a
+   cert after approval — `343f40f8`. Split-stack e2e with separate
+   owner/member/wrong HOMEs; member uses ephemeral signing key;
+   controller add-member; wrong-DID fetch returns 403; correct fetch
+   installs cert; aw init binds to the cloud /api endpoint; mail
+   self-roundtrip + claim-human succeed. `/api/v1/connect` is
+   intentionally in `_TEAM_CERTIFICATE_BYPASS_PATHS` and tested by
+   `test_connect_route_bypasses_cloud_team_certificate_bridge`; no
+   redundant pure-cloud bridge test added.
+3. Split-origin deployments (onboarding, aweb server, registry)
+   continue to work — `343f40f8` runs against split cloud + awid
+   Docker stack and passes 9/9.
+4. Any cloud-only custodial shortcut is documented as custodial —
+   `eb8e388d` `docs/sot.md` adds `/api/v1/onboarding/cli-signup`
+   under "Onboarding DIDKey authority" and explicitly names it as
+   custodial/managed (cloud is the team controller for hosted teams).
+   New "BYOIT Certificate Pickup" subsection clarifies cloud is NOT
+   the BYOIT controller. `accept-invite` is named as a same-machine
+   helper.
+
+**What aweb 1.18.1 brings to ac via the pin:**
+- aala epic (BYOIT cross-machine cert lifecycle; awid stores full
+  signed cert blobs at registration; authenticated GET fetch endpoint
+  at `/v1/namespaces/{domain}/teams/{name}/certificates/{cert_id}`;
+  identity-scoped mail tolerates multi-team DID membership).
+- aweb-aajs (BYOD wizard identity lifetime prompt fix). User-facing
+  CLI surface only; ac doesn't surface `aw init` wizard directly so
+  ac product impact is zero.
+- aweb-aakk (task-claim dashboard event publishing). Server-side fix
+  for silent-loss of `TeamTaskClaimedEvent`/`TeamTaskUnclaimedEvent`
+  on direct task.claimed/task.unclaimed inputs. ac mounts the
+  dashboard event feed; this is a positive fix that ac inherits via
+  the pin bump.
+
+**Bonus fix in 343f40f8:** `TestDataMigration::test_json_export_and_verification`
+was order-dependent under pytest-randomly (asserted `public_addresses
+>= 1` without seeding). Now self-seeds a permanent-custodial identity
+via `/api/v1/identities/create-permanent-custodial` before calling
+`export_identity_data`.
+
+**Trust model + invariants check:**
+- awid stores public cert artifacts only; never the team controller
+  private key.
+- Cert fetch is subject-only authorized (caller must equal
+  `cert.member_did_aw`).
+- All seven invariants (independent primitives, DNS-anchored trust,
+  custody choice, coordination primacy, progressive disclosure,
+  distribution > features, open/portable) hold unchanged.
+
+**Release protocol exercised end-to-end again:**
+1. Per-gate log against post-bump `.venv` (aweb 1.18.1 + awid-service
+   0.5.1 from PyPI). All 6 release-ready gates green: 1170 backend
+   tests (same as v0.5.4 — no regression), 96 frontend tests
+   (+2 from Grace's BYOIT flow tests), 9 two-service tests including
+   the rewritten split-stack BYOIT e2e under aweb 1.18.1.
+2. SOT analysis mailed.
+3. CTO written-and-mailed approval.
+4. Manual `git push origin main` + `git tag -a v0.5.5` + `git push
+   origin v0.5.5`. Did not use `make ship` (auto-pushes tag,
+   short-circuits approval step).
+
+**Process notes from this release:**
+- aweb-aala.10 implementation involved a coord-borrow: Grace
+  (John's dev) was authorized by Juan to work in ac under Tom's
+  coord, after she crossed the lane unsupervised earlier in the day.
+  Insight-option was the first call (have her mail observations);
+  Juan reversed to "let her do the work, you review"; Randy
+  concurred ("authorized cross-coord borrow is not what the
+  dispatch-via-coord memory was banked against"). The protocol
+  worked: Grace's commits went through Tom's delta-review and gate
+  discipline; v0.5.5 ships clean.
+- aweb 1.18.0 ghost-tag stays in aweb history. 1.18.1 is the
+  published recovery release. ac pins against 1.18.1 directly.
+
+**Closes:**
+- `aweb-aala.10` (P1, ac alignment with BYOIT cert contract). John
+  closed in tracker on receipt of tag mail; aala epic close pending
+  Tom's "GHA green + prod rolled" confirmation.
+
+**GHA:** release tag push triggered aweb-cloud CI/CD run
+`24933534665`. Image publish to GHCR follows on green.
+
+---
+
 ## 2026-04-25 — BYOIT cross-machine team join + multi-membership launch hardening (aala epic)
 
 **Commits (aweb):**
