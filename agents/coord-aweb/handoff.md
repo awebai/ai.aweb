@@ -1,11 +1,63 @@
 # Coordinator aweb OSS (John) — Handoff
 
-Last updated: 2026-04-23 (end of aakq ship cycle)
+Last updated: 2026-04-25 EOD (post awid prod cutover + AGENTS.md migrations rule)
 
-## Current state
+## Current state (read this first on wake-up)
 
-**aweb 1.17.0 shipped.** aakq epic closed. Main at `b98a331` (ai.aweb)
-and `bb668be` (aweb). PyPI + npm published via GHA.
+**aweb origin/main:** `72530c2` Add database-migrations discipline rule to AGENTS.md
+- `72530c2` — AGENTS.md migrations rule (this cycle, mine)
+- `ed4fa89` — awid prod DB lifecycle script + Makefile targets (this cycle, mine)
+- `2e6156b` — Harden hosted MCP proxy signing (Grace, aweb-aajh + aajg). NOT yet tagged. 1.18.2 release cycle is on-demand: cycle when next runtime delta accumulates, no urgency from Tom (his test-two-service was green at pure 1.18.1, v0.5.6 ships at aweb>=1.18.1).
+- `b0b2b27` — last release tag (1.18.1 / aw-v1.18.1 / awid-v0.5.1 / awid-service-v0.5.1)
+
+**ai.aweb origin/main:** `00952ad` Decision record: awid prod cutover from 0.3.1 to 0.5.1
+
+**Production state:**
+- api.awid.ai/health → `version=0.5.1`, db ok, redis ok
+- Dump preserved at `/tmp/awid-awid-reset-20260425T181335Z.sql` (rollback safety net for the cutover)
+- ac v0.5.5 live; ac v0.5.6 in flight (Tom releasing today, picks up Grace's aaja.6 at aweb>=1.18.1)
+
+**Open follow-ups on my plate:**
+- BYOIT prod-awid smoke test (Randy ask). Mailed Tom (`f2881e63`) to route via Grace post-v0.5.6 or take it himself, with the option to punt back to me. Min coverage: cert blob actually populates after add-member; cross-machine fetch verifies; wrong-DID 403. Mail Randy with the result when done.
+- 1.18.2 release cycle for `2e6156b` is on-demand. Tom doesn't need it. Cycle when there's enough pent-up runtime delta to justify a tag, OR when a future ac release needs it pinned, OR when Juan asks. Push tags individually one-by-one (banked lesson).
+- Render redeploy of awid is manual via dashboard (no API key, no deploy hook). Worth proposing to Juan: a deploy hook + a daily probe of api.awid.ai/health vs PyPI head to catch the next aala-style version drift before it becomes a cutover. Filed in 2026-04-25 awid-cutover decision record under "Open follow-ups."
+
+**Open from prior cycles, still open:**
+- `aweb-aakr` (P4) — membership-field duplication between teams.yaml and workspace.yaml. Juan-level architectural call. Not actively scheduled.
+- `aweb-aajv` (Dashboard lifecycle bypasses OSS mutation hooks) — Randy re-opened after Tom's pin-bump close was premature.
+- `aweb-aald` (BYOD ephemeral re-init observation Grace filed from my aajs review) — future P? task, not actively scheduled.
+
+## Decision records added this cycle (ai.aweb/docs/decisions.md)
+
+- 2026-04-25 — awid prod registry cutover from 0.3.1 to 0.5.1 (00952ad). Captures the deployment lag, impact, recovery script, and migrations-discipline lesson per Randy's three-point ask.
+- 2026-04-25 — aweb-cloud v0.5.5 ships (was already there before my cycle started)
+- 2026-04-25 — BYOIT cross-machine team join + multi-membership launch hardening (aala epic) (was already there)
+
+## Memories banked this cycle (per-agent dir + MEMORY.md index)
+
+- `feedback_pgdbm_checksum_normalization.md` — pgdbm normalizes line endings + strips before SHA256; raw `sha256(file)` won't match `schema_migrations.checksum`. Surfaced during cutover validation when I almost chased a fake bug.
+- `feedback_consolidated_migration_discipline.md` — never edit a consolidated single-file migration in place; every additive change is a new ordered file. Codifies the lesson behind the cutover.
+- (Both also reflected in aweb/AGENTS.md "Database migrations" section so dev agents see them on wake-up.)
+
+## Engineering quality bar held this cycle
+
+- Local docker-postgres:16-alpine dry-run before any prod-destructive op surfaced two real PG-version-skew bugs (`SET transaction_timeout=0`, `schema_migrations` row collision). Both encoded into the script as sanitizers. Lesson: even mechanical tooling deserves a synthetic-seed dry-run when it touches prod state.
+- Pre-cutover schema column-by-column comparison confirmed the only delta was the new nullable `team_certificates.certificate` — no risk of `--column-inserts` referencing dropped/renamed columns. Treat this as the standard pre-cutover check on any future schema-reset.
+- Push-discipline: ed4fa89 + 72530c2 + 00952ad each pushed individually, working tree clean between commits, no batched pushes. Lesson `feedback_push_tags_individually.md` extends to non-tag pushes too — the principle is "don't batch what GitHub event-coalesces."
+
+## Cross-coord state
+
+- Tom finished his bisect (sibling aweb at b0b2b27 → green at pure 1.18.1) and restored to ed4fa89. v0.5.6 release sequence in flight on his side. He'll mail when v0.5.6 tags.
+- Grace pushed 18021ff9 (aaja.6) to ac under Tom's authorized cross-coord borrow. That borrow's scope is aaja.6; she's back under my coord for aweb-side work after v0.5.6 closes.
+- Randy has the awid cutover confirmation + the three follow-up asks I'm working through.
+
+---
+
+## History (older cycles below — useful for context, not current)
+
+## aakq cycle final state (2026-04-23)
+
+aweb 1.17.0 shipped. aakq epic closed. Main at `b98a331` (ai.aweb) and `bb668be` (aweb). PyPI + npm published via GHA.
 
 Tags out on github.com/awebai/aweb:
 - `server-v1.17.0` (cb8f7f5) — pypi aweb 1.17.0 live
