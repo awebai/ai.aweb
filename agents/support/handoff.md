@@ -43,23 +43,33 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Known issues
 
-1. **IDENTITY MISMATCH on outbound messages — REAL on the wire**
-   (re-confirmed 2026-04-25). Randy inspected his inbox JSON for two
-   of my mails (msg 4b4468ff and 9f426014); both show server-side
-   `verification_status: "identity_mismatch"` with
-   `signature_present: true`. So the channel-event header
-   `verified=false` is not just a renderer bug here — the signature
-   IS on the message but doesn't validate against the expected
-   key/identity binding awid has for me. Distinct from KI#3 (Randy's
-   release mail, where server said verified and only the RX header
-   misrendered). Hypothesis: plugin 1.1.0 TX signing path uses
-   identity.yaml.address (juan.aweb.ai/amy — stale) instead of
-   cert.member_address (aweb.ai/amy — current), so the signed
-   payload claims a sender awid can't bind to my did:key + active
-   cert. Channel 1.3.0 (aakq.1) flipped this precedence; 1.3.1
-   carries that fix. Pending /plugin update to 1.3.1 + restart +
-   resend. KI#1 closes if Randy's next inbox check shows
-   `verification_status: verified` on the post-upgrade test mail.
+1. **IDENTITY MISMATCH on outbound messages — verifier-side bug,
+   P1 filed by Randy 2026-04-25.** Confirmed reproduced under
+   current stack (aw 1.18.1, channel 1.3.1, awid prod 0.5.1) on
+   fresh mail 335a4c2b. Not a plugin-version, awid-version, or
+   stale-state issue. Triage trail:
+   - Local↔awid binding INTACT: `aw id show`, `aw id resolve`, `aw id addresses`
+     all agree my did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ ↔
+     did:key:z6MkrGU6...uxV3o, no rotation in awid log (single
+     register_did at seq 1, 2026-04-20T11:36:44Z), both addresses
+     (aweb.ai/amy and juan.aweb.ai/amy) bind to the same did:key.
+   - aakq.1 fix DID work: from_address now derives from cert
+     correctly (post-upgrade mails show from_address=aweb.ai/amy).
+   - Server-side: `verification_status: "identity_mismatch"`,
+     `signature_present: true`, `from_did` and `from_stable_id`
+     populated, but `signing_key_id: ''` (empty) — consistent across
+     four test mails today.
+   - Leading hypothesis: CLI verifier chain in
+     `aweb/cli/go/awid/client.go` (PinResolver/RegistryResolver/
+     recipient-binding) falls through to identity_mismatch when
+     signing_key_id is empty on cert-authenticated sends. Needs a
+     dispatched fix; Randy filed P1 for John to dispatch.
+   - Operational impact: my outbound mail still arrives and is
+     readable, but receivers see it marked unverified. Until the
+     verifier fix lands, treat any mail you send as "untrusted on
+     receipt" for the verification signal. Chat works (chat-side
+     verification path not affected, per Randy's earlier sender_leaving
+     chats showing verified=true on his side and mine).
 
 2. **Channel plugin auto-acks mail** — The aweb channel plugin
    acknowledges mail on delivery, so `aw mail inbox` shows nothing.
