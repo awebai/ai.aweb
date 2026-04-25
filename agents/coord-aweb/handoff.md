@@ -156,7 +156,44 @@ this slice):
 4. ✓ Fetch-envelope certificate field pinned: base64 of exact UTF-8
    team certificate JSON.
 
-## ff92358 LANDED on origin/main 2026-04-25
+## 9b2eed3 LANDED on origin/main 2026-04-25 (slice 2 of aala)
+
+Grace pushed `9b2eed3 Add cross-machine fetch-cert e2e` directly
+without pre-push review. Per Juan's "don't wait on reviews" that's
+allowed. Independent post-push verification:
+- e2e: exit 0, 159 tests, Phase 22 marker. Up from 139.
+- code-reviewer GO-with-notes on the slice.
+- 5 of 6 remaining aala children CLOSED in this slice: .6, .8, .9,
+  .11, .12.
+
+**One real post-push gap to fix before tag**: aala.9 closure is
+premature. Three error messages still point cross-machine users at
+`aw id team accept-invite` (which fails for them after Grace's .6
+conservative-helper rename):
+- cli/go/cmd/aw/init.go:231
+- cli/go/cmd/aw/run.go:449
+- cli/go/cmd/aw/run.go:461
+
+Flagged to Grace as a one-string-fix follow-up commit. Trivial.
+Won't push the tag until those land.
+
+**Discipline note flagged to Grace**: closing tasks should require
+verified acceptance ("I checked each acceptance item, they hold"),
+not "I think it's done." First time her close-discipline slipped;
+worth surfacing. Juan's directive covers push-without-pre-push;
+doesn't relax close-on-verified-acceptance.
+
+## Tom's status (after my mail e2e8b867 → 4cc636f7 → bbf3240f-4fe0):
+
+Mia dispatched on aala.10 ac surface walk. Tom asked for aweb
+release timing + awid version. Answered (`a*`):
+- aweb 1.18.0 + aw CLI 1.18.0 + awid-service 0.5.0 + channel stays
+  1.3.1.
+- ~6-12h to tag (Grace fixes .9 strings → my gate log + SOT analysis
+  → Randy approves → tag).
+- I'll mail Tom the moment the tag fires.
+
+## ff92358 LANDED on origin/main 2026-04-25 (slice 1 of aala)
 
 Single commit "Implement cross-machine team cert fetch" covers
 aala.1/.2/.3/.4/.5/.7 + the four follow-ups + Randy's new contract
