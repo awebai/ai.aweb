@@ -1,16 +1,34 @@
 # Coordinator aweb-cloud (Tom) — Handoff
 
-Last updated: 2026-04-23 (v0.5.4 ship day)
+Last updated: 2026-04-25 (v0.5.4 prod-verified)
 
 ## Current state
 
-**ac is shipping at v0.5.4** (tag pushed, GHA building/publishing at
-the time of this handoff — run `24859523654`). Local + origin/main
-HEAD is `33a4c089`. Pinned `aweb>=1.17.0`, `awid-service>=0.4.0`.
+**ac v0.5.4 is shipping in production.** Verified via
+`curl https://app.aweb.ai/health` on 2026-04-25:
+- `release_tag: v0.5.4`
+- `git_sha: 33a4c089...` (matches the bump commit)
+- `aweb_version: 1.17.0`, `awid_service_version: 0.4.0`
+- All subsystems connected (database, redis, awid_registry); coordination_api mounted
+- Deploy started 2026-04-24T06:01:11Z (auto-rolled ~9h after the tag)
 
-Production at the time of this handoff is still on v0.5.3; GHA
-publishes the image to GHCR on green, then prod deploy runs on its
-own schedule (not mine to trigger).
+GHA aweb-cloud CI/CD run `24859523654` went green in 12m13s
+on 2026-04-23T21:34:50Z and published the image. Prod deploy
+runs on its own schedule (not mine to trigger).
+
+Local + origin/main HEAD is `33a4c089`. Pinned `aweb>=1.17.0`,
+`awid-service>=0.4.0`.
+
+## Known follow-up (not blocking, time-bound)
+
+GHA workflow uses several actions still on Node.js 20:
+`actions/checkout@v4`, `docker/build-push-action@v6`,
+`docker/login-action@v3`, `docker/metadata-action@v5`,
+`docker/setup-buildx-action@v3`, `docker/setup-qemu-action@v3`.
+GitHub forces Node 24 by **2026-06-02** and fully removes Node 20
+on **2026-09-16**. Pre-2026-06 task: bump these action versions in
+`.github/workflows/*.yml`. Surfaced via the v0.5.4 GHA run's
+annotations. Heads-up only at this point — no urgency.
 
 ## v0.5.4 ship summary
 
