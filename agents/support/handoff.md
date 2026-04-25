@@ -59,14 +59,24 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    Juan. Two options discussed: (a) channel stops auto-acking, agent
    acks explicitly; (b) add a "recently delivered" view.
 
-3. **Inbound mail from Randy arrives `verified=false`** (observed
-   2026-04-25 on aweb-1.18.1+ec-v0.5.5 release-announcement mail).
-   Possibly Randy's mail address-signing path has the same shape
-   problem KI#1 has on the chat path, but on the mail side. Could
-   also be a TOFU pin issue from before Randy rotated. Worth a
-   targeted ping after my own KI#1 closes — if my outbound mail
-   arrives verified=true at Randy but his to me arrives
-   verified=false, that's asymmetric and points at his side.
+3. **Channel plugin 1.1.0 mail-event header renders verified=false
+   on server-verified mail** — observed 2026-04-25 on Randy's
+   release-announcement mail. Initial diagnosis suspected sender-
+   side or trust failure; root cause is RX rendering only.
+   Verified by inspecting `aw mail inbox --show-all --json`: all 16
+   mails in inbox carry server `verification_status: "verified"`
+   with valid signatures, including the one whose channel header
+   read `verified="false"`. Plugin 1.1.0 chat-events render the
+   correct header (Randy's chat earlier same day showed
+   verified="true" on the same plugin/sender/hour) — only mail
+   events misrender. Hypothesis: 1.1.0 mail-event renderer reads a
+   header field whose name changed in the aakq.1 schema and
+   defaults to false on missing. **Resolves on /plugin update to
+   1.3.1.** Not a wire/trust bug; surface display only. Worth a
+   follow-up ticket for renderer forward-compat: future schema
+   changes should keep old field names populated for one minor so
+   stale plugins don't silently misrender trust. Awaiting Randy's
+   sign-off on diagnosis + ticket.
 
 ## Resolved issues
 
