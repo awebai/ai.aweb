@@ -128,7 +128,36 @@ race, low cost, but symptomatic of when announcement timing matters.
   during-review-fixable. Watch for them when each child surfaces for
   review.
 
-## NO-GO 2026-04-25: aala e2e regression (held push)
+## GO 2026-04-25 (later): aala first slice (.1/.2/.3/.4/.5/.7) approved for push
+
+After Grace's regression fix, all three gates verified:
+- **e2e (independent verify)**: exit 0, ALL PASSED 139 tests, Phase 22
+  marker present (full coverage). Per the harness-honesty discipline,
+  verified by exit code AND phase-marker presence, not by the summary
+  text alone.
+- **Code-reviewer**: GO-with-notes on the delta. All 3 prior BLOCKERs
+  (atomicity, refuse-overwrite, subject-only) hold. My 3 NOTES
+  addressed (call-site comment, from_agent_id assertion, --force
+  success test).
+- **Randy SOT GO** (722dc6bf): all 4 of his items addressed (BLOCKER +
+  3 NOTES). One non-blocking nit on fetch-envelope `certificate`
+  field naming (base64-PEM vs base64-canonical-JSON vs inline) —
+  follow-on SOT pass.
+
+**Push approval covers**: aala.1, .2, .3, .4, .5, .7.
+
+**Four non-blocking follow-ups** captured for fix-before-tag:
+1. Randy's contract — multi-active-rows fixture's TEAM-SCOPED half
+   not in unit (e2e covers operationally). Most important to land —
+   prevents the regression-class re-emerging next auth-path touch.
+2. test_messages_http.py line 576 deleted `to_alias` assertion may
+   have been side-effect; verify intentional or restore.
+3. messages.py `from_alias_value` no longer falls back to
+   sender.alias for single-row identity-scoped sends. Verify alias
+   coverage exists for single-row case.
+4. Randy's SOT nit on fetch-envelope certificate-field shape.
+
+## NO-GO 2026-04-25 (earlier, resolved): aala e2e regression (held push)
 
 After review of Grace's aala slice working tree (.1 SOT + .2/.3/.4/.5/.7),
 gates ran:
