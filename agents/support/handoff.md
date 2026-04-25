@@ -43,14 +43,23 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Known issues
 
-1. **IDENTITY MISMATCH on outbound messages** — Amy's messages arrive
-   at other agents marked `verified=false` / `IDENTITY MISMATCH`.
-   Re-tested 2026-04-24 against Randy: still reproduces, but my
-   channel plugin is **1.1.0** (pre-aakq.1 fix to channel
-   address-signing context). Randy's hypothesis: 1.1.0 signs with
-   identity.yaml.address while the cert binds aweb.ai/amy, producing
-   the mismatch. Pending plugin upgrade to 1.3.1 + re-test before
-   declaring resolve-or-reproduce.
+1. **IDENTITY MISMATCH on outbound messages — REAL on the wire**
+   (re-confirmed 2026-04-25). Randy inspected his inbox JSON for two
+   of my mails (msg 4b4468ff and 9f426014); both show server-side
+   `verification_status: "identity_mismatch"` with
+   `signature_present: true`. So the channel-event header
+   `verified=false` is not just a renderer bug here — the signature
+   IS on the message but doesn't validate against the expected
+   key/identity binding awid has for me. Distinct from KI#3 (Randy's
+   release mail, where server said verified and only the RX header
+   misrendered). Hypothesis: plugin 1.1.0 TX signing path uses
+   identity.yaml.address (juan.aweb.ai/amy — stale) instead of
+   cert.member_address (aweb.ai/amy — current), so the signed
+   payload claims a sender awid can't bind to my did:key + active
+   cert. Channel 1.3.0 (aakq.1) flipped this precedence; 1.3.1
+   carries that fix. Pending /plugin update to 1.3.1 + restart +
+   resend. KI#1 closes if Randy's next inbox check shows
+   `verification_status: verified` on the post-upgrade test mail.
 
 2. **Channel plugin auto-acks mail** — The aweb channel plugin
    acknowledges mail on delivery, so `aw mail inbox` shows nothing.
@@ -60,23 +69,22 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    acks explicitly; (b) add a "recently delivered" view.
 
 3. **Channel plugin 1.1.0 mail-event header renders verified=false
-   on server-verified mail** — observed 2026-04-25 on Randy's
-   release-announcement mail. Initial diagnosis suspected sender-
-   side or trust failure; root cause is RX rendering only.
-   Verified by inspecting `aw mail inbox --show-all --json`: all 16
-   mails in inbox carry server `verification_status: "verified"`
-   with valid signatures, including the one whose channel header
-   read `verified="false"`. Plugin 1.1.0 chat-events render the
-   correct header (Randy's chat earlier same day showed
-   verified="true" on the same plugin/sender/hour) — only mail
-   events misrender. Hypothesis: 1.1.0 mail-event renderer reads a
-   header field whose name changed in the aakq.1 schema and
-   defaults to false on missing. **Resolves on /plugin update to
-   1.3.1.** Not a wire/trust bug; surface display only. Worth a
-   follow-up ticket for renderer forward-compat: future schema
-   changes should keep old field names populated for one minor so
-   stale plugins don't silently misrender trust. Awaiting Randy's
-   sign-off on diagnosis + ticket.
+   on server-verified mail** (aweb-aale, P3, filed by Randy
+   2026-04-25). Observed on Randy's release-announcement mail.
+   Initial diagnosis suspected sender-side or trust failure; root
+   cause is RX rendering only. Verified by `aw mail inbox
+   --show-all --json`: all 16 inbox mails carry server
+   `verification_status: "verified"` with valid signatures,
+   including the one whose channel header read `verified="false"`.
+   Plugin 1.1.0 chat-events render the correct header on the same
+   plugin/sender/hour — only mail events misrender. Likely cause:
+   1.1.0 mail-event renderer reads a header field whose name
+   changed in the aakq.1 schema and defaults to false on missing.
+   **Resolves on /plugin update to 1.3.1.** Not a wire/trust bug;
+   surface display only. aale also tracks the forward-compat policy
+   (channel header schema changes should keep old field names
+   populated for at least one minor so stale plugins don't
+   silently downgrade trust signals).
 
 ## Resolved issues
 
