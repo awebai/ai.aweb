@@ -82,19 +82,23 @@ race, low cost, but symptomatic of when announcement timing matters.
 
 ## What's up next
 
-- **aweb-aakz dispatched to Grace 2026-04-25** (multi-membership mail
-  409). P1 per Randy. Surfaced by Amy 2026-04-24 — two-membership
-  did:aw gets 409 on `aw mail send`, chat works. Latent bug newly
-  reachable via the per-membership flow aakq enabled. Server-side
-  analysis from Randy: `identity_auth_deps.py:126` raises on
-  multi-row; `:130` has the disambiguating `get_messaging_auth` that
-  chat uses but mail doesn't. Investigation order I gave Grace:
-  (1) check if cli/go/cmd/aw/mail.go sends X-AWID-Team-Certificate
-  the way chat does, (2) check which auth dep the mail handler uses,
-  (3) pick fix shape A/B/CLI. Same release protocol as 1.17.0;
-  Randy will signal whether ship is 1.17.1 (patch) or 1.18.0.
-- **Grace**: dispatched to aakz via chat. Offline 2d; will see on
-  return. No urgency (Amy on chat workaround).
+- **aweb-aala P0 launch epic filed by Grace 2026-04-25** (12 child
+  tasks, BYOIT cross-machine team join + multi-membership hardening).
+  Design from Juan per Grace: awid stores full signed public cert
+  blobs. New awid endpoint + schema change + CLI add-member redesign
+  + accept-invite redesign + ac cloud alignment + E2E matrix + migration
+  plan. Beyond my approval lane; needs Randy's architectural review
+  on aala.1 (SOT) before .2-.5 implement. **Held off escalating to
+  Randy/Juan/Tom until Grace answers 5 clarifying questions** in my
+  mail e7d2a6cf — superseding aakz, sequencing, Juan-scope-known,
+  aakr-overlap, time-shape.
+- **aweb-aakz** (multi-membership mail 409, dispatched to Grace
+  earlier today): aala.7 explicitly says "Fix the aweb-aakz class of
+  failures" — pending Grace's confirmation that aala.7 supersedes
+  it and aakz can close as duplicate.
+- **Grace**: working on invite/add-member/bootstrap survey for Juan
+  (her direct dispatch); filed aala epic from that survey. Currently
+  reading the aakr context I forwarded earlier today.
 - **aweb-aakr** sits as a future design task. No action unless Juan
   wants to revisit the architectural question.
 - **Tom's v0.5.4 cycle: shipped and deployed.** Tag `33a4c089`
