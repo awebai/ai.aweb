@@ -317,26 +317,33 @@ data + CLI classifier fix. Preserves my v0.5.9 substance as-is.
 Option A (ac team-sync to AWID for personal-owned hosted teams)
 filed as Task #29 v0.5.10+ ticket — long-term cleanup.
 
-**Re-verified scope for v0.5.10 (per re-investigation + John af6e2b27)**:
-ealier "personal teams skip registration via owner_type gate" framing
-was wrong; owner_type IS organization (default-org-per-user). Real
-gap is the call site: `ensure_registered_team` is called only by
-`TeamsService.create_team:263`. Personal/onboarding/headless flows
-call sibling `ensure_local_team_state` but NOT
-`ensure_registered_team`. AWID's data model collapses cert and
-member registration into one operation (awid.team_certificates is the
-membership table; no separate /members endpoint). Refined fix:
-~6 call-site additions + cert AWID registration in
-`ensure_stored_agent_team_certificate` + operational backfill of
-juan.aweb.ai/teams/aweb + permanent-agent certs. Total ~50-80 LOC.
+**v0.5.10 ac team-sync scope DEPRECATED** per John 661fd028 +
+Juan/Grace 37683527 architectural reframe.
 
-**Juan's coord dispatch (per John 7382b450)**: Grace implements
-both aweb 1.18.6 (CLI classifier + 3 bugs) AND ac v0.5.10
-(team-sync). 2+2 split: John reviews aweb side, Tom reviews ac
-side. Discipline: subagent on each commit + independent gate
-verification (release-ready + journey-installed-aw + frontend-e2e
-maintaining "ALL tests pass" rigor) + bisect demonstration on each
-test + opt-in handshake on push + combined Randy approval mail.
+The whole "AWID stores team_certificates rows as authorization
+authority" frame was wrong-axis. Intended model is decentralized:
+AWID publishes team public key + revocation list; authorization
+comes from cert-presentation + signature verification, NOT
+row-existence in AWID. Task #29 (mine) and #43 (John's) marked
+deleted in lockstep.
+
+**New substance shape** (Grace's revised dispatch, queue from John):
+1. SOT updates — architectural axis codified
+2. AWID cert-presentation: signed address GET endpoint accepts
+   presented certs + verifies against team key + revocation list
+   (John reviews)
+3. aweb 1.18.6 CLI re-scoped against new model — classifier may
+   route hosted-team-aliases to AWID with cert-presentation rather
+   than via aweb server alias path (John reviews)
+4. ac side: possibly nothing, possibly very small consolidation
+   (Tom reviews if anything lands)
+
+**Lesson banked at coord layer**: when investigating architecture,
+periodically question the axis not just the position. Contract doc
+L70 ("did:key alone is not proof") was the cert-presentation
+framing in negative — could have flagged earlier if I'd read
+"key proof = cert chain" rather than "server verifies key proof
+arbitrarily."
 
 ## What to check FIRST on next wake-up
 
