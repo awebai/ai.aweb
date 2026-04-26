@@ -74,10 +74,19 @@ Updated picture:
 3. **aall**: **close-as-no-action**. Nothing to backfill —
    ephemerals correctly have no awid rows; permanents do.
 
-**Updated restricted ship-mail line** (per John 9460803e):
+**Final ship-mail line LOCKED** (per John 59b31a27, after Avi
+briefing 9ed78982 superseded three prior drafts):
 "KI#1 closes for continuity case (aalk: known-agent pin fallback).
 Authenticated CLI lookup for org_only / team_members_only address
-visibility remains open under aalm (P1)."
+visibility remains open under aalm (P1) — landing in v0.5.9."
+
+**Tracker state** (per John 59b31a27):
+- aweb-aall: CLOSED as not-a-bug.
+- aweb-aalo + aweb-aalp: filed P3 in Goto's lane (awid server-side
+  correctness bugs surfaced during the cohort investigation —
+  ownership_proof acceptance + visibility-filter consistency).
+- aalk c250cd1: Grace push pending opt-in handshake; John GO sent.
+- Avi sign-off: pending (11d offline; expected slow leg).
 
 **Brief Randy-escalation false-alarm on ac dashboard persistence path
 (f5ea2abf → 17c364ec)**: I investigated for ~30 min before reframe.
