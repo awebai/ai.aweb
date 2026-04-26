@@ -127,12 +127,30 @@ So: **pushes proceed when leg 2 lands green**. Do not wait for aalk
 ship. Bundling would couple unrelated work and slow Grace's
 RCA-first cadence on aalk.
 
-When leg 2 green:
-1. I signal Grace (chat) — push GO.
-2. Grace pushes aweb ef5c3d7, I push ac (b5b1ee1f + 4f31e116 in same
-   `git push origin main`).
-3. Randy mails ship-framing to Charlene (aalf + aale closed
-   empirically; aalg PARTIAL with aalk follow-up named).
+When leg 2 green — **v0.5.9 ship sequence** (revised after aweb 1.18.3
+publish per John 1031f72a, my plan 546bca16):
+
+1. Bump `aweb>=1.18.3` (was 1.18.2) in backend/pyproject.toml + `uv sync
+   --refresh` (banked: feedback_uv_sync_refresh_after_pypi_publish.md).
+2. Bump version 0.5.8 → 0.5.9 + `uv lock`.
+3. Commit pin-bump + version-bump (single commit or two; doesn't
+   matter — both ride v0.5.9 tag).
+4. Run release-ready gate chain (per banked
+   feedback_makefile_is_authoritative_gate_chain.md): make release-ready
+   covers test-backend + test-frontend + test-two-service + verify-remote/model/migrations.
+5. Tag v0.5.9 + `git push origin v0.5.9` individually (banked:
+   feedback_push_tags_individually.md).
+6. GHA fires; verified-live legs 2-3 re-run against v0.5.9 substance
+   (leg-2 dashboard probe = aalf attestation on v0.5.9; leg-3 CLI =
+   aalm attestation if user has 1.18.3 CLI).
+7. Randy mails ship-framing to Charlene with locked single-gap line.
+
+**v0.5.9 commit set on ac main when tag fires**:
+- b5b1ee1f (parallel-registry dead-code cleanup)
+- 4f31e116 (test-infra fix: compose port + bootstrap script)
+- 5844ffba (Mia's UX fix: Reachability/Message-acceptance disambiguation;
+  pending her push, GO'd)
+- NEW: pin-bump 1.18.2 → 1.18.3 + version-bump 0.5.8 → 0.5.9
 
 ## Test-infra fix (4f31e116) — context
 
