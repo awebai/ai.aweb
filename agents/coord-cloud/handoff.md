@@ -272,24 +272,32 @@ bump needed for v0.5.9 unless 1.18.5 is preferable).
 ## v0.5.9 ship gates
 
 1. **v0.5.8.1 deploys first** so there's a clean Mode 1 attestation
-   baseline. Currently in Render's hands; tag pushed
-   2026-04-26 ~19:16Z, GHA build green at 19:30Z, /health unchanged
-   at last check (auto-deploy may need manual trigger per Juan's
-   "render is manual" note + v0.5.6 stall pattern banked).
-2. **aweb 1.18.5 release** carrying Grace's fix stack
-   (f329be73): CLI non-404 mask removal, Go did:aw log verifier
-   seq=1 fix, server-side private-lookup binding. e2e 178 checks
-   green incl. full reachability matrix. John's lane to tag + push.
-3. **ac v0.5.9 pin bump** to `aweb>=1.18.5` (was `>=1.18.4` in
-   earlier plan; revised after Grace's v0.5.9-blocker root cause
-   work). Plus everything else in the v0.5.9 commit set on ac main
-   (b5b1ee1f, 4f31e116, 5844ffba, d1511867).
-4. **Leg-2** (Juan dashboard probe) — re-anchored to v0.5.8.1 once
+   baseline. Tag pushed 2026-04-26 ~19:16Z, GHA build green at
+   19:30Z, /health unchanged at last check (auto-deploy may need
+   manual trigger per Juan's "render is manual" note + v0.5.6 stall
+   pattern banked).
+2. **Mia closes ac auth_bridge bypass** (b-scope per recon
+   bee1b57a). The pre-resolution to routing_did from local
+   aweb.agents in middleware/auth_bridge.py:1720-1750 + 805-840
+   shortcuts around the contract BEFORE the OSS app sees the
+   request, so Grace's f329be73 fix-closes don't reach
+   cloud-CLI-from-hosted-custodial paths. Highest leverage to
+   close. Dashboard handlers (c-scope) + proof-of-ownership-on-
+   from-identity follow as separate commits/tickets.
+3. **aweb 1.18.5 tag** held pending #2. Grace pushed aweb core to
+   origin/main (8a79ee8 + 7c795be + acdf96a + 242b2eb covers
+   awid+server+e2e+contract). Per Grace f2907678: not final tag
+   until cloud-hosted-custody verification is green.
+4. **ac v0.5.9 pin bump** to `aweb>=1.18.5` plus everything else in
+   the v0.5.9 commit set on ac main (b5b1ee1f, 4f31e116, 5844ffba,
+   d1511867, plus Mia's auth_bridge fix once it lands).
+5. **Leg-2** (Juan dashboard probe) — re-anchored to v0.5.8.1 once
    it deploys, then re-runs against v0.5.9.
 
-Test-gap closure (formerly Mia → reassigned to Grace per Juan-direct,
-folded into f329be73's 178-check matrix) is no longer a separate
-gate — it's done.
+Test-gap closure (originally dispatched to Mia, reassigned to Grace
+per Juan-direct, folded into f329be73's 178-check matrix in
+242b2eb-style contract doc) is no longer a separate gate — it's
+done. Mia's new scope is contract-enforcement on the ac side.
 
 ## What to check FIRST on next wake-up
 
