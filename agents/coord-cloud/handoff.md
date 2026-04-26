@@ -269,37 +269,54 @@ After hotfix: cleanup commits stay parked. v0.5.9 plan unchanged
 target stays aweb>=1.18.4 (pin already bumped in v0.5.8.1, no further
 bump needed for v0.5.9 unless 1.18.5 is preferable).
 
-## v0.5.9 ship gates
+## v0.5.9 release-readiness — substance done, holding on aweb 1.18.6
 
-1. **v0.5.8.1 deploys first** so there's a clean Mode 1 attestation
-   baseline. Tag pushed 2026-04-26 ~19:16Z, GHA build green at
-   19:30Z, /health unchanged at last check (auto-deploy may need
-   manual trigger per Juan's "render is manual" note + v0.5.6 stall
-   pattern banked).
-2. **Mia closes ac auth_bridge bypass** (b-scope) — **GO'd
-   f3145b14**, push pending Mia. Lifetime-discrimination approach
-   per contract L73-75: ephemeral aliases keep fast-path rewrite
-   (server-local coordination); persistent + unknown-lifetime pass
-   through to OSS for contract enforcement. 26 lines auth_bridge.py
-   + bisect-verified tests (stash → persistent FAILS, pop → both
-   PASS). 203/203 auth_bridge suite green. Dashboard handlers
-   (c-scope: messages.py + chat.py local-fallback removal) +
-   proof-of-ownership-on-from-identity (d-scope ticket) follow
-   separately.
-3. **aweb 1.18.5 tag** held pending #2. Grace pushed aweb core to
-   origin/main (8a79ee8 + 7c795be + acdf96a + 242b2eb covers
-   awid+server+e2e+contract). Per Grace f2907678: not final tag
-   until cloud-hosted-custody verification is green.
-4. **ac v0.5.9 pin bump** to `aweb>=1.18.5` plus everything else in
-   the v0.5.9 commit set on ac main (b5b1ee1f, 4f31e116, 5844ffba,
-   d1511867, plus Mia's auth_bridge fix once it lands).
-5. **Leg-2** (Juan dashboard probe) — re-anchored to v0.5.8.1 once
-   it deploys, then re-runs against v0.5.9.
+**v0.5.8.1 LIVE in production** (release_tag=v0.5.8.1, aweb 1.18.4,
+deployed 2026-04-26 21:12Z). Mode 1 strict-matcher 422 closed
+empirically per Amy's fb258854 attestation
+(verification_status=verified on Tom→Amy probe 3175b394).
 
-Test-gap closure (originally dispatched to Mia, reassigned to Grace
-per Juan-direct, folded into f329be73's 178-check matrix in
-242b2eb-style contract doc) is no longer a separate gate — it's
-done. Mia's new scope is contract-enforcement on the ac side.
+**aweb 1.18.5 PUBLISHED** (PyPI 21:08:58Z, npm 21:11:31Z).
+Server-side substance includes Grace's d4fb982 (Mode 1 server fix)
++ aalq audit + identity-messaging-contract + sub-binding cleanup
++ hosted-custodial e2e matrix.
+
+**v0.5.9 substance complete on origin/main**:
+- b5b1ee1f (parallel-registry cleanup)
+- 4f31e116 (test-infra fix)
+- 5844ffba + d1511867 (UX disambiguation: Reachability vs Message
+  acceptance vs Address visibility)
+- f3145b14 + 479411cf (Mia's auth_bridge alias-classifier fix per
+  contract L73-75)
+
+**release/v0.5.9 @ 38d047d5** in `/tmp/ac-v059-workdir/ac-v059`
+(branch off origin/main + pin bump aweb>=1.18.5 + version 0.5.9).
+**ALL test gates GREEN per Juan's "ALL tests pass" directive**:
+- backend full: 1174 passed
+- frontend: 96 passed (1 lint warning)
+- two-service: 11 passed
+- journey-local-aw: 138 + 4 Playwright passed
+- journey-installed-aw: 138 + 4 Playwright passed
+- frontend-e2e (via local-container): 4 Playwright passed
+- release-verify-remote/model/migrations: pass
+
+**Tag/push HELD per John 2ff836b9** until aweb 1.18.6 ships. Reason:
+1.18.5 CLI selector misclassifies slash-prefixed hosted-team labels
+(e.g. juan.aweb.ai/randy) as direct AWID addresses — fail-closes
+correctly but blocks every 1.18.5 user's outbound to hosted-custodial
+team members. Workaround: plain alias (`aw mail send --to randy`).
+Real fix: Grace's CLI classifier fix in 1.18.6 (RCA in flight +
+2 more bugs in 1.18.6 scope per John ff2ec457).
+
+**v0.5.9 pin bumps to aweb>=1.18.6 once shipped**, then re-run all
+gates + tag + push.
+
+**Architectural option B endorsed** (per Juan-direct, Tom 69e35c50,
+John 0a4573fb): hosted-team auth via aweb server using local cert
+data + CLI classifier fix. Preserves my v0.5.9 substance as-is.
+Option A (ac team-sync to AWID for personal-owned hosted teams)
+filed as Task #29 v0.5.10+ ticket — long-term cleanup independent
+of v0.5.9 path.
 
 ## What to check FIRST on next wake-up
 
