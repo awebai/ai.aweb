@@ -35,33 +35,50 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Local versions (this workspace)
 
-- `aw`: **1.18.3** (commit 4f8ad6e, built 2026-04-26T16:20:09Z) ✓
+- `aw`: **1.18.4** (downgraded from 1.18.5 per Randy 1be13b2e to recover sidechannel; 1.18.5 fail-closed blocks all juan.aweb.ai/* recipients with HTTP 404 until classifier fix lands)
 - channel plugin: 1.3.3 ✓
-- **1.18.3 probe FAILED** (2026-04-26 ~16:24Z). aalk + aalm shipped (commits c250cd1 + 9846a6c + 606ec64 + b5347bf + a9ee6b8 in tag 01a9bdb=1.18.3) but didn't close my case. Wholesale KI#1 closure framing was premature; ship-mail held by Charlene per Randy.
-- Awaiting **1.18.4** (or whatever ships the (B) fix) for retest. Grace dispatched for second-round diagnostic + instrumented reproducer.
+- server: ac v0.5.8.1, aweb 1.18.4 deployed (Mode 1 fix d4fb982 live). Mode 1 GREEN attested via Tom's mail 3175b394 (verification_status=verified).
+- **DO NOT `aw upgrade` to 1.18.5** until John gives all-clear. Real fix is CLI classifier (1.18.6 timeline per John 1365910d).
 - Version subcommand is `aw version` (NOT `aw --version`, which errors `unknown flag`).
 
 ## Known issues
 
-1. **KI#1 — split into two distinct modes by John 9b29c13b**:
+1. **WORKING WORKAROUND for chat sidechannel on 1.18.4**:
+   `aw chat send-and-leave <alias> --team aweb:juan.aweb.ai "..."`
+   (plain alias + --team override). Delivers (server vs=identity_mismatch
+   but message lands). Active team aweb:aweb.ai's workspace is EMPTY;
+   all team peers (grace, kate, noah, tom, mia, randy, john, avi, leo,
+   jack, ivy, nova, frank, ceo) are visible only under --team
+   aweb:juan.aweb.ai. So bare alias without --team hits empty workspace
+   → "agent not found".
 
-   **Mode 1 (population-level regression on 1.18.3)**: anyone on
-   1.18.3 sending mail to hosted-custodial recipients gets
-   HTTP 422 `"to_address must match the to_stable_id recipient"` →
-   mail bounces. Tom independently reproduced. Many auto-upgrade
-   users affected. **Fix**: Grace's d4fb982; ships in **1.18.4**
-   (expedited, no yank per Juan). Workaround: pin to 1.18.2
-   (`pip install aweb==1.18.2` or `npm install -g @awebai/aw@1.18.2`)
-   OR use chat for inter-team comms. I'm staying on 1.18.3 + chat
-   workaround (pinning is fragile to next `aw upgrade`).
+   **No working mail combination** to hosted-custodial recipients on
+   1.18.4 from my workspace. All variants 422 (to_stable_id mismatch
+   on full address, "must be domain/name" on plain alias, "signed_payload
+   from must match the authenticated sender" with --team override).
+   Mail-out is dead until the CLI classifier fix (1.18.6).
 
-   **Mode 2 (my-workspace-specific chat empty to_did)**: confirmed
-   real on 1.18.3 by Randy ecfdd444 (not a stale-binary artifact;
-   my interaction log proves binary was 1.18.3 commit 4f8ad6e at
-   chat send-time). Separate code path issue. Likely rides
-   **1.18.5**. Grace needs to reproduce against my exact workspace
-   shape to identify the wiring gap. State already sent in mail
-   e672f0a0 to Grace (workspace shape + reproducer commands).
+2. **KI#1 — split into two distinct modes by John 9b29c13b**:
+
+   **Mode 1 — population regression on 1.18.3 → CLOSED on 1.18.4**:
+   server-side d4fb982 (`_recipient_identity_matches` helper) deployed
+   in ac v0.5.8.1. Empirically attested via Tom's mail 3175b394
+   (verification_status=verified). Mode 1 done.
+
+   **Mode 2 — CLI classifier misclassifies hosted-team-aliases**:
+   `juan.aweb.ai/randy`-shaped addresses get classified as direct
+   AWID addresses, but for hosted teams they should route through
+   server's team-alias path. Real fix is CLI classification
+   (1.18.6 timeline). Randy + John converged 1365910d.
+   - 1.18.5 added Mode 2 Part 1 fail-closed (correctly refuses to
+     send when classifier returns broken result) → made my workspace
+     unable to send anywhere; downgraded to 1.18.4 to recover.
+   - Mode 2 Part 2 was hypothesized as AWID-side team registration
+     (Randy 5cc7afbf), but Randy retracted 1be13b2e: "real bug is
+     CLI selector classification, my earlier 'register the team'
+     framing was wrong; apologies for the noise."
+   - Grace 50e4f66f / Randy 1be13b2e / John 1365910d aligned on:
+     real fix = CLI classifier in 1.18.6.
 
    Workspace shape (load-bearing for Mode 2): active_team
    aweb:aweb.ai, cert.member_address aweb.ai/amy,
@@ -78,8 +95,9 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    - no "closes" framing on messaging releases without empirical
      attestation across multiple stack shapes
 
-   Standing by for 1.18.4 publish (Mode 1 retest) and later 1.18.5
-   (Mode 2 retest).
+   Standing by for **1.18.6** (CLI classifier fix) — at which point
+   `aw upgrade` will be safe and full-address paths should resolve
+   correctly. Until then: stay on 1.18.4 + chat workaround.
    - Mail wire shapes for my outbound: 4 banked earlier had
      signing_key_id EMPTY-STRING; bbbc19aa has signing_key_id ABSENT.
      Both → identity_mismatch. Empty vs absent is a config-state
