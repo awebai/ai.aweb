@@ -55,8 +55,19 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
      `identity.RegistryURL`; with neither selection nor AWID env var
      set, resolver setup gets nothing → cert lookup fails → unsigned
    **Coverage gap closes via aalk** (P1, dispatched to Grace under
-   John's coord). Likely ships as aweb 1.18.3. Randy will mail when
-   it publishes; re-run probe to close.
+   John's coord). Fix is **commit c250cd1** on origin/main (amended
+   from 189a78b for rotation-resilience: now signs both
+   to_did=current did:key AND to_stable_id=stable did:aw). Likely
+   ships as aweb 1.18.3. Randy/Tom will point at packaged build when
+   ready; re-run mail + chat probes to juan.aweb.ai/randy and ask
+   Randy for server vs on both to close.
+   - **Architectural framing (Grace, 80b1a13d)**: Randy's awid row
+     exists but is `org_only`. c250cd1 closes my continuity case
+     via known_agents TOFU pin fallback (registry-first, fall back
+     to pin on 404). Cleaner long-term answer for in-org-sender →
+     org_only-recipient is **authenticated registry lookup for
+     org/team-private rows** — separate work, deeper than aalk.
+     Don't conflate the two when answering future support threads.
    - Mail wire shapes for my outbound: 4 banked earlier had
      signing_key_id EMPTY-STRING; bbbc19aa has signing_key_id ABSENT.
      Both → identity_mismatch. Empty vs absent is a config-state
