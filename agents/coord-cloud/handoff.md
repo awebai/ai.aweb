@@ -26,7 +26,7 @@ to him via mail (f1cca8d4) and to Grace via chat to route to him.
 
 | Commit | Repo | Author-coord | Reviewer-coord | Status |
 |--------|------|--------------|----------------|--------|
-| ef5c3d7 | aweb | Grace | John (pending GO on this SHA) | holding for John's fresh GO |
+| ef5c3d7 | aweb | Grace | John (a27c742c GO + Tom ack c1357c45) | GO, holding |
 | b5b1ee1f | ac | Grace | Tom | GO, holding |
 | 4f31e116 | ac | Tom (auto) | n/a (test infra) | self-merged, holding |
 
