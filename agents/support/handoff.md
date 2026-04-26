@@ -1,6 +1,6 @@
 # Support (Amy) Handoff
 
-Last updated: 2026-04-25
+Last updated: 2026-04-26
 
 ## Current state
 
@@ -35,57 +35,43 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Local versions (this workspace)
 
-- `aw`: 1.18.1 (commit ff8161c) ✓ (upgraded 2026-04-25 via `aw upgrade`)
-- channel plugin: **1.1.0** ✗ (need 1.3.1; pending `/plugin update
-  aweb-channel@awebai-marketplace` by Juan + session restart). 1.3.1
-  carries both aakq.1 (precedence flip — likely fix for KI#1) and a
-  .mcp.json shape fix that was broken in 1.1.0-1.3.0.
+- `aw`: 1.18.1 (commit ff8161c) ✓
+- channel plugin: **1.3.1** ✓ (Juan upgraded + full Claude Code restart 2026-04-26 ~07:00Z; pid 2802 → `~/.claude/plugins/cache/awebai-marketplace/aweb-channel/1.3.1/dist/index.js`)
+- **Awaiting v0.5.8 publish** for two banked fixes already in main:
+  - aweb ae247c4 (aalg fix) → unblocks aalg verification probe
+  - channel dd4ef9f (aale fix) → unblocks aale render verification
 
 ## Known issues
 
-1. **IDENTITY MISMATCH on outbound — CLI cross-team-cert residual
-   (separate from v0.5.7 dashboard fix).** Status 2026-04-25
-   evening: v0.5.7 closes the ac dashboard mail TX path (Grace's
-   RCA, fix in ac/backend f5db375a). My reproductions are NOT on
-   that path — all 4 banked instances (4b4468ff, 9f426014,
-   d5e80f3b, 335a4c2b) are CLI `aw mail send`. Randy revised the
-   decision-record framing to "TX-shape root cause closed (dashboard);
-   CLI cross-team-cert empty-string signing_key_id residual
-   identified" and dispatched the CLI investigation to John.
-   - Empirical differential (this workspace, 2026-04-25): 18/18
-     inbound mails to me show `signing_key_id` ABSENT and verify
-     fine. Mine outbound shows `signing_key_id` EMPTY-STRING and
-     downgrades to `identity_mismatch`. Empty-string is exclusive
-     to my outbound — sender-side specific.
-   - Likely triggered by my cross-team config: active team's
-     cert.member_address (aweb.ai/amy) ≠ identity.yaml.address
-     (juan.aweb.ai/amy — stale home). Hypothesis points at signEnvelope
-     in aweb/cli/go/awid/client.go:40-97 — either the early return
-     at line 41 fires on this config and a downstream layer fills
-     FromDID without filling SigningKeyID, or a non-signEnvelope
-     path produces my wire envelope. John has the OSS contract
-     authority to dig.
-   - Local↔awid binding INTACT (no rotation, both addresses bind
-     to same did:key — ruled out as cause).
-   - Operational impact: my outbound mail AND outbound chat both
-     arrive identity_mismatch on the server (14/14 of my chat sends
-     to Randy in the live session, per `aw chat history --json`).
-     Earlier "chat unaffected" assumption was wrong — that was based
-     only on inbound-from-Randy headers rendering verified=true in
-     my channel; we never checked the server-recorded status for
-     amy→randy chats. Chat-event header on RX still reads
-     verified=true (likely session-cached trust or different
-     renderer path), but if any future authorization gate reads
-     server-side verification_status on chat, my coordination
-     breaks silently.
-   - Investigation packet mailed to Randy 2026-04-25 (msg
-     83b35955) — self-contained for forwarding to John. Bonus
-     chat-also-affected finding mailed 2026-04-25 (msg 198cbdfd).
-   - Closure protocol: after CLI residual fix ships, send Randy
-     fresh CLI mail AND fresh CLI chat under unchanged
-     cross-team config; both verification_status=verified on
-     server → closes; either still identity_mismatch → still
-     residual scope.
+1. **aalg — IDENTITY MISMATCH on outbound CLI mail+chat (cross-team
+   cert).** Confirmed open post-channel-1.3.1 restart (2026-04-26):
+   fresh CLI mail bbbc19aa and fresh CLI chat 068ed2d5 from me to
+   Randy both server-recorded `identity_mismatch`. Fix ae247c4 is in
+   aweb main but not in published 1.18.1; ships in v0.5.8.
+   - Mail wire shapes for my outbound: 4 banked earlier had
+     signing_key_id EMPTY-STRING; bbbc19aa has signing_key_id ABSENT.
+     Both → identity_mismatch. Empty vs absent is a config-state
+     variant of the same cert-attestation-missing bug.
+   - Chat envelope schema lacks signing_key_id entirely (fields:
+     body, from_address, from_agent, from_did, from_stable_id,
+     is_contact, message_id, sender_leaving, signature, timestamp,
+     to_address, type, verification_status). Cross-team chat has no
+     wire-level mechanism to carry the cert reference, so server
+     falls back to `from_address must match awid registration for
+     stable_id` — fails for me because my stable_id
+     (did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ) registers to
+     juan.aweb.ai/amy at awid, but my active cert's member_address
+     is aweb.ai/amy. ae247c4 must address this asymmetry too (Randy
+     confirms aalg fix in main covers it).
+   - Earliest me→randy chats (2026-04-21) had
+     from_addr=juan.aweb.ai/amy + identity_mismatch. Post-aakq
+     (2026-04-25 onwards) from_addr=aweb.ai/amy + identity_mismatch.
+     aakq fixed the address-derivation; aalg fixes the
+     cert-attestation gap that aakq exposed.
+   - Verification gate post-v0.5.8 + upgrade: fresh CLI mail AND
+     fresh CLI chat to Randy under unchanged cross-team config; both
+     verification_status=verified on server → closes; either still
+     identity_mismatch → residual scope still open.
 
 2. **Channel plugin auto-acks mail** — The aweb channel plugin
    acknowledges mail on delivery, so `aw mail inbox` shows nothing.
@@ -94,23 +80,26 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    Juan. Two options discussed: (a) channel stops auto-acking, agent
    acks explicitly; (b) add a "recently delivered" view.
 
-3. **Channel plugin 1.1.0 mail-event header renders verified=false
-   on server-verified mail** (aweb-aale, P3, filed by Randy
-   2026-04-25). Observed on Randy's release-announcement mail.
-   Initial diagnosis suspected sender-side or trust failure; root
-   cause is RX rendering only. Verified by `aw mail inbox
-   --show-all --json`: all 16 inbox mails carry server
-   `verification_status: "verified"` with valid signatures,
-   including the one whose channel header read `verified="false"`.
-   Plugin 1.1.0 chat-events render the correct header on the same
-   plugin/sender/hour — only mail events misrender. Likely cause:
-   1.1.0 mail-event renderer reads a header field whose name
-   changed in the aakq.1 schema and defaults to false on missing.
-   **Resolves on /plugin update to 1.3.1.** Not a wire/trust bug;
-   surface display only. aale also tracks the forward-compat policy
-   (channel header schema changes should keep old field names
-   populated for at least one minor so stale plugins don't
-   silently downgrade trust signals).
+3. **aale — channel mail-event renderer asymmetry** (P3, filed by
+   Randy 2026-04-25, originally suspected resolved by 1.3.1; NOT
+   resolved). Confirmed open on channel 1.3.1 post-restart
+   (2026-04-26) with clean discriminator: Randy sent a fresh mail
+   (15a130c0) and fresh chat (ae94e00c) within the same minute, same
+   plugin instance, same sender. Mail rendered `verified="false"`,
+   chat rendered `verified="true"`. Server JSON for both:
+   verification_status=verified. Pin store at capture time contained
+   Randy's did:aw entry (auto-pinned during 07:03 startup) — so
+   hypothesis (B) "missing pin → false" downgraded; hypothesis (C)
+   "data-shape asymmetry in renderer between mail and chat code
+   paths" confirmed. Fix dd4ef9f is in aweb main but not in
+   published channel 1.3.1; ships as 1.3.2 in v0.5.8.
+   - Verification gate post-1.3.2 + upgrade: fresh inbound mail from
+     a server-verified sender must render `verified="true"` in
+     channel header alongside JSON vs=verified.
+   - aale also tracks the forward-compat policy (channel header
+     schema changes should keep old field names populated for at
+     least one minor so stale plugins don't silently downgrade
+     trust signals).
 
 ## Resolved issues
 
