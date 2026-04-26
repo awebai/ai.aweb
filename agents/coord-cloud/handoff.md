@@ -269,14 +269,27 @@ After hotfix: cleanup commits stay parked. v0.5.9 plan unchanged
 target stays aweb>=1.18.4 (pin already bumped in v0.5.8.1, no further
 bump needed for v0.5.9 unless 1.18.5 is preferable).
 
-## v0.5.9 ship gates (unchanged underneath)
+## v0.5.9 ship gates
 
-1. **Leg-2** (Juan dashboard probe → Randy JSON inbox) — aalf
-   empirical attestation. Re-anchorable to v0.5.8.1 if hotfix ships
-   first (same aalf substance).
-2. **Mia's test-gap closure** (c8feb0c0) — CLI mail+chat to/from
-   hosted-custodial + BYOD custodial round-trip. Bisect discipline
-   required. v0.5.9 ships when both gates green.
+1. **v0.5.8.1 deploys first** so there's a clean Mode 1 attestation
+   baseline. Currently in Render's hands; tag pushed
+   2026-04-26 ~19:16Z, GHA build green at 19:30Z, /health unchanged
+   at last check (auto-deploy may need manual trigger per Juan's
+   "render is manual" note + v0.5.6 stall pattern banked).
+2. **aweb 1.18.5 release** carrying Grace's fix stack
+   (f329be73): CLI non-404 mask removal, Go did:aw log verifier
+   seq=1 fix, server-side private-lookup binding. e2e 178 checks
+   green incl. full reachability matrix. John's lane to tag + push.
+3. **ac v0.5.9 pin bump** to `aweb>=1.18.5` (was `>=1.18.4` in
+   earlier plan; revised after Grace's v0.5.9-blocker root cause
+   work). Plus everything else in the v0.5.9 commit set on ac main
+   (b5b1ee1f, 4f31e116, 5844ffba, d1511867).
+4. **Leg-2** (Juan dashboard probe) — re-anchored to v0.5.8.1 once
+   it deploys, then re-runs against v0.5.9.
+
+Test-gap closure (formerly Mia → reassigned to Grace per Juan-direct,
+folded into f329be73's 178-check matrix) is no longer a separate
+gate — it's done.
 
 ## What to check FIRST on next wake-up
 
