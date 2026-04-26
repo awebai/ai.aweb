@@ -20,7 +20,7 @@ How aweb.ai is organized. Every agent reads this on wake-up.
 |-------------|------|---------------|-----------------------------------------------|
 | Coord aweb  | John | ../aweb       | Code review, invariant enforcement, owns main |
 | Coord cloud | Tom  | ../ac         | Code review, cloud/OSS alignment, owns main   |
-| Coord awid  | Goto | ../aweb/awid/ | Code review, identity architecture integrity  |
+| Coord awid  | John | ../aweb/awid/ | Code review, identity architecture integrity (combined with coord-aweb) |
 
 ### Founders (human)
 
@@ -100,6 +100,92 @@ then run a one-shot smoke against the surface the release actually
 changes. Only after both — then mail "fully live." Together: the
 does/doesn't-fix contract states the claim accurately;
 verified-live discipline confirms the claim landed.
+
+## Release discipline (six standing policies, post-1.18.3 incident)
+
+Adopted 2026-04-26 after the aweb 1.18.3 → 1.18.4 → v0.5.8.1 cycle.
+All four discipline failures of that cycle (synthetic reproducer,
+deferred audit, ignored risk-flag, no hosted-custodial matrix; plus
+auto-upgrade fanout and published-vs-deployed gap) collapse to three
+axes — comms framing, engineering coverage, distribution blast
+radius — with one or two policies per axis.
+
+Apply to any release in scope (messaging, identity, verification,
+trust, address-resolution; aweb + ac + awid). All coords + CTO + dev
+agents are bound by these.
+
+### Axis 1: Comms framing
+
+**Policy 1 — Empirical-attestation as standing release gate.** No
+closure framing in any comms-bound content (ship-mail, blog, social,
+release notes) until ≥1 user verifies on their actual stack.
+Pre-empirical = "ships substance for X." For messaging/identity/trust
+changes, ≥2 distinct user-shape probes verifying green before "closes
+for X" framing. Trailing hedges ("attestation pending") do NOT soften
+"closes" headlines.
+
+### Axis 2: Engineering coverage
+
+**Policy 2 — Coverage-gap audit before any release** touching
+identity / verification / trust / address-resolution. Previous cycle's
+queued audits MUST complete before tagging. Standing checklist on the
+release-readiness gate: (a) what user shapes are NOT in our fixtures,
+(b) what architectural asymmetries did the previous cycle find but
+defer, (c) have they been audited. If not — release blocks until
+they are, OR scope is explicitly + verifiably narrowed to not touch
+the audited code.
+
+**Policy 3 — Risk-flag-to-test conversion.** Every peer-flagged risk
+with "may not be tested" / "could differ" / "different code path"
+language at scoping/dispatch time becomes a release-blocking
+regression test in the release that addresses the original issue.
+Bookkept by the dispatching coord. Verified by CTO during
+spec-conformance review. Test exists before tagging; if not — release
+blocks.
+
+**Policy 4 — Hosted-custodial e2e matrix.** Until the full
+combinatorial matrix exists in CI, ANY release touching messaging
+or identity ships under "ships substance for X" framing only —
+never "closes for X." Matrix dimensions: `(sender Client-construction-
+path) × (transport: mail/chat) × (cert-config: BYOD-self / hosted-
+custodial / cross-team-cert) × (recipient reachability:
+public/org_only/team_members_only/nobody) × (workspace-shape) ×
+(CLI-version × deployed-server-version)`. v0.5.9 priority.
+
+### Axis 3: Distribution blast radius
+
+**Policy 5 — Staged distribution before npm latest tag promotion.**
+aweb releases stage to npm `next` tag first; hold for ≥1h
+team-canary window before promoting to `latest`. Homebrew tap
+honors the same window. Implementation: workflow change in
+`aw-release.yml`. Auto-upgrade was the blast-radius multiplier
+during the 1.18.3 incident.
+
+**Policy 6 — Service-deployed-with-fix verification before requesting
+empirical attestation.** Sibling to Policy 1 at the deployment layer
+— a package-published signal is not a deploy signal. Before
+requesting empirical attestation on a server-side fix: verify the
+deployed service is actually running the new code (hit `/health` and
+confirm version, OR smoke-test one new endpoint that exercises the
+fix path). For OSS self-hosted: empirical-attestation request must
+explicitly say "after redeploying with fix version." For hybrid (CLI
++ cloud-server): both must be on the fix version. CLI changes that
+add a new wire-shape can wake dormant server code paths (Policy 4's
+matrix should cover this CLI×server co-evolution surface).
+
+### Implementation responsibilities
+
+- **All coords** apply Policies 1, 2, 3, 6 at release-readiness gate
+  for their repo's releases. Each coord's CLAUDE.md has the
+  release-readiness checklist that explicitly verifies each policy.
+- **CTO (Randy)** verifies Policies 2, 3 during spec-conformance
+  review on each release.
+- **Tom** designs + maintains Policy 5 (staged distribution
+  workflow); coord-aweb coordinates.
+- **John (coord-aweb)** owns the v0.5.9 hosted-custodial matrix work
+  (Policy 4) since aweb is the messaging substrate.
+- **Juan** signs off on policy changes; coords + CTO codify and
+  apply.
 
 ## How oversight works
 
