@@ -315,8 +315,28 @@ gates + tag + push.
 John 0a4573fb): hosted-team auth via aweb server using local cert
 data + CLI classifier fix. Preserves my v0.5.9 substance as-is.
 Option A (ac team-sync to AWID for personal-owned hosted teams)
-filed as Task #29 v0.5.10+ ticket — long-term cleanup independent
-of v0.5.9 path.
+filed as Task #29 v0.5.10+ ticket — long-term cleanup.
+
+**Re-verified scope for v0.5.10 (per re-investigation + John af6e2b27)**:
+ealier "personal teams skip registration via owner_type gate" framing
+was wrong; owner_type IS organization (default-org-per-user). Real
+gap is the call site: `ensure_registered_team` is called only by
+`TeamsService.create_team:263`. Personal/onboarding/headless flows
+call sibling `ensure_local_team_state` but NOT
+`ensure_registered_team`. AWID's data model collapses cert and
+member registration into one operation (awid.team_certificates is the
+membership table; no separate /members endpoint). Refined fix:
+~6 call-site additions + cert AWID registration in
+`ensure_stored_agent_team_certificate` + operational backfill of
+juan.aweb.ai/teams/aweb + permanent-agent certs. Total ~50-80 LOC.
+
+**Juan's coord dispatch (per John 7382b450)**: Grace implements
+both aweb 1.18.6 (CLI classifier + 3 bugs) AND ac v0.5.10
+(team-sync). 2+2 split: John reviews aweb side, Tom reviews ac
+side. Discipline: subagent on each commit + independent gate
+verification (release-ready + journey-installed-aw + frontend-e2e
+maintaining "ALL tests pass" rigor) + bisect demonstration on each
+test + opt-in handshake on push + combined Randy approval mail.
 
 ## What to check FIRST on next wake-up
 
