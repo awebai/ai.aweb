@@ -1,80 +1,158 @@
 # CTO Handoff
-Last updated: 2026-04-25 (post-v0.5.5 verified-live; aalf RCA converged; awaiting Tom's lane-dispatch)
+Last updated: 2026-04-26 (post-architecture-pivot; reproducer + conformance suite in flight)
 
 ## State in one paragraph
 
-Three releases since last handoff: aweb 1.18.1 (recovered ghost-tag 1.18.0), ac v0.5.5 (aala BYOIT cross-machine flow), ac v0.5.6 (mid-deploy at handoff time). awid prod cutover from 0.3.1 → 0.5.1 happened 2026-04-25 (John executed; required for aala to actually work in prod — discovered post-tag that artifact-published ≠ deployed-service-running). KI#1 (verification_status=identity_mismatch) RCA fully converged with John 2026-04-25 evening: TX-side malformed envelope in ac dashboard mail path; RX verifier downgrade is correct. Patch shape settled — caller+signer both, signer is load-bearing (mirror CLI signEnvelope auto-correct in ac's sign_on_behalf). Lane authorization pending from Tom; option (1) Grace continues in ac under Tom's coord is my preference and John's.
+Juan called a stop on the speculate-fix-publish-ask-Amy cycle after channel 1.3.2 shipped and didn't actually close Amy's mail-renderer-asymmetry symptom. Two pivots happened: (1) reproducer-as-gate — John builds a local end-to-end harness reproducing Amy's exact symptom, and any candidate fix must flip baseline-to-green locally before ship; (2) architecture work — server, Go CLI, and channel TS verifier drift is the root bug class (aalf, aalg, aale all instances), so we're defining a shared trust contract + JSON conformance vectors that both clients must pass. Grace pulled out of patch-lane onto the architecture work with me. John runs the reproducer + intermediate aweb 1.18.2 / ac v0.5.8 ship if it passes. Architecture release migrates to v0.5.9 / channel 1.3.3.
 
-## What's live (verified end-to-end)
+## What's in main vs not
 
-- `pypi.org/project/aweb` 1.18.1 — published, GHA green
-- `pypi.org/project/awid-service` 0.5.1 — published AND deployed to api.awid.ai prod (post-cutover 2026-04-25)
-- `npm @awebai/aw` 1.18.1 — published
-- `npm @awebai/claude-channel` 1.3.1 — published
-- `ghcr.io/awebai/ac-cloud:v0.5.5` — published AND deployed to app.aweb.ai (verified-live by Tom 2026-04-25 ~15:42Z, /health returns release_tag=v0.5.5, aweb 1.18.1, awid 0.5.1, all subsystems green)
-- `ghcr.io/awebai/ac-cloud:v0.5.6` — published; auto-deploy pending at handoff time. Tom watching for /health flip + hosted-MCP-OAuth smoke.
+- `aweb origin/main`: aalf substance (f5db375a), aalf cosmetic (6545c954), aalg substance (ae247c4), aalg N1+N2 cosmetic (67af50f), Grace's first conformance slice held LOCAL at 24ae609 (NOT pushed).
+- `ac main`: aalf at v0.5.6 + bumped commits not yet tagged for v0.5.8.
+- `npm @awebai/claude-channel`: 1.3.2 published live (registry-fallback fix, real bug closed; does NOT close aale renderer-asymmetry symptom).
 
-## Active critical thread: aalf (KI#1 fix)
+## Active work — three parallel tracks
 
-**RCA**: TX-side. ac/backend/src/aweb_cloud/routers/messages.py dashboard mail send path passes msg_to_did (= recipient's stable did:aw) into to_did and never populates to_stable_id. CLI signEnvelope auto-corrects this shape; ac's Python sign_on_behalf does not. Verifier at client.go:652 (checkRecipientBinding) correctly downgrades to IdentityMismatch because to_stable_id is empty AND toDID(did:aw) != c.did(did:key).
+### Track 1: Reproducer harness (John, in flight)
 
-**Patch (settled with John)**:
-1. Signer fix in sign_on_behalf — mirror signEnvelope: if to_did starts with "did:aw:", move to to_stable_id and clear to_did. Load-bearing — makes ac protocol-consistent with CLI signer.
-2. Caller fix in messages.py — explicit split in dict literal. Defense in depth.
-3. Audit: grep all sign_on_behalf callers; expectation is zero intentional did:aw-in-to_did callers (all malformed per contract).
+`aweb/scripts/e2e-amy-symptom-reproducer.sh` + supporting Go fixtures.
+Three modes: BASELINE (no fixes — replicates Amy's exact pre-fix failure)
+/ INTERMEDIATE (aalg-only) / POST (both aalg + renderer fix). Channel
+plugin version-switching via npm install --no-save into temp dir to
+test against published 1.3.2 and built-from-source candidate fixes.
 
-**Regression test (John relaying to Grace)**: four-case matrix — Tom/John/Grace/Amy senders to Amy receiver. Pre-fix: Amy fails IdentityMismatch, others pass. Post-fix: all four pass. Question still open: why does Tom/John/Grace currently pass on the same TX path? Hypotheses (a) registry resolution short-circuits earlier in chain, (b) prior TOFU pin verified-state cached. Grace's regression should isolate.
+**This becomes the new release-gate**: any candidate fix must flip
+BASELINE → POST locally before ship. Discontinues the speculate-publish-
+ask-Amy cycle that produced channel 1.3.2 without empirically closing
+Amy's symptom.
 
-**Empty signing_key_id** (Grace's cosmetic flag): non-causal, file as separate post-launch cleanup task.
+### Track 2: Trust contract architecture (Randy + Grace)
 
-**Lane-dispatch (Tom's call)**: my preference is option (1) — Grace continues in ac under Tom's coord (aaja.6 shape). John concurs. Tom not yet replied on authorization. Mail to Tom: d0c4040e-3340-4bb8-8111-5ef1b9c367d4.
+Working doc: `agents/cto/aale-trust-contract.md`. Direction is option (b)
+per Juan: distributed-but-conformant. Three independent verifier impls
+keep their autonomy but conform to a shared contract via JSON test
+vectors loaded by both Go and TS test suites.
 
-**Release-gate framing for v0.5.7** (or whatever ships the fix): same v0.5.6-shape gate-log + SOT analysis + CTO mailed-approval + verified-live discipline. Plus browser-verify pathway for any UI-surface changes (Tom's discipline-gap flag — see below).
+**Survey findings**:
+- Server is data substrate only — does NOT compute verification_status.
+  Just stores raw signed envelopes + metadata.
+- Go CLI computes status on inbox-read in 4 passes (crypto sig, recipient
+  binding, sender registry, TOFU pin).
+- Channel TS does same 4 passes on event delivery.
+- Drift between Go and TS is the bug class. aalf, aalg, aale are all
+  instances.
 
-## Discipline gap to bank: browser-verify for UI-surface changes
+**First slice** (Grace held push at 24ae609):
+- `aweb/test-vectors/trust/recipient-binding-v1.json` — 7 vectors covering
+  aalf shape (V1), aale stable-match (V3), did:key fallback (V4), did:key
+  mismatch (V5), stable mismatch (V6), absent recipient pass-through, and
+  recipient-binding-doesn't-upgrade-failed-crypto edge.
+- Go conformance harness: `cli/go/awid/trust_conformance_test.go` loads
+  vectors and asserts via `NormalizeRecipientBinding`.
+- TS conformance harness: `channel/test/conformance.test.ts` loads same
+  vectors and asserts via `SenderTrustManager`.
+- TS implementation patch: threads `selfStableID`/`to_stable_id` through;
+  ports Go stable-id-first recipient-binding semantics.
+- Amy-shape dispatch regression on mail.
 
-Tom flagged it on v0.5.5: dashboard UI changes pass /health curl probe (release_tag matches, subsystems green) but the actual user-visible delta is browser-verified-only. /health does not exercise dashboard rendering. The published-vs-deployed memory needs a corollary: for releases whose surface is dashboard UI text or layout, /health is necessary but not sufficient — add a browser-test probe (or at minimum a screenshot-diff during release-gate). Will add to a memory entry.
+**Spec-conformance finding (mailed Grace as Note 1 pre-push)**: Go uses
+`EqualFold` (case-insensitive) for stable_id; TS uses `===` (case-sensitive).
+Wire with mixed-case stable_id would diverge. Asked Grace to update TS
+to `.toLowerCase()` match + add a case-insensitive vector to the JSON file.
+Same opt-in handshake follow-up commit before push.
 
-## Open items (mine, not delegated)
+**John's gate-read** in parallel — code-reviewer subagent pass on substance.
+Combined approval (his substance + my spec-conformance) lets Grace push.
 
-- **Bank Tom's browser-verify discipline-gap memory** (this session, before going idle).
-- **Decision record entry for aweb 1.18.1 + ac v0.5.5 + awid 0.5.1 prod cutover** — converging with John on the entry text. He has the migration-discipline lessons; I have the release-framing.
-- **Mirror release-framing pointer to coord-cloud + coord-awid AGENTS.md** — already in coord-aweb. Per John's recommendation 2026-04-25.
-- **Stand by for Tom's v0.5.6 fully-live mail** — auto-deploy + hosted-MCP-OAuth smoke.
-- **Stand by for Tom's aalf lane-dispatch decision** — caller+signer both, audit requirement, my preference is option (1).
+### Track 3: Wizard polish + aalh (Noah, held)
 
-## Filed and tracked, not actively my work
+- `aalh` (--body-file flag): in scope per Juan default-in.
+- `aaai/aaaj/aaak/aaal` (wizard polish): in scope per Juan.
+- Held pending pattern-conversation close on Grace's 1.3.2 release-protocol
+  slip. Once she's demonstrated holding gates on the conformance work,
+  John dispatches Noah on the wizard polish under his coord.
 
-- **aweb-aakr** (P4) — membership-field overlap. Deferred by agreement.
-- **aweb-aaky** (P3) — ac Makefile realpath refactor. Not urgent.
-- **aweb-aals epic + aaiy + various P1/P2** — John's audit backlog. Stage-gate on ship priorities.
-- **aaiu.5** (hosted onboarding e2e) — real-still-open.
-- **aaja.7** (signing-path unification) — real-still-open. The aalf signer-fix in sign_on_behalf is a small overlap with this; coordinate at landing.
-- **aweb-aale** (P3) — channel plugin 1.1.0 mail-event header verified=false render bug. Display-only, not a verification bug. Not a ship-blocker.
-- **aakz** (mail-send 409) — closed. chat-fallback workaround documented.
+## Resolved scope decisions (Juan calls)
 
-## Release-gate discipline — standing policy (verified across 4 ships)
+- Drop `aaac` (aw run double-echo).
+- Drop `KI#2` (channel auto-ack — "not really an issue").
+- Architecture option: **(b) distributed-but-conformant**. TS channel
+  cannot depend on Go CLI being installed locally, so option (a)
+  consume-canonical doesn't work. Three verifiers keep autonomy, conform
+  to shared contract.
+- Ship intermediate v0.5.8 with aalf+aalg substance once reproducer
+  validates; aale renderer asymmetry closure migrates to v0.5.9 /
+  architecture release.
 
-Six rules now codified in memory + docs:
-1. Release gate = full e2e user journey green (decisions.md 2026-04-22).
-2. Review via shared working tree, no chat-pasted diffs.
-3. Route dev-agent dispatch through the coordinator.
-4. Trust the Makefile's release-ready chain — not parallel skill-docs.
-5. Written approval via mail — "GO" in user conversation ≠ GO in coordinator inbox.
-6. Published artifact ≠ deployed service. Verified-live = artifact + /health + smoke against deployed endpoint. (NEW 2026-04-25, banked from awid prod 0.3.1-vs-0.5.1 lag discovery.)
-7. (pending: browser-verify pathway for UI-surface changes — will bank from Tom's flag.)
+## Standing release policies (now 11 — banked across cycle)
+
+1. Release gate = full e2e + SOT + CTO mailed-approval (2026-04-22).
+2. Review via shared working tree (2026-04-22).
+3. Route dev-agent dispatch through coordinator (2026-04-23).
+4. Trust the Makefile's release-ready chain (2026-04-23).
+5. Written approval via mail (2026-04-23).
+6. Use prohibition language explicitly (2026-04-25).
+7. Push release tags individually (2026-04-25).
+8. Tracker audit needs symptom-check (2026-04-25).
+9. Published artifact ≠ deployed service (2026-04-25).
+10. Browser-verify for UI-surface releases (2026-04-25).
+11. Closure framing rests on empirical attestation (2026-04-25).
+12. **Reproducer-as-gate** (NEW 2026-04-26): no candidate fix ships
+    without local end-to-end reproducer flipping pre-fix-failure to
+    post-fix-pass. Discontinues speculate-publish-ask-user cycles.
+13. **Code-reviewer subagent for gate-input commits** (banked by John
+    2026-04-26 + me): default to subagent pass for any commit on the
+    release-bound path; shape-level reads are for awareness only.
+
+## What's stale / pending discipline events
+
+- **Channel 1.3.2 protocol-violation slip** (Grace shipped before mailed
+  approval, second-instance pattern after aala.10): noted; substance
+  intact; no rollback (npm publish destructive); no retroactive approval
+  (sets bad precedent). Bilateral feedback delivered by John (16331624);
+  Grace ack clean (37abc627); held on wizard-polish dispatch until
+  pattern conversation closes via clean-discipline cycle on the
+  conformance work. Banking from this cycle: explicit gate language at
+  dispatch-time for every commit Grace touches that has any release
+  surface.
+
+## Open trackers worth visibility (filed during cycle)
+
+- aweb-aalf: TX-side dashboard malformed envelope. Substance in main, ships v0.5.8.
+- aweb-aalg: CLI cross-team-cert sender-identity verification. ae247c4 + cosmetic in main, ships v0.5.8.
+- aweb-aalh: backtick body footgun, Noah dispatched, --body-file flag.
+- aweb-aali: aako-pattern --to-did did:aw:X coverage gap (next cycle).
+- aweb-aalj (TBD): trust contract architecture + Go+TS conformance suite.
+  May get filed as a project epic with subtasks per pass (recipient-binding,
+  crypto-sig, registry, TOFU). Or stays in working doc and gets promoted
+  to docs/ when ratified.
+- aweb-aale: stays open — channel mail-renderer asymmetry, closes via
+  conformance-driven path, NOT 1.3.2 alone.
 
 ## What to check FIRST on next wake-up
 
-1. Tom's lane-dispatch reply on aalf — option (1) authorized? Grace cleared to patch?
-2. Tom's v0.5.6 fully-live mail landed?
-3. Grace's regression test design + why-only-Amy investigation findings?
-4. Amy's status — has she seen any new identity_mismatch on a fresh TX-path mail post-deploy? Pre-fix, expect she still does.
-5. John's converging decision-record entry for 1.18.1 + 0.5.5 + awid 0.5.1.
+1. Grace's follow-up commit on top of 24ae609 (case-insensitive vector +
+   .toLowerCase() match in TS)?
+2. John's code-reviewer subagent gate-read on 24ae609 + Grace's followup?
+3. John's reproducer harness ready mail (BASELINE reproduces Amy's
+   exact failure on clean local stack)?
+4. Tom's hold ack for ac v0.5.8 (mailed 96d9af68 earlier; should already
+   be aligned)?
+5. Noah's aalh first commit — held by John pending pattern-close on Grace?
 
 ## Context I don't want to lose
 
-- The aala "shipped end-to-end" framing was wrong on 2026-04-25 because awid prod was on 0.3.1 while the BYOIT epic depended on 0.5.1. Tagged 14:52Z; discovered ~24h later when Amy hit identity_mismatch on a related path. John executed dump-restore lifecycle to bring prod up. Lesson banked as feedback_published_vs_deployed.md.
-- Channel header verified=false (Amy's first symptom report) is a render, not crypto truth. JSON inbox is canonical. Banked as feedback_json_inbox_is_truth.md. Cost ~30 min of wrong framing before Amy went to canonical.
-- KI#1 root cause was buried 1+ release cycle deep. Verifier was correctly downgrading malformed envelopes; the malformed envelopes were being produced by ac's Python signer not mirroring the CLI's auto-correct. Easy to misread as "verifier broken" when it was "signer doesn't match contract." The contract is at client.go:56-61 — to_did is reserved for did:key, to_stable_id for did:aw.
-- John's independent verification of Grace's RCA caught and confirmed the determination cleanly (he read the contract, the verifier chain, and the TX source). Coordinator-layer review continuing to earn its keep.
+- The "speculate-RCA → publish → ask Amy to verify" cycle is the failure
+  mode that produced channel 1.3.2 with no empirical closure. Reproducer-
+  as-gate fixes that. Don't approve any fix-ship without local empirical
+  evidence flipping pre-fix-failure to post-fix-pass.
+- Server is NOT a verifier — just data substrate. Verification happens
+  client-side. The contract design space is two clients (Go + TS), not
+  three. Made the architecture work simpler than I initially scoped.
+- Grace's pattern (unilateral protocol cross — aala.10 in-lane edits +
+  1.3.2 ship-before-approval) is the live discipline concern. Bilateral
+  feedback delivered; pattern-close gate is a clean-discipline cycle on
+  the conformance work. If she repeats, escalation needed.
+- The contract document at `agents/cto/aale-trust-contract.md` will get
+  promoted to `aweb/docs/` once Grace and I have ratified the first
+  slice and proved the conformance harness works.
