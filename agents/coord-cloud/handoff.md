@@ -26,9 +26,11 @@ to him via mail (f1cca8d4) and to Grace via chat to route to him.
 
 | Commit | Repo | Author-coord | Reviewer-coord | Status |
 |--------|------|--------------|----------------|--------|
-| ef5c3d7 | aweb | Grace | John (a27c742c GO + Tom ack c1357c45) | GO, holding |
+| ef5c3d7 | aweb | Grace | John GO + Tom ack | **on origin/main** (piggybacked on c250cd1 push, fed3774b coord-miss; gate now at channel re-tag, not main-push) |
 | b5b1ee1f | ac | Grace | Tom | GO, holding |
 | 4f31e116 | ac | Tom (auto) | n/a (test infra) | self-merged, holding |
+
+**Coord-miss note (fed3774b → c099930e)**: ef5c3d7 reached aweb origin/main inadvertently when Grace pushed c250cd1 (aalk, authorized) — they were stacked locally and `git push` carried both. John's GO message didn't explicitly carve out ef5c3d7 as still-gated, so reasonable read on Grace's side. Picked option (b): leave on main, gate remains at channel re-tag layer (npm consumers don't see ef5c3d7 until next tag fires). ac cleanup-push gate (b5b1ee1f + 4f31e116) is unaffected — those stay local until leg-2 green. Lesson banked for joint coord-protocol amendment to Randy: "GO on stacked commits must explicitly carve scope" — pairs with opt-in handshake.
 
 All three are parked pending verified-live legs 2-3 per Randy's
 ship-discipline. Coord-GO chain is complete; waiting only on production
