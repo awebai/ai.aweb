@@ -35,39 +35,55 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Local versions (this workspace)
 
-- `aw`: 1.18.2 (commit f2e3325, built 2026-04-26T10:13:21Z) ✓
-- channel plugin: **1.3.3** ✓ (afternoon restart 2026-04-26 ~14:24Z; pid 42205 → `~/.claude/plugins/cache/awebai-marketplace/aweb-channel/1.3.3/dist/index.js`)
-- **Awaiting aalk publish** (likely aweb 1.18.3, exact version TBD on Grace's commit) for the resolver fallback that handles identity.yaml-only workspaces (mine has no selection.yaml). Randy will mail when it tags + publishes. Re-run probe post-publish + upgrade to close aalg.
+- `aw`: **1.18.3** (commit 4f8ad6e, built 2026-04-26T16:20:09Z) ✓
+- channel plugin: 1.3.3 ✓
+- **1.18.3 probe FAILED** (2026-04-26 ~16:24Z). aalk + aalm shipped (commits c250cd1 + 9846a6c + 606ec64 + b5347bf + a9ee6b8 in tag 01a9bdb=1.18.3) but didn't close my case. Wholesale KI#1 closure framing was premature; ship-mail held by Charlene per Randy.
+- Awaiting **1.18.4** (or whatever ships the (B) fix) for retest. Grace dispatched for second-round diagnostic + instrumented reproducer.
 - Version subcommand is `aw version` (NOT `aw --version`, which errors `unknown flag`).
 
 ## Known issues
 
-1. **aalg — IDENTITY MISMATCH on outbound CLI mail+chat (cross-team
-   cert).** Reconfirmed open post-aw-1.18.2 + channel-1.3.3 (afternoon
-   2026-04-26): fresh CLI mail 6a65f384/284ca742 and fresh CLI chat
-   497d6558/e101046f all server-recorded `identity_mismatch`. Wire
-   shape (per Randy): canonical signed_payload `to_did=""` empty, no
-   `to_stable_id`, `signing_key_id` absent. ae247c4 (aalg-PARTIAL) is
-   in 1.18.2 binary but doesn't fire on my workspace shape because:
-   - my workspace has no `selection.yaml` (never had one)
-   - my `registry_url=https://api.awid.ai` lives on `identity.yaml`
-   - the resolver setup in ae247c4 reads `Selection.RegistryURL`, not
-     `identity.RegistryURL`; with neither selection nor AWID env var
-     set, resolver setup gets nothing → cert lookup fails → unsigned
-   **Coverage gap closes via aalk** (P1, dispatched to Grace under
-   John's coord). Fix is **commit c250cd1** on origin/main (amended
-   from 189a78b for rotation-resilience: now signs both
-   to_did=current did:key AND to_stable_id=stable did:aw). Likely
-   ships as aweb 1.18.3. Randy/Tom will point at packaged build when
-   ready; re-run mail + chat probes to juan.aweb.ai/randy and ask
-   Randy for server vs on both to close.
-   - **Architectural framing (Grace, 80b1a13d)**: Randy's awid row
-     exists but is `org_only`. c250cd1 closes my continuity case
-     via known_agents TOFU pin fallback (registry-first, fall back
-     to pin on 404). Cleaner long-term answer for in-org-sender →
-     org_only-recipient is **authenticated registry lookup for
-     org/team-private rows** — separate work, deeper than aalk.
-     Don't conflate the two when answering future support threads.
+1. **aalg / KI#1 — IDENTITY MISMATCH on outbound CLI mail (cross-team
+   cert, org_only recipient).** 1.18.3 ship was supposed to close
+   this via aalk (pin fallback on 404) + aalm (signed registry lookup
+   for org_only rows). Empirical attestation 2026-04-26 ~16:24Z:
+   - mail ec17b909 → server vs=identity_mismatch (Randy confirmed)
+   - chat eb0f6cc5 → server vs=identity_mismatch (Randy confirmed)
+   - wire shape unchanged: canonical signed_payload `to_did=""`,
+     no `to_stable_id`
+   **NEW SURFACE post-1.18.3**: subsequent `aw mail send --to-address
+   juan.aweb.ai/randy` calls return **HTTP 422** with detail
+   `"to_address must match the to_stable_id recipient"`. Chat send
+   still works (mail is blocked at HTTP layer; chat goes through but
+   server records identity_mismatch). The 422 is strong evidence
+   **aalm IS firing** (signed lookup populates to_stable_id) but
+   server-side pairing check rejects the result — likely because
+   Randy's org_only awid row registers his stable_id against an
+   address other than `juan.aweb.ai/randy` (what I type). This is
+   Randy's hypothesis (B): "awid visibility filter checks active-
+   cert-team only, not cross-team stable-did membership."
+
+   Pin pre-condition: Randy's did:aw was in known_agents at probe
+   time (first_seen 16:24:25Z); hypothesis (C) "no pin" ruled out.
+
+   Workspace shape (unchanged across this whole arc): active_team
+   aweb:aweb.ai, cert.member_address aweb.ai/amy, identity.yaml.
+   address juan.aweb.ai/amy (stale), identity.yaml.registry_url
+   https://api.awid.ai, no selection.yaml, no AWID_* env vars.
+   `aw doctor` flags only the address↔cert mismatch; everything
+   else green.
+
+   Grace dispatched for second-round diagnostic + instrumented
+   reproducer. Standing down until 1.18.4 (or whatever ships the
+   targeted fix).
+
+   **Architectural framing banked (Grace, 80b1a13d)**: in-org-sender
+   → org_only-recipient is the canonical case. aalk is the
+   continuity-fallback for known recipients; aalm is the
+   authenticated lookup for org_only rows. Both shipped in 1.18.3
+   but case isn't closed. The deeper fix is whatever lets
+   to_address↔to_stable_id pairing succeed for cross-team senders
+   addressing org_only rows by their home-namespace address.
    - Mail wire shapes for my outbound: 4 banked earlier had
      signing_key_id EMPTY-STRING; bbbc19aa has signing_key_id ABSENT.
      Both → identity_mismatch. Empty vs absent is a config-state
