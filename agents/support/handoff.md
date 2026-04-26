@@ -43,47 +43,43 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Known issues
 
-1. **aalg / KI#1 — IDENTITY MISMATCH on outbound CLI mail (cross-team
-   cert, org_only recipient).** 1.18.3 ship was supposed to close
-   this via aalk (pin fallback on 404) + aalm (signed registry lookup
-   for org_only rows). Empirical attestation 2026-04-26 ~16:24Z:
-   - mail ec17b909 → server vs=identity_mismatch (Randy confirmed)
-   - chat eb0f6cc5 → server vs=identity_mismatch (Randy confirmed)
-   - wire shape unchanged: canonical signed_payload `to_did=""`,
-     no `to_stable_id`
-   **NEW SURFACE post-1.18.3**: subsequent `aw mail send --to-address
-   juan.aweb.ai/randy` calls return **HTTP 422** with detail
-   `"to_address must match the to_stable_id recipient"`. Chat send
-   still works (mail is blocked at HTTP layer; chat goes through but
-   server records identity_mismatch). The 422 is strong evidence
-   **aalm IS firing** (signed lookup populates to_stable_id) but
-   server-side pairing check rejects the result — likely because
-   Randy's org_only awid row registers his stable_id against an
-   address other than `juan.aweb.ai/randy` (what I type). This is
-   Randy's hypothesis (B): "awid visibility filter checks active-
-   cert-team only, not cross-team stable-did membership."
+1. **KI#1 — split into two distinct modes by John 9b29c13b**:
 
-   Pin pre-condition: Randy's did:aw was in known_agents at probe
-   time (first_seen 16:24:25Z); hypothesis (C) "no pin" ruled out.
+   **Mode 1 (population-level regression on 1.18.3)**: anyone on
+   1.18.3 sending mail to hosted-custodial recipients gets
+   HTTP 422 `"to_address must match the to_stable_id recipient"` →
+   mail bounces. Tom independently reproduced. Many auto-upgrade
+   users affected. **Fix**: Grace's d4fb982; ships in **1.18.4**
+   (expedited, no yank per Juan). Workaround: pin to 1.18.2
+   (`pip install aweb==1.18.2` or `npm install -g @awebai/aw@1.18.2`)
+   OR use chat for inter-team comms. I'm staying on 1.18.3 + chat
+   workaround (pinning is fragile to next `aw upgrade`).
 
-   Workspace shape (unchanged across this whole arc): active_team
-   aweb:aweb.ai, cert.member_address aweb.ai/amy, identity.yaml.
-   address juan.aweb.ai/amy (stale), identity.yaml.registry_url
-   https://api.awid.ai, no selection.yaml, no AWID_* env vars.
-   `aw doctor` flags only the address↔cert mismatch; everything
-   else green.
+   **Mode 2 (my-workspace-specific chat empty to_did)**: confirmed
+   real on 1.18.3 by Randy ecfdd444 (not a stale-binary artifact;
+   my interaction log proves binary was 1.18.3 commit 4f8ad6e at
+   chat send-time). Separate code path issue. Likely rides
+   **1.18.5**. Grace needs to reproduce against my exact workspace
+   shape to identify the wiring gap. State already sent in mail
+   e672f0a0 to Grace (workspace shape + reproducer commands).
 
-   Grace dispatched for second-round diagnostic + instrumented
-   reproducer. Standing down until 1.18.4 (or whatever ships the
-   targeted fix).
+   Workspace shape (load-bearing for Mode 2): active_team
+   aweb:aweb.ai, cert.member_address aweb.ai/amy,
+   identity.yaml.address juan.aweb.ai/amy (stale), identity.yaml.
+   registry_url https://api.awid.ai, no selection.yaml, no AWID_*
+   env vars. `aw doctor` flags only the address↔cert mismatch.
 
-   **Architectural framing banked (Grace, 80b1a13d)**: in-org-sender
-   → org_only-recipient is the canonical case. aalk is the
-   continuity-fallback for known recipients; aalm is the
-   authenticated lookup for org_only rows. Both shipped in 1.18.3
-   but case isn't closed. The deeper fix is whatever lets
-   to_address↔to_stable_id pairing succeed for cross-team senders
-   addressing org_only rows by their home-namespace address.
+   Empirical attestation discipline caught the 1.18.3 premature
+   closure before Charlene's ship-mail. **Banked policy changes
+   (per John, pending Juan + Randy sign-off)**:
+   - hosted custodial e2e matrix as release-gate
+   - audit-before-ship for known-asymmetric code paths
+   - staged distribution before npm latest tag promotion
+   - no "closes" framing on messaging releases without empirical
+     attestation across multiple stack shapes
+
+   Standing by for 1.18.4 publish (Mode 1 retest) and later 1.18.5
+   (Mode 2 retest).
    - Mail wire shapes for my outbound: 4 banked earlier had
      signing_key_id EMPTY-STRING; bbbc19aa has signing_key_id ABSENT.
      Both → identity_mismatch. Empty vs absent is a config-state
