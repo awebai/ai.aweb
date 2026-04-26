@@ -1,31 +1,69 @@
 # Coordinator aweb OSS (John) — Handoff
 
-Last updated: 2026-04-25 EOD (post awid prod cutover + AGENTS.md migrations rule)
+Last updated: 2026-04-26 (mid-cycle, v0.5.8 + three-layer KI#1 reframe)
 
 ## Current state (read this first on wake-up)
 
-**aweb origin/main:** `72530c2` Add database-migrations discipline rule to AGENTS.md
-- `72530c2` — AGENTS.md migrations rule (this cycle, mine)
-- `ed4fa89` — awid prod DB lifecycle script + Makefile targets (this cycle, mine)
-- `2e6156b` — Harden hosted MCP proxy signing (Grace, aweb-aajh + aajg). NOT yet tagged. 1.18.2 release cycle is on-demand: cycle when next runtime delta accumulates, no urgency from Tom (his test-two-service was green at pure 1.18.1, v0.5.6 ships at aweb>=1.18.1).
-- `b0b2b27` — last release tag (1.18.1 / aw-v1.18.1 / awid-v0.5.1 / awid-service-v0.5.1)
+**Cycle in flight: v0.5.8 release with three-layer KI#1 reframe.**
 
-**ai.aweb origin/main:** `00952ad` Decision record: awid prod cutover from 0.3.1 to 0.5.1
+aweb 1.18.2 (924070c) shipped to PyPI earlier today. Channel 1.3.3 (3ee9b94) shipped to npm — bad-signature corruption fixed at 2f52433 after Grace's empirical catch (banked: subagent-can-be-wrong-on-crypto-detail). ac v0.5.8 pending Tom's tag, gates on leg-2 dashboard probe.
 
-**Production state:**
-- api.awid.ai/health → `version=0.5.1`, db ok, redis ok
-- Dump preserved at `/tmp/awid-awid-reset-20260425T181335Z.sql` (rollback safety net for the cutover)
-- ac v0.5.5 live; ac v0.5.6 in flight (Tom releasing today, picks up Grace's aaja.6 at aweb>=1.18.1)
+**aweb origin/main:** `c250cd1` Fix known-agent fallback for missing registry addresses (Grace, aalk; GO sent today, push imminent under opt-in handshake)
 
-**Open follow-ups on my plate:**
-- BYOIT prod-awid smoke test (Randy ask). Mailed Tom (`f2881e63`) to route via Grace post-v0.5.6 or take it himself, with the option to punt back to me. Min coverage: cert blob actually populates after add-member; cross-machine fetch verifies; wrong-DID 403. Mail Randy with the result when done.
-- 1.18.2 release cycle for `2e6156b` is on-demand. Tom doesn't need it. Cycle when there's enough pent-up runtime delta to justify a tag, OR when a future ac release needs it pinned, OR when Juan asks. Push tags individually one-by-one (banked lesson).
-- Render redeploy of awid is manual via dashboard (no API key, no deploy hook). Worth proposing to Juan: a deploy hook + a daily probe of api.awid.ai/health vs PyPI head to catch the next aala-style version drift before it becomes a cutover. Filed in 2026-04-25 awid-cutover decision record under "Open follow-ups."
+Recent stack since 924070c:
+- `c250cd1` — aalk (Grace, GO sent today; supersedes 189a78b with Randy's refinement folded in: signEnvelope writes ToStableID + helper assertion. Targeted Go tests green from my workspace.)
+- `ef5c3d7` — Reject local awid registry in channel (parked, gates on leg-2 dashboard probe per Tom's posture)
+- `3ee9b94` — channel 1.3.3 release tag (shipped to npm)
+- `2f52433` — TOFU bad-signature corruption fix (Grace empirical catch on base64-char-flip non-determinism)
+- `924070c` — aweb 1.18.2 release tag (shipped to PyPI)
+
+**KI#1 final framing (today, post-three-iteration churn):**
+
+After three reframes triggered by Grace's chat challenge → my prod-DB query → Juan's ephemeral-agent correction, the picture collapsed cleanly to:
+
+1. **aalk** (closing v0.5.8): TOFU continuity-fallback. CLI ChainResolver falls through to PinResolver on registry 404; PinResolver returns DID + StableID; signEnvelope copies identity.StableID into env.ToStableID. Closes Amy's case (she has Randy pinned). c250cd1 GO sent, push imminent under opt-in handshake.
+
+2. **aalm** (P1, SOLE architectural follow-on): Go RegistryResolver does anonymous awid GETs — org_only/team_members_only rows return 404 even though rows EXIST in DB. Authenticated CLI requests + awid server-side filtering by team-cert membership closes it. Cross-coord (Grace CLI + Goto awid + Juan-loop on signature scheme: detached Ed25519 over canonical method+path+body? bearer+sig? — real architectural question). Days-to-weeks. v0.5.9.
+
+3. **aalo + aalp** (P3, Goto's lane): awid server correctness bugs found in passing — (a) LIST endpoint reports ownership_proof=true on mismatched controller key; (b) LIST endpoint applies visibility filter despite ownership_proof claim. Filed today, not v0.5.8-blocking, may share root cause.
+
+4. **aaln** (P3, my lane): `aw id register` reports success without verifying server registration state (filed by Randy today). Narrow CLI bug. Backlog.
+
+5. **aall** (CLOSED today as not-a-bug): originally framed as "9/10 permanent agents missing from awid" but the 5 missing (charlene, enoch, goto, grace, noah) are EPHEMERAL agents per Juan's classification — ephemerals don't get persistent registrations by design. Persistent agents under juan.aweb.ai (amy, avi, john, marvin, randy, support, tom) are all present and registered.
+
+**Final ship-mail line locked** (Randy framing-authority + my drafting + Tom + Juan correction):
+
+  "KI#1 closes for continuity case (aalk: known-agent pin fallback when 
+  registry resolution misses or returns empty). Authenticated CLI lookup 
+  for org_only / team_members_only address visibility remains open 
+  under aalm (P1) — landing in v0.5.9."
+
+**Held: ship-mail to Charlene** gates on Avi sign-off (mailed ceo 9ed78982 with final framing; supersedes 055c9410, fb5105f2, e0c4e29d). Avi offline 11d — slow leg. Three-events distinction (Tom's): cleanup pushes (gates leg-2) / tag cycles (each coord's call) / ship-mail (Avi sign-off). Independent.
+
+**Direct prod awid DB access**: I have working psql connection via `aweb/.env.awid-production` (AWID_DATABASE_URL → Neon). Used today to settle the aall scope question. Useful follow-up surface.
+
+**Lessons banked today (durable memory, ../../../.claude/projects/.../memory/):**
+- `feedback_bug_class_spans_architectural_layers.md` — bug class can decompose into N architectural layers; reproducer-green at layer 1 doesn't close class. Hold wholesale-closure framing until layers mapped.
+- Concrete trigger: today's KI#1 three-iteration churn. Original "wholesale closes" → three layers → empirical DB verification → Juan's ephemeral correction. Truth-finding is iterative; framing must be revised honestly along the way.
+
+**Open follow-ups on my plate (carried from prior cycles):**
+- BYOIT prod-awid smoke test (Randy ask, task #27). Mailed Tom (`f2881e63`); cert blob populates after add-member; cross-machine fetch verifies; wrong-DID 403.
+- v0.5.8 verified-live probe leg 2 (task #34): Juan dashboard send → Randy JSON inbox. Pending Juan/Randy execution.
+- Render redeploy of awid is manual via dashboard. Worth proposing deploy hook + daily probe of api.awid.ai/health vs PyPI head to catch next aala-style version drift.
 
 **Open from prior cycles, still open:**
 - `aweb-aakr` (P4) — membership-field duplication between teams.yaml and workspace.yaml. Juan-level architectural call. Not actively scheduled.
 - `aweb-aajv` (Dashboard lifecycle bypasses OSS mutation hooks) — Randy re-opened after Tom's pin-bump close was premature.
 - `aweb-aald` (BYOD ephemeral re-init observation Grace filed from my aajs review) — future P? task, not actively scheduled.
+
+**Memories banked this cycle (most recent first):**
+- `feedback_bug_class_spans_architectural_layers.md` (today) — sibling to reproducer-synthetic but at architecture-decomposition layer. Bug class spans N layers; fix at layer 1 doesn't close class even if reproducer only exercises layer 1. Concrete trigger: KI#1 three-layer reframe.
+- `feedback_reproducer_synthetic_state_assumes_user_invariants.md` (today, earlier) — reproducer-canonical-green is necessary but not sufficient; user state shape may differ.
+- `feedback_subagent_can_be_wrong_on_crypto_detail.md` (today) — subagent confident-wrong on base64-char-flip determinism; Grace caught empirically.
+- `feedback_uv_sync_refresh_after_pypi_publish.md` (today) — Tom found uv index cache lag.
+- `feedback_grace_unilateral_protocol_cross_pattern.md`, `feedback_multi_gate_go_mail_visibility.md` (today) — Grace unilateral channel 1.3.2 push; CTO-blind chat-only GO.
+- `feedback_default_to_code_reviewer_subagent_for_gate_reads.md` (recurring; flagged twice this week) — default to subagent for non-trivial gate-reads.
+- `feedback_artificial_gate_from_unverified_dependency.md`, `feedback_verify_before_relay_at_coord_layer.md` (this week) — verify before relaying upstream signals.
 
 ## Decision records added this cycle (ai.aweb/docs/decisions.md)
 
