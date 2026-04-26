@@ -216,17 +216,67 @@ checkout. P3.
 - **Mia**: still offline; earlier stand-down moot.
 - **Tom (me)**: dormant pending leg 2 (Juan dashboard probe).
 
-## v0.5.9 ship now gates on TWO things, not one
+## URGENT: prod observably broken — hotfix v0.5.8.1 in flight
 
-1. **Leg-2** (Juan dashboard probe → Randy JSON inbox confirmation) —
-   aalf empirical attestation on v0.5.8.
-2. **Test-gap closure** (Mia dispatched, c8feb0c0) — CLI mail+chat to/
-   from hosted-custodial identities + BYOD custodial round-trip.
-   Current test surface covers dashboard ↔ custodial and MCP OAuth
-   from custodial, but NOT the CLI path Amy was actually on. That's
-   the synthetic-vs-actual-attestation gap that bit aalg/aalk.
-   Bisect discipline required (test must fail on broken state +
-   pass on fix). v0.5.9 doesn't tag until both gates green.
+**Symptom**: Any CLI on aweb 1.18.3+ trying to mail a hosted-custodial
+identity gets HTTP 422 "to_address must match the to_stable_id
+recipient." Reproduced by me + Amy. Population-level on the cohort,
+not target-specific.
+
+**Root cause**: aweb 1.18.2 server (running in v0.5.8 prod) has the
+strict pre-d4fb982 matcher that requires same-agent_id between
+to_stable_id-resolved and to_address-resolved rows. aalm in 1.18.3
+CLI started populating to_stable_id properly via authenticated awid
+lookups, exposing pre-existing data inconsistency in cloud's mounted
+aweb DB (multiple agent rows for same identity, likely from
+replacement history).
+
+**Three layers of fix**:
+
+1. **Mode 1 (server, d4fb982 in aweb 1.18.4)**: `_recipient_identity_matches`
+   accepts agent_id OR did_aw OR did_key match. Lands in prod via ac
+   v0.5.8.1 hotfix (awaiting Juan auth).
+2. **Mode 2 (CLI, 7a770c8 in aweb main, future 1.18.5)**: signEnvelope
+   was fail-opening on AWID 404 for direct address targets; now
+   fail-closes. Prevents silent unverifiable chat wires.
+3. **Underlying registry-sync gap**: local certs exist for
+   juan.aweb.ai/<members> but AWID has no team row + no member rows.
+   Data-layer issue not solvable by code; needs controller-key +
+   data-owner coord (Goto's lane + Juan's authority for
+   juan.aweb.ai). Per Grace a77930c2: `aweb:juan.aweb.ai` local cert
+   exists, AWID can't authorize it. Registry-sync/data repair OR
+   reachability policy change required.
+
+## Hotfix v0.5.8.1 plan (pending Juan auth)
+
+1. Branch `hotfix/v0.5.8.1` from `origin/main` (= 0336a2c4 v0.5.8 tag).
+2. Apply ONLY: aweb pin 1.18.2 → 1.18.4 in backend/pyproject.toml +
+   `uv sync --refresh` + `uv lock` + version bump 0.5.8 → 0.5.8.1.
+   No other substance.
+3. Commit on the hotfix branch (single commit).
+4. Run `make release-ready` (banked discipline:
+   feedback_makefile_is_authoritative_gate_chain.md).
+5. Tag `v0.5.8.1` on the branch tip.
+6. **Push tag only**, NOT main, to avoid piggybacking the
+   held v0.5.9 cleanup commits (b5b1ee1f + 4f31e116 + 5844ffba).
+   Same coord-miss class as fed3774b on aweb side.
+7. Render auto-deploys.
+8. Empirical attestation: I rerun mail probe → expect HTTP 200 +
+   verification_status=verified. Amy reruns her probe.
+
+After hotfix: cleanup commits stay parked. v0.5.9 plan unchanged
+(cleanup + Mia UX + Mia tests + version bump 0.5.8.1 → 0.5.9). Pin
+target stays aweb>=1.18.4 (pin already bumped in v0.5.8.1, no further
+bump needed for v0.5.9 unless 1.18.5 is preferable).
+
+## v0.5.9 ship gates (unchanged underneath)
+
+1. **Leg-2** (Juan dashboard probe → Randy JSON inbox) — aalf
+   empirical attestation. Re-anchorable to v0.5.8.1 if hotfix ships
+   first (same aalf substance).
+2. **Mia's test-gap closure** (c8feb0c0) — CLI mail+chat to/from
+   hosted-custodial + BYOD custodial round-trip. Bisect discipline
+   required. v0.5.9 ships when both gates green.
 
 ## What to check FIRST on next wake-up
 
