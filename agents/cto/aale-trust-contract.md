@@ -44,18 +44,27 @@ Output: `verified` | `failed`.
 Logic:
 ```
 if signing_key_id is non-empty and signing_key_id != from_did: return "failed"
+if from_did does not start with "did:key:": return "unverified"
 public_key = extractPublicKey(from_did)
 if extraction fails: return "failed"
 if not Ed25519.verify(public_key, signed_payload, decode(signature)): return "failed"
 return "verified"
 ```
 
+Output: `verified` | `failed` | `unverified`.
+
 Edge cases:
 - `signing_key_id` absent OR empty-string → treated identically (no
   selector guard fires; verify with from_did).
-- `signing_key_id` present and ≠ `from_did` → `failed`.
-- Signature decode failure → `failed`.
-- Public key extraction failure → `failed`.
+- `signing_key_id` present and ≠ `from_did` → `failed` (selector guard).
+- `from_did` is not a `did:key:` identity (e.g. `did:aw:`, `did:web:`) →
+  `unverified`. We can't perform Ed25519 verification on a non-did:key
+  identity; "unverified" means "no claim made," not "tried and failed."
+  This matches both Go and TS implementations (banked from N1 in
+  John's b990023 gate-read 2026-04-26).
+- Signature decode failure (bad base64) → `failed`.
+- Public key extraction failure (malformed did:key) → `failed`.
+- Signature bytes valid base64 but don't verify against public key → `failed`.
 
 ### Pass B — Recipient binding
 
@@ -197,10 +206,31 @@ Each vector is a complete pipeline input + expected output:
 }
 ```
 
-Vectors live in `aweb/test-vectors/trust/` (new directory). Both
-`aweb/cli/go/awid/conformance_test.go` (new) and
-`aweb/channel/test/conformance.test.ts` (new) load the same JSON files
+Vectors live in `aweb/test-vectors/trust/` (new directory) as flat
+files with version suffix per pass: `recipient-binding-v1.json`,
+`crypto-sig-v1.json`, `registry-v1.json`, `tofu-v1.json`. README at
+the directory root documents the schema of each pass's vector
+format. Both `aweb/cli/go/awid/trust_conformance_test.go` and
+`aweb/channel/test/conformance.test.ts` load the same JSON files
 and assert.
+
+Pass B vector schema (flat, used by recipient-binding-v1.json):
+```json
+{
+  "name": "<descriptive-name>",
+  "initial_status": "verified" | "failed" | "verified_custodial",
+  "self_did": "did:key:...",
+  "self_stable_id": "did:aw:...",
+  "to_did": "did:key:..." | "did:aw:..." | "",
+  "to_stable_id": "did:aw:..." | "",
+  "expected_status": "verified" | "identity_mismatch" | "failed"
+}
+```
+
+Pass A/C/D vector schemas will be richer (Pass A needs signature +
+signed_payload + decode-failure inputs; Pass C needs registry-state
+mock; Pass D needs pin-store mock). Each pass file documents its
+own schema; the README tracks which schema-versions are in use.
 
 ## 4. Initial vector set (must catch known bugs)
 
@@ -298,7 +328,7 @@ Performance optimization, not correctness.
 ## 7. First implementation slice (Grace ratified)
 
 Scope-narrowed first cycle:
-1. `aweb/test-vectors/trust/recipient-binding/` — JSON vectors for
+1. `aweb/test-vectors/trust/recipient-binding-v1.json` — JSON vectors for
    Pass B only (the smallest pass; covers aalf shape and aale stable-match
    directly).
 2. Go harness: `aweb/cli/go/awid/conformance_recipient_binding_test.go`
