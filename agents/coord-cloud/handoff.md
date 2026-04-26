@@ -276,14 +276,16 @@ bump needed for v0.5.9 unless 1.18.5 is preferable).
    19:30Z, /health unchanged at last check (auto-deploy may need
    manual trigger per Juan's "render is manual" note + v0.5.6 stall
    pattern banked).
-2. **Mia closes ac auth_bridge bypass** (b-scope per recon
-   bee1b57a). The pre-resolution to routing_did from local
-   aweb.agents in middleware/auth_bridge.py:1720-1750 + 805-840
-   shortcuts around the contract BEFORE the OSS app sees the
-   request, so Grace's f329be73 fix-closes don't reach
-   cloud-CLI-from-hosted-custodial paths. Highest leverage to
-   close. Dashboard handlers (c-scope) + proof-of-ownership-on-
-   from-identity follow as separate commits/tickets.
+2. **Mia closes ac auth_bridge bypass** (b-scope) — **GO'd
+   f3145b14**, push pending Mia. Lifetime-discrimination approach
+   per contract L73-75: ephemeral aliases keep fast-path rewrite
+   (server-local coordination); persistent + unknown-lifetime pass
+   through to OSS for contract enforcement. 26 lines auth_bridge.py
+   + bisect-verified tests (stash → persistent FAILS, pop → both
+   PASS). 203/203 auth_bridge suite green. Dashboard handlers
+   (c-scope: messages.py + chat.py local-fallback removal) +
+   proof-of-ownership-on-from-identity (d-scope ticket) follow
+   separately.
 3. **aweb 1.18.5 tag** held pending #2. Grace pushed aweb core to
    origin/main (8a79ee8 + 7c795be + acdf96a + 242b2eb covers
    awid+server+e2e+contract). Per Grace f2907678: not final tag
