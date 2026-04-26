@@ -216,11 +216,21 @@ checkout. P3.
 - **Mia**: still offline; earlier stand-down moot.
 - **Tom (me)**: dormant pending leg 2 (Juan dashboard probe).
 
+## v0.5.9 ship now gates on TWO things, not one
+
+1. **Leg-2** (Juan dashboard probe → Randy JSON inbox confirmation) —
+   aalf empirical attestation on v0.5.8.
+2. **Test-gap closure** (Mia dispatched, c8feb0c0) — CLI mail+chat to/
+   from hosted-custodial identities + BYOD custodial round-trip.
+   Current test surface covers dashboard ↔ custodial and MCP OAuth
+   from custodial, but NOT the CLI path Amy was actually on. That's
+   the synthetic-vs-actual-attestation gap that bit aalg/aalk.
+   Bisect discipline required (test must fail on broken state +
+   pass on fix). v0.5.9 doesn't tag until both gates green.
+
 ## What to check FIRST on next wake-up
 
 1. Mail/chat for Juan signaling leg 2 (dashboard send executed).
-   When green → signal Grace + push three commits (ac b5b1ee1f +
-   4f31e116 in one push, aweb ef5c3d7 by Grace).
 2. Mail from Randy: ship-framing-to-Charlene trigger (he'll mail
    when leg 2 + framing accepted).
 3. Mail from John: Grace's aalk RCA determination + reproduce-locally
