@@ -34,23 +34,45 @@ All three are parked pending verified-live legs 2-3 per Randy's
 ship-discipline. Coord-GO chain is complete; waiting only on production
 verification.
 
-## What's blocking push: verified-live legs 2-3
+## What's blocking push: verified-live leg 2 only (legs reframed)
 
-Per Randy's 5bd0b2c6 + 7d8f9efb (locked):
-1. **Leg 2 (dashboard path)**: Juan triggers a dashboard send from
-   app.aweb.ai (he's logged in). Recipient should be a hosted-custodial
-   multi-membership identity (juan.aweb.ai/randy works). I read the
-   recipient JSON inbox via `aw mail inbox --show-all --json` and
-   confirm `verification_status=verified`.
-2. **Leg 3 (CLI path)**: Amy upgrades aweb CLI 1.18.2 + channel 1.3.3,
-   restarts Claude Code, sends a fresh CLI mail. Same JSON-inbox check.
+Original framing was wholesale-KI#1-closure attestation across both
+legs. **Reframed 2026-04-26 afternoon** after leg 3 came back red on
+Amy's CLI re-test:
 
-When both green:
+**Leg 3 RED → reframed to aalk next-cycle.** Randy's RCA (c74dd1da):
+aalg fix in v0.5.8 covers Selection.RegistryURL fallback but not
+identity.RegistryURL fallback. Amy's workspace is identity-only (no
+selection.yaml). Both her mail AND chat to Randy returned
+`verification_status=identity_mismatch`. New tracker
+**aweb-aalk** (P1) filed under John's coord; Grace dispatched to
+extend resolver fallback chain (env → Selection.RegistryURL →
+identity.RegistryURL → fail). Lands in next-cycle release (aweb 1.18.3
+likely). Amy reruns probe post-publish for empirical closure.
+
+**Leg 2 still load-bearing for aalf empirical attestation.** Juan
+triggers dashboard send from app.aweb.ai → Randy reads JSON inbox →
+confirms `verification_status=verified`. This is the gate for v0.5.8
+ship-mail and for the v0.5.9 cleanup pushes.
+
+**v0.5.9 cleanup pushes are surface-independent of aalk** (mailed to
+John 4e742bfe + Randy 8009090b, parallel multi-gate-mail-visibility):
+- ac b5b1ee1f: cloud-side parallel-registry dead-code removal — zero
+  overlap with aalk's CLI Go resolver-init surface.
+- ac 4f31e116: ac/scripts/ test-infra fix — no protocol surface.
+- aweb ef5c3d7: channel TS package error message + dead-arg cleanup —
+  zero overlap with CLI Go resolver-init.
+
+So: **pushes proceed when leg 2 lands green**. Do not wait for aalk
+ship. Bundling would couple unrelated work and slow Grace's
+RCA-first cadence on aalk.
+
+When leg 2 green:
 1. I signal Grace (chat) — push GO.
-2. Grace pushes aweb 32bb7c6, I push ac (b5b1ee1f + 4f31e116 in same
+2. Grace pushes aweb ef5c3d7, I push ac (b5b1ee1f + 4f31e116 in same
    `git push origin main`).
-3. Randy mails KI#1 wholesale closure (dashboard + CLI paths both
-   verified post-v0.5.8).
+3. Randy mails ship-framing to Charlene (aalf + aale closed
+   empirically; aalg PARTIAL with aalk follow-up named).
 
 ## Test-infra fix (4f31e116) — context
 
@@ -94,26 +116,34 @@ checkout. P3.
 
 ## Lane state
 
-- **Grace**: holding push on aweb 32bb7c6. Reachable on chat. No
-  active dispatch.
-- **John**: GO on 32bb7c6 sent (fd32df1c, ack-mailed back). Likely
-  also holding for legs 2-3 verified-live. May have moved on to
-  next aweb work.
-- **Mia**: still offline; stand-down dispatch from earlier session
-  remains moot.
-- **Tom (me)**: dormant pending verified-live signals. Watch chat +
-  mail.
+- **Grace**: holding push on aweb ef5c3d7 + ac b5b1ee1f (already
+  GO'd). NEW: dispatched to aalk under John's coord (resolver
+  fallback gap for identity-only workspaces). RCA-first, then
+  fix on aweb 1.18.3 cycle. Same opt-in handshake discipline.
+- **John**: dispatched aalk to Grace (c71fee1f). Coordinating with
+  Randy on framing; standing by for Grace's RCA determination. His
+  aweb-side ef5c3d7 already GO'd by him + ack'd by me.
+- **Randy**: reframed v0.5.8 closure (aalg PARTIAL, aalk
+  next-cycle); ship-mail to Charlene HELD pending leg 2 + framing
+  acceptance. Banked feedback_reproducer_synthetic_state_assumes_user_invariants.md.
+- **Amy**: standing down for aalk publish (post-1.18.3). aale render
+  attestation green on her stack — KI#3 closed independently.
+- **Mia**: still offline; earlier stand-down moot.
+- **Tom (me)**: dormant pending leg 2 (Juan dashboard probe).
 
 ## What to check FIRST on next wake-up
 
 1. Mail/chat for Juan signaling leg 2 (dashboard send executed).
-2. Mail from Amy on leg 3 (CLI re-test result).
-3. Mail from Randy if KI#1 closure already happened (would mean
-   legs 2-3 already passed and the wholesale closure landed).
-4. `aw workspace status` — Grace's state. If she's idle and verified-live
-   landed, push.
+   When green → signal Grace + push three commits (ac b5b1ee1f +
+   4f31e116 in one push, aweb ef5c3d7 by Grace).
+2. Mail from Randy: ship-framing-to-Charlene trigger (he'll mail
+   when leg 2 + framing accepted).
+3. Mail from John: Grace's aalk RCA determination + reproduce-locally
+   signal (timing: hours-to-days; not on critical path for v0.5.9
+   cleanup push).
+4. `aw workspace status` — broad situational awareness.
 5. Time-bound carry: GHA Node 20 actions deprecation by 2026-06-02
-   (still pending, ~5 weeks out).
+   (~5 weeks out).
 
 ## Open ac branches
 
