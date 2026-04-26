@@ -40,28 +40,55 @@ Original framing was wholesale-KI#1-closure attestation across both
 legs. **Reframed 2026-04-26 afternoon** after leg 3 came back red on
 Amy's CLI re-test:
 
-**Leg 3 RED → reframed architecturally into three layers.** Initial
-RCA (Randy c74dd1da) named aalk as the resolver-fallback fix. After
-Grace's RCA-pass + chat challenge (per John's 9af09d1a),
-the picture deepened to three distinct layers, each with its own fix:
+**Leg 3 RED → architecturally split into aalk (continuity) + aalm
+(authenticated-lookup). Earlier "aall row-backfill" framing was
+wrong-scoped.** After John's direct prod awid DB query (his
+9460803e), rows for the juan.aweb.ai cohort EXIST in awid; Grace's
+"rows missing" controller-LIST result came from a separate awid
+server-side bug (LIST endpoint accepted ownership_proof=true with a
+non-matching controller_did key — Goto's lane to fix). Updated
+two-layer picture:
 
-1. **aalk (c250cd1, GO sent, push imminent)**: TOFU continuity-fallback
-   when registry address row is missing. Closes Amy's empirical case
-   because she has Randy pinned from prior contact.
-2. **aall (P1, Goto + Juan controller-key)**: Backfill of namespace
-   address rows (currently 9/10 agents missing). Closes first-contact
-   resolution when there's no prior pin. Not solvable by self-
-   registration — requires controller authority.
-3. **aalm (P1 new, cross-coord)**: Go RegistryResolver does anonymous
-   awid GETs, so org_only / team_members_only rows return 404 even
-   when they exist. CLI-side likely Grace; awid server-side Goto;
-   Juan owns architectural call on request-signing scheme.
+1. **aalk (c250cd1, GO sent, push imminent)**: TOFU
+   continuity-fallback when registry address row is missing OR
+   anonymous-filtered. Closes Amy's empirical case because she has
+   Randy pinned.
+2. **aalm (P1, load-bearing launch-blocker)**: CLI Go
+   RegistryResolver does anonymous awid lookups; 6 of 7
+   juan.aweb.ai rows are org_only/nobody, so anonymous lookups 404
+   even though rows exist. Authenticated requests + awid
+   server-side visibility filtering closes it. Cross-coord:
+   Grace (CLI signing) + Goto (awid server filter) + Juan
+   (architectural call on request-signing scheme). Days-to-weeks of
+   architecture work.
+3. **aall**: scope-reduced from row-backfill (no longer needed —
+   rows exist). Randy's call on close-as-no-action vs verify-other-
+   namespaces.
 
-**KI#1 ship-mail-to-Charlene framing reframed**: restricted to
-"closes for continuity case (aalk); first-contact + org-private
-resolution remain open under aall + aalm." Ship-or-hold trigger
-call is Randy's authority (with Avi sign-off) — I deferred when
-John pinged me (0bcc8d02 to John; 729ecf18 FYI to Randy).
+**Updated restricted ship-mail line** (per John 9460803e):
+"KI#1 closes for continuity case (aalk: known-agent pin fallback).
+Authenticated CLI lookup for org_only / team_members_only address
+visibility remains open under aalm (P1)."
+
+**Brief Randy-escalation false-alarm on ac dashboard persistence path
+(f5ea2abf → 17c364ec)**: I investigated for ~30 min before reframe.
+Findings worth carrying: ac write paths
+(`services/permanent_addresses.py:assign_permanent_team_address`,
+`routers/agent_addressing.py:update_agent_address_reachability`) DO
+call `registry_client.register_address` / `update_address`. Read
+paths (dashboard.py, agent_lifecycle.py) DO read via
+`list_did_addresses`. Both interact with aalm: when aalm fix lands,
+ac must use the authenticated client so preconditions read true row
+state, not visibility-filtered state. Flagged to Randy
+(f6742f14) + John (7c574f2d) for aalm fix-shape scoping.
+
+**ac parallel-address-authority concern returns to v0.5.9 scope** (not
+launch-blocking, per Randy's reframe). Two-reachability-fields UX
+confusion in dashboard is real but v0.5.9-pace.
+
+**Ship-mail-to-Charlene call** is Randy's authority (with Avi sign-off
+— Avi 11d offline, expected slow leg). I deferred when John pinged
+me (0bcc8d02 → John; 729ecf18 → Randy).
 
 **Leg 2 still load-bearing for aalf empirical attestation.** Juan
 triggers dashboard send from app.aweb.ai → Randy reads JSON inbox →
