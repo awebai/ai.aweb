@@ -40,30 +40,39 @@ Original framing was wholesale-KI#1-closure attestation across both
 legs. **Reframed 2026-04-26 afternoon** after leg 3 came back red on
 Amy's CLI re-test:
 
-**Leg 3 RED → architecturally split into aalk (continuity) + aalm
-(authenticated-lookup). Earlier "aall row-backfill" framing was
-wrong-scoped.** After John's direct prod awid DB query (his
-9460803e), rows for the juan.aweb.ai cohort EXIST in awid; Grace's
-"rows missing" controller-LIST result came from a separate awid
-server-side bug (LIST endpoint accepted ownership_proof=true with a
-non-matching controller_did key — Goto's lane to fix). Updated
-two-layer picture:
+**Leg 3 RED → architecturally simplified to aalk (continuity) +
+aalm (authenticated-lookup, scope-pending-re-query). Earlier "rows
+missing for 9/10 agents" framing was built on a false premise.**
+
+Juan corrected (verbal, late-day): the "missing rows" are ALL
+ephemeral identities — by design, ephemerals don't get persistent
+awid registrations. Only permanent identities do. The
+juan.aweb.ai cohort's permanent-only count (randy + Amy) is the
+correct state, not a coverage gap. Relayed to Randy (cea16d13) +
+John (3cf9d56c).
+
+(Parallel awid server-side bug discovered by Grace: LIST endpoint
+accepted ownership_proof=true with a non-matching controller_did
+key — Goto's lane to fix; orthogonal to the cohort-framing
+correction.)
+
+Updated picture:
 
 1. **aalk (c250cd1, GO sent, push imminent)**: TOFU
    continuity-fallback when registry address row is missing OR
    anonymous-filtered. Closes Amy's empirical case because she has
    Randy pinned.
-2. **aalm (P1, load-bearing launch-blocker)**: CLI Go
-   RegistryResolver does anonymous awid lookups; 6 of 7
-   juan.aweb.ai rows are org_only/nobody, so anonymous lookups 404
-   even though rows exist. Authenticated requests + awid
-   server-side visibility filtering closes it. Cross-coord:
-   Grace (CLI signing) + Goto (awid server filter) + Juan
-   (architectural call on request-signing scheme). Days-to-weeks of
-   architecture work.
-3. **aall**: scope-reduced from row-backfill (no longer needed —
-   rows exist). Randy's call on close-as-no-action vs verify-other-
-   namespaces.
+2. **aalm (P1, scope-pending-cohort-re-query)**: CLI Go
+   RegistryResolver does anonymous awid lookups; permanent
+   identities with org_only/team_members_only reachability return
+   404 to anonymous callers even though rows exist. Authenticated
+   requests + awid server-side visibility filtering closes it.
+   Cross-coord: Grace (CLI signing) + Goto (awid server filter) +
+   Juan (architectural call on request-signing scheme). Scope
+   contingent on re-query bounded to permanent identities; if the
+   cohort is small (just randy), aalm closes a known-narrow gap.
+3. **aall**: **close-as-no-action**. Nothing to backfill —
+   ephemerals correctly have no awid rows; permanents do.
 
 **Updated restricted ship-mail line** (per John 9460803e):
 "KI#1 closes for continuity case (aalk: known-agent pin fallback).
