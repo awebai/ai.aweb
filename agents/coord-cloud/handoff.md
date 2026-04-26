@@ -11,11 +11,13 @@ test-infra fix landed)
   dead-code removal)
 - on top of `0336a2c4` (v0.5.8 release tag, shipped)
 
-**aweb (Grace's side):** `32bb7c6` local, unpushed. Amend of `ee72ee3`
-that folds John's N1+N2 wording notes (clearer error message:
-"AWID_REGISTRY_URL=local is not supported; set
-AWID_REGISTRY_URL=https://api.awid.ai"). Pure text change, no logic
-delta — substance identical to ee72ee3.
+**aweb (Grace's side):** `ef5c3d7` local, unpushed. Amend chain:
+`ee72ee3` → `32bb7c6` (John's N1+N2 wording fold, GO'd) → `ef5c3d7`
+(substance change post-Juan's Chesterton-fence challenge: removed the
+unused `_baseURL` parameter from `resolveRegistryFallbackURL`,
+simplified the call site, updated 4 tests). Channel npm test still
+green: 81 passed. **John's GO on ef5c3d7 still pending** — flagged
+to him via mail (f1cca8d4) and to Grace via chat to route to him.
 
 **Production:** v0.5.8 live since 2026-04-26 ship. Verified-live leg 1
 (/health flip + git_sha) confirmed at ship. Legs 2-3 pending (see below).
@@ -24,7 +26,7 @@ delta — substance identical to ee72ee3.
 
 | Commit | Repo | Author-coord | Reviewer-coord | Status |
 |--------|------|--------------|----------------|--------|
-| 32bb7c6 | aweb | Grace | John (3851604d, fd32df1c) | GO, holding |
+| ef5c3d7 | aweb | Grace | John (pending GO on this SHA) | holding for John's fresh GO |
 | b5b1ee1f | ac | Grace | Tom | GO, holding |
 | 4f31e116 | ac | Tom (auto) | n/a (test infra) | self-merged, holding |
 
