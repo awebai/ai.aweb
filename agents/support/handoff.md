@@ -35,19 +35,28 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Local versions (this workspace)
 
-- `aw`: 1.18.1 (commit ff8161c) ✓
-- channel plugin: **1.3.1** ✓ (Juan upgraded + full Claude Code restart 2026-04-26 ~07:00Z; pid 2802 → `~/.claude/plugins/cache/awebai-marketplace/aweb-channel/1.3.1/dist/index.js`)
-- **Awaiting v0.5.8 publish** for two banked fixes already in main:
-  - aweb ae247c4 (aalg fix) → unblocks aalg verification probe
-  - channel dd4ef9f (aale fix) → unblocks aale render verification
+- `aw`: 1.18.2 (commit f2e3325, built 2026-04-26T10:13:21Z) ✓
+- channel plugin: **1.3.3** ✓ (afternoon restart 2026-04-26 ~14:24Z; pid 42205 → `~/.claude/plugins/cache/awebai-marketplace/aweb-channel/1.3.3/dist/index.js`)
+- **Awaiting aalk publish** (likely aweb 1.18.3, exact version TBD on Grace's commit) for the resolver fallback that handles identity.yaml-only workspaces (mine has no selection.yaml). Randy will mail when it tags + publishes. Re-run probe post-publish + upgrade to close aalg.
+- Version subcommand is `aw version` (NOT `aw --version`, which errors `unknown flag`).
 
 ## Known issues
 
 1. **aalg — IDENTITY MISMATCH on outbound CLI mail+chat (cross-team
-   cert).** Confirmed open post-channel-1.3.1 restart (2026-04-26):
-   fresh CLI mail bbbc19aa and fresh CLI chat 068ed2d5 from me to
-   Randy both server-recorded `identity_mismatch`. Fix ae247c4 is in
-   aweb main but not in published 1.18.1; ships in v0.5.8.
+   cert).** Reconfirmed open post-aw-1.18.2 + channel-1.3.3 (afternoon
+   2026-04-26): fresh CLI mail 6a65f384/284ca742 and fresh CLI chat
+   497d6558/e101046f all server-recorded `identity_mismatch`. Wire
+   shape (per Randy): canonical signed_payload `to_did=""` empty, no
+   `to_stable_id`, `signing_key_id` absent. ae247c4 (aalg-PARTIAL) is
+   in 1.18.2 binary but doesn't fire on my workspace shape because:
+   - my workspace has no `selection.yaml` (never had one)
+   - my `registry_url=https://api.awid.ai` lives on `identity.yaml`
+   - the resolver setup in ae247c4 reads `Selection.RegistryURL`, not
+     `identity.RegistryURL`; with neither selection nor AWID env var
+     set, resolver setup gets nothing → cert lookup fails → unsigned
+   **Coverage gap closes via aalk** (P1, dispatched to Grace under
+   John's coord). Likely ships as aweb 1.18.3. Randy will mail when
+   it publishes; re-run probe to close.
    - Mail wire shapes for my outbound: 4 banked earlier had
      signing_key_id EMPTY-STRING; bbbc19aa has signing_key_id ABSENT.
      Both → identity_mismatch. Empty vs absent is a config-state
@@ -80,26 +89,16 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
    Juan. Two options discussed: (a) channel stops auto-acking, agent
    acks explicitly; (b) add a "recently delivered" view.
 
-3. **aale — channel mail-event renderer asymmetry** (P3, filed by
-   Randy 2026-04-25, originally suspected resolved by 1.3.1; NOT
-   resolved). Confirmed open on channel 1.3.1 post-restart
-   (2026-04-26) with clean discriminator: Randy sent a fresh mail
-   (15a130c0) and fresh chat (ae94e00c) within the same minute, same
-   plugin instance, same sender. Mail rendered `verified="false"`,
-   chat rendered `verified="true"`. Server JSON for both:
-   verification_status=verified. Pin store at capture time contained
-   Randy's did:aw entry (auto-pinned during 07:03 startup) — so
-   hypothesis (B) "missing pin → false" downgraded; hypothesis (C)
-   "data-shape asymmetry in renderer between mail and chat code
-   paths" confirmed. Fix dd4ef9f is in aweb main but not in
-   published channel 1.3.1; ships as 1.3.2 in v0.5.8.
-   - Verification gate post-1.3.2 + upgrade: fresh inbound mail from
-     a server-verified sender must render `verified="true"` in
-     channel header alongside JSON vs=verified.
-   - aale also tracks the forward-compat policy (channel header
-     schema changes should keep old field names populated for at
-     least one minor so stale plugins don't silently downgrade
-     trust signals).
+3. **aale — channel mail-event renderer asymmetry** ✅ **CLOSED on
+   channel 1.3.3** (Pass B TS verifier path). Empirical attestation
+   2026-04-26 afternoon: Randy's mails e68be37a and 099ac527 both
+   rendered channel header `verified="true"` with matching JSON
+   vs=verified. Pre-fix baseline was 6 confirmed false-renders on
+   channel 1.3.1 (Randy + Grace mails). Banked with Grace.
+   Forward-compat policy banking still appropriate (channel header
+   schema changes should keep old field names populated for at
+   least one minor so stale plugins don't silently downgrade trust
+   signals).
 
 ## Resolved issues
 
