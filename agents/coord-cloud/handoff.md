@@ -40,15 +40,28 @@ Original framing was wholesale-KI#1-closure attestation across both
 legs. **Reframed 2026-04-26 afternoon** after leg 3 came back red on
 Amy's CLI re-test:
 
-**Leg 3 RED → reframed to aalk next-cycle.** Randy's RCA (c74dd1da):
-aalg fix in v0.5.8 covers Selection.RegistryURL fallback but not
-identity.RegistryURL fallback. Amy's workspace is identity-only (no
-selection.yaml). Both her mail AND chat to Randy returned
-`verification_status=identity_mismatch`. New tracker
-**aweb-aalk** (P1) filed under John's coord; Grace dispatched to
-extend resolver fallback chain (env → Selection.RegistryURL →
-identity.RegistryURL → fail). Lands in next-cycle release (aweb 1.18.3
-likely). Amy reruns probe post-publish for empirical closure.
+**Leg 3 RED → reframed architecturally into three layers.** Initial
+RCA (Randy c74dd1da) named aalk as the resolver-fallback fix. After
+Grace's RCA-pass + chat challenge (per John's 9af09d1a),
+the picture deepened to three distinct layers, each with its own fix:
+
+1. **aalk (c250cd1, GO sent, push imminent)**: TOFU continuity-fallback
+   when registry address row is missing. Closes Amy's empirical case
+   because she has Randy pinned from prior contact.
+2. **aall (P1, Goto + Juan controller-key)**: Backfill of namespace
+   address rows (currently 9/10 agents missing). Closes first-contact
+   resolution when there's no prior pin. Not solvable by self-
+   registration — requires controller authority.
+3. **aalm (P1 new, cross-coord)**: Go RegistryResolver does anonymous
+   awid GETs, so org_only / team_members_only rows return 404 even
+   when they exist. CLI-side likely Grace; awid server-side Goto;
+   Juan owns architectural call on request-signing scheme.
+
+**KI#1 ship-mail-to-Charlene framing reframed**: restricted to
+"closes for continuity case (aalk); first-contact + org-private
+resolution remain open under aall + aalm." Ship-or-hold trigger
+call is Randy's authority (with Avi sign-off) — I deferred when
+John pinged me (0bcc8d02 to John; 729ecf18 FYI to Randy).
 
 **Leg 2 still load-bearing for aalf empirical attestation.** Juan
 triggers dashboard send from app.aweb.ai → Randy reads JSON inbox →
@@ -117,15 +130,22 @@ checkout. P3.
 ## Lane state
 
 - **Grace**: holding push on aweb ef5c3d7 + ac b5b1ee1f (already
-  GO'd). NEW: dispatched to aalk under John's coord (resolver
-  fallback gap for identity-only workspaces). RCA-first, then
-  fix on aweb 1.18.3 cycle. Same opt-in handshake discipline.
-- **John**: dispatched aalk to Grace (c71fee1f). Coordinating with
-  Randy on framing; standing by for Grace's RCA determination. His
-  aweb-side ef5c3d7 already GO'd by him + ack'd by me.
-- **Randy**: reframed v0.5.8 closure (aalg PARTIAL, aalk
-  next-cycle); ship-mail to Charlene HELD pending leg 2 + framing
-  acceptance. Banked feedback_reproducer_synthetic_state_assumes_user_invariants.md.
+  GO'd). aalk c250cd1 GO sent and push imminent on aweb side (a
+  separate substance commit, not the v0.5.9 cleanup parking lot).
+  Likely also picks up CLI-side of aalm if Juan ratifies the
+  request-signing scheme.
+- **John**: aalk dispatched + GO'd; reframed KI#1 closure into the
+  three-layer picture (aalk continuity / aall first-contact / aalm
+  authenticated-lookup). Pinged me on ship-mail framing call;
+  I deferred to Randy.
+- **Randy**: holds ship-mail-to-Charlene call. Dual gate now: leg 2
+  green AND ship-mail framing accepted (under restricted-three-layer
+  framing). Banked
+  feedback_reproducer_synthetic_state_assumes_user_invariants.md.
+- **Goto**: aall (controller-key backfill) + awid server-side aalm
+  in his lane. Cross-coord with John for CLI-side aalm.
+- **Juan**: owns architectural call on aalm request-signing scheme.
+  Plus controller-key authority for aall backfill.
 - **Amy**: standing down for aalk publish (post-1.18.3). aale render
   attestation green on her stack — KI#3 closed independently.
 - **Mia**: still offline; earlier stand-down moot.
