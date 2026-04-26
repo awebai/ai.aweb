@@ -44,7 +44,16 @@ After three reframes triggered by Grace's chat challenge → my prod-DB query �
 
 **Lessons banked today (durable memory, ../../../.claude/projects/.../memory/):**
 - `feedback_bug_class_spans_architectural_layers.md` — bug class can decompose into N architectural layers; reproducer-green at layer 1 doesn't close class. Hold wholesale-closure framing until layers mapped.
-- Concrete trigger: today's KI#1 three-iteration churn. Original "wholesale closes" → three layers → empirical DB verification → Juan's ephemeral correction. Truth-finding is iterative; framing must be revised honestly along the way.
+- `feedback_no_trivial_fix_exception_release_bound.md` — release-bound commits get full code-reviewer subagent BEFORE GO, every time, no exceptions. Substance soundness ≠ discipline soundness.
+
+**1.18.3 release in flight** (tasks #36 #37):
+- aalk c250cd1 + aalm 9846a6c + 606ec64 (test coverage) + b5347bf (server-side regression fix) + a9ee6b8 (signed-payload follow-on) all on origin/main.
+- Gate 1 GREEN on b5347bf (also on a9ee6b8 by extension).
+- Gate 2 (e2e) verifying on a9ee6b8 — Grace + my pre-runs both green.
+- Three asymmetries between elif-to_did / elif-to_stable_id / elif-to_address branches in messages.py surfaced by aalk: (1) binding-fallback fixed b5347bf; (2) _with_requested_address mirroring fixed a9ee6b8; (3) registry-client-None handling still queued.
+- aweb-aalq audit tracker queued post-tag (task #38).
+- Held: SOT update to docs/awid-sot.md (signed-read endpoint documentation) — unstaged in worktree, will fold into release commit per discipline.
+- Pre-review-push pattern (Grace pushed 9846a6c + b5347bf + a9ee6b8 pre-handshake citing Juan's standing instruction) — Randy + I both flagged for post-1.18.3 raising with Juan to clarify scope.
 
 **Open follow-ups on my plate (carried from prior cycles):**
 - BYOIT prod-awid smoke test (Randy ask, task #27). Mailed Tom (`f2881e63`); cert blob populates after add-member; cross-machine fetch verifies; wrong-DID 403.
