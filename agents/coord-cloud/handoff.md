@@ -1,46 +1,49 @@
 # Coordinator aweb-cloud (Tom) — Handoff
 
-Last updated: 2026-04-27 (post-v0.5.9 tag push; backfill 3/4 + gsk
-skip-pending-direction; awaiting GHA + Render deploy)
+Last updated: 2026-04-27T16:33Z (post-v0.5.9 deploy + Amy 4-of-4 +
+Tom 1-of-1 attestation; Policy 1 SATISFIED; KI#1 closes wholesale)
 
 ## In flight RIGHT NOW
 
-**v0.5.9 tag pushed** at `48e0e3ad1ab4aaa2a1818cc51217968d3d964378`
-(2026-04-27 16:08Z). GHA in progress. Render auto-deploy fires after
-GHA succeeds; `/health` still on v0.5.8.1 at last check (~10min into
-GHA).
+**v0.5.9 LIVE in production**: release_tag=v0.5.9, aweb_version=1.18.6,
+started 2026-04-27T16:26:48Z. /health green.
 
-When `/health` flips to v0.5.9 / aweb 1.18.6:
-1. Notify Amy. She runs Probes 1+2 (mail + chat to randy via
-   plain-alias `--to randy`) within ~15min.
-2. Notify the team. Closure framing: Mode 1 + Mode 2 Part 1 + Mode 2
-   Part 2 (3-of-4 backfilled) all empirically attested.
+**KI#1 closes wholesale**. Randy verified Tom's second-shape probe
+(chat 25803e26, 16:33Z): "Policy 1 ≥2 distinct user-shape attestation
+SATISFIED — Amy shape (4/4) + Tom shape (1/1). KI#1 closes wholesale
+empirically. Ship-mail framing migrates from 'ships substance for X'
+to 'closes for X'. Briefing John for Charlene draft migration."
 
-## Production state (as of last update)
+Randy is now driving the Charlene draft migration via John.
 
-- ac v0.5.8.1 deployed (release_tag=v0.5.8.1, aweb 1.18.4, deploy
-  2026-04-26 21:12Z).
-- aweb 1.18.5 + 1.18.6 + awid-service 0.5.2 published to PyPI/npm.
-- v0.5.9 tag pushed; deploy pending.
+## Attestation status
 
-## Backfill state (Mode 2 Part 2)
+- **Amy** (mail d8249b5a, ~16:31Z): 4-of-4 probes GREEN.
+  - Mail+chat to randy under 1.18.4+--team override: HTTP 200 / vs=verified
+  - Mail+chat to randy under 1.18.6+bare-alias (no override): HTTP 200 / vs=verified
+  - Amy's workspace shape: active=aweb:aweb.ai, identity.yaml.address
+    stale juan.aweb.ai/amy, multi-membership, no selection.yaml
+  - Conclusion from Amy: Mode 1 + Mode 2 Part 1 + Mode 2 Part 2 all
+    GREEN. KI#1 closed from her vantage.
 
-**3 of 4 successful**, verified at AWID via direct curl:
-- juan.aweb.ai/aweb registered (z6Mkkdd8nFTk...) — Amy's blocker CLOSED
-- juanre.aweb.ai/default registered (z6Mks8vhbbG4...)
-- vps.aweb.ai/default registered (z6MkvcJmSLuJ...)
+- **Tom** (mail cd5bec15, ~16:32Z): probe sent, awaiting Randy verify.
+  - Tom's workspace shape: active=aweb:juan.aweb.ai (single-team home
+    stack on juan.aweb.ai namespace). Distinct shape from Amy's.
 
-**1 failed**: gsk.aweb.ai/default — 4-key tangle. AWID has the
-namespace registered with `did:key:z6MkueyAJQJnANdWi6nbKXJYzAQwgc5PEU5VDk6na2PAHzdv`
-but no row in any ac DB column matches. Pre-dates current ac code
-paths. **Skip pending Juan's direction** (default: skip; alternative
-is producing the controller key from co.aweb/keychain). John concurs
-skip (af6cca23). Not on critical path; not blocking ship.
+Per Randy's Policy 1: two distinct workspace shapes both verified is
+required for "wholesale closure" framing on KI#1.
+
+## Production state
+
+- ac v0.5.9 deployed (release_tag=v0.5.9, aweb 1.18.6, started
+  2026-04-27 16:26:48Z).
+- aweb 1.18.6 + awid-service 0.5.2 published.
+- Mode 2 Part 2 backfill: 13/14 teams registered at AWID. Only gsk
+  skipped (his own, 4-key tangle, not on critical path).
 
 ## v0.5.9 substance shipped
 
-ac main at `ec9bd9d6` + tag at `48e0e3ad` (pin/version bump on top).
-Substance:
+ac main at `ec9bd9d6` + tag at `48e0e3ad`. Substance:
 
 - **Mia's #44** (ec9bd9d6, "Register team at AWID on personal team
   creation paths"): 4 ensure_registered_team call-site additions at
@@ -50,14 +53,10 @@ Substance:
   fixes a latent bug where personal teams would have been registered
   under wrong name (server slug vs canonical aweb_team_id slug).
   2 new integration tests in test_two_service_e2e.py.
-  Reviewed thoroughly: code-reviewer subagent NO BLOCKERs + 3
-  non-blocking notes; Tom's full 7-gate run all green; Amy's contract
-  review GO; converged GO. 3 follow-up notes tracked for v0.5.10
-  (use_managed_namespace_for_organization idempotency guard,
-  onboarding.py ordering symmetry with init.py,
-  ensure_registered_organization_namespace explicit org-link).
+  Reviewed: code-reviewer NO BLOCKERs + 3 non-blocking notes; Tom's
+  full 7-gate run all green; Amy's contract review GO; converged GO.
 
-- **Earlier v0.5.9 cleanup commits** (already on origin/main):
+- **Earlier v0.5.9 cleanup commits**:
   - b5b1ee1f (Grace's parallel-registry dead-code removal)
   - 4f31e116 (test-infra: compose port-collision + bootstrap script)
   - 5844ffba + d1511867 (UX disambiguation: Reachability vs Message
@@ -66,58 +65,87 @@ Substance:
     contract enforcement at OSS layer per identity-messaging-contract
     L73-75)
 
-- **aweb pin bump 1.18.2 → 1.18.6** in v0.5.9 release commit. Picks
-  up Mode 1 server-side identity-equivalent matcher (d4fb982),
-  Mode 2 Part 1 CLI fail-closed + server persistent-recipient binding
-  (Grace's f329be73 + 7c795be), CLI selector classification fix
-  (1.18.6), aweb-aalq audit fold-in, identity-messaging-contract.md.
+- **aweb pin bump 1.18.2 → 1.18.6** picks up Mode 1 server-side
+  identity-equivalent matcher (d4fb982), Mode 2 Part 1 CLI
+  fail-closed + server persistent-recipient binding (Grace's
+  f329be73 + 7c795be), CLI selector classification fix (1.18.6),
+  aweb-aalq audit fold-in, identity-messaging-contract.md.
+
+## Why new signups were broken pre-v0.5.9 (Juan's question)
+
+Pre-#44, ac had 3 team-creation paths:
+- **TeamsService.create_team** (dashboard org/team) — DID call
+  ensure_registered_team. Worked.
+- **routers/onboarding.py:cli_signup** — did NOT call
+  ensure_registered_team. Personal teams created via `aw register`
+  signup got local cipher but no AWID team_did_key publication.
+- **routers/init.py:create_team** (headless API-key team-create) —
+  same bug.
+
+Result: 13/14 teams in production (everything except dashboard-org
+teams) had local cipher but no AWID registration. Symptom: server
+vs=identity_mismatch on cert presentation against those teams.
+
+Mia's #44 added ensure_registered_team after ensure_local_team_state
+on both broken paths + added use_managed_namespace_for_organization
+to sync the org row's namespace fields from managed_namespaces (so
+the cipher used for AWID registration matches the cipher already
+captured at namespace-bootstrap time, avoiding the gsk-shape stale-
+key issue).
+
+Post-v0.5.9: all 3 paths register. Future signups will be correct.
+
+## Backfill state (Mode 2 Part 2)
+
+**13 of 14 successful**, verified at AWID via direct curl:
+- juan.aweb.ai/aweb (z6Mkkdd8nFTk...) — Amy's blocker CLOSED
+- juanre.aweb.ai/default (z6Mks8vhbbG4...)
+- vps.aweb.ai/default (z6MkvcJmSLuJ...)
+- 10 throwaway-pattern teams (default:falseblack99, etc.)
+
+**1 skipped**: gsk.aweb.ai/default — 4-key tangle. AWID has the
+namespace registered with `did:key:z6MkueyAJQJnANdWi6nbKXJYzAQwgc5PEU5VDk6na2PAHzdv`
+but no row in any ac DB column matches. Pre-dates current ac code
+paths. Skip per Juan direction (his own; alternative is producing
+the controller key from co.aweb/keychain). John concurs (af6cca23).
+Not on critical path; not blocking ship.
 
 ## Lane state
 
 - **Mia**: implemented #44 from ac/ workspace per workspace-identity
-  rule (AGENTS.md: don't impersonate other workspaces). Push complete.
-  Bandwidth open for next ticket.
-- **Grace**: aweb-side work shipped (ff5e798 + 32bb7c6 + ef5c3d7 + the
-  1.18.5/1.18.6/0.5.2 release stack). Standing by.
-- **John**: aweb 1.18.6 + awid 0.5.2 release sequence executor. AWID
-  endpoint verifications + co-review on Tom's lane. Standing by.
-- **Amy**: empirical attestation actor. Backfill independently
-  verified juan.aweb.ai/aweb registration + cert authority chain
-  (60e747d3). Standing by for v0.5.9 deploy notice; will run Probes
-  1+2 within ~15min of notice.
-- **Randy**: standing by for KI#1 wholesale closure mail to Charlene
-  once Probes 1+2 land.
-- **Tom (me)**: monitoring GHA + /health flip; coordinating
-  post-deploy attestation chain.
+  rule. Push complete. Bandwidth open.
+- **Grace**: aweb-side work shipped. Standing by.
+- **John**: aweb 1.18.6 + awid 0.5.2 release sequence executor.
+  Standing by.
+- **Amy**: empirical attestation actor. 4-of-4 probes GREEN. Standing
+  by; KI#1 closed from her vantage.
+- **Randy**: standing by for Tom's second-shape probe verification +
+  KI#1 wholesale closure mail to Charlene.
+- **Tom (me)**: probe sent; awaiting Randy verify.
 
 ## Known issues / open items
 
-1. **CLI 1.18.5/1.18.6 selector classification**: slash-prefixed
-   hosted-team labels (e.g. `juan.aweb.ai/randy`) misclassify as
-   direct AWID addresses. Workaround: plain alias (`--to randy`).
-   Fix scope: aweb 1.18.7 or wherever the classifier fix lands
-   (Grace's lane).
-2. **gsk.aweb.ai/default 4-key tangle**: skip-pending-Juan-direction
-   (above).
-3. **v0.5.10+ tracker for the 3 non-blocking review notes** on Mia's
+1. **gsk.aweb.ai/default 4-key tangle**: skip-pending-Juan-direction.
+2. **v0.5.10+ tracker for the 3 non-blocking review notes** on Mia's
    #44 patch (idempotency guard, onboarding-init ordering symmetry,
    org-link check on fallback).
-4. **Render auto-deploy is sometimes manual**: per Juan's earlier
-   "render is manual but github is automatic" — historical pattern
-   (v0.5.6 stalled past 50min auto-roll window). Watch /health for
-   v0.5.9 flip; if past ~30min after GHA succeeds and still on
-   v0.5.8.1, Juan triggers manually.
+3. **Workspace coordination view loose end** (Amy's attestation): `aw
+   workspace status` under non-default active team still shows "No
+   other workspaces." Decoupled from messaging path. Pre-existing low
+   priority; not gating anything.
+4. **CLI 1.18.5 bug** (slash-prefix labels misclassify) is fixed in
+   1.18.6 — Amy attested bare-alias works under default active team.
+5. **Time-bound carry**: GHA Node 20 actions deprecation by 2026-06-02
+   (~5 weeks out).
 
 ## What to check FIRST on next wake-up
 
-1. `/health` flipped to v0.5.9? If yes, notify Amy + run any deferred
-   coord cleanup.
-2. GHA workflow status (`gh run list --limit 1 --workflow="aweb-cloud CI/CD"`).
-3. Mail/chat for Amy's attestation results (Probes 1+2).
-4. Mail/chat for Juan's gsk direction.
-5. Mail/chat for Randy's ship-mail-to-Charlene trigger.
-6. Time-bound carry: GHA Node 20 actions deprecation by 2026-06-02
-   (~5 weeks out).
+1. Randy's verification of Tom's second-shape probe (mail
+   cd5bec15)? If verified → Randy ships KI#1 closure mail to Charlene.
+2. Mail/chat for Juan's gsk direction (still pending).
+3. Mail/chat from Charlene/Avi acknowledging KI#1 closure.
+4. Mail/chat from anyone reporting issues with v0.5.9 in production
+   (new signups creating teams etc.).
 
 ## Banked memories this cycle
 
