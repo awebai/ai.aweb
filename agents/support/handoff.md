@@ -35,30 +35,48 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## Local versions (this workspace)
 
-- `aw`: **1.18.4** (downgraded from 1.18.5 per Randy 1be13b2e to recover sidechannel; 1.18.5 fail-closed blocks all juan.aweb.ai/* recipients with HTTP 404 until classifier fix lands)
+- `aw`: **1.18.6** ✓ (commit 07a50b4, built 2026-04-27T08:59:23Z)
 - channel plugin: 1.3.3 ✓
-- server: ac v0.5.8.1, aweb 1.18.4 deployed (Mode 1 fix d4fb982 live). Mode 1 GREEN attested via Tom's mail 3175b394 (verification_status=verified).
-- **DO NOT `aw upgrade` to 1.18.5** until John gives all-clear. Real fix is CLI classifier (1.18.6 timeline per John 1365910d).
+- server: **ac v0.5.9 / aweb 1.18.6 deployed** (Mode 1 d4fb982 + #44 ec9bd9d6 + Mode 2 backfill all live)
 - Version subcommand is `aw version` (NOT `aw --version`, which errors `unknown flag`).
 
 ## Known issues
 
-1. **WORKING WORKAROUND for chat sidechannel on 1.18.4**:
-   `aw chat send-and-leave <alias> --team aweb:juan.aweb.ai "..."`
-   (plain alias + --team override). Delivers (server vs=identity_mismatch
-   but message lands). Active team aweb:aweb.ai's workspace is EMPTY;
-   all team peers (grace, kate, noah, tom, mia, randy, john, avi, leo,
-   jack, ivy, nova, frank, ceo) are visible only under --team
-   aweb:juan.aweb.ai. So bare alias without --team hits empty workspace
-   → "agent not found".
+1. **KI#1 — CLOSED 2026-04-27 ~16:30Z**. Full mail + chat reachability
+   restored to all hosted-custodial team members from my cross-team-cert
+   workspace shape. First-ever server-side `verification_status=verified`
+   on my outbound. Empirical attestation matrix 4-of-4 GREEN sent to
+   Tom (d8249b5a) and Mia (49dba8a6).
 
-   **No working mail combination** to hosted-custodial recipients on
-   1.18.4 from my workspace. All variants 422 (to_stable_id mismatch
-   on full address, "must be domain/name" on plain alias, "signed_payload
-   from must match the authenticated sender" with --team override).
-   Mail-out is dead until the CLI classifier fix (1.18.6).
+   **Working syntax post-1.18.6**: bare alias `aw mail send --to randy
+   ...` and `aw chat send-and-leave randy ...` work under default
+   active team aweb:aweb.ai without `--team` override. The 1.18.6 CLI
+   classifier picks the appropriate membership cert based on the
+   recipient's namespace.
 
-2. **KI#1 — split into two distinct modes by John 9b29c13b**:
+   **Resolution chain** (kept for reference; future support threads):
+   - Mode 1 (server-side `_recipient_identity_matches` regression
+     introduced in 1.18.3): closed by d4fb982 in 1.18.4 server, deployed
+     v0.5.8.1 / v0.5.9.
+   - Mode 2 Part 2 (`aweb:juan.aweb.ai` team unregistered at AWID, so
+     hosted-custodial cert presentation couldn't validate): closed by
+     ac #44 (commit ec9bd9d6 — Mia patch, Tom code-axis review, Amy
+     contract-axis review) + Tom's backfill script (Juan-authorized
+     --apply, 13/14 teams backfilled, gsk skipped per Juan).
+   - Mode 2 main (CLI classifier misclassifying hosted-team-aliases as
+     direct AWID addresses): closed by 1.18.6 CLI classifier work.
+   - Mode 2 Part 1 (1.18.5 fail-closed CLI behavior): correct in
+     principle but made cross-team-cert workspaces strictly worse for
+     ~half a day until 1.18.6 shipped the classifier fix; npm latest
+     was rolled back from 1.18.5 → 1.18.4 during that window.
+
+   **Loose end (low priority)**: `aw workspace status` under active
+   team aweb:aweb.ai still shows "No other workspaces" — coordination
+   view is empty even though messaging works. Classifier doesn't need
+   it; not gating anything.
+
+2. **KI#1 history (closed) — split into modes by John 9b29c13b** (kept
+   for archeology):
 
    **Mode 1 — population regression on 1.18.3 → CLOSED on 1.18.4**:
    server-side d4fb982 (`_recipient_identity_matches` helper) deployed
