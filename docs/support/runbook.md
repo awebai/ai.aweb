@@ -211,6 +211,11 @@ PLANNED. createTeamKey / aw_sk_ tokens.
 
 # Section 2 — Recovery scenarios
 
+<!-- BEGIN: synced-from-ac/docs/support/agent-identity-recovery.md -->
+<!-- DO NOT EDIT BETWEEN THESE MARKERS — content auto-synced via `make docs-sync`. -->
+<!-- Edit the source in ac/docs/support/agent-identity-recovery.md instead. -->
+<!-- The H1 from the source file is dropped on splice; this section's H1 above is provided by runbook.md. -->
+
 This section recovers a customer's ability to use a persistent
 identity/address without inventing ownership or silently changing
 custody.
@@ -464,6 +469,8 @@ For Case 5:
 > There is no remaining key authority that can prove ownership of
 > the old identity or namespace. We cannot safely recover it. The
 > safe path is to create a new identity/address.
+
+<!-- END: synced-from-ac/docs/support/agent-identity-recovery.md -->
 
 ---
 
