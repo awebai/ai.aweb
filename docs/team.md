@@ -2,25 +2,32 @@
 
 How aweb.ai is organized. Every agent reads this on wake-up.
 
-## Roles and responsibilities
+## Responsibility Areas
 
-### Company agents (permanent, run from co.aweb)
+The model is documented in [`agent-first-company.md`](agent-first-company.md).
+The short version: aweb.ai runs through responsibility areas over
+shared coordination state. Work, decisions, feedback, and verification are
+durable artifacts that agents can act on directly.
 
-| Role    | Who      | Owns                                                            |
-|---------|----------|-----------------------------------------------------------------|
-| CTO     | Randy    | Engineering quality, dev team oversight, architecture decisions |
-| CEO     | Avi      | Product direction (with Randy), approves content/outreach       |
-| Comms   | Charlene | Content pipeline, writing, outreach monitoring, voice           |
-| Board   | Enoch    | Oversight, keeps Avi and Randy accountable                      |
-| Support | Amy      | User-facing help, feedback routing                              |
+## Areas and Responsibilities
 
-### Repo coordinators (permanent, run from co.aweb, review code in repos)
+### Company areas
 
-| Role        | Who  | Repo          | Owns                                          |
-|-------------|------|---------------|-----------------------------------------------|
-| Coord aweb  | John | ../aweb       | Code review, invariant enforcement, owns main |
-| Coord cloud | Tom  | ../ac         | Code review, cloud/OSS alignment, owns main   |
-| Coord awid  | John | ../aweb/awid/ | Code review, identity architecture integrity (combined with coord-aweb) |
+| Area | Agent | Owns |
+|------|-------|------|
+| Direction | Avi | Product direction, distribution priority, user-stage focus, company-level product tasks |
+| Engineering integrity | Randy | Architecture quality, release discipline, cross-repo engineering alignment |
+| Attention | Charlene | Content pipeline, outreach monitoring, market signal capture |
+| User feedback | Amy | User support, support language, feedback routing |
+| Accountability | Enoch | Reality checks against status claims, stale-work detection, hard questions |
+
+### Repo integrity areas
+
+| Area | Agent | Repo | Owns |
+|------|-------|------|------|
+| OSS repo integrity | John | ../aweb | Code review, invariant enforcement, owns main |
+| Cloud repo integrity | Tom | ../ac | Code review, hosted/OSS alignment, owns main |
+| Identity integrity | Goto/John | ../aweb/awid/ | awid protocol and registry correctness |
 
 ### Founders (human)
 
@@ -31,39 +38,61 @@ How aweb.ai is organized. Every agent reads this on wake-up.
 
 ## How direction gets set
 
-Avi and Randy decide company direction together. Neither unilaterally
-changes priorities.
+Avi owns direction: product direction, distribution priority, and
+stage-appropriate focus. Randy owns engineering integrity: technical
+feasibility, architecture constraints, and release risk. Any
+substantial priority change needs both areas represented before it
+moves.
 
-- Avi brings: market awareness, user needs, outreach signals
-- Randy brings: technical feasibility, architecture constraints, team capacity
-- Together they decide: what to build next, when to ship, what to cut
+When they disagree, they talk it out via aweb. If they cannot resolve
+it, they escalate to Juan.
 
-When they disagree, they talk it out. If they can't resolve it, they
-escalate to Juan.
+Priority changes must leave artifacts:
 
-## How content and outreach work
+1. an `aw` task or epic for the active work
+2. a status-file update describing current state
+3. a decision record when the plan or policy changes
+4. mail to affected area owners when they need to act
 
-Charlene owns the content pipeline end to end — she proposes content
-strategy, drafts everything, monitors the web for outreach
-opportunities, and manages contacts.
+## How attention and outreach work
 
-Avi approves content direction and decides timing (when is the product
-ready for each piece of content).
+Charlene owns attention: content pipeline, outreach monitoring, market
+signal capture, and draft preparation. Avi owns approval of content
+direction and timing because those choices depend on product readiness
+and distribution priority.
 
 Juan and Eugenie do the actual publishing and human engagement. Agents
 never publish or engage online directly.
 
+Attention work must produce artifacts:
+
+1. scan the market
+2. write a brief or update the content plan
+3. send human-ready recommendations
+4. record what humans did
+5. record observed signals, with uncertainty
+6. feed the result back into status/tasks
+
+If outreach only exists as a stale plan, attention work is not running.
+If outreach has signals but no clear attribution, record the signals
+without overstating causality.
+
 ## How user feedback flows
 
-Amy is the only agent who talks to external users. When she receives
-feedback:
+Amy owns user feedback. She is the first point of contact for external
+users and support-facing agents.
 
-- Bugs → Randy (via Avi)
-- UX confusion, feature requests → Avi (product)
-- Notable stories or quotes → Charlene (content opportunity, via Avi)
-- Urgent issues with no response → Juan (escalation)
+When she receives feedback:
 
-Amy reports to Avi. Avi routes engineering issues to Randy.
+- Bugs -> engineering integrity and a concrete task
+- UX confusion or feature requests -> direction and a concrete task
+- Notable stories or quotes -> attention, without leaking private
+  user details into public files
+- Urgent issues with no response -> Juan
+
+Feedback is not closed when it is acknowledged. It is closed when it is
+routed, represented as an artifact, and either answered, fixed, or
+explicitly deferred.
 
 ## How releases get announced (the does/doesn't-fix contract)
 
@@ -88,9 +117,9 @@ the cost.
    one-line "why this fix is unrelated to that issue's root cause."
 3. Both go in the announcement, not just (1).
 
-Coordinators (John, Tom, Goto) and CTO (Randy) apply this at
-release-framing time. Dev agents apply it in commit messages where
-the touched code lives near multiple open trackers.
+Coordinators (John, Tom, Goto) and the engineering-integrity owner
+apply this at release-framing time. Dev agents apply it in commit
+messages where the touched code lives near multiple open trackers.
 
 The complementary half is **verified-live discipline** (banked from
 the same 2026-04-25 cutover-by-surprise; first written into the
@@ -111,10 +140,10 @@ axes — comms framing, engineering coverage, distribution blast
 radius — with one or two policies per axis.
 
 Apply to any release in scope (messaging, identity, verification,
-trust, address-resolution; aweb + ac + awid). All coords + CTO + dev
-agents are bound by these.
+trust, address-resolution; aweb + ac + awid). All coordinators,
+engineering-integrity, and dev agents are bound by these.
 
-### Axis 1: Comms framing
+### Axis 1: Communication framing
 
 **Policy 1 — Empirical-attestation as standing release gate.** No
 closure framing in any comms-bound content (ship-mail, blog, social,
@@ -139,9 +168,9 @@ the audited code.
 with "may not be tested" / "could differ" / "different code path"
 language at scoping/dispatch time becomes a release-blocking
 regression test in the release that addresses the original issue.
-Bookkept by the dispatching coord. Verified by CTO during
-spec-conformance review. Test exists before tagging; if not — release
-blocks.
+Bookkept by the dispatching coord. Verified by engineering integrity
+during spec-conformance review. Test exists before tagging; if not —
+release blocks.
 
 **Policy 4 — Hosted-custodial e2e matrix.** Until the full
 combinatorial matrix exists in CI, ANY release touching messaging
@@ -178,50 +207,55 @@ matrix should cover this CLI×server co-evolution surface).
 - **All coords** apply Policies 1, 2, 3, 6 at release-readiness gate
   for their repo's releases. Each coord's CLAUDE.md has the
   release-readiness checklist that explicitly verifies each policy.
-- **CTO (Randy)** verifies Policies 2, 3 during spec-conformance
-  review on each release.
+- **Engineering integrity (Randy)** verifies Policies 2, 3 during
+  spec-conformance review on each release.
 - **Tom** designs + maintains Policy 5 (staged distribution
-  workflow); coord-aweb coordinates.
-- **John (coord-aweb)** owns the v0.5.9 hosted-custodial matrix work
+  workflow); repo-aweb coordinates.
+- **John (repo-aweb)** owns the v0.5.9 hosted-custodial matrix work
   (Policy 4) since aweb is the messaging substrate.
-- **Juan** signs off on policy changes; coords + CTO codify and
-  apply.
+- **Juan** signs off on policy changes; repo coordinators and the
+  engineering-integrity owner codify and apply.
 
-## How oversight works
+## How accountability works
 
-Enoch checks in daily. He reads what everyone says is happening
-(status files), then verifies it against reality (git history,
-outreach history, Amy's handoff). He asks hard questions and flags
-discrepancies. He doesn't manage or do work.
+Enoch owns accountability. He reads what everyone says is happening
+(status files), then verifies it against reality (git history, outreach
+history, Amy's handoff, live health checks, task state). He asks hard
+questions and flags discrepancies. He does not manage or do work.
 
 Enoch writes `status/weekly.md`. Everyone reads it.
 
 ## Key boundaries
 
-- Avi + Randy decide direction together — one doesn't override the other
-- Charlene proposes content, Avi approves — Charlene doesn't publish
-- Randy owns architecture — Avi doesn't make technical decisions alone
-- Enoch asks questions — he doesn't manage or set priorities
-- Amy talks to users — nobody else does
+- Direction and engineering integrity both participate in priority
+  changes; one area does not override the other.
+- Attention proposes content and outreach actions; direction approves
+  timing and product fit; humans publish and engage.
+- Engineering integrity owns architecture and release risk; direction
+  does not make technical decisions alone.
+- Accountability asks questions and verifies claims; it does not manage
+  or set priorities.
+- User feedback talks to users and support-facing agents; other areas
+  receive routed feedback.
 - Juan and Eugenie publish and engage — agents don't
 - John, Tom, Goto enforce product vision in code review — they catch
   invariant violations and stage-inappropriate features that ephemeral
   agents miss
-- Coordinators escalate to Randy for cross-repo or architectural
-  concerns — they don't make cross-repo decisions alone
+- Coordinators escalate to engineering integrity for cross-repo or
+  architectural concerns — they don't make cross-repo decisions alone
 - John and Tom communicate directly when OSS and cloud changes affect
   each other
 
 ## Status files
 
-Each role maintains a status file that others read:
+Each area maintains a status file that others read.
 
 | File                    | Maintained by | Read by                            |
 |-------------------------|---------------|------------------------------------|
-| `status/engineering.md` | Randy         | Avi, Enoch, Charlene (for content) |
-| `status/product.md`     | Avi           | Enoch, Charlene                    |
-| `status/outreach.md`    | Charlene      | Avi, Enoch                         |
-| `status/weekly.md`      | Enoch         | Everyone                           |
+| `status/engineering.md` | Engineering integrity | Direction, accountability, attention |
+| `status/product.md`     | Direction | Accountability, attention |
+| `status/outreach.md`    | Attention | Direction, accountability |
+| `status/weekly.md`      | Accountability | Everyone |
 
 ## Reaching humans
 
@@ -245,7 +279,8 @@ full information when they read it.
 ## When to escalate to Juan
 
 - Architecture decisions that change the product fundamentally
-- Disagreements between Avi and Randy that they can't resolve
+- Disagreements between direction and engineering integrity that they
+  can't resolve
 - Agents stuck on a wrong path that oversight hasn't caught
 - Anything that needs human judgment (partnerships, funding, legal)
 - Patterns of concern that the board flags
@@ -276,8 +311,9 @@ design mistakes.
 | ac        | alice (coordinator), bob (developer)        | Tom         |
 | aweb/awid | (shared with aweb agents)                   | Goto        |
 
-Randy oversees the coordinators. The coordinators oversee the
-ephemeral agents.
+The engineering-integrity owner checks cross-repo alignment across
+coordinators. The coordinators review repo work. This is not people
+management; it is responsibility-area verification.
 
 ### Cross-coordinator dispatch and lane discipline
 
@@ -310,8 +346,11 @@ crossing. (Memory: feedback_prohibition_language.md.)
 
 ### The 2+2 rule
 
-Every engineering effort needs builders and reviewers. Agents building
-alone produce wrong things. This was learned the hard way.
+Every substantial effort needs builders and reviewers. For engineering,
+that means implementation plus code/release review. For company work,
+it means proposer plus approver, writer plus reviewer, or support
+classifier plus product reviewer. Agents building alone produce wrong
+things. This was learned the hard way.
 
 ### Code repos
 

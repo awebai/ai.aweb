@@ -1,0 +1,15 @@
+aweb_url: https://app.aweb.ai/api
+api_key: aw_sk_3c2e67e91300629eb933cd8ce7436cc7d81d9370c09256feaec0b81e1ed415c1
+memberships:
+    - team_id: aweb:juan.aweb.ai
+      alias: randy
+      role_name: developer
+      workspace_id: e4ea6cc6-1c98-416e-8915-5e8a30d19a37
+      cert_path: team-certs/aweb__juan.aweb.ai.pem
+      joined_at: "2026-04-21T22:01:35Z"
+human_name: juanre
+agent_type: agent
+canonical_origin: github.com/awebai/ai.aweb
+hostname: altair.local
+workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/engineering-integrity
+updated_at: "2026-04-28T19:46:01Z"

@@ -61,13 +61,15 @@ updates. For people who are already interested. Builds domain authority.
 ### 5. Running a company with AI agents (working title)
 - **Where**: juanreyero.com
 - **Status**: Not started
-- **When**: After the co.aweb agent team (CTO, CEO, board) has been
-  running for a few weeks and we have real experience
+- **When**: After the responsibility-area agent team has been running
+  long enough to have real experience
 - **Distribution**: HN, Reddit, Twitter. This has broad appeal beyond
   the multi-agent coding audience.
-- **Notes**: The story of co.aweb itself: permanent CTO and CEO agents,
-  a board member that keeps them accountable, handoff docs, invariants.
-  What works, what doesn't. Dogfooding at the company level.
+- **Notes**: The story of ai.aweb itself: responsibility-area agents,
+  builder/reviewer pairs, task claims, handoff docs, invariants,
+  verifiable feedback where possible, and weaker signals handled with
+  explicit uncertainty. What works, what doesn't. Dogfooding at the
+  company level.
 
 ---
 

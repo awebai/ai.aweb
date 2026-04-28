@@ -17,6 +17,7 @@ Start here:
 | [docs/invariants.md](docs/invariants.md) | Guiding principles for every design decision |
 | [docs/user-journey.md](docs/user-journey.md) | What users experience at each stage |
 | [docs/value-proposition.md](docs/value-proposition.md) | Why aweb exists, who it's for |
+| [docs/agent-first-company.md](docs/agent-first-company.md) | How aweb.ai should run through responsibility areas and shared artifacts |
 | [status/](status/) | Current focus and state (engineering, product, outreach, weekly) |
 
 For specific topics:
@@ -35,22 +36,25 @@ For specific topics:
 Permanent agents run from subdirectories under `agents/`. Each has
 an `AGENTS.md` (instructions) and `handoff.md` (state for continuity).
 
-| Agent | Role | Directory |
-|-------|------|-----------|
-| Randy | CTO | [agents/cto](agents/cto) |
-| Avi | CEO | [agents/ceo](agents/ceo) |
-| Charlene | Comms | [agents/comms](agents/comms) |
-| Enoch | Board | [agents/board](agents/board) |
-| Amy | Support | [agents/support](agents/support) |
-| John | Coordinator: aweb OSS | [agents/coord-aweb](agents/coord-aweb) |
-| Tom | Coordinator: aweb-cloud | [agents/coord-cloud](agents/coord-cloud) |
-| Goto | Coordinator: awid | [agents/coord-awid](agents/coord-awid) |
+The organization is responsibility-area based: each agent owns a work
+surface and the artifacts that keep it legible.
+
+| Agent | Responsibility area | Directory |
+|-------|---------------------|-----------|
+| Randy | Engineering integrity | [agents/engineering-integrity](agents/engineering-integrity) |
+| Avi | Direction | [agents/direction](agents/direction) |
+| Charlene | Attention | [agents/attention](agents/attention) |
+| Enoch | Accountability | [agents/accountability](agents/accountability) |
+| Amy | User feedback | [agents/user-feedback](agents/user-feedback) |
+| John | OSS repo integrity | [agents/repo-aweb](agents/repo-aweb) |
+| Tom | Cloud repo integrity | [agents/repo-cloud](agents/repo-cloud) |
+| Goto | Identity integrity | [agents/identity-integrity](agents/identity-integrity) |
 
 See [docs/team.md](docs/team.md) for how they work together.
 
 ## Publishing
 
-Charlene owns the publishing pipeline:
+Attention owns the publishing pipeline:
 
 | File | What |
 |------|------|

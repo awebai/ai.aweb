@@ -48,29 +48,46 @@ agent:
   spent on engineering instead of getting it in front of people is an
   hour wasted.
 - **The 2+2 rule.** Agents building alone produce wrong things. Every
-  engineering effort needs at least one builder and one reviewer. This
-  was learned the hard way — agents left unsupervised burned thousands
-  of tokens building the wrong things.
+  substantial effort needs at least one builder and one reviewer. For
+  code this means implementation plus code/release review. For company
+  work it means proposer plus approver, writer plus reviewer, or
+  support classifier plus product reviewer. This was learned the hard
+  way — agents left unsupervised burned thousands of tokens building
+  the wrong things.
+- **Responsibility areas.** The agent team is organized around areas
+  of responsibility over shared artifacts: direction, engineering
+  integrity, attention, user feedback, accountability, and repo
+  integrity.
+- **Feedback strength matters.** Always look for feedback. Prefer
+  feedback that is close and verifiable, such as code -> test -> fix
+  or release -> health check -> smoke test. For weaker surfaces like
+  social posts and signups, capture the signal without overstating
+  causality.
 
 ## Docs to read on every wake-up
 
 Read in this order:
 
-1. **`docs/team.md`** — Team structure, R&R, how direction gets set,
-   how content/outreach work, how feedback flows, how to reach humans.
-2. **`docs/invariants.md`** — Guiding principles that must hold in
+1. **`docs/team.md`** — Team structure, responsibility areas, how direction
+   gets set, how content/outreach work, how feedback flows, how to
+   reach humans.
+2. **`docs/agent-first-company.md`** — The operating model: work,
+   decisions, feedback, and verification as durable coordination
+   artifacts.
+3. **`docs/invariants.md`** — Guiding principles that must hold in
    every design decision.
-3. **`docs/user-journey.md`** — What users experience at each stage.
-4. **`docs/value-proposition.md`** — Why aweb exists, who it's for.
-5. **`status/` files for your area** — Current focus and state.
+4. **`docs/user-journey.md`** — What users experience at each stage.
+5. **`docs/value-proposition.md`** — Why aweb exists, who it's for.
+6. **`status/` files for your area** — Current focus and state.
    Each status file (engineering, product, outreach, weekly) leads
    with a "Current focus" section that says what matters right now.
 
-**Read when relevant to your role:**
+**Read when relevant to your area:**
 - `docs/audiences.md` — Who uses aweb, what their day looks like,
-  where they hang out. Relevant for Avi, Charlene, Enoch.
+  where they hang out. Relevant for direction, attention, and
+  accountability.
 - `docs/capabilities.md` — What aweb provides, mapped to user journey
-  stages. Relevant for coordinators (John, Tom, Goto) and Randy.
+  stages. Relevant for repo integrity and engineering integrity.
 
 **Reference documents** (read when you need detail):
 - `docs/aweb-high-level.md` — The identity/protocol architecture
@@ -83,7 +100,8 @@ Read in this order:
 co.aweb/
 ├── CLAUDE.md              # You are here
 ├── docs/
-│   ├── team.md            # Team structure and R&R
+│   ├── team.md            # Responsibility areas and team responsibilities
+│   ├── agent-first-company.md # Company operating model
 │   ├── invariants.md      # Guiding principles
 │   ├── user-journey.md    # What users experience
 │   ├── value-proposition.md # Why we exist
@@ -93,31 +111,31 @@ co.aweb/
 │   ├── decisions.md       # Decision log with commit hashes
 │   └── strategy.md        # Go-to-market strategy (reference)
 ├── status/
-│   ├── engineering.md     # Randy maintains
-│   ├── product.md         # Avi maintains
-│   ├── outreach.md        # Charlene maintains
-│   └── weekly.md          # Enoch maintains
-├── publishing/            # Charlene owns (public)
+│   ├── engineering.md     # Engineering integrity
+│   ├── product.md         # Direction
+│   ├── outreach.md        # Attention
+│   └── weekly.md          # Accountability
+├── publishing/            # Attention owns (public)
 │   ├── plan.md            # Content calendar
 │   ├── voice.md           # How we talk
 │   ├── landscape.md       # Agent-to-agent ecosystem map
 │   ├── history.md         # What we published
 │   └── drafts/            # Blog posts, video scripts
 └── agents/
-    ├── cto/               # Randy
-    ├── ceo/               # Avi
-    ├── board/             # Enoch
-    ├── comms/             # Charlene
-    ├── support/           # Amy
-    ├── coord-aweb/        # John (aweb OSS coordinator)
-    ├── coord-cloud/       # Tom (aweb-cloud coordinator)
-    └── coord-awid/        # Goto (awid coordinator)
+    ├── engineering-integrity/ # Randy
+    ├── direction/             # Avi
+    ├── accountability/        # Enoch
+    ├── attention/             # Charlene
+    ├── user-feedback/         # Amy
+    ├── repo-aweb/             # John, OSS repo integrity
+    ├── repo-cloud/            # Tom, cloud repo integrity
+    └── identity-integrity/    # Goto, identity integrity
 ```
 
 ## How agents work here
 
 Each agent runs Claude Code from their subdirectory under `agents/`
-(e.g., `agents/cto/`). `aw` finds `.aw/workspace.yaml` in that
+(e.g., `agents/engineering-integrity/`). `aw` finds `.aw/workspace.yaml` in that
 directory. Shared documents are at `../../` relative to the agent.
 
 ### Wake-up routine (mandatory, every time)
@@ -130,9 +148,11 @@ directory. Shared documents are at `../../` relative to the agent.
 4. Read `../../status/weekly.md` — what the board said last time
 5. Read your `handoff.md` — remember what you were doing
 6. `aw chat pending` and `aw mail inbox` — check for messages
-7. Do your job (see your own CLAUDE.md)
-8. Update `handoff.md` before going idle or when context gets large
-9. `git add` your changed files, commit, and push
+7. Check whether your active work is represented as an `aw` task; if
+   it is substantial and not represented, create or update the task.
+8. Do your job (see your own CLAUDE.md)
+9. Update `handoff.md` before going idle or when context gets large
+10. `git add` your changed files, commit, and push
 
 ### Handoff documents
 
@@ -195,13 +215,14 @@ All repos live as siblings in one parent directory:
 | ac | `../ac/` | Cloud: auth, billing, dashboard, SaaS | Private |
 
 From agent subdirectories (`agents/X/`), sibling repos are at
-`../../../<repo>/`. Coordinators and the CTO also have the relevant
-sibling repo symlinked into their own agent dir for convenience:
+`../../../<repo>/`. Repo integrity and engineering integrity also have
+the relevant sibling repo symlinked into their own agent dir for
+convenience:
 
-- `agents/coord-aweb/aweb` → `../../../aweb`
-- `agents/coord-cloud/ac` → `../../../ac`
-- `agents/coord-awid/awid` → `../../../aweb/awid`
-- `agents/cto/aweb`, `agents/cto/ac`
+- `agents/repo-aweb/aweb` -> `../../../aweb`
+- `agents/repo-cloud/ac` -> `../../../ac`
+- `agents/identity-integrity/awid` -> `../../../aweb/awid`
+- `agents/engineering-integrity/aweb`, `agents/engineering-integrity/ac`
 
 Prefer `git -C aweb log` over `cd ../../../aweb && git log` — the
 symlink keeps your CWD anchored in your own agent dir, which keeps

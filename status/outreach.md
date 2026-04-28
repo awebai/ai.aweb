@@ -17,5 +17,8 @@ Last updated: 2026-04-11 (initial — Charlene will maintain going forward)
 - Notable: none yet
 
 ## Next actions
-- Begin daily web scanning when product approaches readiness
-- Propose content calendar to CEO
+- Begin daily web scanning now that product readiness is no longer the
+  blocker
+- Propose content calendar to direction
+- Record observed signals from every outreach action without
+  overstating attribution

@@ -1,30 +1,30 @@
 # Product Status
 
-Last updated: 2026-04-28 20:43 CEST (Avi)
+Last updated: 2026-04-28 21:41 CEST (Avi)
 
 ## Current focus
 
-**The product is live enough for distribution again; the remaining gap is
-company operating rhythm.** The 2026-04-25 product status is stale:
-KI#1 is no longer launch-blocking. Cloud is live on v0.5.9 with aweb
-1.18.6, and Amy/Tom attestation in the latest support/cloud handoffs
-marks the mail/chat identity issue closed.
+**The product is live enough for distribution again; the remaining gap
+is company operating discipline.** KI#1 is no longer launch-blocking.
+Cloud is live on v0.5.9 with aweb 1.18.6, and Amy/Tom attestation in
+the latest support/cloud handoffs marks the mail/chat identity issue
+closed.
 
-Today Juan asked for a company-organization pass: how to run aweb
-agent-first. Product implication: dogfooding is no longer just "agents
-use chat." The company needs a clearer operating system around tasks,
-claims, status, handoffs, gates, and human decision points, using the
-same primitives we sell.
+Juan asked for a company-organization pass: how to run aweb
+agent-first. The active epic is `aweb-aals`. The model is responsibility
+areas, shared artifacts, builder/reviewer contracts, and feedback
+signals graded by strength. We should exploit verifiable feedback where
+available and still record weaker signals without overstating
+causality.
 
 This week:
-1. Turn the "agent-first company" study into a concrete operating model:
-   which agents exist, what they own, what every wake-up produces, and
-   what must be represented as aweb tasks/claims instead of only markdown.
-2. Restart distribution now that the live blocker is closed: blog post
+1. Finish `aweb-aals.2`: responsibility-area instruction sweep,
+   reviewer required.
+2. Start `aweb-aals.1`: convert current company priorities into `aw`
+   tasks with builder, reviewer, and strongest available feedback
+   signal.
+3. Restart distribution now that the live blocker is closed: blog post
    voice pass, first outreach brief, and first human-led conversations.
-3. Fix the comms execution gap: `status/outreach.md` and Charlene's
-   handoff are still 2026-04-11-era, and `aw chat ... charlene` does
-   not resolve in the active workspace.
 
 ## Product readiness
 
@@ -64,14 +64,13 @@ This week:
 
 ## Priorities
 
-1. **Define the agent-first operating model** — Juan asked for this
-   today, and it directly supports the "running a company with AI
-   agents" dogfooding story.
-2. **Reactivate distribution** — blocker is closed; the board's
+1. **Finish the responsibility-area reorg (`aweb-aals`)** — docs and
+   directories are mostly in place; remaining work is review and
+   converting priorities into tasks.
+2. **Reactivate distribution** — blocker is closed; accountability's
    engineering-to-distribution concern is now acute again.
-3. **Repair comms execution path** — Charlene needs a live workspace
-   identity or a documented replacement alias, current outreach status,
-   and a first daily brief.
+3. **Repair attention execution path** — attention needs a reachable
+   workspace identity, current outreach status, and a first daily brief.
 4. **Keep engineering in release-discipline mode, not feature-expansion
    mode** — recent v0.5.9 work is exactly the kind of correctness
    discipline needed before inviting users, but the next product step
@@ -79,11 +78,7 @@ This week:
 
 ## Open questions for Juan
 
-- For the agent-first operating model, should company work use the
-  current permanent-agent roster as-is, or should we create explicit
-  operational teams/workspaces by function (exec, engineering, comms,
-  support)?
 - Do we still want the collision video before the first blog post, or
   should the blog post publish first now that v0.5.9 is live?
-- Who owns fixing the comms identity gap if `charlene` is not resolvable
-  in the active aweb workspace?
+- What is the first distribution action, and what feedback signal do we
+  record after it runs?
