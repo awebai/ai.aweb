@@ -604,13 +604,20 @@ f287638d):
 
 The four confirmed gaps:
 
-- **Internal-alias-only rename** [(d) pending] — change
-  `agent.alias` without changing the public address. Confirmed no
-  endpoint. Whether alias is intended-immutable for coordination
-  stability or unbuilt-but-might-add is pending product
-  classification (bounced to Avi). If a customer asks today, the
-  only path is archive + create new with the desired alias
-  (Section 1.2 → Section 1.9).
+- **Internal-alias-only rename** [(c) intentional today, possibly
+  reconsidered] — change `agent.alias` without changing the public
+  address. Confirmed no endpoint. Per Avi (product, f18c2329):
+  internal alias is part of the local team coordination contract;
+  scripts and chat resolution depend on it. No deep product
+  invariant forbidding alias-only rename forever, but the current
+  contract treats it as immutable. If real customer demand
+  surfaces, would be designed explicitly with history continuity,
+  collision handling, and script-impact warnings.
+
+  Customer-facing answer (verbatim): **"Alias-only rename is not
+  supported; archive + create new is the current path, with
+  history continuity tradeoff."** (Section 1.2 → Section 1.9 for
+  the archive + create-new flow.)
 - **Per-agent custom routing rules** [(c) intentional today,
   possibly reconsidered] — beyond the access_mode +
   messaging_policy + reachability triple. The 5-valued enum is the
