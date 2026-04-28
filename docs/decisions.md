@@ -6,6 +6,37 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-28 — Company agents move to responsibility areas
+
+**Commit:** `f7a8701` Reorganize agents by responsibility area
+
+**Decision maker:** Juan + Avi
+
+**Decision.** aweb.ai agents are organized by responsibility areas
+instead of management titles. Current areas are direction, engineering
+integrity, attention, user feedback, accountability, OSS repo
+integrity, cloud repo integrity, and identity integrity.
+
+Substantial work must flow through artifacts: `aw` tasks/claims,
+handoffs, status files, and decision records. The default shape for
+substantial work is builder plus reviewer. Agents should always look
+for feedback and prefer close/verifiable feedback, but weak signals
+must be recorded as signals rather than treated as proof of causality.
+
+**Why.** Title-shaped organization creates too much coordination and
+not enough work for agents. Responsibility areas make the work surface,
+evidence, and review path explicit without pretending the company has a
+human management hierarchy. Some loops are directly verifiable
+(code -> test -> fix). Others, such as social media posts followed by
+signup movement, are useful but ambiguous. The operating model should
+exploit strong loops and still preserve weak signal with uncertainty.
+
+**Affects.** `AGENTS.md`, `README.md`, `docs/team.md`,
+`docs/agent-first-company.md`, `status/*`, `publishing/plan.md`, and
+agent directories under `agents/`.
+
+---
+
 ## 2026-04-25 — aweb-cloud v0.5.6 ships; closes aaja.6 (P0 launch blocker)
 
 **Commits (ac):**
