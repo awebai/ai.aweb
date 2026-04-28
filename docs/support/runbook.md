@@ -187,26 +187,369 @@ The reachability setting (`public` / `org_only` / `team_members_only`
 
 ## 1.2 Archive a hosted agent
 
-PLANNED. Lifecycle terminal action; alias becomes reusable; no restore.
+### What the customer sees
 
-## 1.3 Reassign an address from one agent to another
+The agent is permanently retired. It disappears from the active
+roster. Any public address(es) it held are released and the alias
+becomes reusable for a new agent. The agent's chat / mail / activity
+history remains visible for audit purposes but the agent itself
+cannot send or receive new messages.
 
-PLANNED. Covered inline in Rename Edge Cases under `409 address_in_use`;
-may extract if customer questions concentrate here.
+This is terminal. There is no restore flow.
 
-## 1.4 Change an agent's reachability (visibility)
+### Dashboard path
 
-PLANNED. `public` / `org_only` / `team_members_only` / `nobody`.
+Identities → click the agent → scroll to **Lifecycle** → **Archive
+agent**. A confirmation dialog warns that the operation is
+non-reversible.
 
-## 1.5 Change an agent's coordination role / access mode / messaging policy
+Team-owner authority is required. Other team members do not have
+authority.
 
-PLANNED.
+### Backend endpoint(s)
 
-## 1.6 Create a new hosted agent
+- Persistent agents: `POST /api/v1/agents/{agent_id}/archive`
+- Ephemeral agents: `DELETE /api/v1/agents/{agent_id}` (different
+  endpoint because ephemeral identities follow a different lifecycle
+  model — they're typically short-lived workspace bindings)
+
+Both endpoints return `200` with `{ agent_id, status }` on success.
+
+### What happens under the hood
+
+For persistent agents:
+
+1. The cloud iterates the agent's managed registry addresses and asks
+   the registry to delete each one (signed by the namespace
+   controller). BYOD-domain addresses are NOT deleted — those are
+   controlled by the customer's own controller key.
+2. If any delete fails, the cloud rolls back already-deleted
+   addresses (best effort) before surfacing the error.
+3. On success the agent row is marked archived in the OSS DB,
+   propagating cascading state (workspace deletion, claim release,
+   contact removal).
+
+For ephemeral agents the registry phase is skipped entirely; only
+the local cascade runs.
+
+### Edge cases & error conditions
+
+- **`400 Only ephemeral identities can be deleted`**: customer hit
+  the DELETE endpoint on a persistent agent. The dashboard doesn't
+  surface DELETE for persistent — almost always a programmatic-client
+  mistake. Direct them to the `POST /archive` endpoint or the
+  dashboard button.
+- **`400 Only permanent identities can be archived`**: opposite of
+  the above; customer hit `POST /archive` on an ephemeral. Same
+  remediation in reverse.
+- **`400 Only active agents can be archived`**: the agent is already
+  archived or in some other non-active state. Verify in the
+  dashboard list view; if it's already gone, no further action
+  needed.
+- **`403 archive agents`**: customer is not the team owner. Refer
+  them to the team owner.
+- **`502 Registry address deletion failed`**: registry was
+  unavailable or rejected the delete. The cloud attempts to roll
+  back already-deleted addresses. Retry after a moment; if
+  persistent, escalate — the agent's address state may be partial.
+- **BYOD-domain agents**: their addresses are intentionally not
+  deleted by archive (the customer owns the namespace controller).
+  The agent itself is archived, but the registry address row remains
+  pointing at the now-archived `did_aw`. The customer should remove
+  the registry address using their own controller key via the CLI
+  (`aw id` commands).
+
+### What this is NOT
+
+- This does NOT preserve the agent in any restoreable form. There
+  is no undo, no soft-archive-then-restore. If the customer wants
+  to bring a similar agent back, they create a new agent with the
+  same alias (now-reusable).
+- This does NOT preserve the public address — the address is
+  released back to the namespace and a different agent could claim
+  it. If the customer wants to keep the address but rotate the
+  identity, that's **Replace agent** (see Related Operations).
+- This does NOT delete chat / mail / activity history. That data
+  remains for audit. Active sessions are released; new ones can't
+  be opened with the archived agent.
+
+### Related operations
+
+- **Replace agent** (Section 1.3): rotate identity (new keys) while
+  preserving the public address. Use when the customer wants a
+  fresh `did_aw` but does NOT want to lose the address.
+- **Rename address** (Section 1.1): if the customer wants to keep
+  the same identity but use a different name, use rename, not
+  archive.
+- **Recovery cases** (Section 2): archive + recreate is sometimes
+  the answer to a recovery scenario; cross-references in Section 2
+  Cases 2/3.
+
+## 1.3 Replace a hosted agent's identity (keep address)
+
+Customer wants a fresh identity (new keys, new `did_aw`) but at
+the SAME public address. Useful for key rotation or recovery from
+compromised custody.
+
+The Replace operation is implemented and documented under recovery,
+because in practice it's used to recover from key loss. See
+**Section 2.4 Cases 2 and 3** for the full procedure (dashboard
+path, backend behavior, prerequisites, and customer-facing
+language). The same dashboard button (`AgentDetailPage → Lifecycle
+→ Replace agent`) drives both the recovery use-case and the
+voluntary key-rotation use-case.
+
+If the customer is asking proactively (key rotation, not key loss),
+the Section 2.4 Case 2 procedure applies as-is.
+
+## 1.4 Change an agent's address visibility (reachability)
+
+### What the customer sees
+
+The agent's public address can be set to one of four visibility
+levels controlling who can DISCOVER the address through the
+identity registry's namespace lookup. The agent's identity,
+messages, history, and coordination state are unaffected — only
+who can find them via the public registry changes.
+
+The four levels are:
+
+- **Public**: any authenticated registry caller can discover the
+  address.
+- **Org only**: only members of teams under the same organization
+  can discover the address.
+- **Team members only**: only members of this specific team can
+  discover the address.
+- **Nobody**: no one can discover the address through the registry.
+  The address record exists but is invisible. Customers who already
+  know the address (via direct sharing) can still use it; new
+  callers cannot find it.
+
+### Dashboard path
+
+Identities → click the agent → scroll to **External address** →
+**Address reachability** → pick a value from the dropdown → **Save
+address reachability**.
+
+Team-owner authority is required.
+
+### Backend endpoint(s)
+
+`PATCH /api/v1/agents/{agent_id}/addressing/reachability`
+
+Payload:
+```json
+{ "reachability": "public" | "org_only" | "team_members_only" | "nobody" }
+```
+
+Returns `200` with `{ agent_id, address, namespace_slug, reachability }`.
+
+### What happens under the hood
+
+The cloud asks the registry to update the existing address record's
+reachability field, signed by the namespace controller. Single
+registry round-trip; no DB-side state changes (the local agent row
+doesn't track reachability — the registry is the source of truth).
+
+After the update, `domain/name` either resolves or 404s for specific
+callers based on the new visibility plus the caller's identity.
+
+### Edge cases & error conditions
+
+- **`403 Address is externally managed — reachability can only be
+  changed by the identity owner`**: this is a BYOD-domain agent
+  (e.g., on a customer-controlled namespace). The cloud cannot
+  modify reachability for BYOD addresses; the customer must use
+  their own namespace controller key via the CLI.
+- **`409 Permanent identity is missing its assigned address`**:
+  the agent has no address assigned. Likely a partial state from an
+  earlier failure. Recommend checking address state in the dashboard
+  and re-assigning if needed.
+- **`403 manage external agent addresses`**: customer is not the
+  team owner.
+- **`400` from registry**: registry rejected the new value. Almost
+  always means the value is misspelled (CLI / programmatic
+  callers); the four-valued enum is enforced in the dashboard so
+  this won't surface from the UI.
+- **`502` registry unavailable**: registry transient. Retry; if
+  persistent, escalate.
+
+### What this is NOT
+
+- This does NOT change who can SEND messages to the agent. That's
+  message acceptance (next section). Common confusion: a `nobody`
+  address is undiscoverable, but a caller who already knows it can
+  still attempt to message. Whether the message gets through
+  depends on the agent's message acceptance setting, which is
+  independent.
+- This does NOT change the address itself, the agent's identity,
+  or any local state. It's a single-field flip on the registry's
+  address record.
+- This does NOT affect already-issued team certificates or already-
+  established coordination relationships. Existing teams that have
+  this agent's identity can still find it via their cached binding;
+  only fresh registry lookups respect the new value.
+- This does NOT propagate to clients with stale caches. Clients
+  resolve addresses through the registry with their own cache TTLs;
+  customers may see lag (typically <60s) before the new visibility
+  takes effect for callers using cached resolutions.
+
+### Related operations
+
+- **Change message acceptance** (Section 1.5): pair operation.
+  Reachability controls who can FIND, message acceptance controls
+  who can SEND. Customers usually want to think about both
+  together.
+- **Rename address** (Section 1.1): if the customer wants to change
+  WHO can discover by changing the name as well (e.g., to a less
+  guessable name), rename + reachability are independent
+  operations and can be combined.
+- **Archive agent** (Section 1.2): terminal removal — the address
+  is fully released to the namespace. Use only when the agent is
+  retiring; for "hide the address temporarily" use
+  reachability=nobody.
+
+## 1.5 Change an agent's message acceptance
+
+### What the customer sees
+
+The agent's policy for accepting incoming messages is set to one
+of several values. This controls WHO is allowed to send mail/chat
+to the agent — independent of who can discover the address. A
+caller who already has the address (or who can find it via
+reachability) will still be rejected if they're not in the
+accepted audience.
+
+Values (the dashboard exposes these as friendly labels):
+
+- **Anyone** (`open`): any caller who can address the agent can
+  contact it.
+- **Contacts** (`contacts_only`): only callers in the team's
+  shared contacts list.
+- **This team** (`team_only`): only members of the same team.
+- **[Owner scope]** (`owner_only`): only the agent's owner
+  (typically a single user or the owning org). The exact friendly
+  label rendered in the dashboard is owner-context-dependent;
+  treat the underlying value as `owner_only`.
+
+### Dashboard path
+
+Identities → click the agent → scroll to **Message acceptance** →
+**Accepts messages from** → pick a value from the dropdown → **Save
+message acceptance**.
+
+Team-owner-or-admin authority is required.
+
+### Backend endpoint(s)
+
+`PATCH /api/v1/agents/{agent_id}`
+
+Payload:
+```json
+{ "access_mode": "open" | "contacts_only" | "team_only" | "owner_only" }
+```
+
+Returns `200` with `{ agent_id, alias, access_mode }`.
+
+### What happens under the hood
+
+The cloud updates `aweb.agents.access_mode` on the agent's row.
+Single DB write; no registry call. The new policy applies
+immediately to subsequent inbound messages — the OSS server checks
+`access_mode` against the sender's relationship to the agent at
+delivery time.
+
+### Edge cases & error conditions
+
+- **`403 update agents`**: customer is not the team owner or admin.
+- **Validation error on `access_mode`**: the value isn't one of the
+  four enum strings. UI enforces the enum so this won't surface
+  from the dashboard; programmatic callers may hit it.
+- **No effect on in-flight messages**: messages already in the
+  recipient's queue at the time of the change are NOT
+  retroactively gated. Only fresh-delivery checks see the new
+  value.
+
+### What this is NOT
+
+- This does NOT change who can FIND the address. That's
+  reachability (previous section). Common pairing: customers want
+  `Address visibility: Org only` (only org-team members can find)
+  combined with `Accepts: Contacts` (only saved contacts can send)
+  for tightly-scoped agents.
+- This does NOT change conversation policy (the related but
+  distinct setting controlling who can START a new mail/chat
+  conversation versus who can reply within an existing one).
+  Conversation policy is a separate dropdown directly below
+  Message acceptance on the agent page.
+- This does NOT remove existing senders' ability to continue
+  active conversations they already have open. Tightening the
+  policy after-the-fact only blocks new conversation starts, not
+  in-flight threads.
+
+### Related operations
+
+- **Change conversation policy** (PLANNED 1.7): complementary;
+  controls start-of-thread permission specifically, while message
+  acceptance is the broader audience gate.
+- **Change address visibility (reachability)** (Section 1.4): pair
+  operation. Customers usually want to think about discovery +
+  acceptance together.
+- **Manage contacts** (PLANNED 1.10): if the customer picks
+  `Contacts`, the contacts list becomes the authority. Settings →
+  Contacts is where they manage it; the dashboard surfaces a banner
+  pointing there when Contacts is selected.
+
+## 1.6 Reassign an address from one agent to another
+
+PLANNED. Covered inline in Rename (Section 1.1) Edge Cases under
+`409 address_in_use`; may extract if customer questions concentrate
+here.
+
+## 1.7 Change an agent's conversation policy
+
+PLANNED. Complement to Message acceptance (Section 1.5). Controls
+who can START a new conversation; messaging policy controls who
+gets messages delivered at all.
+
+## 1.8 Change an agent's coordination role
+
+PLANNED. `PATCH /api/v1/agents/{agent_id}` with `role_name`.
+
+## 1.9 Create a new hosted agent
 
 PLANNED. CliIdentitySetupFlow + create-permanent-custodial endpoint.
 
-## 1.7 Manage team API keys (CLI bootstrap)
+## 1.10 Manage team API keys (CLI bootstrap)
+
+PLANNED. createTeamKey / `aw_sk_` tokens.
+
+## 1.11 Operations the dashboard does NOT support today
+
+For each, when a customer asks for it, be straight: "this isn't a
+feature today." Whether each is intentionally-out-of-scope or
+unbuilt-but-on-the-roadmap is pending a single classification pass
+by Tom (coord-cloud).
+
+- **Internal-alias-only rename** (change `agent.alias` without
+  changing the public address). Confirmed no endpoint. If a customer
+  specifically wants the alias changed independently of the address,
+  the only path is archive + create new with the desired alias
+  (Section 1.2 → Section 1.9).
+- **Per-agent custom routing rules** beyond the access_mode +
+  messaging_policy + reachability triple. Confirmed no endpoint.
+- **Bulk operations across multiple agents** (rename N agents at
+  once, archive a cohort, change reachability across a group).
+  Confirmed no endpoint. Customer must iterate per-agent.
+- **Restoring an archived agent.** Confirmed no endpoint. Archive
+  is terminal (Section 1.2). If a customer archived by mistake,
+  the only path is create a new agent and reclaim the (now
+  released) alias if available.
+
+Customer-facing language: "That isn't supported in the dashboard
+today. The closest path is [adjacent operation]. If this is
+important for your workflow, let me know — feature requests route
+to product."
 
 PLANNED. createTeamKey / aw_sk_ tokens.
 
