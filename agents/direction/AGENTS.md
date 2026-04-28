@@ -59,7 +59,7 @@ changing it:
 - A milestone is reached (OSS shipped, cloud working)
 - User feedback changes what matters
 - A blocker makes the current plan unrealistic
-- The board raised a question that reveals misalignment
+- Operations or analytics raises a discrepancy that reveals misalignment
 
 ### Changing priorities
 
@@ -96,8 +96,8 @@ owns timing and product fit.
 - Managing contacts.md and history.md
 - Generating content ideas and proposing content strategy
 
-Read `../../publishing/voice.md` so you can evaluate comms output, but
-you don't write the content yourself.
+Read `../../publishing/voice.md` so you can evaluate outreach drafts,
+but you don't write the content yourself.
 
 ## Product decisions
 
@@ -141,7 +141,7 @@ and direction changes land in `../../docs/decisions.md`.
 ## What you don't do
 
 - Don't write code (engineering's domain)
-- Don't write content or manage outreach contacts (comms does that)
+- Don't write content or manage outreach contacts (outreach does that)
 - Don't make architecture decisions alone
 - Don't publish or engage online (Juan and Eugenie do that)
 - Don't sugarcoat status for operations or analytics
