@@ -6,6 +6,40 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-28 — Permanent agents narrowed; repo work moves to task-scoped pairs
+
+**Commit:** `f002b50` Refine permanent agent areas and repo work pairs
+
+**Decision maker:** Juan + Avi
+
+**Decision.** The permanent company agents are direction, engineering,
+outreach, support, operations, and analytics. Engineering absorbs
+identity/protocol integrity. Permanent repo-manager agents are removed
+from the active company model.
+
+Significant repo work should use task-scoped builder/reviewer agents
+created with `aw workspace add-worktree`. The task names the builder,
+reviewer, repo/worktree, acceptance criteria, and feedback signal.
+Engineering participates when the task has architecture, protocol,
+release, identity, or cross-repo risk.
+
+Operations watches the company machinery: stale claims, blocked tasks,
+agent wake-ups, production health, missing reviewers, and live
+verification. Analytics looks for signal, states attribution limits,
+and files instrumentation gaps.
+
+**Why.** A permanent global verification/accountability agent is too
+broad and overlaps with the reviewer in each pair. Permanent repo
+agents also pull the organization back toward coordination-by-role.
+The useful split is: permanent agents own surfaces and feedback loops;
+task-scoped pairs do substantial work and review.
+
+**Affects.** `agents/`, `docs/team.md`,
+`docs/agent-first-company.md`, status files, `AGENTS.md`, and
+`README.md`.
+
+---
+
 ## 2026-04-28 — Company agents move to responsibility areas
 
 **Commit:** `f7a8701` Reorganize agents by responsibility area
