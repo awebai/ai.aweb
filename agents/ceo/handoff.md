@@ -1,91 +1,106 @@
 # CEO Handoff
 
-Last updated: 2026-04-21 (Avi, after full repo study)
+Last updated: 2026-04-28 20:43 CEST (Avi, repo + company-agent study pass)
 
 ## Where we actually are
 
-The product has shipped. The prior handoff (2026-04-11) said "OSS
-close to shippable, cloud mid-migration" — both are now stale.
+The product is live and the previous launch-blocker state is stale.
 
-- **aweb OSS**: v1.16.0 server + CLI + awid-service v0.4.0.
-  End-to-end user journey works (hosted and self-hosted). SOT docs
-  match code. Shipping, not shipping-soon.
-- **aweb-cloud (ac)**: v0.5.3. Identity migration complete.
-  Dashboard feature-complete. Billing live, Stripe wired, tiers at
-  $0 / $25 / $250 (strategy.md's known-gap re: pricing mismatch has
-  closed). awid.ai is a production dependency.
-- **Amy**: now holds a second address `aweb.ai/amy` (public support
-  contact) — see `docs/decisions.md` 2026-04-21 entry.
+- **aweb OSS**: local sibling repo is at main `2477dea`; latest release
+  tags include `server-v1.18.6`, `aw-v1.18.6`, `awid-v0.5.2`, and
+  `awid-service-v0.5.2`. Recent work centers on trust contract,
+  identity-equivalent recipient binding, and fail-closed messaging.
+- **aweb-cloud**: production health reports `release_tag=v0.5.9`,
+  `git_sha=48e0e3ad`, `aweb_version=1.18.6`, awid connected, and
+  coordination API mounted.
+- **awid registry**: production health reports `version=0.5.2` with
+  Redis/database/schema healthy.
+- **KI#1**: closed per latest support/cloud handoffs. Amy's 4-of-4
+  attestation and Tom's second-shape probe satisfied the empirical
+  closure policy on 2026-04-27. Old engineering.md still says launch
+  blocked; do not trust it until Randy refreshes it.
 
-The prior CEO handoff's "waiting for product to work" was the right
-stance as of 2026-04-11; it is no longer correct. The gate has been met.
+## What changed this wake-up
 
-## Active decisions (still stand)
+- Answered Amy's support-runbook question on internal-alias-only rename:
+  classification **(c) intentional today, possibly reconsidered**.
+  Alias-only rename is not supported today; archive + create new is the
+  customer-facing path, with history continuity tradeoff.
+- Sent Randy an async status request because he is offline and the prior
+  chat thread was closed.
+- Tried to check with comms via `aw chat send-and-wait charlene`; it
+  failed with `agent not found: charlene`. Comms handoff and outreach
+  status are still 2026-04-11-era. This is an operating-system bug, not
+  just a stale file.
+- Rewrote `status/product.md` around current reality: v0.5.9 live,
+  KI#1 closed, distribution should restart, and today's Juan-directed
+  focus is the agent-first company operating model.
 
-- **OSS ships before cloud** — moot now, both are shipping.
-- **Crypto identity migration was the right call** — validated; the
-  cloud migration landed cleanly.
-- **Content publishing split**: personal/story on juanreyero.com,
-  technical on aweb.ai/blog. (See `docs/decisions.md` 2026-04-11.)
+## Agent-first company study notes
 
-## New state (my read, not yet a Juan-approved decision)
+Current company structure is conceptually good but operationally split
+between markdown and aweb:
 
-- Engineering-to-distribution ratio has to shift this week. This was
-  the board's concern on 2026-04-07 and it is now the gap.
-- The blog post has been in draft for 12 days. Publishing it is the
-  longest pole.
-- 8 outreach contacts identified, 0 contacted. Charlene's daily
-  scan never started. Infrastructure is dormant.
-- `status/product.md` and my prior handoff both described a
-  pre-launch reality. I have rewritten product.md; this handoff
-  matches.
+- Permanent roles exist: CEO, CTO, Comms, Board, Support, and repo
+  coordinators.
+- Wake-up routines are explicit and mostly right: pull, read north-star
+  docs, read status/handoff, check aweb messages, do work, update status
+  and handoff, commit/push.
+- The weak point is that active company work is not consistently modeled
+  as aweb tasks/claims. Status files say what matters, but they are not
+  a live work queue.
+- Agent identities are not fully aligned with the role map. Example:
+  `charlene` is documented as Comms, but not resolvable in the active
+  workspace.
+- Board oversight correctly checks claims against git/outreach reality,
+  but weekly status is stale and outreach has not started.
+
+My initial product read: the company should organize around the same
+primitives aweb sells:
+
+1. **Tasks are the source of active work**, not status prose.
+2. **Claims are the conflict-avoidance mechanism**, including for
+   strategic/comms/support work, not only code.
+3. **Handoff files are durable memory**, not the work queue.
+4. **Status files are published state**, not private scratchpads.
+5. **Mail is for async decisions and audit**, chat for blocking
+   questions, and decision records for durable changes.
+6. **Every non-trivial engineering cycle still needs builder+reviewer**;
+   for company/process work, the equivalent is author+reviewer or
+   proposer+approver.
+
+## Current risks
+
+- Distribution remains at zero published/outreach actions even though the
+  product is live. This is now the largest company risk.
+- Comms agent identity/process appears broken or incomplete. If Charlene
+  cannot be reached, outreach cannot become a reliable company function.
+- Engineering status is stale relative to production and support handoffs.
+  Randy needs to refresh it so board/comms are not reading a launch-blocked
+  world that no longer exists.
+- `ac` has active uncommitted work by another agent (Mia, aweb-aalr);
+  do not touch or normalize it from CEO context.
+- `aweb` has an untracked doc `docs/awid-ensure-team-endpoint.md`; treat
+  as someone else's work.
 
 ## What to check FIRST on next wake-up
 
-1. Did the blog post get published? (`publishing/history.md` is
-   currently empty; a publish event would land there.)
-2. Did Charlene start the daily scan? (co.aweb `outreach/daily/`
-   directory is empty as of today.)
-3. Has any contact been opened? (co.aweb `outreach/history.md`
-   empty as of today.)
-4. Has Juan responded to the voice-pass ask / the collision-video
-   decision?
-5. Did Randy ship the runTeamSwitch patch? (aweb-aakn, P2.)
+1. Did Randy reply with refreshed engineering status, and did
+   `status/engineering.md` move past the stale 2026-04-25 aalf state?
+2. Is `charlene` supposed to exist as an aweb identity? If yes, fix or
+   escalate the missing identity; if no, update docs/status to the real
+   comms alias.
+3. Did Juan decide whether the first distribution asset is the blog post
+   or collision video?
+4. Did any outreach brief or outreach history entry appear?
+5. Did the agent-first operating model get turned into a concrete doc or
+   task set?
 
-## What's in conversations / in progress
+## Reference map
 
-- No active aw chat threads. Mail inbox empty.
-- Randy active right now (same host). No open asks to him from me.
-- Amy active on aweb.ai/amy. No user feedback yet.
-- No outstanding Charlene or Enoch items.
-
-## What to do on next wake-up (suggested sequence)
-
-1. Pull, read north-star docs, read `status/engineering.md`,
-   `status/outreach.md`, `docs/decisions.md` for new entries.
-2. If Juan has replied on voice pass / collision video — act on it.
-3. If Charlene has updated outreach.md with scan results — read and
-   route.
-4. If Randy has shipped the runTeamSwitch patch — note in product
-   status and close out.
-5. If none of the above: reach out to Charlene via chat and ask
-   specifically what's blocking the first scan. If it's waiting on
-   me (e.g. content approval), unblock her same-day.
-6. Rewrite the "Current focus" block of `status/product.md` to
-   reflect whatever moved.
-
-## Reference map (what lives where)
-
-- **aweb OSS** (../../../aweb): server, CLI, awid, channel.
-  CHANGELOG.md is the truth. SOTs in `docs/`. v1.16.0 current.
-- **ac cloud** (../../../ac): backend + dashboard + migrations. Pins
-  aweb>=1.16.0 and awid-service>=0.4.0. v0.5.3 current.
-- **co.aweb** (../../../co.aweb): outreach contacts, competitive
-  landscape, agent key backups. `outreach/contacts.md`,
-  `outreach/watch.md`, `outreach/history.md`,
-  `outreach/competitive-landscape.md`. `keys/` holds agent-key
-  backups (source of truth is `~/.config/aw/controllers/`).
-- **ai.aweb** (this repo): company docs, status, publishing, and
-  the five company agents (cto, ceo, board, comms, support) + three
-  coordinators (aweb, cloud, awid). All `aw` commands run from the
-  agent's own subdirectory.
+- **ai.aweb**: company docs, status, publishing, permanent agents.
+- **aweb** (`../../../aweb`): OSS coordination core, CLI, awid, channel.
+- **ac** (`../../../ac`): hosted app, dashboard, auth, billing, cloud
+  bootstrap, mounted OSS integration.
+- **co.aweb** (`../../../co.aweb`): private outreach and keys. Do not
+  put contact names or approach details in public files.

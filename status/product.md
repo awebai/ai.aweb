@@ -1,82 +1,89 @@
 # Product Status
 
-Last updated: 2026-04-21 (Avi)
+Last updated: 2026-04-28 20:43 CEST (Avi)
 
 ## Current focus
 
-**The product has shipped. Distribution has not started.** The
-engineering-to-distribution ratio the board flagged on 2026-04-07 is
-now the active gap — not a future concern. Every further hour spent
-polishing the stack without users is wasted by our own invariants.
+**The product is live enough for distribution again; the remaining gap is
+company operating rhythm.** The 2026-04-25 product status is stale:
+KI#1 is no longer launch-blocking. Cloud is live on v0.5.9 with aweb
+1.18.6, and Amy/Tom attestation in the latest support/cloud handoffs
+marks the mail/chat identity issue closed.
+
+Today Juan asked for a company-organization pass: how to run aweb
+agent-first. Product implication: dogfooding is no longer just "agents
+use chat." The company needs a clearer operating system around tasks,
+claims, status, handoffs, gates, and human decision points, using the
+same primitives we sell.
 
 This week:
-1. Push Juan through the blog-post voice pass and publish
-   `publishing/drafts/2026-04-09-five-agents-blog-post.md` on
-   juanreyero.com. 12 days old in draft; longer is waste.
-2. Have Charlene start the daily scan and open the first 1-2 of the 8
-   identified outreach contacts. The "wait for product readiness"
-   gate has been met.
-3. Decide with Randy: is the collision video still the highest-priority
-   asset, or is the blog post enough to carry Stage 1 awareness?
+1. Turn the "agent-first company" study into a concrete operating model:
+   which agents exist, what they own, what every wake-up produces, and
+   what must be represented as aweb tasks/claims instead of only markdown.
+2. Restart distribution now that the live blocker is closed: blog post
+   voice pass, first outreach brief, and first human-led conversations.
+3. Fix the comms execution gap: `status/outreach.md` and Charlene's
+   handoff are still 2026-04-11-era, and `aw chat ... charlene` does
+   not resolve in the active workspace.
 
 ## Product readiness
 
-- **OSS aweb**: Shipping. v1.16.0 server + CLI, awid-service v0.4.0.
-  `aw run claude` and `aw init` work end-to-end, hosted and
-  self-hosted. e2e journey script passes. One P2 paper-cut
-  (runTeamSwitch, aweb-aakn) pending a small patch — not a ship
-  blocker.
-- **aweb-cloud**: Shipping. v0.5.3. Identity migration complete.
-  Dashboard feature-complete for launch (Monitor / Tasks / Mail /
-  Chat / Agents / Settings / Onboarding / Connect). Billing live,
-  Stripe wired, pricing aligned with strategy doc
-  ($0 / $25 / $250).
-- **awid registry**: Live at api.awid.ai. Hard dependency of the
-  hosted cloud.
-- **Landing site (aweb.ai)**: Live. Needs a blog section in Hugo to
-  host aweb.ai/blog posts (per 2026-04-11 publishing split). Not a
-  launch blocker — first post goes to juanreyero.com.
+- **OSS aweb**: Shipping. Local repo is at aweb 1.18.6-era main;
+  tags include `server-v1.18.6`, `aw-v1.18.6`, `awid-v0.5.2`, and
+  `awid-service-v0.5.2`. Current focus in recent commits is trust
+  contract enforcement, identity-equivalent recipient matching, and
+  hosted-custodial matrix coverage.
+- **aweb-cloud**: Live. `https://app.aweb.ai/health` reports
+  `release_tag=v0.5.9`, `aweb_version=1.18.6`, database/Redis/awid
+  healthy, and mounted coordination API healthy.
+- **awid registry**: Live. `https://api.awid.ai/health` reports
+  `version=0.5.2`, Redis/database/schema healthy.
+- **Landing site (aweb.ai)**: Live. Blog section still listed as needed
+  for aweb.ai/blog posts; first personal/problem post remains planned
+  for juanreyero.com.
 
-## Outreach state (from co.aweb)
+## Outreach state
 
-- **Blog post "5 agents"**: Drafted 2026-04-09. Awaiting Juan's
-  voice pass. Not published.
-- **Contacts**: 8 identified (7 protocol-article authors + Addy
-  Osmani + Yeachan Heo), 0 contacted, 0 replies.
-- **Daily scanning**: Not running. Infrastructure built, execution
-  not started.
+- **Blog post "5 agents"**: Draft ready since 2026-04-09; still not
+  published per `publishing/history.md`.
+- **Contacts**: Public status still says identified but uncontacted.
+  Private outreach files show no daily briefs and no recorded outreach
+  actions.
+- **Daily scanning**: Not running.
 - **Conversations joined**: 0.
-- **History.md**: Empty.
 
-## User feedback (from Amy)
+## User feedback
 
-None yet. Amy activated `aweb.ai/amy` today (2026-04-21) as the
-canonical public support address — support surface is now ready for
-external users. No external users yet.
+- Amy asked for product classification on internal-alias-only rename.
+  Answer sent 2026-04-28: classify as **intentional today, possibly
+  reconsidered**. Customer-facing line: alias-only rename is not
+  supported; archive + create new is the current path, with history
+  continuity tradeoff.
+- No external user feedback surfaced in the public handoffs beyond
+  internal attestation and support-runbook shaping.
 
 ## Priorities
 
-1. **Publish the blog post this week** — longest pole, blocks the
-   rest of the outreach sequence.
-2. **Start the 5-conversations-per-week habit** (strategy.md Pillar
-   1) — Charlene monitors, humans engage.
-3. **Open the first 3-5 direct contacts** once the blog post is
-   live (so the outreach points at something real).
-4. **Ship the runTeamSwitch patch** (Randy) — small but visible
-   paper-cut for any multi-team user.
-5. **Decide on the collision video** — produce or cut from the
-   plan.
-
-## Strategy-doc reconciliation
-
-`docs/strategy.md` lists a "known gap" that live pricing doesn't
-match the doc ($25/$250 vs $49/$149 live). That gap has closed —
-cloud v0.5.3 enforces $25/$250. The known-gaps note in strategy.md
-is stale; will fix in a later pass.
+1. **Define the agent-first operating model** — Juan asked for this
+   today, and it directly supports the "running a company with AI
+   agents" dogfooding story.
+2. **Reactivate distribution** — blocker is closed; the board's
+   engineering-to-distribution concern is now acute again.
+3. **Repair comms execution path** — Charlene needs a live workspace
+   identity or a documented replacement alias, current outreach status,
+   and a first daily brief.
+4. **Keep engineering in release-discipline mode, not feature-expansion
+   mode** — recent v0.5.9 work is exactly the kind of correctness
+   discipline needed before inviting users, but the next product step
+   is usage, not more hidden polish.
 
 ## Open questions for Juan
 
-- Blog-post voice pass — when?
-- Collision video — still highest-priority asset, or drop?
-- Amy's second address (`aweb.ai/amy`) is wired; do we announce
-  aweb.ai/amy as the public support contact in the blog post footer?
+- For the agent-first operating model, should company work use the
+  current permanent-agent roster as-is, or should we create explicit
+  operational teams/workspaces by function (exec, engineering, comms,
+  support)?
+- Do we still want the collision video before the first blog post, or
+  should the blog post publish first now that v0.5.9 is live?
+- Who owns fixing the comms identity gap if `charlene` is not resolvable
+  in the active aweb workspace?
