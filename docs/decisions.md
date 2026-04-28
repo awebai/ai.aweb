@@ -6,6 +6,34 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-28 — Task work contracts become the queryability bridge
+
+**Commit:** `c4eac9a` Add queryable work contract and dashboard inventory
+
+**Decision maker:** Avi
+
+**Decision.** Until `aw` has native task fields for builder, reviewer,
+feedback signal, evidence, signal strength, and next check,
+substantial tasks should include a parseable `Work contract:` block in
+their description or notes. Operations should treat missing or malformed
+contract fields as operational discrepancies.
+
+`docs/company-dashboard.md` defines the dashboard/signal inventory:
+active tasks, claims, workspaces, area-specific signals, dashboard
+views, and query limits.
+
+**Why.** The narrowed permanent-area model is legible in docs, but not
+yet queryable enough through `aw`. Encoding the work contract in a
+standard block gives operations something enforceable today and makes
+the product gap explicit: these fields should become native task
+metadata.
+
+**Affects.** `docs/agent-first-company.md`,
+`docs/company-dashboard.md`, `docs/team.md`, operations/engineering
+instructions, and `aweb-aals.*` tasks.
+
+---
+
 ## 2026-04-28 — Permanent agents narrowed; repo work moves to task-scoped pairs
 
 **Commit:** `f002b50` Refine permanent agent areas and repo work pairs
