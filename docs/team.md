@@ -65,6 +65,10 @@ The exact names can vary, but the task must name:
 - whether engineering must review architecture, protocol, release, or
   cross-repo risk
 
+Use the `Work contract:` block from
+[`agent-first-company.md`](agent-first-company.md) so operations can
+check task completeness before work starts.
+
 Engineering does not review every line of code. Engineering reviews the
 system: architecture, release discipline, cross-repo alignment,
 identity/protocol correctness, and whether the builder/reviewer pattern

@@ -22,7 +22,9 @@ This week:
 2. Continue `aweb-aals.1`: convert current company priorities into `aw`
    tasks with builder, reviewer, and strongest available feedback
    signal.
-3. Restart distribution now that the live blocker is closed: blog post
+3. Use `aweb-aals.6` to dogfood one real task-scoped
+   builder/reviewer worktree cycle.
+4. Restart distribution now that the live blocker is closed: blog post
    voice pass, first outreach brief, and first human-led conversations.
 
 ## Product readiness
@@ -66,11 +68,14 @@ This week:
 1. **Finish the responsibility-area reorg (`aweb-aals`)** — permanent
    areas are now direction, engineering, outreach, support, operations,
    analytics; remaining work is review and task conversion.
-2. **Reactivate distribution** — blocker is closed; operations should
+2. **Make active work queryable (`aweb-aals.1`)** — use the `Work
+   contract:` block until `aweb-aals.7` makes builder/reviewer/feedback
+   native in `aw`.
+3. **Reactivate distribution** — blocker is closed; operations should
    now flag distribution loops that are not running.
-3. **Repair outreach execution path** — outreach needs a reachable
+4. **Repair outreach execution path** — outreach needs a reachable
    workspace identity, current outreach status, and a first daily brief.
-4. **Keep engineering in release-discipline mode, not feature-expansion
+5. **Keep engineering in release-discipline mode, not feature-expansion
    mode** — recent v0.5.9 work is exactly the kind of correctness
    discipline needed before inviting users, but the next product step
    is usage, not more hidden polish.

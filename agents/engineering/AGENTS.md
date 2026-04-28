@@ -68,6 +68,10 @@ Use equivalent names for `ac` or `awid` work. The task should name:
 - strongest available feedback signal
 - whether engineering review is required
 
+Use the `Work contract:` block from
+`../../docs/agent-first-company.md`. Repo work without a builder,
+reviewer, acceptance criteria, and feedback signal should not start.
+
 The builder implements. The reviewer independently checks the diff,
 tests, invariants, and release framing. Engineering reviews systemic
 risk and closes the loop on release discipline.

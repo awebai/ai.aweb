@@ -91,6 +91,8 @@ Read in this order:
 
 **Reference documents** (read when you need detail):
 - `docs/aweb-high-level.md` — The identity/protocol architecture
+- `docs/company-dashboard.md` — Queryable company dashboard and signal
+  inventory
 - `docs/strategy.md` — Go-to-market playbook
 - SOT docs in the code repos (aweb-sot.md, awid-sot.md)
 

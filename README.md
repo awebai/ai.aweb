@@ -18,6 +18,7 @@ Start here:
 | [docs/user-journey.md](docs/user-journey.md) | What users experience at each stage |
 | [docs/value-proposition.md](docs/value-proposition.md) | Why aweb exists, who it's for |
 | [docs/agent-first-company.md](docs/agent-first-company.md) | How aweb.ai runs through areas, work pairs, and feedback loops |
+| [docs/company-dashboard.md](docs/company-dashboard.md) | Queryable company dashboard and signal inventory |
 | [status/](status/) | Current focus and state |
 
 For specific topics:

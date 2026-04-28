@@ -37,6 +37,7 @@ check -> discrepancy -> routed task -> recheck
 - `aw work blocked`
 - stale claims
 - tasks missing named reviewers
+- active tasks missing `Work contract:` fields
 - scheduled agents that did not wake up
 - production health/version endpoints
 - status files older than their expected cadence
@@ -49,6 +50,8 @@ check -> discrepancy -> routed task -> recheck
 - Ping the responsible area when a loop is stuck.
 - Maintain a short operations status.
 - Maintain the company dashboard/runbook when it exists.
+- Parse the `Work contract:` block defined in
+  `../../docs/agent-first-company.md` and file tasks for missing fields.
 - Keep `status/weekly.md` as a roll-up until replaced by a better
   dashboard/report.
 

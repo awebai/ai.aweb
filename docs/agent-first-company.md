@@ -140,6 +140,27 @@ Tasks should include:
 - open uncertainty
 - labels that make the work discoverable
 
+Until `aw` has native fields for this, every substantial task should
+include this parseable block in its description or notes:
+
+```text
+Work contract:
+Area:
+Builder:
+Reviewer:
+Repo/worktree:
+Acceptance:
+Feedback signal:
+Evidence:
+Signal strength: strong|weak|unknown
+Open uncertainty:
+Next check:
+```
+
+Use `n/a` only when the field genuinely does not apply. Do not omit a
+field because the answer is inconvenient. A missing reviewer, missing
+feedback signal, or unknown evidence path is itself operational signal.
+
 ### Use Claims To Prevent Duplicate Work
 
 Agents should claim substantial work before doing it. Before claiming,
@@ -202,7 +223,8 @@ state; decision records explain how and why state changed.
 
 ### Build The Company Dashboard
 
-The dashboard should show:
+The dashboard should show the fields defined in
+[`company-dashboard.md`](company-dashboard.md):
 
 - active tasks and claims
 - stale claims

@@ -17,6 +17,10 @@ Last updated: 2026-04-28 22:23 CEST
 
 - `aweb-aals`: company operating model reorganization.
 - `aweb-aals.2`: instruction sweep needs reviewer pass before close.
+- `aweb-aals.6`: first real task-scoped builder/reviewer worktree
+  cycle.
+- `aweb-aals.7`: make builder/reviewer/feedback fields native in `aw`
+  tasks after dogfooding the prose contract.
 - Current engineering/release work still needs conversion into queryable
   tasks under `aweb-aals.1`.
 

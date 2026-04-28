@@ -19,10 +19,14 @@ Last updated: 2026-04-28 22:23 CEST
 
 - Signup, activation, usage, support, traffic, and outreach reply data
   sources need inventory.
-- Analytics workspace identity is not initialized.
+- Analytics workspace identity is not initialized. Tracked by
+  `aweb-aals.4`.
+- `docs/company-dashboard.md` now defines the signal inventory that
+  analytics should turn into briefs and instrumentation tasks.
 
 ## Next checks
 
 - Inventory available data sources.
 - Propose the first signal brief format.
 - File tasks for missing events or dashboards.
+- Use `aweb-aals.4` as the startup task for this area.
