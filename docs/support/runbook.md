@@ -287,20 +287,70 @@ the local cascade runs.
 
 ## 1.3 Replace a hosted agent's identity (keep address)
 
-Customer wants a fresh identity (new keys, new `did_aw`) but at
-the SAME public address. Useful for key rotation or recovery from
-compromised custody.
+### What the customer sees
 
-The Replace operation is implemented and documented under recovery,
-because in practice it's used to recover from key loss. See
-**Section 2.4 Cases 2 and 3** for the full procedure (dashboard
-path, backend behavior, prerequisites, and customer-facing
-language). The same dashboard button (`AgentDetailPage → Lifecycle
-→ Replace agent`) drives both the recovery use-case and the
-voluntary key-rotation use-case.
+The agent gets fresh identity keys (new `did_aw`, new `did:key`)
+while keeping the same public address. Existing chat / mail history
+remains attached to the address; senders who message the agent at
+the unchanged address reach the new identity transparently. Useful
+for proactive key rotation or recovery from compromised custody.
 
-If the customer is asking proactively (key rotation, not key loss),
-the Section 2.4 Case 2 procedure applies as-is.
+### Dashboard path
+
+Identities → click the agent → scroll to **Lifecycle** → **Replace
+agent**. Confirmation dialog warns that the old identity is archived
+and the address rebinds to the new identity.
+
+Team-owner authority is required.
+
+### Detailed procedure
+
+The same dashboard control handles both **proactive key rotation**
+and **recovery from key loss**. The detailed procedure (backend
+behavior, prerequisites, what-to-verify) is in **Section 2.4 Cases
+2 and 3** — Case 2 if the registry already has the address, Case 3
+if the address needs to be created at replace-time.
+
+For proactive rotation, Section 2.4 Case 2 applies as-is; the
+customer is in the "address exists, you want a new identity"
+state.
+
+### Customer-facing language (proactive rotation)
+
+Quote this back when the customer is rotating proactively, not
+recovering:
+
+> We can rotate your agent's identity to a fresh key while keeping
+> the same public address. Anyone messaging the agent's address
+> continues to reach it without disruption. The old identity is
+> archived for audit. Use Lifecycle → Replace agent in the
+> dashboard.
+
+For key-loss recovery, the customer-facing language quotes are in
+Section 2.5.
+
+### What this is NOT
+
+- This does NOT change the agent's public address. If the customer
+  wants both identity rotation AND a new name, run Replace then
+  Rename (Section 1.1) afterwards — or the reverse.
+- This does NOT preserve the old `did_aw`. Open conversations
+  whose other end has cached the old `did:aw` → `did:key` mapping
+  may see verification lag until their cache expires (DID key
+  resolution: 5 min nominal, up to 10 min worst-case).
+- This does NOT preserve the old signing keys for audit-then-
+  retrieval. The replaced identity is archived; its private keys
+  are gone (custodial side) or supposed to be revoked (self-
+  custodial side).
+
+### Related operations
+
+- **Section 2.4 Case 2** — full procedure when the address exists
+  at the registry.
+- **Section 2.4 Case 3** — full procedure when the address needs
+  to be created at replace-time.
+- **Archive agent** (Section 1.2) — different operation: archive
+  releases the address; Replace keeps it.
 
 ## 1.4 Change an agent's address visibility (reachability)
 
@@ -510,49 +560,72 @@ delivery time.
 
 ## 1.6 Reassign an address from one agent to another
 
-PLANNED. Covered inline in Rename (Section 1.1) Edge Cases under
-`409 address_in_use`; may extract if customer questions concentrate
-here.
+PLANNED. Owner: Amy (author) / Mia (verification).
+Target: as-needed (covered inline in Rename Section 1.1 Edge Cases
+under `409 address_in_use`; only extract if customer questions
+concentrate on this surface).
 
 ## 1.7 Change an agent's conversation policy
 
-PLANNED. Complement to Message acceptance (Section 1.5). Controls
-who can START a new conversation; messaging policy controls who
-gets messages delivered at all.
+PLANNED. Owner: Amy (author) / Mia (verification). Target: v0.5.10.
+Complement to Message acceptance (Section 1.5); customers ask for
+both together.
 
 ## 1.8 Change an agent's coordination role
 
-PLANNED. `PATCH /api/v1/agents/{agent_id}` with `role_name`.
+PLANNED. Owner: Amy (author) / Mia (verification). Target: v0.5.11.
+`PATCH /api/v1/agents/{agent_id}` with `role_name`.
 
 ## 1.9 Create a new hosted agent
 
-PLANNED. CliIdentitySetupFlow + create-permanent-custodial endpoint.
+PLANNED. Owner: Amy (author) / Mia (verification). Target: v0.5.10.
+First-touch experience, high-stakes — should be filled before
+v0.5.10 ship.
 
 ## 1.10 Manage team API keys (CLI bootstrap)
 
-PLANNED. createTeamKey / `aw_sk_` tokens.
+PLANNED. Owner: Amy (author) / Mia (verification). Target: v0.5.11.
+createTeamKey / `aw_sk_` tokens.
 
 ## 1.11 Operations the dashboard does NOT support today
 
 For each, when a customer asks for it, be straight: "this isn't a
-feature today." Whether each is intentionally-out-of-scope or
-unbuilt-but-on-the-roadmap is pending a single classification pass
-by Tom (coord-cloud).
+feature today." Each gap is classified by intent (per Tom
+f287638d):
 
-- **Internal-alias-only rename** (change `agent.alias` without
-  changing the public address). Confirmed no endpoint. If a customer
-  specifically wants the alias changed independently of the address,
-  the only path is archive + create new with the desired alias
+- (a) **Intentional by design** — never plan to add; architecture
+  has an alternative path
+- (b) **Unbuilt, likely roadmap** — natural feature evolution as
+  customers ask
+- (c) **Intentional today, possibly reconsidered** — current
+  contract; would require product re-decision
+- (d) **Pending product classification** — intent question still
+  open
+
+The four confirmed gaps:
+
+- **Internal-alias-only rename** [(d) pending] — change
+  `agent.alias` without changing the public address. Confirmed no
+  endpoint. Whether alias is intended-immutable for coordination
+  stability or unbuilt-but-might-add is pending product
+  classification (bounced to Avi). If a customer asks today, the
+  only path is archive + create new with the desired alias
   (Section 1.2 → Section 1.9).
-- **Per-agent custom routing rules** beyond the access_mode +
-  messaging_policy + reachability triple. Confirmed no endpoint.
-- **Bulk operations across multiple agents** (rename N agents at
-  once, archive a cohort, change reachability across a group).
-  Confirmed no endpoint. Customer must iterate per-agent.
-- **Restoring an archived agent.** Confirmed no endpoint. Archive
-  is terminal (Section 1.2). If a customer archived by mistake,
-  the only path is create a new agent and reclaim the (now
-  released) alias if available.
+- **Per-agent custom routing rules** [(c) intentional today,
+  possibly reconsidered] — beyond the access_mode +
+  messaging_policy + reachability triple. The 5-valued enum is the
+  contract; finer controls would be feature work, not a missing
+  endpoint.
+- **Bulk operations across multiple agents** [(b) unbuilt, likely
+  roadmap] — rename N agents at once, archive a cohort, change
+  reachability across a group. Customer must iterate per-agent
+  today. Standard dashboard maturation as customers ask.
+- **Restoring an archived agent** [(a) intentional by design] —
+  archive is terminal (Section 1.2). Architecture preserves
+  identity continuity through Replace (Section 1.3 / Section 2.4
+  Case 2), not Restore. Address gets released; alias gets
+  released; if a customer archived by mistake, the only path is
+  create a new agent and reclaim the (now released) alias.
 
 Customer-facing language: "That isn't supported in the dashboard
 today. The closest path is [adjacent operation]. If this is
