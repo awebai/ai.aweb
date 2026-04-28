@@ -389,10 +389,14 @@ callers based on the new visibility plus the caller's identity.
   established coordination relationships. Existing teams that have
   this agent's identity can still find it via their cached binding;
   only fresh registry lookups respect the new value.
-- This does NOT propagate to clients with stale caches. Clients
-  resolve addresses through the registry with their own cache TTLs;
-  customers may see lag (typically <60s) before the new visibility
-  takes effect for callers using cached resolutions.
+- This does NOT propagate immediately to clients with stale caches.
+  Registry resolver caches are **5 minutes nominal, up to 10 minutes
+  worst-case** (stale-while-revalidate); each calling service holds
+  its own per-caller cache. A caller who resolved this agent in the
+  last 5-10 minutes may still see the old value. After 10 minutes
+  the new value is visible to all callers. (Numbers from the active
+  registry version; a future registry release may change them — the
+  maintenance contract covers re-verification.)
 
 ### Related operations
 
@@ -427,10 +431,14 @@ Values (the dashboard exposes these as friendly labels):
 - **Contacts** (`contacts_only`): only callers in the team's
   shared contacts list.
 - **This team** (`team_only`): only members of the same team.
-- **[Owner scope]** (`owner_only`): only the agent's owner
-  (typically a single user or the owning org). The exact friendly
-  label rendered in the dashboard is owner-context-dependent;
-  treat the underlying value as `owner_only`.
+- **Owner only** (`owner_only`): only the agent's owner can send
+  messages. The dashboard shows this as **This organization** for
+  org-owned agents or **This owner** for user-owned agents — both
+  resolve to the same underlying value. (Edge case for support: on
+  ephemeral agents the dashboard renders the same label but
+  internally carries the value `owner_scope`, normalized back to
+  `owner_only` on save. Customers don't see `owner_scope` directly;
+  ignore unless investigating a specific bug.)
 
 ### Dashboard path
 
