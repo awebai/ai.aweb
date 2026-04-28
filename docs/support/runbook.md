@@ -42,7 +42,10 @@ Each operation has a 7-bullet structure:
 
 **Recovery scenarios** (Section 2) — customer's identity is broken
 (key lost, address missing, dashboard fails). Different shape:
-triage facts → matrix → per-case procedure → customer-facing language.
+triage facts → matrix → per-case procedure → customer-facing language
+→ escalation → engineer SQL appendix. Section 2 is auto-synced from
+ac's source-of-truth for recovery; do not hand-edit between the
+sync markers.
 
 Customer-facing parts are **What the customer sees**, **What this is
 NOT**, and the **Customer-facing language** quotes in recovery
@@ -212,25 +215,61 @@ PLANNED. createTeamKey / aw_sk_ tokens.
 # Section 2 — Recovery scenarios
 
 <!-- BEGIN: synced-from-ac/docs/support/agent-identity-recovery.md -->
-<!-- DO NOT EDIT BETWEEN THESE MARKERS — content auto-synced via `make docs-sync`. -->
-<!-- Edit the source in ac/docs/support/agent-identity-recovery.md instead. -->
-<!-- The H1 from the source file is dropped on splice; this section's H1 above is provided by runbook.md. -->
+<!-- DO NOT EDIT BETWEEN THESE MARKERS — content auto-synced via make docs-sync -->
 
-This section recovers a customer's ability to use a persistent
-identity/address without inventing ownership or silently changing
-custody.
+This runbook is for support agents and on-call engineers diagnosing broken
+persistent agent identities on hosted `aweb-cloud`.
 
-Do not guess. Every recovery must preserve the correct authority
-boundary:
+Use the canonical identity model in the OSS docs as the source of truth:
 
-- The identity registry owns DID and address state.
+- `../aweb/docs/identity-guide.md`
+- `../aweb/docs/trust-model.md`
+- `../aweb/docs/awid-sot.md`
+
+This document only covers hosted support triage and recovery.
+
+For support-agent operating instructions, see
+[`docs/support/support-role-instructions.md`](support-role-instructions.md).
+For the tool architecture and command inventory, see
+[`docs/support-tools.md`](../support-tools.md).
+
+## Support Goal
+
+Recover the user's ability to use a persistent identity/address without
+inventing ownership or silently changing custody.
+
+Do not guess. Every recovery must preserve the correct authority boundary:
+
+- awid owns DID and address state.
 - Cloud owns managed namespace controller keys for hosted namespaces.
 - Cloud owns hosted custodial identity keys.
 - Local worktrees own self-custodial identity keys.
-- BYOD namespace controller keys are owned by the customer unless
-  explicitly hosted by cloud.
+- BYOD namespace controller keys are owned by the customer unless explicitly
+  hosted by cloud.
 
-## 2.1 Initial triage
+## Source-of-Truth Map
+
+Use the correct source before deciding what is broken:
+
+| Fact | Source of truth | Support tool |
+| --- | --- | --- |
+| DID registration and DID -> current did:key | awid registry | `aw id resolve <did_aw>` or awid API |
+| Active addresses for a DID | awid registry reverse lookup | `aw id addresses <did_aw>` or awid API |
+| Public or caller-visible address discovery | awid registry visibility rules | `aw id namespace addresses <domain>` |
+| Specific address resolution | awid registry visibility rules | `aw id namespace resolve <domain/name>` |
+| Cloud-managed namespace controller availability | `aweb_cloud.managed_namespaces` | `aweb-support namespace-state <domain>` |
+| Hosted custodial key/certificate presence | `aweb_cloud.cloud_custodial_keys`, `cloud_agent_certificates` | `aweb-support agent-state ...` |
+| Agent canonical identity fields | `aweb.agents.did`, `stable_id`, `custody` | `aweb-support agent-state ...` |
+| Runtime workspace/team/task/presence state | aweb coordination tables and Redis | `aweb-support agent-state ...`, `aweb-support team-state ...` |
+| Cloud owner/org/team metadata | cloud server tables | `aweb-support team-state ...` |
+
+Do not infer registry truth from embedded/local database tables. In local
+development the awid service may share a Postgres database, but production awid
+is a registry service boundary. Support should use registry APIs or registry
+read tools for registry facts, and cloud support endpoints for hosted
+operational facts.
+
+## Initial Triage
 
 Collect these facts before choosing a recovery path:
 
@@ -243,106 +282,273 @@ Collect these facts before choosing a recovery path:
 - Whether the user still has access to the original local worktree and
   `.aw/signing.key`.
 - Whether the namespace is cloud-managed or BYOD.
-- Whether the registry has the DID registered.
-- Whether the registry has an address for that DID.
+- Whether awid has the DID registered.
+- Whether awid has an address for that DID.
 
-If the identity is ephemeral, recovery does not apply. Ephemeral
-identities are not recoverable as durable identities; create a new
-identity.
+If the identity is ephemeral, this runbook does not apply. Ephemeral identities
+are not recoverable as durable identities; create a new identity.
 
-## 2.2 API-first diagnostics
+## Tool-First Diagnostics
 
-Prefer API/CLI checks first. Use SQL only when API state is
-insufficient or an engineer is already involved.
+Prefer API/CLI checks first. Use SQL only when API state is insufficient or an
+engineer is already involved.
 
-### Inspect cloud identity state
+Configure the cloud support wrapper:
 
-From the dashboard, capture:
+```bash
+export AWEB_CLOUD_URL="https://app.aweb.ai"
+export AWEB_CLOUD_ADMIN_API_KEY="<support/admin key>"
+```
+
+All `aweb-support` responses use the `support-contract-v1` envelope from
+`../aweb/docs/support-contract-v1.md`. Read `payload.schema` to identify the
+payload shape, not ad-hoc top-level fields.
+
+Useful reads:
+
+```bash
+aweb-support agent-state --agent-id <agent_uuid>
+aweb-support agent-state --address <domain/name>
+aweb-support agent-state --team-id <team_identifier> --name <agent_name>
+aweb-support namespace-state <domain>
+aweb-support team-state <team_identifier>
+aweb-support team-state --slug <team_slug>
+aweb-support replacement-history --agent-id <agent_uuid>
+aweb-support replacement-history --address <domain/name>
+```
+
+`<team_identifier>` may be a server team UUID, canonical colon-form team id, or
+team slug.
+
+When a user can run commands locally, ask for:
+
+```bash
+aw doctor --json
+```
+
+or, for a shareable bundle:
+
+```bash
+aw doctor support-bundle --output doctor.json
+```
+
+### 1. Inspect Cloud Identity State
+
+Use `aweb-support agent-state ...` and, when the dashboard is available,
+cross-check the dashboard. Capture:
 
 - agent name and `agent_id`
 - status: `active`, `retired`, `archived`, or `deleted`
 - custody: `self` or `custodial`
 - lifetime: must be `persistent`
+- canonical `did` and `stable_id`
+- legacy/registry projection fields `did_key` and `did_aw`
 - address, if shown
 - reachability: `nobody`, `org_only`, `team_members_only`, or `public`
+- hosted custody material booleans
+- replacement history counts
 
-If the dashboard cannot load the agent, escalate to engineering with
-the team and agent identifiers.
+The hosted persistent identity is not ready if any of these are missing:
 
-### Check whether the DID is registered
+- `payload.agent.did`
+- `payload.agent.stable_id` or `payload.agent.did_aw`
+- `payload.agent.custody`
+- `payload.custody.cloud_custodial_key_present` for custodial identities
 
-Use the identity's `stable_id` / `did:aw`:
+If `did_key`/`did_aw` are present but canonical `did`/`stable_id`/`custody`
+are missing, escalate as a creation-path regression. Do not work around this by
+manually using fallback fields in support decisions; the runtime addressing and
+lifecycle APIs depend on the canonical columns.
+
+### 2. Check Whether the DID Is Registered at awid
+
+Use the identity's `stable_id` / `did:aw`.
 
 ```bash
+aw id resolve <did_aw>
 curl -sS "$AWID_URL/v1/did/$DID_AW/key"
 ```
 
 Interpretation:
 
-- `200`: the DID is registered.
-- `404`: the DID is not registered.
-- `200` but `current_did_key` does not match the cloud/local
-  `did:key`: stop and escalate as possible identity corruption.
-- `5xx` or network failure: registry availability issue, not an
-  identity recovery decision.
+- CLI success or HTTP `200`: the DID is registered.
+- CLI not found or HTTP `404`: the DID is not registered.
+- Success where `current_did_key` does not match the cloud/local `did:key`:
+  stop and escalate as possible identity corruption.
+- HTTP `5xx` or network failure: awid availability issue, not an identity
+  recovery decision.
 
-### Check whether the registry has addresses for the DID
+### 3. Check Whether awid Has Addresses for the DID
 
 ```bash
+aw id addresses <did_aw>
 curl -sS "$AWID_URL/v1/did/$DID_AW/addresses"
 ```
 
 Interpretation:
 
-- One or more addresses: registry has address state. Use the address
-  that matches the team/namespace being recovered.
-- Empty list: no registry address exists for this DID.
+- One or more addresses: awid has address state. Use the address that matches
+  the team/namespace being recovered.
+- Empty list: no awid address exists for this DID.
 
-Do not use public namespace discovery for this step. Public namespace
-address listing is reachability-aware. DID reverse lookup is the
-correct diagnostic for identity ownership.
+Do not use public namespace discovery for this step. Public namespace address
+listing is reachability-aware. DID reverse lookup is the correct diagnostic for
+identity ownership.
 
-### Classify the namespace
+### 4. Classify the Namespace
 
 For the address domain, determine whether it is:
 
-- **Cloud-managed**: cloud has a `managed_namespaces` row and
-  controller key for this team.
-- **BYOD with available controller key**: the customer/operator can
-  sign namespace controller operations outside cloud.
-- **BYOD with lost controller key**: no authorized party can sign
-  namespace controller operations.
+- **Cloud-managed**: `aweb-cloud` has a `managed_namespaces` row and controller
+  key for this team.
+- **BYOD with available controller key**: the customer/operator can sign
+  namespace controller operations outside cloud.
+- **BYOD with lost controller key**: no authorized party can sign namespace
+  controller operations.
 - **Unknown/unmanaged**: stop and escalate.
 
 Cloud dashboard recovery may only create or reassign addresses for
 cloud-managed namespaces where cloud has controller authority.
 
-## 2.3 Recovery matrix
+Operational checks:
+
+```bash
+aweb-support namespace-state <domain>
+aweb-support team-state <team_identifier>
+aweb-support team-state --slug <team_slug>
+```
+
+For a cloud-managed namespace, verify:
+
+- `payload.namespace.cloud_managed` is `true`
+- `payload.namespace.controller_key_available` is `true`
+- `payload.namespace.registration_status` is `registered` for address writes,
+  or can be registered by cloud using the stored controller key
+- `payload.team.server_team_id` matches the affected agent's cloud team
+
+If a freshly created cloud team has no default `managed_namespaces` row, or the
+row has no controller key, escalate as a team-creation regression. Hosted
+custodial identity creation cannot safely create managed addresses without that
+row because cloud has no namespace controller authority to use.
+
+## Known Failure Signatures From Recent Incidents
+
+These are examples of source-of-truth mistakes. Use them as patterns to
+recognize bugs, not as hardcoded support cases.
+
+### Hosted identity says "Identity not ready"
+
+Likely cause:
+
+- `aweb.agents.did_key` and `did_aw` exist, but canonical `did`,
+  `stable_id`, or `custody` are `NULL`.
+
+Expected correct shape:
+
+- `did = did_key`
+- `stable_id = did_aw`
+- `custody = 'custodial'` for hosted custodial identities
+- `lifetime = 'persistent'`
+- cloud custody key and team certificate booleans are present
+
+Support action:
+
+- Verify with `aweb-support agent-state ...`.
+- Verify `/api/v1/agents/{agent_id}/addressing` behavior if acting as an
+  owner/admin.
+- Escalate to engineering if canonical columns are missing. This is a creation
+  or projection bug, not a customer recovery choice.
+
+### create-permanent-custodial fails because namespace controller is missing
+
+Likely cause:
+
+- Team creation did not create the default `managed_namespaces` row, or the row
+  exists without `controller_private_key_ciphertext`.
+
+Expected correct shape:
+
+- team has exactly one default managed namespace for its slug/domain
+- controller DID is present
+- controller key availability is true
+- registration may be `unregistered` immediately after team creation, but
+  hosted identity address assignment should register it before creating the
+  address
+
+Support action:
+
+- Run `aweb-support team-state ...` and `aweb-support namespace-state <domain>`.
+- Escalate if controller key is absent. Do not invent a replacement controller
+  for an existing namespace without an engineering recovery plan.
+
+### Workspace init returns 409 because the DID is not registered
+
+Likely cause:
+
+- `POST /api/v1/workspaces/init` tried to create or assign the managed address
+  before the identity DID was registered at awid.
+
+Expected correct shape:
+
+- the local or hosted flow registers the DID at awid first
+- `aw id resolve <did_aw>` returns the current `did:key`
+- only then does address creation or assignment run under the correct namespace
+  authority
+
+Support action:
+
+- Run `aw doctor --json` if the caller has a local worktree.
+- Run `aw id resolve <did_aw>` and `aw id addresses <did_aw>`.
+- For self-custodial local identities, register the existing DID from the
+  original worktree and retry init.
+- For hosted custodial identities, escalate as a backend sequencing bug. Hosted
+  cloud must not attempt managed address creation before DID registration
+  succeeds.
+
+### awid state looks different from embedded DB rows
+
+Likely cause:
+
+- Support or tests read local `aweb.dns_namespaces` / `public_addresses`
+  directly and assumed that was authoritative registry state.
+
+Correct model:
+
+- awid registry APIs are authoritative for DID and address state.
+- Embedded/local rows are implementation storage for a local registry
+  instance, not a cloud support contract.
+- Public namespace listing is reachability-filtered; DID reverse lookup is the
+  diagnostic for "which addresses belong to this identity?"
+
+Support action:
+
+- Use `aw id resolve`, `aw id addresses`, `aw id namespace resolve`, or the
+  awid API for registry facts.
+- Use cloud support tools for cloud ownership/custody/managed namespace facts.
+
+## Recovery Matrix
 
 | Case | State | Recovery |
 | --- | --- | --- |
 | 1 | Managed namespace, self-custodial key still exists locally | Run `aw id register` from the original worktree, then create/assign the managed address from cloud if needed. |
-| 2 | Managed namespace, keys lost, address exists at registry | Use dashboard Replace. Cloud registers a new custodial DID and reassigns the existing address with namespace controller authority. |
-| 3 | Managed namespace, keys lost, DID/address never registered, local cloud row still has intended address | Use dashboard Replace. Cloud registers a new custodial DID, creates the missing address with namespace controller authority, archives the old identity, and creates the replacement. |
+| 2 | Managed namespace, keys lost, address exists at awid | Use dashboard Replace. Cloud registers a new custodial DID and reassigns the existing address with namespace controller authority. |
+| 3 | Managed namespace, keys lost, DID/address never registered at awid, local cloud row still has intended address | Use dashboard Replace. Cloud registers a new custodial DID, creates the missing address with namespace controller authority, archives the old identity, and creates the replacement. |
 | 4 | BYOD namespace, namespace controller key is available | Customer/operator uses CLI/controller tooling to recover. Cloud must not guess or create BYOD addresses without authority. |
 | 5 | BYOD namespace, identity key and namespace controller key are both lost | No recovery by design. Archive the broken identity and create a new identity/address under a controlled namespace. |
 
 Adjacent state:
 
-- DID registered but address missing: treat like Case 3 for
-  cloud-managed namespaces with a known local intended address. Treat
-  as Case 4 for BYOD.
-- Address exists but DID key mismatch: stop and escalate as possible
-  corruption.
-- Multiple addresses for one DID: choose the address that belongs to
-  the affected team/namespace; escalate if ambiguous.
+- DID registered but address missing: treat like Case 3 for cloud-managed
+  namespaces with a known local intended address. Treat as Case 4 for BYOD.
+- Address exists but DID key mismatch: stop and escalate as possible corruption.
+- Multiple addresses for one DID: choose the address that belongs to the
+  affected team/namespace; escalate if ambiguous.
 
-## 2.4 Recovery procedures
+## Recovery Procedures
 
-### Case 1: register existing self-custodial DID
+### Case 1: Register Existing Self-Custodial DID
 
-Use this when the user still has the original local worktree and
-signing key.
+Use this when the user still has the original local worktree and signing key.
 
 Ask the user or operator to run from that worktree:
 
@@ -357,17 +563,17 @@ curl -sS "$AWID_URL/v1/did/$DID_AW/key"
 curl -sS "$AWID_URL/v1/did/$DID_AW/addresses"
 ```
 
-If the DID is registered but no managed address exists, use the
-dashboard address assignment flow for the agent.
+If the DID is registered but no managed address exists, use the dashboard
+address assignment flow for the agent.
 
-### Case 2: dashboard Replace (existing address)
+### Case 2: Dashboard Replace Existing awid Address
 
 Use this when:
 
 - identity is persistent
 - key is lost
 - namespace is cloud-managed
-- registry already has the address
+- awid already has the address
 
 In the dashboard:
 
@@ -375,119 +581,78 @@ In the dashboard:
 2. Open the affected agent.
 3. Confirm it is the intended persistent identity.
 4. Use Replace.
-5. Verify the replacement agent has a new `did` / `stable_id` and the
-   same external address.
+5. Verify the replacement agent has a new `did` / `stable_id` and the same
+   external address.
 
 Expected backend behavior:
 
-- register the new DID at the registry
+- register the new DID at awid
 - reassign the existing address to the new DID
 - archive the old agent
 - create a new custodial persistent agent
 - record a replacement announcement
 
-### Case 3: dashboard Replace (missing address)
+### Case 3: Dashboard Replace Missing awid Address
 
 Use this when:
 
 - identity is persistent
 - key is lost
 - namespace is cloud-managed
-- registry does not have the old DID/address
+- awid does not have the old DID/address
 - the cloud agent row still has the intended managed address
 
 In the dashboard, use the same Replace operation as Case 2.
 
 Expected backend behavior:
 
-- register the new DID at the registry
-- create the missing managed address at the registry with namespace
-  controller authority
+- register the new DID at awid
+- create the missing managed address at awid with namespace controller
+  authority
 - archive the old agent
 - create a new custodial persistent agent
 - record a replacement announcement
 
-If cloud cannot identify the intended managed address, do not guess.
-Escalate to engineering.
+If cloud cannot identify the intended managed address, do not guess. Escalate
+to engineering.
 
-### Case 4: BYOD controller recovery
+### Case 4: BYOD Controller Recovery
 
-Cloud support should not run managed dashboard replacement for BYOD
-addresses unless cloud holds the namespace controller key.
+Cloud support should not run managed dashboard replacement for BYOD addresses
+unless cloud holds the namespace controller key.
 
-The customer/operator who controls the namespace should recover using
-CLI or controller tooling. The exact procedure depends on which keys
-are still available.
+The customer/operator who controls the namespace should recover using CLI or
+controller tooling. The exact procedure depends on which keys are still
+available.
 
-Escalate to engineering if the customer has a controller key but the
-CLI lacks the needed operation.
+Escalate to engineering if the customer has a controller key but the CLI lacks
+the needed operation.
 
-### Case 5: no recovery
+### Case 5: No Recovery
 
-If both the self-custodial identity key and the BYOD namespace
-controller key are lost, there is no safe authority left to prove
-continuity.
+If both the self-custodial identity key and the BYOD namespace controller key
+are lost, there is no safe authority left to prove continuity.
 
 Tell the customer:
 
-> We cannot safely recover this identity or address because both the
-> identity key and namespace controller authority are unavailable.
-> The safe path is to archive the broken identity and create a new
-> identity/address under a controlled namespace.
+> We cannot safely recover this identity or address because both the identity
+> key and namespace controller authority are unavailable. The safe path is to
+> archive the broken identity and create a new identity/address under a
+> controlled namespace.
 
-## 2.5 Customer-facing language
-
-Use clear authority-based explanations. Do not mention internal table
-names.
-
-For Case 1:
-
-> Your identity key still exists locally, so the safest recovery is
-> to re-register that same identity from the original worktree. This
-> preserves the same durable identity.
-
-For Case 2:
-
-> The address exists, but the identity key is no longer usable. We
-> can replace the identity with a new cloud-managed key and move the
-> existing address to the replacement.
-
-For Case 3:
-
-> The old identity was never fully registered, but the address
-> belongs to a cloud-managed namespace. We can provision a new
-> cloud-managed identity and create the intended address under the
-> namespace controller.
-
-For Case 4:
-
-> This address is under your own namespace. Recovery must be
-> performed by the holder of that namespace controller key.
-
-For Case 5:
-
-> There is no remaining key authority that can prove ownership of
-> the old identity or namespace. We cannot safely recover it. The
-> safe path is to create a new identity/address.
-
-<!-- END: synced-from-ac/docs/support/agent-identity-recovery.md -->
-
----
-
-# Section 3 — Escalation
+## Escalation Checklist
 
 Escalate to engineering when any of these are true:
 
-- The registry's `resolve_key` returns a `current_did_key` that does
-  not match expected local/cloud state.
-- The registry has multiple plausible addresses and support cannot
-  determine the intended one.
-- The address domain is not clearly cloud-managed or BYOD.
-- A dashboard Replace operation returns `409` or `502`.
-- The agent is active locally but registry state points the address at
-  a different DID.
-- The customer reports message/auth failures after a successful
-  replacement.
+- awid `resolve_key` returns a `current_did_key` that does not match expected
+  local/cloud state.
+- awid has multiple plausible addresses and support cannot determine the
+  intended one.
+- the address domain is not clearly cloud-managed or BYOD.
+- the dashboard Replace operation returns `409` or `502`.
+- the agent is active locally but awid state points the address at a different
+  DID.
+- the customer reports message/auth failures after a successful replacement.
 
 Include this data in the escalation:
 
@@ -496,18 +661,49 @@ Include this data in the escalation:
 - custody and lifetime
 - old `did:key` and `did:aw`
 - expected address
-- registry `resolve_key` result
-- registry `list_did_addresses` result
+- awid `resolve_key` result
+- awid `list_did_addresses` result
 - namespace classification
 - exact dashboard/API error text
 
----
+## Customer-Facing Language
 
-# Engineer Appendix — SQL checks
+Use clear authority-based explanations. Do not mention internal table names.
 
-For engineering support or incident response only.
+For Case 1:
 
-### Local agent state
+> Your identity key still exists locally, so the safest recovery is to
+> re-register that same identity from the original worktree. This preserves the
+> same durable identity.
+
+For Case 2:
+
+> The address exists, but the identity key is no longer usable. We can replace
+> the identity with a new cloud-managed key and move the existing address to the
+> replacement.
+
+For Case 3:
+
+> The old identity was never fully registered, but the address belongs to a
+> cloud-managed namespace. We can provision a new cloud-managed identity and
+> create the intended address under the namespace controller.
+
+For Case 4:
+
+> This address is under your own namespace. Recovery must be performed by the
+> holder of that namespace controller key.
+
+For Case 5:
+
+> There is no remaining key authority that can prove ownership of the old
+> identity or namespace. We cannot safely recover it. The safe path is to create
+> a new identity/address.
+
+## Engineer Appendix: SQL Checks
+
+Use these only for engineering support or incident response.
+
+### Local Agent State
 
 ```sql
 SELECT
@@ -525,7 +721,7 @@ FROM aweb.agents a
 WHERE a.agent_id = '<agent_uuid>';
 ```
 
-### Cloud-managed namespace authority
+### Cloud-Managed Namespace Authority
 
 ```sql
 SELECT
@@ -543,10 +739,10 @@ WHERE domain = '<address_domain>'
   AND deleted_at IS NULL;
 ```
 
-### Local registry address rows
+### Local awid Address Rows
 
-These rows are local database state for the hosted identity registry
-service. Prefer the registry API for support diagnostics.
+These rows are local database state for the hosted awid service. Prefer the
+awid API for support diagnostics.
 
 ```sql
 SELECT
@@ -563,7 +759,7 @@ WHERE ns.domain = '<address_domain>'
   AND pa.name = '<address_name>';
 ```
 
-### Replacement audit
+### Replacement Audit
 
 ```sql
 SELECT
@@ -580,3 +776,6 @@ FROM aweb.replacement_announcements
 WHERE old_agent_id = '<old_agent_uuid>'
 ORDER BY created_at DESC;
 ```
+
+<!-- END: synced-from-ac/docs/support/agent-identity-recovery.md -->
+

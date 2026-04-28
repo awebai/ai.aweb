@@ -11,6 +11,11 @@ Use the canonical identity model in the OSS docs as the source of truth:
 
 This document only covers hosted support triage and recovery.
 
+For support-agent operating instructions, see
+[`docs/support/support-role-instructions.md`](support-role-instructions.md).
+For the tool architecture and command inventory, see
+[`docs/support-tools.md`](../support-tools.md).
+
 ## Support Goal
 
 Recover the user's ability to use a persistent identity/address without
@@ -24,6 +29,28 @@ Do not guess. Every recovery must preserve the correct authority boundary:
 - Local worktrees own self-custodial identity keys.
 - BYOD namespace controller keys are owned by the customer unless explicitly
   hosted by cloud.
+
+## Source-of-Truth Map
+
+Use the correct source before deciding what is broken:
+
+| Fact | Source of truth | Support tool |
+| --- | --- | --- |
+| DID registration and DID -> current did:key | awid registry | `aw id resolve <did_aw>` or awid API |
+| Active addresses for a DID | awid registry reverse lookup | `aw id addresses <did_aw>` or awid API |
+| Public or caller-visible address discovery | awid registry visibility rules | `aw id namespace addresses <domain>` |
+| Specific address resolution | awid registry visibility rules | `aw id namespace resolve <domain/name>` |
+| Cloud-managed namespace controller availability | `aweb_cloud.managed_namespaces` | `aweb-support namespace-state <domain>` |
+| Hosted custodial key/certificate presence | `aweb_cloud.cloud_custodial_keys`, `cloud_agent_certificates` | `aweb-support agent-state ...` |
+| Agent canonical identity fields | `aweb.agents.did`, `stable_id`, `custody` | `aweb-support agent-state ...` |
+| Runtime workspace/team/task/presence state | aweb coordination tables and Redis | `aweb-support agent-state ...`, `aweb-support team-state ...` |
+| Cloud owner/org/team metadata | cloud server tables | `aweb-support team-state ...` |
+
+Do not infer registry truth from embedded/local database tables. In local
+development the awid service may share a Postgres database, but production awid
+is a registry service boundary. Support should use registry APIs or registry
+read tools for registry facts, and cloud support endpoints for hosted
+operational facts.
 
 ## Initial Triage
 
@@ -44,45 +71,100 @@ Collect these facts before choosing a recovery path:
 If the identity is ephemeral, this runbook does not apply. Ephemeral identities
 are not recoverable as durable identities; create a new identity.
 
-## API-First Diagnostics
+## Tool-First Diagnostics
 
 Prefer API/CLI checks first. Use SQL only when API state is insufficient or an
 engineer is already involved.
 
+Configure the cloud support wrapper:
+
+```bash
+export AWEB_CLOUD_URL="https://app.aweb.ai"
+export AWEB_CLOUD_ADMIN_API_KEY="<support/admin key>"
+```
+
+All `aweb-support` responses use the `support-contract-v1` envelope from
+`../aweb/docs/support-contract-v1.md`. Read `payload.schema` to identify the
+payload shape, not ad-hoc top-level fields.
+
+Useful reads:
+
+```bash
+aweb-support agent-state --agent-id <agent_uuid>
+aweb-support agent-state --address <domain/name>
+aweb-support agent-state --team-id <team_identifier> --name <agent_name>
+aweb-support namespace-state <domain>
+aweb-support team-state <team_identifier>
+aweb-support team-state --slug <team_slug>
+aweb-support replacement-history --agent-id <agent_uuid>
+aweb-support replacement-history --address <domain/name>
+```
+
+`<team_identifier>` may be a server team UUID, canonical colon-form team id, or
+team slug.
+
+When a user can run commands locally, ask for:
+
+```bash
+aw doctor --json
+```
+
+or, for a shareable bundle:
+
+```bash
+aw doctor support-bundle --output doctor.json
+```
+
 ### 1. Inspect Cloud Identity State
 
-From the dashboard, capture:
+Use `aweb-support agent-state ...` and, when the dashboard is available,
+cross-check the dashboard. Capture:
 
 - agent name and `agent_id`
 - status: `active`, `retired`, `archived`, or `deleted`
 - custody: `self` or `custodial`
 - lifetime: must be `persistent`
+- canonical `did` and `stable_id`
+- legacy/registry projection fields `did_key` and `did_aw`
 - address, if shown
 - reachability: `nobody`, `org_only`, `team_members_only`, or `public`
+- hosted custody material booleans
+- replacement history counts
 
-If the dashboard cannot load the agent, escalate to engineering with the team
-and agent identifiers.
+The hosted persistent identity is not ready if any of these are missing:
+
+- `payload.agent.did`
+- `payload.agent.stable_id` or `payload.agent.did_aw`
+- `payload.agent.custody`
+- `payload.custody.cloud_custodial_key_present` for custodial identities
+
+If `did_key`/`did_aw` are present but canonical `did`/`stable_id`/`custody`
+are missing, escalate as a creation-path regression. Do not work around this by
+manually using fallback fields in support decisions; the runtime addressing and
+lifecycle APIs depend on the canonical columns.
 
 ### 2. Check Whether the DID Is Registered at awid
 
 Use the identity's `stable_id` / `did:aw`.
 
 ```bash
+aw id resolve <did_aw>
 curl -sS "$AWID_URL/v1/did/$DID_AW/key"
 ```
 
 Interpretation:
 
-- `200`: the DID is registered.
-- `404`: the DID is not registered.
-- `200` but `current_did_key` does not match the cloud/local `did:key`:
+- CLI success or HTTP `200`: the DID is registered.
+- CLI not found or HTTP `404`: the DID is not registered.
+- Success where `current_did_key` does not match the cloud/local `did:key`:
   stop and escalate as possible identity corruption.
-- `5xx` or network failure: awid availability issue, not an identity recovery
-  decision.
+- HTTP `5xx` or network failure: awid availability issue, not an identity
+  recovery decision.
 
 ### 3. Check Whether awid Has Addresses for the DID
 
 ```bash
+aw id addresses <did_aw>
 curl -sS "$AWID_URL/v1/did/$DID_AW/addresses"
 ```
 
@@ -110,6 +192,122 @@ For the address domain, determine whether it is:
 
 Cloud dashboard recovery may only create or reassign addresses for
 cloud-managed namespaces where cloud has controller authority.
+
+Operational checks:
+
+```bash
+aweb-support namespace-state <domain>
+aweb-support team-state <team_identifier>
+aweb-support team-state --slug <team_slug>
+```
+
+For a cloud-managed namespace, verify:
+
+- `payload.namespace.cloud_managed` is `true`
+- `payload.namespace.controller_key_available` is `true`
+- `payload.namespace.registration_status` is `registered` for address writes,
+  or can be registered by cloud using the stored controller key
+- `payload.team.server_team_id` matches the affected agent's cloud team
+
+If a freshly created cloud team has no default `managed_namespaces` row, or the
+row has no controller key, escalate as a team-creation regression. Hosted
+custodial identity creation cannot safely create managed addresses without that
+row because cloud has no namespace controller authority to use.
+
+## Known Failure Signatures From Recent Incidents
+
+These are examples of source-of-truth mistakes. Use them as patterns to
+recognize bugs, not as hardcoded support cases.
+
+### Hosted identity says "Identity not ready"
+
+Likely cause:
+
+- `aweb.agents.did_key` and `did_aw` exist, but canonical `did`,
+  `stable_id`, or `custody` are `NULL`.
+
+Expected correct shape:
+
+- `did = did_key`
+- `stable_id = did_aw`
+- `custody = 'custodial'` for hosted custodial identities
+- `lifetime = 'persistent'`
+- cloud custody key and team certificate booleans are present
+
+Support action:
+
+- Verify with `aweb-support agent-state ...`.
+- Verify `/api/v1/agents/{agent_id}/addressing` behavior if acting as an
+  owner/admin.
+- Escalate to engineering if canonical columns are missing. This is a creation
+  or projection bug, not a customer recovery choice.
+
+### create-permanent-custodial fails because namespace controller is missing
+
+Likely cause:
+
+- Team creation did not create the default `managed_namespaces` row, or the row
+  exists without `controller_private_key_ciphertext`.
+
+Expected correct shape:
+
+- team has exactly one default managed namespace for its slug/domain
+- controller DID is present
+- controller key availability is true
+- registration may be `unregistered` immediately after team creation, but
+  hosted identity address assignment should register it before creating the
+  address
+
+Support action:
+
+- Run `aweb-support team-state ...` and `aweb-support namespace-state <domain>`.
+- Escalate if controller key is absent. Do not invent a replacement controller
+  for an existing namespace without an engineering recovery plan.
+
+### Workspace init returns 409 because the DID is not registered
+
+Likely cause:
+
+- `POST /api/v1/workspaces/init` tried to create or assign the managed address
+  before the identity DID was registered at awid.
+
+Expected correct shape:
+
+- the local or hosted flow registers the DID at awid first
+- `aw id resolve <did_aw>` returns the current `did:key`
+- only then does address creation or assignment run under the correct namespace
+  authority
+
+Support action:
+
+- Run `aw doctor --json` if the caller has a local worktree.
+- Run `aw id resolve <did_aw>` and `aw id addresses <did_aw>`.
+- For self-custodial local identities, register the existing DID from the
+  original worktree and retry init.
+- For hosted custodial identities, escalate as a backend sequencing bug. Hosted
+  cloud must not attempt managed address creation before DID registration
+  succeeds.
+
+### awid state looks different from embedded DB rows
+
+Likely cause:
+
+- Support or tests read local `aweb.dns_namespaces` / `public_addresses`
+  directly and assumed that was authoritative registry state.
+
+Correct model:
+
+- awid registry APIs are authoritative for DID and address state.
+- Embedded/local rows are implementation storage for a local registry
+  instance, not a cloud support contract.
+- Public namespace listing is reachability-filtered; DID reverse lookup is the
+  diagnostic for "which addresses belong to this identity?"
+
+Support action:
+
+- Use `aw id resolve`, `aw id addresses`, `aw id namespace resolve`, or the
+  awid API for registry facts.
+- Use cloud support tools for cloud ownership/custody/managed namespace facts.
 
 ## Recovery Matrix
 
