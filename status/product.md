@@ -1,6 +1,6 @@
 # Product Status
 
-Last updated: 2026-04-28 21:41 CEST (Avi)
+Last updated: 2026-04-28 22:23 CEST (Avi)
 
 ## Current focus
 
@@ -10,17 +10,16 @@ Cloud is live on v0.5.9 with aweb 1.18.6, and Amy/Tom attestation in
 the latest support/cloud handoffs marks the mail/chat identity issue
 closed.
 
-Juan asked for a company-organization pass: how to run aweb
-agent-first. The active epic is `aweb-aals`. The model is responsibility
-areas, shared artifacts, builder/reviewer contracts, and feedback
-signals graded by strength. We should exploit verifiable feedback where
-available and still record weaker signals without overstating
-causality.
+Juan refined the company model again. The permanent areas are now
+direction, engineering, outreach, support, operations, and analytics.
+Repo work should happen through task-scoped builder/reviewer pairs
+created with `aw workspace add-worktree`, not permanent repo-manager
+agents. Every archetype owns a feedback loop.
 
 This week:
-1. Finish `aweb-aals.2`: responsibility-area instruction sweep,
-   reviewer required.
-2. Start `aweb-aals.1`: convert current company priorities into `aw`
+1. Update `aweb-aals.2`: responsibility-area instruction sweep now
+   reflects the smaller permanent set and task-scoped repo pairs.
+2. Continue `aweb-aals.1`: convert current company priorities into `aw`
    tasks with builder, reviewer, and strongest available feedback
    signal.
 3. Restart distribution now that the live blocker is closed: blog post
@@ -52,7 +51,7 @@ This week:
 - **Daily scanning**: Not running.
 - **Conversations joined**: 0.
 
-## User feedback
+## Support / user feedback
 
 - Amy asked for product classification on internal-alias-only rename.
   Answer sent 2026-04-28: classify as **intentional today, possibly
@@ -64,12 +63,12 @@ This week:
 
 ## Priorities
 
-1. **Finish the responsibility-area reorg (`aweb-aals`)** — docs and
-   directories are mostly in place; remaining work is review and
-   converting priorities into tasks.
-2. **Reactivate distribution** — blocker is closed; accountability's
-   engineering-to-distribution concern is now acute again.
-3. **Repair attention execution path** — attention needs a reachable
+1. **Finish the responsibility-area reorg (`aweb-aals`)** — permanent
+   areas are now direction, engineering, outreach, support, operations,
+   analytics; remaining work is review and task conversion.
+2. **Reactivate distribution** — blocker is closed; operations should
+   now flag distribution loops that are not running.
+3. **Repair outreach execution path** — outreach needs a reachable
    workspace identity, current outreach status, and a first daily brief.
 4. **Keep engineering in release-discipline mode, not feature-expansion
    mode** — recent v0.5.9 work is exactly the kind of correctness

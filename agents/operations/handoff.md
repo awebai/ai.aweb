@@ -1,4 +1,4 @@
-# Accountability Handoff
+# Operations Handoff
 
 Last updated: 2026-04-11
 

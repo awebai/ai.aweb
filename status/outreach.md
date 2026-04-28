@@ -1,24 +1,30 @@
 # Outreach Status
+Last updated: 2026-04-28 22:23 CEST
 
-Last updated: 2026-04-11 (initial — Charlene will maintain going forward)
+## Current focus
 
-## Content pipeline
-- Blog post "5 agents" draft ready, needs Juan's voice pass
-- No other posts in progress
+Outreach is the distribution surface: market scanning, content/outreach
+drafts, human-ready recommendations, and external response capture.
+Product readiness is no longer the blocker; the next blocker is running
+the first distribution action and recording signal.
 
-## Outreach monitoring
-- Daily briefs: not yet writing (waiting for product readiness)
-- Conversations found: 0
+## Actions
 
-## Contacts
-- Identified: 7
-- Contacted: 0
-- Responded: 0
-- Notable: none yet
+- Blog post "5 agents" draft exists and still needs Juan's voice pass.
+- No public post, daily brief, or human-led conversation is recorded in
+  public status yet.
+- Private outreach files should be checked before any concrete contact
+  update; do not copy contact details into this repo.
+
+## Signals
+
+- No outreach signal yet because no action is recorded.
+- Future signals should distinguish direct replies/clicks from weak
+  correlation such as signup movement after a post.
 
 ## Next actions
-- Begin daily web scanning now that product readiness is no longer the
-  blocker
-- Propose content calendar to direction
-- Record observed signals from every outreach action without
-  overstating attribution
+
+- Begin daily web scanning.
+- Propose the first distribution action to direction.
+- Record what humans publish or send.
+- Ask analytics for a signal read once an action runs.

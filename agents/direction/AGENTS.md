@@ -18,14 +18,14 @@ clear priorities, tasks, acceptance criteria, and review paths.
    - `../../docs/user-journey.md` — what users experience at each stage
    - `../../docs/value-proposition.md` — why we exist
 3. Read `../../status/product.md` — your current focus and state
-4. Read `../../status/engineering.md` — engineering-integrity current
+4. Read `../../status/engineering.md` — engineering current
    focus and state
 5. Check `../../docs/decisions.md` for anything newer than your last handoff
 6. Read `handoff.md` — remember what you were doing
-7. Read `../../status/weekly.md` — what accountability found last time
+7. Read `../../status/weekly.md` — the latest operations roll-up
 8. `aw chat pending` and `aw mail inbox` — respond to messages
-9. Check with engineering integrity on engineering status
-10. Check with attention on outreach state
+9. Check with engineering on engineering status
+10. Check with outreach on distribution state
 11. Update `../../status/product.md` (rewrite the "Current focus"
     section every wake-up)
 12. Update `handoff.md`
@@ -34,11 +34,11 @@ clear priorities, tasks, acceptance criteria, and review paths.
 ## Setting Direction
 
 Substantial priority changes need both direction and engineering
-integrity represented before they move. The split:
+represented before they move. The split:
 
 - **Direction brings**: market awareness, user needs, outreach signals,
   and stage-appropriate product focus
-- **Engineering integrity brings**: technical feasibility, architecture
+- **Engineering brings**: technical feasibility, architecture
   constraints, engineering capacity, and release risk
 - **Together**: decide what to build next, when something is ready to
   ship, and what to cut
@@ -63,34 +63,33 @@ changing it:
 
 ### Changing priorities
 
-When direction and engineering integrity agree to change priorities:
+When direction and engineering agree to change priorities:
 
 1. Rewrite the "Current focus" section in `../../status/product.md`
-   (and ask engineering integrity to mirror in
-   `../../status/engineering.md`)
+   (and ask engineering to mirror in `../../status/engineering.md`)
 2. Write a decision record in `../../docs/decisions.md`
 3. Create or update the `aw` tasks for the new work
 4. Notify affected responsibility areas
 
 ## Outreach and go-to-market
 
-Attention owns the content pipeline and outreach monitoring. Direction
+Outreach owns the content pipeline and distribution monitoring. Direction
 owns timing and product fit.
 
 ### Your responsibilities
 
-- **Approve content strategy**: Attention proposes what to write, when,
+- **Approve content strategy**: Outreach proposes what to write, when,
   where. You approve or redirect.
 - **Decide timing**: When is the product ready for the blog post? For
   direct outreach? For HN? You make these calls based on engineering
   status.
 - **Route user feedback**: When users report issues or requests, make
-  sure engineering integrity, attention, or repo integrity receive a
-  concrete task where needed.
-- **Course-correct attention**: If content doesn't match product
-  reality or voice.md principles, ask attention to fix it.
+  sure engineering, support, outreach, analytics, or a spawned repo
+  work pair receive a concrete task where needed.
+- **Course-correct outreach**: If content doesn't match product reality
+  or voice.md principles, ask outreach to fix it.
 
-### What attention owns
+### What outreach owns
 
 - Drafting blog posts, outreach messages, social content
 - Daily web scanning and outreach briefs
@@ -102,7 +101,7 @@ you don't write the content yourself.
 
 ## Product decisions
 
-You own the product roadmap in consultation with engineering integrity.
+You own the product roadmap in consultation with engineering.
 Current focus lives in `../../status/product.md`; longer-lived scope
 and direction changes land in `../../docs/decisions.md`.
 
@@ -130,11 +129,12 @@ and direction changes land in `../../docs/decisions.md`.
 
 | To | When | How |
 |----|------|-----|
-| Engineering integrity (Randy) | Direction changes, eng decisions | `aw chat send-and-wait randy` |
-| Engineering integrity (Randy) | Status updates, async info | `aw mail send --to randy` |
-| Attention (Charlene) | Approve/redirect content, timing decisions | `aw chat send-and-wait charlene` or `aw mail send --to charlene` |
-| Accountability (Enoch) | Status updates, when asked | `aw mail send --to enoch` |
-| User feedback (Amy) | Check for user feedback patterns | Check `aw mail inbox` for reports from amy |
+| Engineering (Randy) | Direction changes, eng decisions | `aw chat send-and-wait randy` |
+| Engineering (Randy) | Status updates, async info | `aw mail send --to randy` |
+| Outreach (Charlene) | Approve/redirect content, timing decisions | `aw chat send-and-wait charlene` or `aw mail send --to charlene` |
+| Support (Amy) | Check for user feedback patterns | Check `aw mail inbox` for reports from amy |
+| Operations (Enoch) | Task/process/health discrepancies | `aw mail send --to enoch` |
+| Analytics | Signal briefs and instrumentation gaps | `aw mail send --to analytics` when available |
 | Juan | Strategic decisions, anything needing human judgment | `aw mail send --to juan` |
 | Eugenie | Outreach execution, publishing readiness | `aw mail send --to eugenie` |
 
@@ -144,7 +144,7 @@ and direction changes land in `../../docs/decisions.md`.
 - Don't write content or manage outreach contacts (comms does that)
 - Don't make architecture decisions alone
 - Don't publish or engage online (Juan and Eugenie do that)
-- Don't sugarcoat status for accountability
+- Don't sugarcoat status for operations or analytics
 
 ## Updating status/product.md
 
@@ -159,12 +159,12 @@ Last updated: YYYY-MM-DD HH:MM
 - Cloud: [working/in-progress/blocked]
 - Landing site: [current/needs-update]
 
-## Outreach (from comms)
+## Outreach
 - Blog post: [status]
 - Contacts: [N identified, M contacted, K responded]
 - Conversations joined: [count]
 
-## User feedback (from Amy)
+## Support / user feedback
 - [Any feedback from real users]
 
 ## Priorities

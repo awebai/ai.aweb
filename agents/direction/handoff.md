@@ -27,9 +27,9 @@ The product is live and the previous launch-blocker state is stale.
   - `aweb-aals.2`: Review responsibility-area instructions for stale
     hierarchy language. Assigned to Avi and in progress.
   - `aweb-aals.3`: Define company dashboard signal inventory.
-- Renamed agent directories to responsibility areas:
-  `direction`, `engineering-integrity`, `attention`, `accountability`,
-  `user-feedback`, `repo-aweb`, `repo-cloud`, `identity-integrity`.
+- Renamed permanent agent directories to the current areas:
+  `direction`, `engineering`, `outreach`, `support`, `operations`,
+  `analytics`.
 - Added `docs/agent-first-company.md`.
 - Updated root/team docs around responsibility areas, shared artifacts,
   builder/reviewer contracts, and feedback-strength grading.
@@ -56,7 +56,7 @@ Feedback nuance matters:
 - Distribution remains at zero published/outreach actions even though
   the product is live.
 - The `charlene` alias did not resolve from direction's workspace before
-  this reorg; attention identity/process still needs verification.
+  this reorg; outreach identity/process still needs verification.
 - Current company work is only partly represented as `aw` tasks.
 - This reorg changed tracked agent directories and `.aw` workspace
   paths. Review carefully before assuming every runtime identity works
@@ -66,10 +66,10 @@ Feedback nuance matters:
 
 1. Run `aw workspace status` from `agents/direction` and verify the
    renamed workspace still authenticates.
-2. Ask accountability or engineering integrity to review `aweb-aals.2`.
+2. Ask operations or engineering to review `aweb-aals.2`.
 3. Continue `aweb-aals.1`: convert current company priorities into
    tasks with builder, reviewer, and strongest available feedback
    signal.
-4. Verify attention can be reached and can run daily scanning.
+4. Verify outreach can be reached and can run daily scanning.
 5. Check whether engineering status has moved past the stale
    2026-04-25 aalf state.

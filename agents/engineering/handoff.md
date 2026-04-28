@@ -28,7 +28,7 @@ Amy's symptom.
 
 ### Track 2: Trust contract architecture (Randy + Grace)
 
-Working doc: `agents/engineering-integrity/aale-trust-contract.md`. Direction is option (b)
+Working doc: `agents/engineering/aale-trust-contract.md`. Direction is option (b)
 per Juan: distributed-but-conformant. Three independent verifier impls
 keep their autonomy but conform to a shared contract via JSON test
 vectors loaded by both Go and TS test suites.
@@ -86,7 +86,7 @@ Combined approval (his substance + my spec-conformance) lets Grace push.
 
 ## Standing release policies (now 11 — banked across cycle)
 
-1. Release gate = full e2e + SOT + engineering-integrity mailed approval (2026-04-22).
+1. Release gate = full e2e + SOT + engineering mailed approval (2026-04-22).
 2. Review via shared working tree (2026-04-22).
 3. Route dev-agent dispatch through coordinator (2026-04-23).
 4. Trust the Makefile's release-ready chain (2026-04-23).
@@ -153,6 +153,6 @@ Combined approval (his substance + my spec-conformance) lets Grace push.
   1.3.2 ship-before-approval) is the live discipline concern. Bilateral
   feedback delivered; pattern-close gate is a clean-discipline cycle on
   the conformance work. If she repeats, escalation needed.
-- The contract document at `agents/engineering-integrity/aale-trust-contract.md` will get
+- The contract document at `agents/engineering/aale-trust-contract.md` will get
   promoted to `aweb/docs/` once Grace and I have ratified the first
   slice and proved the conformance harness works.

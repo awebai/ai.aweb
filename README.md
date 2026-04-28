@@ -13,12 +13,12 @@ Start here:
 
 | Document | What it covers |
 |----------|---------------|
-| [docs/team.md](docs/team.md) | Team structure, roles, responsibilities, how agents interact |
+| [docs/team.md](docs/team.md) | Permanent responsibility areas and task-scoped work pairs |
 | [docs/invariants.md](docs/invariants.md) | Guiding principles for every design decision |
 | [docs/user-journey.md](docs/user-journey.md) | What users experience at each stage |
 | [docs/value-proposition.md](docs/value-proposition.md) | Why aweb exists, who it's for |
-| [docs/agent-first-company.md](docs/agent-first-company.md) | How aweb.ai should run through responsibility areas and shared artifacts |
-| [status/](status/) | Current focus and state (engineering, product, outreach, weekly) |
+| [docs/agent-first-company.md](docs/agent-first-company.md) | How aweb.ai runs through areas, work pairs, and feedback loops |
+| [status/](status/) | Current focus and state |
 
 For specific topics:
 
@@ -41,20 +41,21 @@ surface and the artifacts that keep it legible.
 
 | Agent | Responsibility area | Directory |
 |-------|---------------------|-----------|
-| Randy | Engineering integrity | [agents/engineering-integrity](agents/engineering-integrity) |
+| Randy | Engineering | [agents/engineering](agents/engineering) |
 | Avi | Direction | [agents/direction](agents/direction) |
-| Charlene | Attention | [agents/attention](agents/attention) |
-| Enoch | Accountability | [agents/accountability](agents/accountability) |
-| Amy | User feedback | [agents/user-feedback](agents/user-feedback) |
-| John | OSS repo integrity | [agents/repo-aweb](agents/repo-aweb) |
-| Tom | Cloud repo integrity | [agents/repo-cloud](agents/repo-cloud) |
-| Goto | Identity integrity | [agents/identity-integrity](agents/identity-integrity) |
+| Charlene | Outreach | [agents/outreach](agents/outreach) |
+| Amy | Support | [agents/support](agents/support) |
+| Enoch | Operations | [agents/operations](agents/operations) |
+| TBD | Analytics | [agents/analytics](agents/analytics) |
+
+Significant repo work uses task-scoped builder/reviewer agents created
+with `aw workspace add-worktree`, not permanent repo-manager agents.
 
 See [docs/team.md](docs/team.md) for how they work together.
 
 ## Publishing
 
-Attention owns the publishing pipeline:
+Outreach owns the publishing pipeline:
 
 | File | What |
 |------|------|

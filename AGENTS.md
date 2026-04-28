@@ -54,10 +54,10 @@ agent:
   support classifier plus product reviewer. This was learned the hard
   way — agents left unsupervised burned thousands of tokens building
   the wrong things.
-- **Responsibility areas.** The agent team is organized around areas
-  of responsibility over shared artifacts: direction, engineering
-  integrity, attention, user feedback, accountability, and repo
-  integrity.
+- **Responsibility areas.** The permanent agent team is organized
+  around surfaces over shared artifacts: direction, engineering,
+  outreach, support, operations, and analytics. Repo implementation
+  happens through task-scoped builder/reviewer worktree pairs.
 - **Feedback strength matters.** Always look for feedback. Prefer
   feedback that is close and verifiable, such as code -> test -> fix
   or release -> health check -> smoke test. For weaker surfaces like
@@ -84,10 +84,10 @@ Read in this order:
 
 **Read when relevant to your area:**
 - `docs/audiences.md` — Who uses aweb, what their day looks like,
-  where they hang out. Relevant for direction, attention, and
-  accountability.
+  where they hang out. Relevant for direction, outreach, support, and
+  analytics.
 - `docs/capabilities.md` — What aweb provides, mapped to user journey
-  stages. Relevant for repo integrity and engineering integrity.
+  stages. Relevant for direction, engineering, support, and analytics.
 
 **Reference documents** (read when you need detail):
 - `docs/aweb-high-level.md` — The identity/protocol architecture
@@ -111,31 +111,32 @@ co.aweb/
 │   ├── decisions.md       # Decision log with commit hashes
 │   └── strategy.md        # Go-to-market strategy (reference)
 ├── status/
-│   ├── engineering.md     # Engineering integrity
+│   ├── engineering.md     # Engineering
 │   ├── product.md         # Direction
-│   ├── outreach.md        # Attention
-│   └── weekly.md          # Accountability
-├── publishing/            # Attention owns (public)
+│   ├── outreach.md        # Outreach
+│   ├── support.md         # Support
+│   ├── operations.md      # Operations
+│   ├── analytics.md       # Analytics
+│   └── weekly.md          # Operations roll-up
+├── publishing/            # Outreach owns (public)
 │   ├── plan.md            # Content calendar
 │   ├── voice.md           # How we talk
 │   ├── landscape.md       # Agent-to-agent ecosystem map
 │   ├── history.md         # What we published
 │   └── drafts/            # Blog posts, video scripts
 └── agents/
-    ├── engineering-integrity/ # Randy
-    ├── direction/             # Avi
-    ├── accountability/        # Enoch
-    ├── attention/             # Charlene
-    ├── user-feedback/         # Amy
-    ├── repo-aweb/             # John, OSS repo integrity
-    ├── repo-cloud/            # Tom, cloud repo integrity
-    └── identity-integrity/    # Goto, identity integrity
+    ├── direction/       # Avi
+    ├── engineering/     # Randy
+    ├── outreach/        # Charlene
+    ├── support/         # Amy
+    ├── operations/      # Enoch
+    └── analytics/       # TBD
 ```
 
 ## How agents work here
 
 Each agent runs Claude Code from their subdirectory under `agents/`
-(e.g., `agents/engineering-integrity/`). `aw` finds `.aw/workspace.yaml` in that
+(e.g., `agents/engineering/`). `aw` finds `.aw/workspace.yaml` in that
 directory. Shared documents are at `../../` relative to the agent.
 
 ### Wake-up routine (mandatory, every time)
@@ -145,7 +146,7 @@ directory. Shared documents are at `../../` relative to the agent.
    prop) and your relevant status file — paths from agent dirs are
    `../../docs/<file>` and `../../status/<file>`
 3. Check `../../docs/decisions.md` for entries newer than your last handoff
-4. Read `../../status/weekly.md` — what the board said last time
+4. Read `../../status/weekly.md` — the latest operations roll-up
 5. Read your `handoff.md` — remember what you were doing
 6. `aw chat pending` and `aw mail inbox` — check for messages
 7. Check whether your active work is represented as an `aw` task; if
@@ -215,14 +216,16 @@ All repos live as siblings in one parent directory:
 | ac | `../ac/` | Cloud: auth, billing, dashboard, SaaS | Private |
 
 From agent subdirectories (`agents/X/`), sibling repos are at
-`../../../<repo>/`. Repo integrity and engineering integrity also have
-the relevant sibling repo symlinked into their own agent dir for
-convenience:
+`../../../<repo>/`. Engineering has sibling repo symlinks for
+cross-repo review:
 
-- `agents/repo-aweb/aweb` -> `../../../aweb`
-- `agents/repo-cloud/ac` -> `../../../ac`
-- `agents/identity-integrity/awid` -> `../../../aweb/awid`
-- `agents/engineering-integrity/aweb`, `agents/engineering-integrity/ac`
+- `agents/engineering/aweb` -> `../../../aweb`
+- `agents/engineering/ac` -> `../../../ac`
+- `agents/engineering/awid` -> `../../../aweb/awid`
+
+For significant repo implementation, create task-scoped builder and
+reviewer worktrees with `aw workspace add-worktree` instead of relying
+on permanent repo-manager agents.
 
 Prefer `git -C aweb log` over `cd ../../../aweb && git log` — the
 symlink keeps your CWD anchored in your own agent dir, which keeps

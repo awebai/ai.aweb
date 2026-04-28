@@ -13,9 +13,8 @@ handoff to detect that the world changed.
 **Decision maker:** Juan + Avi
 
 **Decision.** aweb.ai agents are organized by responsibility areas
-instead of management titles. Current areas are direction, engineering
-integrity, attention, user feedback, accountability, OSS repo
-integrity, cloud repo integrity, and identity integrity.
+instead of management titles. Current areas are direction, engineering,
+outreach, support, operations, and analytics.
 
 Substantial work must flow through artifacts: `aw` tasks/claims,
 handoffs, status files, and decision records. The default shape for
