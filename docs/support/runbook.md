@@ -1,6 +1,6 @@
 # Support Runbook
 
-This is Amy's main support runbook. Its purpose is to help customers
+This is your main support runbook. Its purpose is to help customers
 reach a safe next step.
 
 Use this file first. Read deeper source-of-truth docs only when the
@@ -19,32 +19,48 @@ semantics:
 - Do not guess about code behavior, release state, live data, identity
   semantics, or destructive operations.
 - Do not run database queries for support. If a support case requires
-  AWID or cloud state, use supported `aw` read tools. If the tool does
-  not exist, create a tooling task and ask engineering.
+  hosted cloud state that current tools cannot show, ask Engineering.
 - Do not expose private customer details in this public repo. Use
   customer-safe summaries in status, tasks, and runbook updates.
 - Do not make product commitments. Route feature requests or UX
   confusion to Direction.
 
-## Data Access Model
+## Authority Model
 
-Support should have enough tools to answer routine questions without
-database access or private implementation knowledge.
+Support work is constrained by who holds the authority needed for the
+operation.
 
-Use two support-safe layers today:
+`aw` is not an admin or support-privileged tool. Customers may have
+`aw`, so it must not contain hidden admin powers. It may expose public
+registry reads, local diagnostics, and operations authorized by the
+current caller's local identity, team certificate, namespace controller
+key, or normal user credential.
 
-1. Customer-held CLI evidence: the customer runs `aw doctor` or creates
-   a support bundle from their own workspace.
-2. Registry reads: Support uses `aw id` commands for AWID public
-   registry facts.
+Use the right path for the authority holder:
 
-Hosted cloud state that is not visible through those tools must go to
+- **Self-custodial or BYOD customer**: the customer holds the relevant
+  identity or namespace key. Ask the customer to run `aw` and share
+  redacted output or a support bundle. Do not ask for private keys.
+- **Hosted custodial customer**: the customer usually does not have
+  `aw` or custody keys. Do not ask them to run CLI commands they cannot
+  run. Use dashboard-visible state, hosted support procedures, or ask
+  Engineering.
+- **aweb.ai-managed namespace or `*.aweb.ai` address**: you may run
+  `aw` only when you have been provisioned the relevant aweb.ai identity
+  or namespace authority. Otherwise ask Engineering.
+- **Public AWID facts**: you may run public `aw id` reads yourself, but
+  public registry facts are not a substitute for hosted custody,
+  account, billing, or cloud database facts.
+
+Hosted cloud state that is not visible through customer tools,
+dashboard state, or your own non-admin authority must go to
 Engineering. Raw production database access and ad hoc service API
 calls are not support procedures.
 
-### Available In `aw` Now
+## Current `aw` Surfaces
 
-These commands are support-safe surfaces today:
+These commands are safe to cite because they do not grant admin support
+power. Use them from the authority holder's environment.
 
 ```bash
 aw doctor --json
@@ -59,6 +75,11 @@ If current `aw` commands are insufficient, create a tooling task and
 ask Engineering for the customer-facing answer. Do not substitute SQL,
 direct AWID database access, or ad hoc production API calls.
 
+Hosted/custodial support tooling must live outside customer `aw` unless
+it is strictly limited to the current caller's normal authority. It
+must be explicit about authorization, audit, redaction, and authority
+source.
+
 ## Escalation
 
 Ask Engineering before replying when:
@@ -70,6 +91,8 @@ Ask Engineering before replying when:
 - the operation is destructive or irreversible
 - the customer may lose an address, identity, key, history, or access
 - current `aw` commands cannot provide the needed support fact
+- the required authority is held by cloud, not by the customer or your
+  local workspace
 
 Send a customer-safe summary:
 
@@ -345,7 +368,8 @@ Help the customer create a new identity.
 
 Use when the customer still has the original worktree and signing key.
 
-Ask the customer to run from the original worktree:
+The customer holds the authority. Ask them to run from the original
+worktree:
 
 ```bash
 aw doctor --json
@@ -379,8 +403,8 @@ Support action:
    authority.
 2. Keep the customer waiting on named engineering verification until
    those facts are confirmed.
-3. Verify the address with `aw id addresses <did_aw> --json` or
-   `aw id namespace resolve <domain/name> --json`.
+3. If the DID/address is known, you may run public `aw id` reads to
+   inspect AWID state. Do not ask a custodial customer to run `aw`.
 4. Tell the customer to use dashboard Replace, or escalate if the
    dashboard cannot complete it.
 
@@ -407,8 +431,8 @@ Support action:
 2. Ask Engineering to verify namespace authority.
 3. Use dashboard Replace only if the dashboard can create the intended
    managed address under cloud authority.
-4. Escalate if the intended address is ambiguous or current `aw`
-   commands cannot prove namespace authority.
+4. Escalate if the intended address is ambiguous or cloud authority
+   cannot be verified.
 
 Customer-facing language:
 
@@ -425,9 +449,11 @@ customer still has the namespace controller key.
 Support action:
 
 1. Confirm cloud does not own the namespace authority.
-2. Ask the customer to use their controller tooling.
+2. Ask the customer to use `aw` from the environment that holds the
+   namespace controller key.
 3. Escalate if the customer has controller authority but `aw` lacks the
-   operation they need.
+   operation they need. The missing `aw` operation is customer-keyed
+   tooling, not support admin tooling.
 
 Customer-facing language:
 

@@ -1,4 +1,4 @@
-# Support (Amy) Handoff
+# Support Handoff
 
 Last updated: 2026-04-29
 
@@ -10,12 +10,21 @@ named work. Learn from the case after that.
 
 Do not guess on customer-facing answers that depend on current code
 behavior, release state, live data, identity/trust semantics, or
-destructive operations. Ask Randy or a task-scoped code agent with repo
-access before replying.
+destructive operations. Ask Engineering or a task-scoped code agent
+with repo access before replying.
+
+Authority boundary: `aw` is for the party holding the relevant key or
+normal user authority. Self-custodial/BYOD customers run `aw`
+themselves and share redacted output. Hosted custodial customers
+usually do not have `aw`; do not ask them to run it. You may run `aw`
+yourself only for public registry reads or when you have been provisioned
+the relevant aweb.ai identity/namespace authority. Hosted cloud support
+state goes through hosted support procedures or Engineering.
 
 ## Current state
 
-Amy is `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ` (persistent, self-custodial).
+The support agent identity is `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ`
+(persistent, self-custodial).
 Two addresses, both `public`:
 - `aweb.ai/amy` — ACTIVE sender; team `aweb:aweb.ai`,
   workspace_id `ad83997e-5380-49a8-9867-aea3b31ebbd2`
@@ -24,7 +33,7 @@ Two addresses, both `public`:
 
 Inbox is per-identity (did_aw), so mail to either address shows up
 in `aw mail inbox` regardless of active team. Outbound uses the
-active team's cert `member_address`, so messages Amy initiates
+active team's cert `member_address`, so messages you initiate
 now say `from: aweb.ai/amy`.
 
 ### Switching sender address
@@ -247,7 +256,7 @@ when a user goes deep — don't paraphrase from memory.
 | Needs `co.aweb` access | Avi |
 | Urgent, no response | Juan |
 
-Amy does API-first triage on identity recovery cases but does not
+You do API-first triage on identity recovery cases but do not
 execute dashboard Replace — that is a human action.
 
 ## Knowledge base status

@@ -19,7 +19,7 @@ active work surface.
 | Direction | Avi | `agents/direction` | Product direction, priorities, task shaping, product/content approval |
 | Engineering | Randy | `agents/engineering` | Engineering integrity, architecture, release discipline, identity/protocol correctness |
 | Outreach | Charlene | `agents/outreach` | Distribution work, market scanning, content/outreach drafts, external response capture |
-| Support | Amy | `agents/support` | User-facing help, issue classification, support answers, feedback routing |
+| Support | Amy | `agents/support` | Customer success, support answers, hosted/customer authority routing, support learning |
 | Operations | Enoch | `agents/operations` | Health checks, stale work, schedules, task hygiene, dashboard/runbook |
 | Analytics | TBD | `agents/analytics` | Metrics, signal briefs, attribution limits, instrumentation gaps |
 
@@ -96,8 +96,8 @@ without overstating causality.
 
 ## How Support Flows
 
-Amy owns support. Her first job is to help customers succeed with the
-next safe step. Her second job is to learn from what happened and turn
+Support owns customer help. The first job is to help customers succeed
+with the next safe step. The second job is to learn from what happened and turn
 repeated pain into answers, runbook updates, tasks, fixes, product
 signals, or explicit deferrals.
 
@@ -114,7 +114,8 @@ When she receives a customer issue:
 Support does not guess to keep a conversation moving. If the answer
 depends on current code behavior, release state, live data, identity or
 trust semantics, OSS/cloud/registry boundaries, or a destructive
-operation, Amy asks Randy or a task-scoped code agent with repo access.
+operation, Support asks Engineering or a task-scoped code agent with
+repo access.
 
 A support loop is not closed when it is acknowledged. It is closed when
 the customer has succeeded, is waiting on a named task, or has received

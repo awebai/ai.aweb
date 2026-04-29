@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-04-29 08:44 CEST
+Last updated: 2026-04-29 09:06 CEST
 
 ## Current focus
 
@@ -17,10 +17,11 @@ task: `aweb-aals.8`.
 
 ## Waiting on engineering
 
-- `aweb-aaka.34`: decide and implement the stable `aw` surface for
-  hosted support reads. Until this exists, Support must ask
-  Engineering for hosted cloud state that current `aw` commands cannot
-  show.
+- `aweb-aaka.34`: decide and implement hosted/custodial support
+  tooling outside customer `aw`. `aw` must remain a customer/key-holder
+  CLI, not an admin support surface. Until the hosted support surface is
+  clear, Support asks Engineering for cloud state that the customer or
+  support agent cannot inspect with their own authority.
 
 ## Closed customer loops
 
@@ -36,3 +37,6 @@ task: `aweb-aals.8`.
 - If the safe customer-facing answer depends on current code behavior,
   release state, live data, identity/trust semantics, or a destructive
   operation, Support asks Engineering before replying.
+- Ask self-custodial/BYOD customers to run `aw` themselves because
+  they hold the keys. Do not ask hosted custodial customers to run
+  `aw`; they usually do not have it.
