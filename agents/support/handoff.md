@@ -255,6 +255,8 @@ execute dashboard Replace — that is a human action.
 - `agent-guide.md` in aweb is the current path.
 - `../../docs/support/agent-identity-recovery.md` synced from ac via
   `make docs-sync`. Re-run after any ac-side edits.
+- `../../docs/support/runbook.md` is the local customer-success entry
+  point. It is not auto-spliced from ac recovery docs.
 - Identity docs in aweb are v1.8.1+: `identity-guide.md` and
   `trust-model.md` are current sources.
 

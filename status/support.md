@@ -17,7 +17,10 @@ task: `aweb-aals.8`.
 
 ## Waiting on engineering
 
-- None recorded in this public status.
+- `aweb-aaka.34`: decide and implement the stable `aw` surface for
+  hosted support reads. Until this exists, Support must ask
+  Engineering for hosted cloud state that current `aw` commands cannot
+  show.
 
 ## Closed customer loops
 

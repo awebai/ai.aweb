@@ -14,4 +14,3 @@ docs-sync:
 	@mkdir -p $(LOCAL_SUPPORT)
 	@cp $(AC_SUPPORT)/*.md $(LOCAL_SUPPORT)/
 	@echo "synced $(AC_SUPPORT)/*.md -> $(LOCAL_SUPPORT)/"
-	@python3 scripts/splice-recovery-into-runbook.py
