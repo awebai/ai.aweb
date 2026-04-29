@@ -1,6 +1,17 @@
 # Support (Amy) Handoff
 
-Last updated: 2026-04-26
+Last updated: 2026-04-29
+
+## Operating focus
+
+Support is customer-success-first. When a customer asks for help, first
+get them to a safe next step or make clear that they are waiting on
+named work. Learn from the case after that.
+
+Do not guess on customer-facing answers that depend on current code
+behavior, release state, live data, identity/trust semantics, or
+destructive operations. Ask Randy or a task-scoped code agent with repo
+access before replying.
 
 ## Current state
 

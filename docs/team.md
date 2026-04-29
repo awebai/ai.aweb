@@ -96,20 +96,30 @@ without overstating causality.
 
 ## How Support Flows
 
-Amy owns support. She handles user-facing help, classifies issues,
-routes feedback, and turns user pain into tasks.
+Amy owns support. Her first job is to help customers succeed with the
+next safe step. Her second job is to learn from what happened and turn
+repeated pain into answers, runbook updates, tasks, fixes, product
+signals, or explicit deferrals.
 
-When she receives feedback:
+When she receives a customer issue:
 
+- Clear runbook answer -> answer directly and follow up for confirmation
+- Code-dependent or risky answer -> ask engineering before replying
 - Bugs -> engineering or a repo task with builder/reviewer
 - UX confusion or feature requests -> direction and a concrete task
 - Notable stories or quotes -> outreach, without leaking private user
   details into public files
 - Urgent issues with no response -> Juan
 
-Feedback is not closed when it is acknowledged. It is closed when it is
-routed, represented as an artifact, and either answered, fixed, or
-explicitly deferred.
+Support does not guess to keep a conversation moving. If the answer
+depends on current code behavior, release state, live data, identity or
+trust semantics, OSS/cloud/registry boundaries, or a destructive
+operation, Amy asks Randy or a task-scoped code agent with repo access.
+
+A support loop is not closed when it is acknowledged. It is closed when
+the customer has succeeded, is waiting on a named task, or has received
+an explicit deferral. The learning artifact comes after that: support
+status, runbook update, task, product signal, or outreach-safe story.
 
 ## How Operations Works
 

@@ -111,7 +111,7 @@ loop differs by area:
 | Engineering | code -> tests/CI -> fix; release -> health/smoke/browser probe |
 | Direction | priority -> shipped artifact/action -> user/support/outreach/analytics signal |
 | Outreach | draft/action -> human publish/engage -> replies/clicks/traffic/signups signal |
-| Support | user issue -> answer/fix/task -> user confirms or issue remains open |
+| Support | customer blocker -> safe answer/engineering question/task -> customer succeeds or waits on named work |
 | Operations | check -> discrepancy -> routed task -> recheck |
 | Analytics | question -> data/query/instrumentation -> signal brief -> next task or no-op |
 
