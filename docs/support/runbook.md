@@ -39,8 +39,9 @@ key, or normal user credential.
 Use the right path for the authority holder:
 
 - **Self-custodial or BYOD customer**: the customer holds the relevant
-  identity or namespace key. Ask the customer to run `aw` and share
-  redacted output or a support bundle. Do not ask for private keys.
+  identity or namespace key. Ask the customer to run `aw` for commands
+  that require that key or their local workspace, and share redacted
+  output or a support bundle. Do not ask for private keys.
 - **Hosted custodial customer**: the customer usually does not have
   `aw` or custody keys. Do not ask them to run CLI commands they cannot
   run. Use dashboard-visible state, hosted support procedures, or ask
@@ -48,9 +49,10 @@ Use the right path for the authority holder:
 - **aweb.ai-managed namespace or `*.aweb.ai` address**: you may run
   `aw` only when you have been provisioned the relevant aweb.ai identity
   or namespace authority. Otherwise ask Engineering.
-- **Public AWID facts**: you may run public `aw id` reads yourself, but
-  public registry facts are not a substitute for hosted custody,
-  account, billing, or cloud database facts.
+- **Non-keyed `aw` reads**: you may run `aw` on behalf of the customer
+  when the command does not require the customer's private key, local
+  workspace, team certificate, namespace controller key, or normal
+  account session. Public AWID reads are the main example.
 
 Hosted cloud state that is not visible through customer tools,
 dashboard state, or your own non-admin authority must go to
@@ -60,15 +62,22 @@ calls are not support procedures.
 ## Current `aw` Surfaces
 
 These commands are safe to cite because they do not grant admin support
-power. Use them from the authority holder's environment.
+power. Run public registry reads yourself when the customer gives you
+the target DID or address. Ask the customer to run local diagnostic
+commands from their own workspace.
 
 ```bash
-aw doctor --json
-aw doctor support-bundle --output doctor.json
 aw id resolve <did_aw> --json
 aw id addresses <did_aw> --json
 aw id namespace resolve <domain/name> --json
 aw id namespace addresses <domain> --json
+```
+
+Customer-run local diagnostics:
+
+```bash
+aw doctor --json
+aw doctor support-bundle --output doctor.json
 ```
 
 If current `aw` commands are insufficient, create a tooling task and

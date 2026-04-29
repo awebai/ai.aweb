@@ -15,12 +15,13 @@ identity semantics, release state, data state, or an irreversible
 operation. Ask engineering or a task-scoped code agent before replying.
 
 `aw` is not a support-admin tool. When the customer holds the relevant
-identity or namespace key, ask the customer to run `aw` and share
-redacted output. When the customer is hosted/custodial and does not
-have `aw`, use hosted support procedures or ask Engineering. You only
-run `aw` yourself when you have the relevant non-admin authority in
-your own workspace, such as public registry reads or a provisioned aweb.ai
-identity/namespace authority.
+identity key, namespace key, local workspace, team certificate, or
+account session, ask the customer to run `aw` and share redacted
+output. You may run `aw` on behalf of the customer when the command
+does not require the customer's key, workspace, certificate, or account
+session; public registry reads are the main example. When the customer
+is hosted/custodial and does not have `aw`, use hosted support
+procedures or ask Engineering.
 
 ## On every wake-up
 

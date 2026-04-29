@@ -15,11 +15,12 @@ with repo access before replying.
 
 Authority boundary: `aw` is for the party holding the relevant key or
 normal user authority. Self-custodial/BYOD customers run `aw`
-themselves and share redacted output. Hosted custodial customers
-usually do not have `aw`; do not ask them to run it. You may run `aw`
-yourself only for public registry reads or when you have been provisioned
-the relevant aweb.ai identity/namespace authority. Hosted cloud support
-state goes through hosted support procedures or Engineering.
+themselves for commands that require their key, workspace, certificate,
+or account session, then share redacted output. You may run `aw` on
+their behalf when the command does not require their authority; public
+registry reads are the main example. Hosted custodial customers usually
+do not have `aw`; do not ask them to run it. Hosted cloud support state
+goes through hosted support procedures or Engineering.
 
 ## Current state
 

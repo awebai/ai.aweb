@@ -18,10 +18,11 @@ task: `aweb-aals.8`.
 ## Waiting on engineering
 
 - `aweb-aaka.34`: decide and implement hosted/custodial support
-  tooling outside customer `aw`. `aw` must remain a customer/key-holder
-  CLI, not an admin support surface. Until the hosted support surface is
-  clear, Support asks Engineering for cloud state that the customer or
-  support agent cannot inspect with their own authority.
+  tooling outside customer `aw`. `aw` may expose public reads and
+  caller-authorized operations, but not admin support powers. Until the
+  hosted support surface is clear, Support asks Engineering for cloud
+  state that the customer or support agent cannot inspect with their
+  own authority.
 
 ## Closed customer loops
 
@@ -38,5 +39,7 @@ task: `aweb-aals.8`.
   release state, live data, identity/trust semantics, or a destructive
   operation, Support asks Engineering before replying.
 - Ask self-custodial/BYOD customers to run `aw` themselves because
-  they hold the keys. Do not ask hosted custodial customers to run
-  `aw`; they usually do not have it.
+  they hold the keys for keyed/local operations. Support can run
+  non-keyed public `aw` reads on the customer's behalf when the
+  customer provides the target DID or address. Do not ask hosted
+  custodial customers to run `aw`; they usually do not have it.
