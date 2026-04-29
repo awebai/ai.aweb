@@ -17,12 +17,8 @@ task: `aweb-aals.8`.
 
 ## Waiting on engineering
 
-- `aweb-aaka.34`: decide and implement hosted/custodial support
-  tooling outside customer `aw`. `aw` may expose public reads and
-  caller-authorized operations, but not admin support powers. Until the
-  hosted support surface is clear, Support asks Engineering for cloud
-  state that the customer or support agent cannot inspect with their
-  own authority.
+- Hosted custodial cases that require cloud state are Engineering
+  escalations until Engineering provides a support-facing procedure.
 
 ## Closed customer loops
 

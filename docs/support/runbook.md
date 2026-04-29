@@ -1,70 +1,64 @@
 # Support Runbook
 
-This is your main support runbook. Its purpose is to help customers
-reach a safe next step.
+Your job is to get the customer to a safe next step, then record what
+we learned.
 
-Use this file first. Read deeper source-of-truth docs only when the
-customer's issue depends on identity, trust, AWID, or support-envelope
-semantics:
+Do not ask for private keys, signing keys, session tokens, admin API
+keys, database access, or unredacted secrets. Do not guess about
+identity, custody, address ownership, or destructive actions.
 
-- `../../../aweb/docs/identity-guide.md`
-- `../../../aweb/docs/trust-model.md`
-- `../../../aweb/docs/awid-sot.md`
-- `../../../aweb/docs/support-contract-v1.md`
+## First Response
 
-## Operating Rules
+For every case, collect:
 
-- Help the customer first. Record the learning after they have a path
-  forward or are waiting on named work.
-- Do not guess about code behavior, release state, live data, identity
-  semantics, or destructive operations.
-- Do not run database queries for support. If a support case requires
-  hosted cloud state that current tools cannot show, ask Engineering.
-- Do not expose private customer details in this public repo. Use
-  customer-safe summaries in status, tasks, and runbook updates.
-- Do not make product commitments. Route feature requests or UX
-  confusion to Direction.
+- what the customer is trying to do
+- what happened instead
+- exact error text
+- timestamp and timezone
+- whether they are using dashboard, `aw`, or both
+- team/domain/address involved, if safe to share
+- whether the customer is self-custodial/BYOD or hosted custodial
 
-## Authority Model
+Then choose the case below.
 
-Support work is constrained by who holds the authority needed for the
-operation.
+## Case 1: Customer Has `aw`
 
-`aw` is not an admin or support-privileged tool. Customers may have
-`aw`, so it must not contain hidden admin powers. It may expose public
-registry reads, local diagnostics, and operations authorized by the
-current caller's local identity, team certificate, namespace controller
-key, or normal user credential.
+Use this when the customer is self-custodial, BYOD, or otherwise has a
+local workspace with `aw`.
 
-Use the right path for the authority holder:
+Ask the customer to run commands that depend on their local workspace,
+identity key, team certificate, namespace controller key, or account
+session.
 
-- **Self-custodial or BYOD customer**: the customer holds the relevant
-  identity or namespace key. Ask the customer to run `aw` for commands
-  that require that key or their local workspace, and share redacted
-  output or a support bundle. Do not ask for private keys.
-- **Hosted custodial customer**: the customer usually does not have
-  `aw` or custody keys. Do not ask them to run CLI commands they cannot
-  run. Use dashboard-visible state, hosted support procedures, or ask
-  Engineering.
-- **aweb.ai-managed namespace or `*.aweb.ai` address**: you may run
-  `aw` only when you have been provisioned the relevant aweb.ai identity
-  or namespace authority. Otherwise ask Engineering.
-- **Non-keyed `aw` reads**: you may run `aw` on behalf of the customer
-  when the command does not require the customer's private key, local
-  workspace, team certificate, namespace controller key, or normal
-  account session. Public AWID reads are the main example.
+Customer-run commands:
 
-Hosted cloud state that is not visible through customer tools,
-dashboard state, or your own non-admin authority must go to
-Engineering. Raw production database access and ad hoc service API
-calls are not support procedures.
+```bash
+aw version
+aw whoami --json
+aw doctor --json
+aw doctor support-bundle --output doctor.json
+```
 
-## Current `aw` Surfaces
+For identity/address problems, ask the customer to run from the
+affected worktree:
 
-These commands are safe to cite because they do not grant admin support
-power. Run public registry reads yourself when the customer gives you
-the target DID or address. Ask the customer to run local diagnostic
-commands from their own workspace.
+```bash
+aw id show --json
+aw id resolve <did_aw> --json
+aw id addresses <did_aw> --json
+```
+
+For BYOD namespace problems, ask the customer to run from the
+environment that holds the namespace controller key:
+
+```bash
+aw id namespace <domain> --json
+aw id namespace resolve <domain/name> --json
+aw id namespace addresses <domain> --json
+```
+
+You may run public registry reads yourself when the customer gives you
+the target DID or address:
 
 ```bash
 aw id resolve <did_aw> --json
@@ -73,56 +67,63 @@ aw id namespace resolve <domain/name> --json
 aw id namespace addresses <domain> --json
 ```
 
-Customer-run local diagnostics:
+Do not ask the customer to paste private key files. The support bundle
+is the shareable artifact.
+
+## Case 2: Hosted Custodial Customer
+
+Use this when the customer uses the dashboard/cloud product and does
+not have `aw` or custody keys.
+
+Do not ask them to run `aw`.
+
+Ask for:
+
+- dashboard page or flow
+- exact error text
+- approximate timestamp
+- team slug/domain
+- agent name or address
+- what they expected to happen
+
+What you can do:
+
+- guide the customer through dashboard flows in this runbook
+- run public AWID reads yourself if you have a DID or address
+- ask Engineering for hosted cloud state that is not visible to the
+  customer
+
+Ask Engineering for hosted state involving custody keys, cloud-managed
+namespace authority, team ownership, account status, billing, dashboard
+lifecycle state, or anything that would otherwise require DB/API/admin
+access.
+
+## Case 3: Public Address Or DID Question
+
+Use this when the customer asks whether an address resolves, which DID
+owns an address, or whether a DID has registered addresses.
+
+Tools you can run:
 
 ```bash
-aw doctor --json
-aw doctor support-bundle --output doctor.json
+aw id resolve <did_aw> --json
+aw id addresses <did_aw> --json
+aw id namespace resolve <domain/name> --json
+aw id namespace addresses <domain> --json
 ```
 
-If current `aw` commands are insufficient, create a tooling task and
-ask Engineering for the customer-facing answer. Do not substitute SQL,
-direct AWID database access, or ad hoc production API calls.
+Public registry reads answer registry facts only. They do not prove
+dashboard ownership, custody state, billing state, or cloud database
+state. If the customer problem depends on those, ask Engineering.
 
-Hosted/custodial support tooling must live outside customer `aw` unless
-it is strictly limited to the current caller's normal authority. It
-must be explicit about authorization, audit, redaction, and authority
-source.
+## Case 4: Dashboard Operation Help
 
-## Escalation
+Use this when the customer wants help doing something in the hosted
+dashboard.
 
-Ask Engineering before replying when:
+### Rename Hosted Agent Address
 
-- the runbook does not cover the case
-- tool output and customer-visible behavior disagree
-- the answer depends on current code behavior or release state
-- AWID, cloud, and local workspace state disagree
-- the operation is destructive or irreversible
-- the customer may lose an address, identity, key, history, or access
-- current `aw` commands cannot provide the needed support fact
-- the required authority is held by cloud, not by the customer or your
-  local workspace
-
-Send a customer-safe summary:
-
-```bash
-aw chat send-and-wait randy "Support blocker: <summary>. Customer impact: <impact>. Facts: <tool output summary>. Question: <specific decision needed>."
-```
-
-## Common Operations
-
-### Rename A Hosted Agent Address
-
-Use when the customer wants the same agent identity to use a different
-public name in the same namespace, for example
-`acme.aweb.ai/avi` to `acme.aweb.ai/sofia`.
-
-Customer outcome:
-
-- same identity
-- same chat and mail history
-- same coordination state
-- new public address
+Customer goal: same agent, same identity, new public address.
 
 Dashboard path:
 
@@ -133,126 +134,19 @@ Dashboard path:
 5. Pick the namespace and new name.
 6. Confirm `Update address`.
 
-Authority:
-
-- Team owner required for hosted custodial agents.
-- BYOD namespace changes require the customer's namespace controller
-  authority.
-
 Common errors:
 
-- `409 address_in_use`: the new name belongs to another agent. The
-  customer can pick another name or explicitly reassign the address.
-  Reassignment moves the name away from the other agent, so make sure
-  the customer understands the effect before they confirm.
-- `403 Namespace is not attached to this team`: ask the customer to
-  refresh and retry. Escalate if it persists.
-- `403 manage external agent addresses`: refer the customer to the
-  team owner.
-- Registry unavailable or rollback failed: escalate with the agent ID,
-  intended address, timestamp, and exact error text.
-
-Related operations:
-
-- Use `Replace hosted agent identity` when the customer wants fresh
-  keys while keeping the same address.
-- Use `Archive hosted agent` when the customer wants to retire the
-  agent and release the address.
-
-### Archive A Hosted Agent
-
-Use when the customer wants to permanently retire an agent.
-
-Customer outcome:
-
-- agent leaves the active roster
-- released hosted addresses can be reused
-- chat, mail, and activity history remain for audit
-- the agent cannot send or receive new messages
-
-Dashboard path:
-
-1. Open `Identities`.
-2. Select the agent.
-3. Open `Lifecycle`.
-4. Choose `Archive agent`.
-5. Confirm the irreversible action.
-
-Authority:
-
-- Team owner required.
-- BYOD addresses remain controlled by the customer's namespace
-  controller.
-
-Common errors:
-
-- `400 Only active agents can be archived`: verify whether the agent is
-  already archived.
-- `403 archive agents`: refer the customer to the team owner.
-- Registry address deletion failed: retry once after a short wait. If
-  it persists, escalate because address state may be partial.
-
-Related operations:
-
-- Use `Replace hosted agent identity` when the customer wants a fresh
-  identity but needs to keep the address.
-- Use `Create hosted agent` when the customer wants a new agent after
-  archiving.
-
-### Replace Hosted Agent Identity
-
-Use when the customer needs fresh identity keys while keeping the same
-public address. This is the right path for key rotation or hosted key
-loss when cloud has namespace authority.
-
-Customer outcome:
-
-- new `did:aw` and signing key
-- same public address
-- old identity archived for audit
-- future messages to the address reach the replacement
-
-Dashboard path:
-
-1. Open `Identities`.
-2. Select the agent.
-3. Open `Lifecycle`.
-4. Choose `Replace agent`.
-5. Confirm that the old identity will be archived.
-
-Authority:
-
-- Team owner required.
-- Cloud-managed namespace required unless Engineering confirms another
-  safe path.
-
-Before telling the customer to replace, verify:
-
-- the identity is persistent
-- the affected address is the intended address
-- the namespace is cloud-managed or otherwise has available controller
-  authority
-- there is no unresolved DID/address mismatch
-
-Escalate if current `aw` commands cannot verify those facts.
-
-Customer-facing language:
-
-> We can rotate the agent to a fresh identity while keeping the public
-> address. The old identity is archived for audit, and future messages
-> to the address reach the replacement.
+- `409 address_in_use`: the name belongs to another agent. Customer can
+  pick another name or explicitly reassign. Reassignment moves the name
+  away from the other agent, so confirm they understand that.
+- `403 Namespace is not attached to this team`: ask them to refresh and
+  retry. Escalate if it persists.
+- `403 manage external agent addresses`: refer them to the team owner.
+- Registry unavailable or rollback failed: ask Engineering.
 
 ### Change Address Visibility
 
-Use when the customer wants to change who can discover an agent's
-address through registry lookup.
-
-Options:
-
-- `Public`: authenticated callers can discover the address.
-- `Org only`: teams under the same organization can discover it.
-- `Team members only`: this team can discover it.
-- `Nobody`: registry discovery is disabled for new lookups.
+Customer goal: control who can discover an address.
 
 Dashboard path:
 
@@ -262,36 +156,19 @@ Dashboard path:
 4. Change `Address reachability`.
 5. Save.
 
-Authority:
+Options:
 
-- Team owner required for hosted addresses.
-- BYOD-domain reachability requires the customer's namespace controller
-  authority.
+- `Public`: authenticated callers can discover the address.
+- `Org only`: teams under the same organization can discover it.
+- `Team members only`: this team can discover it.
+- `Nobody`: registry discovery is disabled for new lookups.
 
-Common errors:
-
-- `403 Address is externally managed`: the customer must use their
-  namespace controller tooling.
-- `409 Permanent identity is missing its assigned address`: escalate if
-  the dashboard cannot show or reassign the intended address.
-- Registry unavailable: retry once; escalate if persistent.
-
-Support note:
-
-Address visibility controls discovery. Message acceptance controls who
-can send. Customers often need both settings checked together.
+Note: address visibility controls discovery. Message acceptance controls
+who can send.
 
 ### Change Message Acceptance
 
-Use when the customer wants to change who can send mail or chat to an
-agent.
-
-Options:
-
-- `Anyone`: any caller who can address the agent can contact it.
-- `Contacts`: saved contacts can contact it.
-- `This team`: team members can contact it.
-- `Owner only`: only the owner scope can contact it.
+Customer goal: control who can send mail or chat to an agent.
 
 Dashboard path:
 
@@ -301,211 +178,173 @@ Dashboard path:
 4. Choose `Accepts messages from`.
 5. Save.
 
-Authority:
+Options:
 
-- Team owner or admin required.
+- `Anyone`
+- `Contacts`
+- `This team`
+- `Owner only`
 
-Common errors:
+If the customer reports that this did not affect existing queued
+messages, that is expected. It affects new delivery decisions.
 
-- `403 update agents`: refer the customer to a team owner or admin.
-- Validation error: programmatic caller sent an unsupported value.
-  Ask them to use the dashboard enum or exact documented value.
+### Archive Hosted Agent
 
-Support note:
+Customer goal: permanently retire an agent.
 
-This setting applies to new delivery decisions. It does not rewrite
-messages already in a queue.
+Dashboard path:
 
-## Dashboard Gaps
+1. Open `Identities`.
+2. Select the agent.
+3. Open `Lifecycle`.
+4. Choose `Archive agent`.
+5. Confirm the irreversible action.
 
-When a customer asks for an unsupported operation, say so directly and
-offer the closest safe path.
+Make sure the customer understands:
 
-Known gaps:
+- archive is terminal
+- active send/receive stops
+- hosted addresses may be released
+- history remains for audit
 
-- Internal-alias-only rename. Current path: archive and create a new
-  agent, with history/address tradeoffs explained.
-- Per-agent custom routing rules beyond the existing reachability and
-  message-acceptance settings.
-- Bulk operations across multiple agents.
-- Restoring an archived agent. Archive is terminal; create a new agent
-  if the customer needs to continue.
+Ask Engineering if registry address deletion fails or address state
+looks partial.
 
-Customer-facing language:
+### Replace Hosted Agent Identity
 
-> That is not supported in the dashboard today. The closest safe path
-> is <adjacent operation>. If this is important for your workflow, I can
-> route it as product feedback.
+Customer goal: fresh identity keys while keeping the public address.
 
-## Recovery Scenarios
+Use this for hosted key loss or proactive hosted key rotation when
+cloud has namespace authority.
 
-Recovery work is about preserving authority. The support goal is to
-restore the customer's ability to use an identity or address without
-inventing ownership, changing custody silently, or bypassing key
-authority.
+Dashboard path:
 
-Authority map:
+1. Open `Identities`.
+2. Select the agent.
+3. Open `Lifecycle`.
+4. Choose `Replace agent`.
+5. Confirm that the old identity will be archived.
 
-| Fact | Source | Support read |
-| --- | --- | --- |
-| DID registration and current key | AWID registry | `aw id resolve <did_aw> --json` |
-| Addresses for a DID | AWID registry | `aw id addresses <did_aw> --json` |
-| Address discovery | AWID registry | `aw id namespace resolve <domain/name> --json` |
-| Local workspace condition | Customer CLI | `aw doctor support-bundle --output doctor.json` |
-
-Do not query AWID databases. Do not ask Support to inspect production
-tables or call raw production APIs. If the needed fact is not available
-through `aw`, the missing tool is the task.
-
-### Initial Triage
-
-Collect:
-
-- team slug or canonical team id
-- agent name or agent id
-- expected address
-- persistent or ephemeral
-- custodial or self-custodial
-- whether the user still has the original worktree and signing key
-- cloud-managed namespace or BYOD namespace
-- exact dashboard, CLI, or API error text
-
-If the identity is ephemeral, durable identity recovery does not apply.
-Help the customer create a new identity.
-
-### Case 1: Self-Custodial Key Still Exists
-
-Use when the customer still has the original worktree and signing key.
-
-The customer holds the authority. Ask them to run from the original
-worktree:
-
-```bash
-aw doctor --json
-aw id register
-aw id resolve <did_aw> --json
-aw id addresses <did_aw> --json
-```
-
-If the DID registers successfully but the managed address is missing,
-use the dashboard address flow or ask Engineering if current `aw`
-commands cannot show the intended address.
-
-Customer-facing language:
-
-> Your identity key still exists locally, so the safest recovery is to
-> re-register that same identity from the original worktree. That
-> preserves the durable identity.
-
-### Case 2: Hosted Key Lost, Address Exists
-
-Use when:
+Before telling the customer to proceed, ask Engineering if you cannot
+verify:
 
 - identity is persistent
-- hosted/custodial key is lost or unusable
+- affected address is the intended address
 - namespace is cloud-managed
-- AWID has the intended address
-
-Support action:
-
-1. Ask Engineering to verify the hosted agent, address, and namespace
-   authority.
-2. Keep the customer waiting on named engineering verification until
-   those facts are confirmed.
-3. If the DID/address is known, you may run public `aw id` reads to
-   inspect AWID state. Do not ask a custodial customer to run `aw`.
-4. Tell the customer to use dashboard Replace, or escalate if the
-   dashboard cannot complete it.
+- no unresolved DID/address mismatch exists
 
 Customer-facing language:
 
-> The address exists, but the identity key is no longer usable. We can
-> replace the identity with a new cloud-managed key and keep the
-> existing address.
+> We can rotate the agent to a fresh identity while keeping the public
+> address. The old identity is archived for audit, and future messages
+> to the address reach the replacement.
 
-### Case 3: Hosted Key Lost, Address Missing
+## Case 5: Identity Or Address Recovery
 
-Use when:
+Use this when the customer lost a key, an address disappeared, a DID
+does not resolve, or dashboard says an identity is not ready.
 
-- identity is persistent
-- hosted/custodial key is lost or unusable
-- namespace is cloud-managed
-- the intended address is known
-- AWID does not currently show that address
+Classify first:
 
-Support action:
+- self-custodial with original worktree/key available
+- self-custodial with key lost
+- BYOD namespace with controller key available
+- BYOD namespace with controller key lost
+- hosted custodial under a cloud-managed namespace
 
-1. Ask Engineering to verify the intended address from hosted cloud
-   state.
-2. Ask Engineering to verify namespace authority.
-3. Use dashboard Replace only if the dashboard can create the intended
-   managed address under cloud authority.
-4. Escalate if the intended address is ambiguous or cloud authority
-   cannot be verified.
+Actions:
 
-Customer-facing language:
+- If the original self-custodial key exists, ask the customer to run
+  `aw id register` from the original worktree, then gather `aw doctor`
+  and registry read output.
+- If a BYOD controller key exists, ask the customer to run `aw` from
+  the environment that holds that controller key.
+- If the customer is hosted custodial, do not ask them to run `aw`.
+  Ask Engineering to verify hosted state and safe recovery path.
+- If both identity key and namespace controller authority are lost,
+  do not promise recovery.
 
-> The old identity was not fully reachable, but the address belongs to
-> a cloud-managed namespace. We can provision a new cloud-managed
-> identity and attach the intended address under that namespace
-> authority.
-
-### Case 4: BYOD Namespace With Controller Available
-
-Use when the address is under a customer-controlled namespace and the
-customer still has the namespace controller key.
-
-Support action:
-
-1. Confirm cloud does not own the namespace authority.
-2. Ask the customer to use `aw` from the environment that holds the
-   namespace controller key.
-3. Escalate if the customer has controller authority but `aw` lacks the
-   operation they need. The missing `aw` operation is customer-keyed
-   tooling, not support admin tooling.
-
-Customer-facing language:
-
-> This address is under your namespace. Recovery must be performed by
-> the holder of the namespace controller key.
-
-### Case 5: No Remaining Authority
-
-Use when both the identity key and the namespace controller authority
-are unavailable.
-
-Support action:
-
-1. Do not attempt recovery.
-2. Explain the authority boundary.
-3. Help the customer create a new identity or address under controlled
-   authority.
-
-Customer-facing language:
+Customer-facing language for no remaining authority:
 
 > There is no remaining key authority that can prove ownership of the
 > old identity or namespace. We cannot safely recover it. The safe path
 > is to create a new identity or address.
 
-### Recovery Escalation Checklist
+## Case 6: Bug, Regression, Or Outage
 
-Escalate with:
+Use this when something that should work is failing.
 
-- customer-safe impact summary
-- team slug or canonical team id
-- agent id and agent name
-- expected address
-- custody and lifetime
-- old `did:key` and `did:aw`, if available
-- output summary from `aw doctor` or support bundle
-- relevant `aw id` read summaries
-- exact dashboard, CLI, or API error text
+Collect:
 
-Escalate immediately when:
+- exact command or dashboard flow
+- exact error text
+- timestamp and timezone
+- `aw version` if CLI is involved
+- support bundle if CLI/local workspace is involved
+- target address/DID/team, if safe to share
+- whether retry changes the result
 
-- `aw id resolve` returns a key that does not match expected state
-- more than one plausible address exists
-- namespace authority is unclear
-- dashboard Replace returns `409` or `502`
-- a successful replacement is followed by message/auth failures
-- current `aw` commands cannot provide the needed support fact
+If it is a CLI/customer-workspace issue, ask for:
+
+```bash
+aw version
+aw doctor --json
+aw doctor support-bundle --output doctor.json
+```
+
+If it is dashboard/hosted/custodial, ask Engineering with the collected
+facts. Do not infer hosted state from public AWID reads alone.
+
+## Case 7: UX Confusion, Docs Gap, Or Feature Request
+
+Use this when the product works as designed but the customer is
+confused, blocked by missing docs, or asking for a capability we do not
+have.
+
+Do:
+
+- answer the immediate question
+- name the current closest path
+- record the confusion or request in `status/support.md`
+- create or route a task if it repeats or blocks success
+- route product decisions to Direction
+
+Do not promise roadmap timing.
+
+## Escalation Packet
+
+When asking Engineering, include:
+
+- customer-safe summary
+- customer goal
+- current blocker
+- dashboard vs `aw`
+- exact error text
+- timestamp and timezone
+- team/domain/address/DID, if safe
+- commands run and summarized output
+- whether the customer has the relevant key/workspace
+- what customer-facing answer you need
+
+Use chat for blocking customer help:
+
+```bash
+aw chat send-and-wait randy "Support blocker: <summary>. Customer impact: <impact>. Facts: <facts>. Question: <specific answer needed>."
+```
+
+Use mail for non-urgent review:
+
+```bash
+aw mail send --to randy --body "Support needs engineering review: <summary>. Customer impact: <impact>. Proposed answer/task: <proposal>. Please confirm or correct."
+```
+
+## Feedback
+
+After the customer has a path forward, record:
+
+- customer-safe issue summary
+- which case it was
+- answer or task created
+- whether the customer confirmed success
+- repeated confusion or missing docs
+- signal strength: strong, weak, or unknown
