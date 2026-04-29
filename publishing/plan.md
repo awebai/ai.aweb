@@ -15,8 +15,9 @@ updates. For people who are already interested. Builds domain authority.
 ### 1. What happens when you give 5 AI agents the same codebase
 - **Where**: juanreyero.com
 - **Status**: Draft ready (publishing/drafts/2026-04-09-five-agents-blog-post.md)
-- **When**: Publish when OSS is shippable — the post links to the repo
-  and `aw init`, so it needs to work when people try it
+- **When**: Product readiness is no longer the blocker. Publish after
+  Juan's voice pass and any needed technical-review pass on current
+  claims.
 - **Distribution**: HN ("Show HN"), Reddit (r/ClaudeAI, r/ChatGPTPro),
   Twitter thread version, LinkedIn
 - **Notes**: Needs Juan's final voice pass. The draft is solid but

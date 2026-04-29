@@ -3,7 +3,7 @@
 ## We are
 - Practitioners who hit this problem and built a solution
 - Open source builders, not enterprise sales
-- Honest about what works and what doesn't
+- Clear about what works and what doesn't
 
 ## We say
 - "We hit this exact problem"

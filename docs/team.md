@@ -76,23 +76,30 @@ is being used on substantial work.
 
 ## How Outreach Works
 
-Charlene owns outreach: distribution work, market scanning, content and
-outreach drafts, and external response capture. Direction approves
-product fit and timing. Juan and Eugenie do the actual publishing and
-human engagement.
+Outreach owns distribution preparation: market scanning, content and
+outreach drafts, human-ready recommendations, public action history,
+and external response capture. Direction approves product fit and
+timing. Juan and Eugenie do the actual publishing and human engagement.
 
-Outreach work must produce artifacts:
+Outreach work follows [`../publishing/runbook.md`](../publishing/runbook.md).
+The runbook is case-based: classify the situation, read the necessary
+references, produce the artifact, route approval or review when needed,
+then record action and signal.
 
-1. scan the market
-2. write a brief or update the content plan
-3. send human-ready recommendations
-4. record what humans did
-5. record observed signals, with uncertainty
-6. feed the result back into status/tasks
+Every outreach cycle should leave one of these artifacts:
+
+- scan brief
+- draft or edited content
+- human reply recommendation
+- publishing/history update
+- signal note with attribution limits
+- follow-up task
 
 If outreach only exists as a stale plan, outreach work is not running.
 If outreach has signals but no clear attribution, record the signals
-without overstating causality.
+without overstating causality. Private contacts, targets, approach
+strategies, and private competitive notes stay in `co.aweb`, never in
+this public repo.
 
 ## How Support Flows
 
