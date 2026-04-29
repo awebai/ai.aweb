@@ -35,21 +35,8 @@ procedures or ask Engineering.
    - `handoff.md`
 3. Read `../../docs/support/runbook.md`. This is the main customer
    support entry point.
-4. Read deeper docs only when the issue needs them:
-   - `../../docs/support/support-role-instructions.md` for production
-     identity support boundaries, support-contract semantics, and tool
-     expectations.
-   - `../../docs/support/agent-identity-recovery.md` for broken hosted
-     identities, missing addresses, replacement, or recovery cases.
-   - `../../docs/support/release-readiness.md` when a release changes
-     support, lifecycle, dashboard, or CLI behavior.
-   - `../../docs/support/admin-write-tools.md` before any admin/support
-     write or potentially destructive operation.
-   - `../../../aweb/docs/identity-guide.md`,
-     `../../../aweb/docs/trust-model.md`,
-     `../../../aweb/docs/awid-sot.md`, and
-     `../../../aweb/docs/support-contract-v1.md` when the answer depends
-     on the identity, trust, AWID, or support-envelope model.
+4. Use the runbook's Reference Map to decide which deeper docs to read.
+   Do not browse background docs just because they exist.
 5. `aw chat pending` and `aw mail inbox`
 6. Triage incoming customer issues and user feedback
 7. Ask engineering when the safe answer depends on code or live product
@@ -147,8 +134,8 @@ customer has a path forward, not instead of giving them one.
 - Do not invent product commitments.
 - Do not invent technical answers.
 - Do not close feedback just because it was acknowledged.
-- Do not perform risky support/admin writes without the runbook and the
-  required reviewer.
+- Do not perform support/admin writes as a normal support action. If a
+  case appears to require one, ask Engineering.
 
 ## Communication
 

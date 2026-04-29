@@ -1,5 +1,13 @@
 # Support Role Instructions
 
+This is a reference document for the trust model, source-of-truth map,
+and support envelope vocabulary. For active customer handling, start
+with `runbook.md`.
+
+Do not treat engineering-only commands, admin endpoints, or database
+checks in this document as routine support actions. If a case requires
+hosted cloud state that the runbook does not expose, ask Engineering.
+
 These instructions are for support agents and on-call engineers diagnosing
 identity, address, namespace, and hosted lifecycle problems in `aweb-cloud`.
 
@@ -7,16 +15,15 @@ The goal is to teach the trust model and tool use. Do not memorize case logic.
 Every incident should be handled by identifying the source of truth, the
 authority required, and the safest non-destructive next step.
 
-## Required Reading
+## Reference Reading
 
-Read these before handling production identity recovery:
+Read these only when the active case needs the identity/trust model or
+Engineering asks for deeper recovery context:
 
-- `../aweb/docs/identity-guide.md`
-- `../aweb/docs/trust-model.md`
-- `../aweb/docs/awid-sot.md`
-- `../aweb/docs/support-contract-v1.md`
-- `docs/sot.md`
-- `docs/support-tools.md`
+- `../../../aweb/docs/identity-guide.md`
+- `../../../aweb/docs/trust-model.md`
+- `../../../aweb/docs/awid-sot.md`
+- `../../../aweb/docs/support-contract-v1.md`
 - `docs/support/agent-identity-recovery.md`
 
 ## Core Trust Model
@@ -75,10 +82,15 @@ Never ask for, print, paste, or store:
 
 Support tools report key presence as booleans. Booleans are enough for triage.
 
-## Read Tools
+## Provisioned Read Tools Reference
 
-Prefer the `aweb-support` wrapper for human support work. It calls the same
-read-only admin endpoints and prints the CROSS-01 support envelope unchanged.
+This section describes hosted support tools when Engineering has
+provisioned them. If you do not already have these tools and authority,
+do not try to configure them during a customer conversation. Ask
+Engineering and use the escalation packet in `runbook.md`.
+
+The `aweb-support` wrapper calls read-only admin endpoints and prints
+the CROSS-01 support envelope unchanged.
 
 | Support question | CLI wrapper | Admin endpoint | Payload schema |
 | --- | --- | --- | --- |
@@ -373,9 +385,11 @@ When escalating to engineering, include:
 Do not include secrets or ciphertext. If a secret appears in a customer-provided
 bundle, stop copying it and ask the user to regenerate a redacted bundle.
 
-## Write Operations
+## Write Operations Reference
 
-Support role instructions for writes are intentionally conservative.
+Do not perform writes during routine support. If Engineering explicitly
+provisions and asks you to participate in a write, keep these
+constraints:
 
 Before any write:
 
@@ -385,10 +399,9 @@ Before any write:
 4. Record ticket/reason and actor.
 5. Verify after the write from the source of truth, not from a cached response.
 
-Write tools must use the shared lifecycle paths described in
-`docs/support-tools.md`. Support must not bypass runtime cascades for task
-claims, presence, replacement announcements, API key cleanup, custody cleanup,
-or audit.
+Write tools must use shared lifecycle paths. Support must not bypass
+runtime cascades for task claims, presence, replacement announcements,
+API key cleanup, custody cleanup, or audit.
 
 If the only available path is a direct database mutation, escalate to
 engineering. Direct DB mutation is incident response, not support role

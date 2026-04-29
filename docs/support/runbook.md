@@ -7,6 +7,60 @@ Do not ask for private keys, signing keys, session tokens, admin API
 keys, database access, or unredacted secrets. Do not guess about
 identity, custody, address ownership, or destructive actions.
 
+## Invariants
+
+- Customer success first. Learning comes after the customer has a path
+  forward or is waiting on named work.
+- Authority decides who acts. The customer runs commands that require
+  their key, workspace, certificate, namespace controller, or account
+  session.
+- You may run public registry reads when the customer gives you a DID
+  or address.
+- Hosted custodial customers usually do not have `aw`; do not ask them
+  to run it.
+- Public AWID state is not cloud account, custody, billing, or dashboard
+  state.
+- If the answer depends on hosted cloud state, current code behavior,
+  release state, or an irreversible operation, ask Engineering before
+  replying.
+
+## Case Router
+
+| Customer says | Use | First action |
+| --- | --- | --- |
+| "I have a CLI/worktree error" | Case 1 or 6 | Ask for `aw version`, `aw doctor`, and support bundle. |
+| "I use the dashboard and do not have `aw`" | Case 2 or 4 | Ask for page/flow, error, timestamp, team, agent/address. |
+| "Does this DID/address exist?" | Case 3 | Run public `aw id` reads if you have the target. |
+| "I want to rename/archive/replace/change visibility" | Case 4 | Guide through dashboard flow; escalate risky state. |
+| "I lost a key/address/identity" | Case 5 | Classify custody and namespace authority first. |
+| "Something that worked is broken" | Case 6 | Collect exact command/flow, error, time, version/bundle. |
+| "This is confusing / missing / unsupported" | Case 7 | Answer current path, record learning, route if repeated. |
+
+## Tool Matrix
+
+| Tool | Who runs it | Use for | Does not prove |
+| --- | --- | --- | --- |
+| `aw doctor --json` | Customer | Local workspace, identity, team, messaging diagnostics | Hosted custody or cloud account state |
+| `aw doctor support-bundle --output doctor.json` | Customer | Shareable redacted local diagnostics | Secrets, hosted custody, billing |
+| `aw id resolve <did_aw> --json` | You or customer | Public DID -> current key registry fact | Cloud ownership or account authority |
+| `aw id addresses <did_aw> --json` | You or customer | Public addresses registered to a DID | Dashboard state or billing |
+| `aw id namespace resolve <domain/name> --json` | You or customer | Public address resolution | Hosted custody or team ownership |
+| Dashboard | Customer | Hosted account-visible actions | BYOD controller authority |
+| `aw chat` / `aw mail` to Engineering | You | Code/cloud/release/authority questions | Customer confirmation |
+
+## Reference Map
+
+Read deeper docs only when the case needs them:
+
+| Doc | Use when | How to treat it |
+| --- | --- | --- |
+| `support-role-instructions.md` | You need the trust model, source-of-truth map, or support envelope vocabulary | Reference only; the runbook decides support actions. |
+| `agent-identity-recovery.md` | Identity/address recovery is subtle or Engineering asks for a structured escalation | Do not run SQL or DB procedures from it. Use it to understand authority and shape the escalation. |
+| `release-readiness.md` | A case depends on a lifecycle/support release or rollout state | Check shipped state and verification expectations. |
+| `admin-write-tools.md` | Engineering asks about admin write review | Engineering background, not a support procedure. |
+| `agent-lifetime-support-epic.md` and coverage/audit docs | You need task history or invariants behind support capabilities | Background only. Active work belongs in `aw` tasks. |
+| `../../../aweb/docs/identity-guide.md`, `trust-model.md`, `awid-sot.md` | You need identity, namespace, team, DID, or AWID semantics | Source-of-truth model docs. |
+
 ## First Response
 
 For every case, collect:

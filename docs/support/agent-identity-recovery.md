@@ -1,5 +1,12 @@
 # Agent Identity Recovery Runbook
 
+This is a deep reference for identity and address recovery. For active
+customer handling, start with `runbook.md`.
+
+Support agents should not run SQL, inspect production databases, or use
+admin endpoints directly from this document. Use it to understand
+authority boundaries and to prepare a clean Engineering escalation.
+
 This runbook is for support agents and on-call engineers diagnosing broken
 persistent agent identities on hosted `aweb-cloud`.
 
@@ -13,8 +20,6 @@ This document only covers hosted support triage and recovery.
 
 For support-agent operating instructions, see
 [`docs/support/support-role-instructions.md`](support-role-instructions.md).
-For the tool architecture and command inventory, see
-[`docs/support-tools.md`](../support-tools.md).
 
 ## Support Goal
 
@@ -73,8 +78,8 @@ are not recoverable as durable identities; create a new identity.
 
 ## Tool-First Diagnostics
 
-Prefer API/CLI checks first. Use SQL only when API state is insufficient or an
-engineer is already involved.
+Prefer API/CLI checks first. Support agents do not use SQL for routine
+support. If API/CLI state is insufficient, ask Engineering.
 
 Configure the cloud support wrapper:
 
@@ -484,7 +489,8 @@ For Case 5:
 
 ## Engineer Appendix: SQL Checks
 
-Use these only for engineering support or incident response.
+Use these only for engineering support or incident response. They are
+not routine support procedures.
 
 ### Local Agent State
 
