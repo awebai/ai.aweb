@@ -34,6 +34,13 @@ queryable Work-contract blocks until aw gets native task fields.
   team_members_only resolution gap closed for authorized teammates.
   Server-side auth predicate corrected in 1.18.6 to
   cert-presentation + signature + non-revocation.
+- aweb-aalg: CLI cross-team-cert sender-identity verification.
+  Verified 2026-04-30 via the aako/cross-team-cert harness
+  (pre-fix identity_mismatch, post-fix verified on mail+chat).
+- aweb-aalq: messages.py / chat.py elif-branch parity audit
+  (to_stable_id / to_did / to_address). Verified 2026-04-30 via
+  branch-parity tests + local-fallback + registry-unconfigured +
+  persistent registry-miss fail-closed.
 - aweb-aala (BYOIT cross-machine cert lifecycle): closed earlier;
   v0.5.5 picked up the cloud side.
 - aweb-aals.2: operating-model reviewer pass approved this wake-up.
@@ -47,15 +54,6 @@ queryable Work-contract blocks until aw gets native task fields.
   scope remaining before close.
 - aweb-aals.3 (avi): company-dashboard signal inventory landed in
   docs/company-dashboard.md; awaiting operations adoption.
-
-## Tracker hygiene gap (do this next wake-up)
-
-aw work active still shows aalg/aalm/aalq under grace as P1, but
-their substance has shipped per the 1.18.3 / 1.18.5 release commits.
-Per audit-methodology memory, symptom-check before declaring closure
-(probe the actual deployed behavior; do not rely on commit-message
-grep). Then close in tracker. This is the most visible operational
-discrepancy right now.
 
 ## Standing release policies (banked through 2026-04-26)
 
@@ -92,14 +90,12 @@ discrepancy right now.
 
 ## What to check FIRST on next wake-up
 
-1. Has tracker hygiene on aalg/aalm/aalq been done? If not, do it
-   (symptom-check first, then aw task close).
-2. mia's progress on aweb-aalr.2; is the ac-side AWID ensure-team
+1. mia's progress on aweb-aalr.2; is the ac-side AWID ensure-team
    refactor advancing?
-3. Did outreach absorb the engineering green-light on distribution?
-4. Any new release shipped overnight (smoke-check
+2. Did outreach absorb the engineering green-light on distribution?
+3. Any new release shipped overnight (smoke-check
    app.aweb.ai/health and api.awid.ai/health version drift).
-5. New mail/chat from avi, juan, amy, charlene, enoch.
+4. New mail/chat from avi, juan, amy, charlene, enoch.
 
 ## Context I don't want to lose
 

@@ -27,10 +27,22 @@ Last updated: 2026-04-30 09:25 CEST
   8a229b46 stale-cli-users). Status: partially landed.
 - `aweb-aals.3` (avi): company-dashboard signal inventory. Defined in
   docs/company-dashboard.md; awaiting operations adoption.
-- Tracker hygiene gap: `aweb-aalg` / `aweb-aalm` / `aweb-aalq` still
-  appear in `aw work active` under grace, but their substance shipped
-  in 1.18.3-1.18.5. Needs symptom-check + close pass per audit-
-  methodology rule (commit-message grep alone is insufficient).
+
+## Closed today (2026-04-30)
+
+- `aweb-aalg` / `aweb-aalm` / `aweb-aalq`: tracker-hygiene close pass.
+  Grace verified each via targeted test runs (not commit-message
+  grep): aalg via the aako/cross-team-cert harness asserting
+  pre-fix identity_mismatch and post-fix verified on mail/chat;
+  aalm via CLI signing namespace address reads with DIDKey +
+  presenting team cert; aalq via message/chat branch-parity tests
+  for to_stable_id/to_did/to_address plus local-fallback, registry-
+  unconfigured, and persistent registry-miss fail-closed cases.
+  Targeted Go (`./cmd/aw` Registry/Signed/Cross/Address/Binding/
+  Fallback/TeamSelector/Mail/Chat suites; `./awid` Registry/Resolve/
+  Address/DIDKey/Certificate suites) and Python (messages 25 / chat
+  12 parity slices) all green.
+- `aweb-aals.2`: operating-model reviewer pass approved; mailed avi.
 
 ## Release/live state
 
