@@ -1,50 +1,68 @@
 # Engineering Status
-Last updated: 2026-04-28 22:23 CEST
+Last updated: 2026-04-30 09:25 CEST
 
 ## Current focus
 
-1. **Engineering is the permanent integrity area.** It owns
-   architecture, release discipline, cross-repo alignment, and
-   identity/protocol correctness.
-2. **Repo implementation should use task-scoped builder/reviewer
-   pairs.** Permanent repo-manager agents are no longer the default
-   operating shape.
-3. **Release claims still need verified-live evidence.** Health/version
-   checks, smoke/browser probes, and user/support confirmation remain
-   the strongest close loops.
+1. **Distribution gate from KI#1 is OFF.** KI#1 (aalf/aalg/aale class)
+   closed in aweb 1.18.3 on 2026-04-26 (commit 01a9bdb: aalk continuity
+   + aalm authenticated-lookup). Trust-model architectural correction
+   shipped in 1.18.6 on 2026-04-27 (commit 7759abc): cert-presentation
+   + signature + non-revocation is the auth predicate; AWID is no
+   longer a membership oracle.
+2. **Engineering posture continues release-discipline + protocol
+   correctness, not feature expansion.** The 1.18.4-1.18.6 sequence
+   (hosted-custodial matrix, identity-equivalent recipients,
+   cert-presentation auth) is exactly that.
+3. **Operating-model reorg.** aweb-aals.2 reviewer pass approved
+   2026-04-30 and closed; the four review targets (artifact-routed
+   work, no management-title framing, signal-strength feedback,
+   renamed directory paths) all pass.
 
 ## Active engineering work
 
-- `aweb-aals`: company operating model reorganization.
-- `aweb-aals.2`: instruction sweep needs reviewer pass before close.
-- `aweb-aals.6`: first real task-scoped builder/reviewer worktree
-  cycle.
-- `aweb-aals.7`: make builder/reviewer/feedback fields native in `aw`
-  tasks after dogfooding the prose contract.
-- Current engineering/release work still needs conversion into queryable
-  tasks under `aweb-aals.1`.
+- `aweb-aalr.2` (mia, ac): AWID ensure-team endpoint + ac persist
+  refactor. P1, in flight, 36h-stale claim — needs check-in.
+- `aweb-aakj` (kate, aweb): admin write tools (org/user/team cleanup).
+  Two commits already in main (08054315 retire-stale-users,
+  8a229b46 stale-cli-users). Status: partially landed.
+- `aweb-aals.3` (avi): company-dashboard signal inventory. Defined in
+  docs/company-dashboard.md; awaiting operations adoption.
+- Tracker hygiene gap: `aweb-aalg` / `aweb-aalm` / `aweb-aalq` still
+  appear in `aw work active` under grace, but their substance shipped
+  in 1.18.3-1.18.5. Needs symptom-check + close pass per audit-
+  methodology rule (commit-message grep alone is insufficient).
 
 ## Release/live state
 
-- OSS observed at aweb 1.18.6-era local main with recent tags
-  `server-v1.18.6`, `aw-v1.18.6`, `awid-v0.5.2`, and
-  `awid-service-v0.5.2`.
-- Cloud observed live at `release_tag=v0.5.9`,
-  `aweb_version=1.18.6`.
-- awid observed live at `version=0.5.2`.
+- Cloud: live at `release_tag=v0.5.10`, `aweb_version=1.18.6`,
+  `awid_service_version=0.5.1`, git_sha bce92c29. Deployed 2026-04-30
+  05:54 UTC. db/redis/awid/coordination_api healthy.
+- aweb OSS: latest published tags `server-v1.18.6`, `aw-v1.18.6`,
+  `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27).
+- awid registry: live at `version=0.5.2`. redis/db/schema healthy.
+- @awebai/claude-channel: 1.3.3 published.
 
 ## Risks
 
-- Existing handoffs still contain historical repo-coordinator language;
-  active instructions now prefer spawned worktree pairs.
-- Analytics has no initialized workspace identity yet.
-- Operations needs to turn stale-claim/live-check monitoring into a
-  concrete dashboard or repeatable report.
+- **Tracker hygiene** is the visible operational discrepancy: open
+  P1 rows whose substance has shipped misrepresent active engineering
+  load and confuse operations' stale-claim views.
+- **Analytics workspace** still TBD; aweb-aals.4 owns init. No
+  engineering blocker, but the dashboard inventory (aweb-aals.3) has
+  no agent home to consume it.
+- **aweb-aals.5** (obsolete repo-manager workspace records) is
+  housekeeping fallout from the narrowed-permanent-set decision; not
+  load-bearing for the operating model but stale rows are operational
+  noise.
 
 ## Next checks
 
-- Verify `aw workspace status` after new directory names are
-  re-announced.
-- Convert active engineering priorities into tasks with builder,
-  reviewer, and feedback signal.
-- Review the new operating model before closing `aweb-aals.2`.
+- Symptom-check + close aalg/aalm/aalq if production behavior matches
+  the closure claim (mail back with evidence, then `aw task close`).
+- Coordinate with outreach: KI#1 was the last engineering blocker
+  on the distribution gate; engineering's side is green for the first
+  human-led conversations and the blog-post voice pass.
+- Watch aweb-aalr.2 progress in ac (mia); ensure-team endpoint
+  refactor is the next significant in-flight cross-repo piece.
+- Verify on next wake-up that aweb-aals.5 / aweb-aals.4 hygiene tasks
+  have either moved or have a named owner.
