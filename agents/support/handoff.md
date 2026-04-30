@@ -1,6 +1,6 @@
 # Support Handoff
 
-Last updated: 2026-04-29
+Last updated: 2026-04-30 (post v0.5.10 deploy)
 
 ## Operating focus
 
@@ -58,8 +58,35 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 - `aw`: **1.18.6** ✓ (commit 07a50b4, built 2026-04-27T08:59:23Z)
 - channel plugin: 1.3.3 ✓
-- server: **ac v0.5.9 / aweb 1.18.6 deployed** (Mode 1 d4fb982 + #44 ec9bd9d6 + Mode 2 backfill all live)
+- server: **ac v0.5.10 / aweb 1.18.6 deployed** 2026-04-30 05:54 UTC
+  (release_tag=v0.5.10, git_sha=bce92c29). v0.5.10 layered auth-gate +
+  personal-org invariants + admin write tools on the v0.5.9 KI#1 base
+  (Mode 1 d4fb982 + #44 ec9bd9d6 + Mode 2 backfill).
 - Version subcommand is `aw version` (NOT `aw --version`, which errors `unknown flag`).
+
+## v0.5.10 runbook deltas (in flight)
+
+Per Randy's commit-traced review (mail 320be732), three customer-visible
+additions land in the next runbook PR:
+
+1. **1.9 NOT-boundary**: pre-v0.5.10 personal teams may need
+   operator-run AWID backfill. If a customer hits cross-team-cert
+   weirdness on a pre-v0.5.10 account, route to engineering — do NOT
+   tell them to retry from the dashboard.
+2. **New login-failure section**: cover the `email_unverified` and
+   `account_inactive` error codes (substance commit 20872ccf —
+   structured fail-before-cookie at login boundary). Map each code to
+   "what the user did to get here" per Randy's review-axis hint.
+3. **Namespace-claim collision messaging**: AWID controller conflicts
+   are now HTTP 409 + structured body (commits 3f9938d0 + 668a9dbd),
+   surfaced in CreateOrganizationDialog.tsx and OwnerSelector.tsx.
+
+1.7 (conversation policy) and 1.9 (create-new-agent) happy paths fill
+from the existing plan unchanged per Randy's Q1/Q2 verdict.
+
+Review path on the PR (Randy mail f455db30): land without waiting,
+Randy reviews against main on the engineering-tech-accuracy slice
+only; Avi owns product/content approval.
 
 ## Known issues
 
@@ -264,9 +291,14 @@ execute dashboard Replace — that is a human action.
 
 - `agent-guide.md` in aweb is the current path.
 - `../../docs/support/agent-identity-recovery.md` synced from ac via
-  `make docs-sync`. Re-run after any ac-side edits.
-- `../../docs/support/runbook.md` is the local customer-success entry
-  point. It is not auto-spliced from ac recovery docs.
+  `make docs-sync` (legacy alongside-the-splice file; not authoritative
+  for support — runbook is).
+- `../../docs/support/runbook.md` is THE single authoritative
+  customer-success entry point. Section 2 (Recovery scenarios) is
+  auto-spliced from ac via `scripts/splice-recovery-into-runbook.py`,
+  invoked by `make docs-sync`. Splice fails loudly if the BEGIN/END
+  markers are missing; hand-edits to Section 2 get overwritten on
+  re-sync (intentional — single source of truth for recovery is ac).
 - Identity docs in aweb are v1.8.1+: `identity-guide.md` and
   `trust-model.md` are current sources.
 
