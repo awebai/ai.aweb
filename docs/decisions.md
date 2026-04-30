@@ -6,6 +6,105 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-30 — Three peer working roles: Sofia, Athena, Hestia
+
+**Commit:** `e71cf22` Reorganize team into Sofia/Athena/Hestia peer roles
+
+**Decision maker:** Juan + Randy
+
+**Decision.** The prior CTO + coord-aweb + coord-cloud shape produced
+excessive coordination overhead and blame routing (most visible during
+the KI#1 cycle, where the speculate-publish-ask-Amy pattern produced
+channel 1.3.2 without empirical closure and required a 1.18.6
+trust-model architectural correction). Replace it with three peer
+working roles:
+
+- **Sofia (Direction)** — priorities, decision records, technical
+  direction (architectural calls, cross-repo coherence, what's
+  load-bearing), release-claim framing for external communication,
+  product/content approval. Does NOT approve PRs, gate releases, or
+  write code.
+- **Athena (Engineer)** — code in aweb (Go CLI, Python server, awid,
+  channel TS) and ac (Python backend, TS frontend) as a permanent
+  surface. Tests, runbook tech-accuracy, support's engineering
+  questions, release-notes drafts. Does NOT tag releases, run
+  release-ready gates, or deploy.
+- **Hestia (Operations)** — release-execution chain: pick up clean
+  main from Athena, run release-ready gates, tag (per-tag-not-batched),
+  watch CI/CD, verify live (`/health` version match + smoke probe of
+  the changed surface), post verified-live mail. Plus operational
+  hygiene (stale claims, blocked tasks, scheduled-agent wake-ups,
+  production health drift, status-file cadence). Does NOT touch
+  code; if a gate fails, kicks back to Athena with the failure shape.
+
+The three are peers. None approves the others. Disagreement
+escalates to Juan.
+
+The prior agents (Avi, Randy, Enoch, John, Tom, plus the developer
+pool Grace/Mia/Henry/Noah) are no longer in the active model. Avi
+and Randy merge into Sofia. Randy's code-side work moves to Athena.
+Enoch's hygiene scope expands into Hestia, which now also owns
+the release-execution chain that was previously split across coord-
+aweb (John) and coord-cloud (Tom).
+
+**Why.** Three failure modes drove the change:
+
+1. **Layer count.** The old shape had ~6 hops per fix (Randy mails
+   John → John dispatches Grace → Grace fixes → John reviews →
+   Grace pushes → John mails Randy → Randy approves → John tags →
+   Tom verifies). Each layer assumed the next was running empirical
+   verification; no layer was actually running the reproducer.
+2. **Approver-in-the-loop.** Randy as CTO was an approver, not an
+   engineer. That title made every release a sign-off ritual instead
+   of a build-and-ship loop. Eliminating the approver position
+   forces the engineer to ship and the operator to verify.
+3. **Cross-repo coordination cost.** John+Tom coordinating cross-
+   repo changes (ac pins aweb; aweb's CLI talks to ac's API)
+   required ongoing mail-based gate handoffs and authorized
+   "coord-borrows" when one repo's developer needed to touch the
+   other repo's code. One engineer holding both repos eliminates
+   that edge entirely; the cost is context load on one head, but
+   the release coupling between aweb and ac is tight enough that
+   one head is structurally more correct than two coordinating.
+
+The "build vs ship" boundary was previously implicit (engineer tags
+→ CI deploys); making Hestia the only role that runs gates and tags
+makes that boundary real and gives the gate run an external pair of
+eyes. The release-runbook becomes the load-bearing artifact: if
+Hestia can't run the gate chain end to end without engineer
+assistance, the role separation is theater.
+
+**The 2+2 rule under the new shape.** The reviewer voice varies per
+case: code-reviewer subagent on the gate-input commit (banked
+policy 13), task-scoped reviewer worktree spawned by Athena for big
+efforts, Sofia for architecture-touching changes (peer review, not
+approval), Juan for founding-principles-shaped calls.
+
+**Affects.** Renames `agents/direction → agents/sofia`,
+`agents/engineering → agents/athena`, `agents/operations →
+agents/hestia`. Rewrites `docs/team.md`, `docs/agent-first-company.md`,
+the root `CLAUDE.md`, and the per-role `AGENTS.md` + starter
+`handoff.md`. Outreach (Charlene), Support (Amy), and Analytics
+(TBD) keep role-named directories.
+
+**Follow-ups not in this commit.**
+
+- Identity setup. The `.aw/identity.yaml` files inside the renamed
+  directories still contain Avi/Randy aliases. New Sofia/Athena/
+  Hestia identities (DIDs at AWID, addresses on `juan.aweb.ai`,
+  team certificates) need to be created interactively by Juan,
+  same shape as Amy's 2026-04-21 second-address setup.
+- Ops runbook. The release-runbook at `agents/hestia/runbook.md`
+  is the load-bearing artifact for the role separation; it does
+  not exist yet and is Hestia's first substantive task.
+- KI#1 closure decision record. John's 2026-04-27 ask for a
+  decisions.md entry covering the KI#1 closure cycle is still
+  outstanding; Sofia owns that under the new model.
+- Stale workspace dirs. `agents/coord-cloud/` and `agents/repo-aweb/`
+  on disk (untracked) are aweb-aals.5 housekeeping.
+
+---
+
 ## 2026-04-28 — Task work contracts become the queryability bridge
 
 **Commit:** `c4eac9a` Add queryable work contract and dashboard inventory
