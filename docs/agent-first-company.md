@@ -2,13 +2,11 @@
 
 This is the operating model for aweb.ai.
 
-The company is organized around a small set of permanent responsibility
-areas, task-scoped builder/reviewer pairs, and feedback loops. Permanent
-agents own surfaces and keep work legible. They are not a management
-hierarchy.
-
-Epic: `aweb-aals` — Reorganize company agents around responsibility
-areas.
+The company is organized around three primary working roles —
+**Sofia (Direction)**, **Athena (Engineer)**, **Hestia (Operations)** —
+plus user-facing surfaces (outreach, support) and analytics. Each role
+has a non-overlapping work surface. Sofia, Athena, and Hestia are
+peers; none is the others' manager.
 
 ## First Principles
 
@@ -22,70 +20,88 @@ If work matters, it needs a durable artifact:
 - a handoff for context that must survive agent restarts
 - a status file for the current published state
 - a decision record when direction changes
-- a release, support, outreach, operations, or analytics note when an
-  external claim changes
+- a release-notes draft when code is ready for ship
+- a verified-live mail when production reflects the release
+- a support, outreach, operations, or analytics note when an external
+  claim changes
 
-Conversation is not enough. Handoff prose is not enough. A status file
-is not a work queue.
+Conversation is not enough. Handoff prose is not enough. A status
+file is not a work queue.
 
-### 2. Substantial Work Needs Two Agents
+### 2. Substantial Work Needs Two Voices
 
-Every substantial effort needs at least:
+Every substantial effort needs at least one **builder** voice and one
+**reviewer** voice. They do not have to be different agents, but they
+have to be different perspectives:
 
-- **Builder**: produces the artifact, implementation, draft, answer,
-  instrumentation, or plan
-- **Reviewer**: checks it against the goal, invariants, evidence, and
-  acceptance criteria
+- For code: Athena builds; the reviewer is a code-reviewer subagent
+  on the gate-input commit, a task-scoped reviewer worktree on big
+  efforts, or Sofia for architecture-touching changes.
+- For direction calls: Sofia proposes; Athena pushes back on the
+  technical reality. They are peers; pushback is expected.
+- For releases: Athena drafts release notes; Sofia reviews framing;
+  Hestia adds verified-live evidence before posting.
+- For support runbook: Amy drafts; Athena reviews technical accuracy
+  on engineering-routing sections; Sofia reviews product/framing.
+- For outreach: Charlene drafts; Sofia reviews timing and fit; humans
+  publish.
 
-For code, spawn task-scoped builder and reviewer agents in repo
-worktrees with `aw workspace add-worktree`. For company work, the pair
-may be outreach plus direction, support plus engineering, analytics
-plus direction, or operations plus the area owner.
+When the second voice is a peer, the call is "they did not converge"
+not "the reviewer rejected." Escalation goes to Juan only when the
+peer disagreement is structural.
 
-The reviewer belongs to the task. There is no permanent review agent
-for everything.
+### 3. Three Working Roles, Plus Surfaces
 
-### 3. Permanent Agents Own Surfaces
+| Role | Agent | Work surface |
+|------|-------|--------------|
+| Direction | Sofia | Priorities, decisions, technical direction, cross-repo architecture, release-claim framing, product/content approval |
+| Engineering | Athena | Code in aweb and ac, tests, runbook tech-accuracy, support engineering questions, release-notes drafts |
+| Operations | Hestia | Release-ready gates, tags, deploys, live-verify, stale-machinery sweeps, dashboard hygiene |
 
-The permanent areas are:
-
-| Area | Agent | Owns |
-| --- | --- | --- |
-| Direction | Avi | Product direction, priorities, task shaping, product/content approval |
-| Engineering | Randy | Engineering integrity, architecture, release discipline, identity/protocol correctness |
-| Outreach | Charlene | Distribution work, market scanning, content/outreach drafts, external response capture |
-| Support | Amy | User-facing help, issue classification, support answers, feedback routing |
-| Operations | Enoch | Company machinery: health checks, stale work, schedules, task hygiene, dashboard/runbook |
+| Surface | Agent | What |
+|---------|-------|------|
+| Outreach | Charlene | Distribution preparation, market scanning, content drafts |
+| Support | Amy | User-facing help, classification, support answers, feedback routing |
 | Analytics | TBD | Metrics, signal briefs, attribution limits, instrumentation gaps |
 
-Ownership means:
+Direction proposes. Engineering implements. Operations ships. None of
+them approves the others' work; they hand off and escalate to Juan
+when peers can't converge.
 
-- know what state must stay current
-- know what feedback loop belongs to the surface
-- create or update tasks when work appears
-- identify builder and reviewer for substantial work
-- route decisions to the right human or agent
-- say when evidence is weak or missing
+### 4. Athena Owns Code As A Permanent Surface
 
-### 4. Repo Work Is Task-Scoped
+Athena is the engineer for both aweb and ac. There are no permanent
+repo-manager agents above her, and there are no separate per-repo
+gate-keeper agents below her. The cross-repo coordination edge that
+two engineers used to negotiate (ac pins aweb; aweb's CLI talks to
+ac's API) collapses into one head holding both.
 
-There are no permanent repo-manager agents for normal code work.
-Significant repo work gets a task-scoped pair:
+Task-scoped builder/reviewer pairs are a tool Athena spawns when the
+work genuinely benefits from parallelism — a multi-day refactor, a
+two-pronged investigation, a high-blast-radius rewrite. Pairs report
+to her, exist for the task, and disappear after. They are not the
+default operating shape for normal code work.
+
+### 5. Hestia Is The Production Chokepoint
+
+Hestia is the only role that deploys. The path from clean main to
+verified-live production runs entirely through her:
 
 ```text
-Task: implement or fix X in aweb/ac/awid
-Builder: spawned worktree agent
-Reviewer: separate spawned worktree agent
-Engineering: involved for architecture, protocol, release, or cross-repo risk
-Feedback signal: tests, CI, health check, smoke/browser probe, user/support confirmation
+Athena: clean main + release-notes draft → signal Hestia
+Hestia: release-ready gates → tag → CI/CD → /health version match → smoke probe → verified-live mail
 ```
 
-Use `aw workspace add-worktree` to create isolated repo workspaces for
-builder and reviewer agents. The pair owns the local correctness of the
-task. Engineering owns systemic risk, release discipline, and protocol
-integrity.
+If a gate fails, Hestia kicks back to Athena with the specific failure
+shape; she does not patch the code. If CI/CD doesn't fire (e.g.,
+batched-tag event coalescing), Hestia troubleshoots the deploy
+infrastructure, not the source code.
 
-### 5. Shared State Beats Status Routing
+The release-runbook is the load-bearing artifact for this role. If
+Hestia can't run the gate chain end to end without engineer
+assistance, the role separation is theater.
+
+### 6. Shared State Beats Status Routing
 
 The company should be queryable through shared state:
 
@@ -97,28 +113,29 @@ The company should be queryable through shared state:
 - release gates, support confirmations, operations checks, and
   analytics briefs prove or qualify claims against reality
 
-The standard is not perfect attribution. The standard is that any fresh
-agent can inspect the artifacts and understand what is happening, what
-is blocked, what was decided, what needs review, and what signal exists.
+The standard is not perfect attribution. The standard is that any
+fresh agent can inspect the artifacts and understand what is
+happening, what is blocked, what was decided, what needs review, and
+what signal exists.
 
-### 6. Look For Feedback, Grade Its Strength
+### 7. Look For Feedback, Grade Its Strength
 
-Every agent archetype must look for feedback as part of its task. The
-loop differs by area:
+Every role must look for feedback as part of its work. The loop
+differs by surface:
 
-| Area | Loop |
-| --- | --- |
-| Engineering | code -> tests/CI -> fix; release -> health/smoke/browser probe |
-| Direction | priority -> shipped artifact/action -> user/support/outreach/analytics signal |
-| Outreach | draft/action -> human publish/engage -> replies/clicks/traffic/signups signal |
-| Support | customer blocker -> safe answer/engineering question/task -> customer succeeds or waits on named work |
-| Operations | check -> discrepancy -> routed task -> recheck |
-| Analytics | question -> data/query/instrumentation -> signal brief -> next task or no-op |
+| Role | Loop |
+|------|------|
+| Direction | priority → shipped artifact/action → user/support/outreach/analytics signal |
+| Engineering | code → tests/CI → fix |
+| Operations | gate → tag → deploy → /health + smoke → verified-live OR rollback |
+| Outreach | draft/action → human publish/engage → replies/clicks/traffic/signups |
+| Support | customer blocker → safe answer or routed task → customer succeeds or waits on named work |
+| Analytics | question → data/query/instrumentation → signal brief → next task or no-op |
 
 Some feedback is strong enough to close a task. Some is only weak
-signal. A social post followed by more signups might matter, but it is
-not clean proof that the post caused the signups. Capture the signal,
-note the uncertainty, and use it to shape the next task.
+signal. A social post followed by more signups might matter, but it
+is not clean proof that the post caused the signups. Capture the
+signal, note the uncertainty, and use it to shape the next task.
 
 When evidence is ambiguous, the correct artifact is often an open
 question or a task with explicit uncertainty, not a confident plan.
@@ -136,7 +153,7 @@ Tasks should include:
 - acceptance criteria
 - the strongest available feedback signal
 - the expected builder
-- the expected reviewer or approver
+- the expected reviewer or peer
 - open uncertainty
 - labels that make the work discoverable
 
@@ -145,7 +162,7 @@ include this parseable block in its description or notes:
 
 ```text
 Work contract:
-Area:
+Surface:
 Builder:
 Reviewer:
 Repo/worktree:
@@ -159,7 +176,8 @@ Next check:
 
 Use `n/a` only when the field genuinely does not apply. Do not omit a
 field because the answer is inconvenient. A missing reviewer, missing
-feedback signal, or unknown evidence path is itself operational signal.
+feedback signal, or unknown evidence path is itself operational
+signal.
 
 ### Use Claims To Prevent Duplicate Work
 
@@ -189,13 +207,13 @@ They should not be the only place active work exists.
 ### Keep Status Files As Published State
 
 Status files are what other agents read to understand current state.
-They should be current, concrete, and short enough to scan. If a status
-file says something is blocked or live, that claim should point to the
-artifact that supports it: task, commit, health check, attestation,
-analytics brief, operations check, or decision record.
+They should be current, concrete, and short enough to scan. If a
+status file says something is blocked or live, that claim should
+point to the artifact that supports it: task, commit, health check,
+attestation, analytics brief, operations check, or decision record.
 
-When the evidence is weak, say that directly. "Post got traffic but no
-attributable signups yet" is useful. "Post worked" is not.
+When the evidence is weak, say that directly. "Post got traffic but
+no attributable signups yet" is useful. "Post worked" is not.
 
 ### Use Decision Records For Direction Changes
 
@@ -203,46 +221,13 @@ When the operating model, product priority, release policy, or public
 claim changes, write a decision record. Status files describe current
 state; decision records explain how and why state changed.
 
-## Work To Do
-
-### Make Active Work Queryable
-
-- Convert current company priorities into `aw` tasks/subtasks.
-- Require current-focus status sections to reference active task refs
-  where appropriate.
-- Define the builder, reviewer, and feedback signal for each active
-  task.
-
-### Keep Permanent Areas Operational
-
-- Keep `agents/<area>/AGENTS.md` focused on that area's work surface,
-  artifacts, feedback loop, and review expectations.
-- Keep `agents/<area>/handoff.md` focused on area memory and next
-  checks.
-- Route implementation work through task-scoped builder/reviewer pairs.
-
-### Build The Company Dashboard
-
-The dashboard should show the fields defined in
-[`company-dashboard.md`](company-dashboard.md):
-
-- active tasks and claims
-- stale claims
-- tasks missing reviewers
-- tasks closed without feedback evidence
-- release gates and live versions
-- production health checks
-- support issues needing routing
-- outreach actions and observed signals
-- analytics briefs and instrumentation gaps
-- agent liveness
-
-This is not an executive dashboard. It is the company's shared
-coordination state.
-
 ## Operating Standard
 
 The operating standard is high-throughput verified work: useful
 artifacts per unit of time and money, with enough shared context,
 review, and feedback to correct course quickly when the evidence is
 incomplete or misleading.
+
+Three roles, peer status, no approver in the loop, single deploy
+chokepoint. Coordination overhead is the failure mode; eliminating
+unnecessary handoffs is the discipline.

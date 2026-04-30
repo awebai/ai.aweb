@@ -48,16 +48,20 @@ agent:
   spent on engineering instead of getting it in front of people is an
   hour wasted.
 - **The 2+2 rule.** Agents building alone produce wrong things. Every
-  substantial effort needs at least one builder and one reviewer. For
-  code this means implementation plus code/release review. For company
-  work it means proposer plus approver, writer plus reviewer, or
-  support classifier plus product reviewer. This was learned the hard
-  way — agents left unsupervised burned thousands of tokens building
-  the wrong things.
-- **Responsibility areas.** The permanent agent team is organized
-  around surfaces over shared artifacts: direction, engineering,
-  outreach, support, operations, and analytics. Repo implementation
-  happens through task-scoped builder/reviewer worktree pairs.
+  substantial effort needs at least one builder voice and one reviewer
+  voice. For code this means implementation plus code-reviewer
+  subagent or task-scoped reviewer worktree. For direction this means
+  Sofia proposes, Athena pushes back on technical reality. For
+  releases this means Athena drafts, Sofia reviews framing, Hestia
+  adds verified-live evidence. The voices do not have to be different
+  agents, but they have to be different perspectives.
+- **Three working roles.** Sofia (Direction) — priorities, decisions,
+  technical direction, release-claim framing. Athena (Engineering) —
+  code in aweb and ac, tests, runbook tech-accuracy. Hestia
+  (Operations) — gates, tags, deploys, live-verify, dashboard
+  hygiene. They are peers; none approves the others. Disagreement
+  escalates to Juan. Plus user-facing surfaces (Charlene outreach,
+  Amy support) and analytics.
 - **Feedback strength matters.** Always look for feedback. Prefer
   feedback that is close and verifiable, such as code -> test -> fix
   or release -> health check -> smoke test. For weaker surfaces like
@@ -127,12 +131,12 @@ co.aweb/
 │   ├── history.md         # What we published
 │   └── drafts/            # Blog posts, video scripts
 └── agents/
-    ├── direction/       # Avi
-    ├── engineering/     # Randy
-    ├── outreach/        # Charlene
-    ├── support/         # Amy
-    ├── operations/      # Enoch
-    └── analytics/       # TBD
+    ├── sofia/          # Sofia — Direction (priorities, decisions, technical direction)
+    ├── athena/         # Athena — Engineering (code in aweb + ac)
+    ├── hestia/         # Hestia — Operations (gates, tags, deploys, live-verify)
+    ├── outreach/       # Charlene — Outreach
+    ├── support/        # Amy — Support
+    └── analytics/      # TBD
 ```
 
 ## How agents work here
@@ -218,16 +222,15 @@ All repos live as siblings in one parent directory:
 | ac | `../ac/` | Cloud: auth, billing, dashboard, SaaS | Private |
 
 From agent subdirectories (`agents/X/`), sibling repos are at
-`../../../<repo>/`. Engineering has sibling repo symlinks for
-cross-repo review:
+`../../../<repo>/`. Athena has sibling repo symlinks for code work:
 
-- `agents/engineering/aweb` -> `../../../aweb`
-- `agents/engineering/ac` -> `../../../ac`
-- `agents/engineering/awid` -> `../../../aweb/awid`
+- `agents/athena/aweb` -> `../../../aweb`
+- `agents/athena/ac` -> `../../../ac`
+- `agents/athena/awid` -> `../../../aweb/awid`
 
-For significant repo implementation, create task-scoped builder and
-reviewer worktrees with `aw workspace add-worktree` instead of relying
-on permanent repo-manager agents.
+For really big efforts, Athena spawns task-scoped builder/reviewer
+worktrees with `aw workspace add-worktree`. Most code work is just
+Athena doing it directly.
 
 Prefer `git -C aweb log` over `cd ../../../aweb && git log` — the
 symlink keeps your CWD anchored in your own agent dir, which keeps
