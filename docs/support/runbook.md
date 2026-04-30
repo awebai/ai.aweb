@@ -383,13 +383,13 @@ When asking Engineering, include:
 Use chat for blocking customer help:
 
 ```bash
-aw chat send-and-wait randy "Support blocker: <summary>. Customer impact: <impact>. Facts: <facts>. Question: <specific answer needed>."
+aw chat send-and-wait athena "Support blocker: <summary>. Customer impact: <impact>. Facts: <facts>. Question: <specific answer needed>."
 ```
 
 Use mail for non-urgent review:
 
 ```bash
-aw mail send --to randy --body "Support needs engineering review: <summary>. Customer impact: <impact>. Proposed answer/task: <proposal>. Please confirm or correct."
+aw mail send --to athena --body "Support needs engineering review: <summary>. Customer impact: <impact>. Proposed answer/task: <proposal>. Please confirm or correct."
 ```
 
 ## Feedback

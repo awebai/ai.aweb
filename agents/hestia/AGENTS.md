@@ -178,8 +178,8 @@ do NOT edit sibling-repo code.
 |----|------|-----|
 | Athena | Release-handoff received, gate failure (kick back), live-state drift | `aw mail send --to athena` |
 | Sofia | Pre-tag framing review, /health drift vs claims, ops discrepancies affecting direction | `aw mail send --to sofia` |
-| Charlene | Released artifacts ready for external claim | `aw mail send --to charlene` |
-| Amy | Live-state changes affecting support runbook | `aw mail send --to amy` |
+| Iris | Released artifacts ready for external claim | `aw mail send --to iris` |
+| Aida | Live-state changes affecting support runbook | `aw mail send --to aida` |
 | Analytics | Instrumentation gaps in operational telemetry | `aw mail send --to analytics` (when active) |
 | Juan | Production incidents, infrastructure failures, repeated stuck loops | `aw mail send --to juan` |
 | Eugenie | When a release is verified-live and ready for distribution | `aw mail send --to eugenie` |

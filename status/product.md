@@ -1,88 +1,88 @@
 # Product Status
 
-Last updated: 2026-04-28 22:23 CEST (Avi)
+Last updated: 2026-04-30 (Sofia, post role-model transition)
 
 ## Current focus
 
-**The product is live enough for distribution again; the remaining gap
-is company operating discipline.** KI#1 is no longer launch-blocking.
-Cloud is live on v0.5.9 with aweb 1.18.6, and Amy/Tom attestation in
-the latest support/cloud handoffs marks the mail/chat identity issue
-closed.
+The product is live. **Distribution is the bottleneck.** KI#1 (the
+last engineering blocker) closed in production on 2026-04-26 with
+aweb 1.18.3 and the trust-model architectural correction shipped in
+1.18.6 on 2026-04-27. Cloud has been on v0.5.10 since 2026-04-30
+05:54 UTC. Engineering's side is green for the first human-led
+conversations and the blog-post voice pass.
 
-Juan refined the company model again. The permanent areas are now
-direction, engineering, outreach, support, operations, and analytics.
-Repo work should happen through task-scoped builder/reviewer pairs
-created with `aw workspace add-worktree`, not permanent repo-manager
-agents. Every archetype owns a feedback loop.
+The team transitioned today (2026-04-30) to three peer working roles
+(Sofia / Athena / Hestia) plus user-facing surfaces (Aida, Iris) and
+analytics (Metis). See `docs/decisions.md` top entries for the role
+model and `docs/team.md` for current bounds.
 
 This week:
-1. Update `aweb-aals.2`: responsibility-area instruction sweep now
-   reflects the smaller permanent set and task-scoped repo pairs.
-2. Continue `aweb-aals.1`: convert current company priorities into `aw`
-   tasks with builder, reviewer, and strongest available feedback
-   signal.
-3. Use `aweb-aals.6` to dogfood one real task-scoped
-   builder/reviewer worktree cycle.
-4. Restart distribution now that the live blocker is closed: blog post
-   voice pass, first outreach brief, and first human-led conversations.
+
+1. Run the first distribution action. Iris stages, Juan and Eugenie
+   publish/engage, Metis records the signal with attribution limits.
+2. Hestia writes the ops runbook and runs a no-op release-ready
+   dry-run to qualify the role separation. Until that runs, the
+   build-vs-ship boundary is theoretical.
+3. AWID identity setup for the renamed agents (Sofia, Athena, Hestia,
+   Aida, Iris, Metis) — interactive task for Juan, same shape as
+   Amy's 2026-04-21 second-address sequence.
+4. Athena absorbs in-flight engineering work (`aweb-aalr.2`,
+   `aweb-aakj`) and writes `status/engineering.md` from her
+   perspective on first wake-up.
+5. Aida's runbook PR with the v0.5.10 deltas (1.9 NOT-boundary,
+   login-failure section, 409 conflict messaging) lands; Athena
+   does technical-accuracy review, Sofia does product/framing.
 
 ## Product readiness
 
-- **OSS aweb**: Shipping. Local repo is at aweb 1.18.6-era main;
-  tags include `server-v1.18.6`, `aw-v1.18.6`, `awid-v0.5.2`, and
-  `awid-service-v0.5.2`. Current focus in recent commits is trust
-  contract enforcement, identity-equivalent recipient matching, and
-  hosted-custodial matrix coverage.
-- **aweb-cloud**: Live. `https://app.aweb.ai/health` reports
-  `release_tag=v0.5.9`, `aweb_version=1.18.6`, database/Redis/awid
-  healthy, and mounted coordination API healthy.
-- **awid registry**: Live. `https://api.awid.ai/health` reports
-  `version=0.5.2`, Redis/database/schema healthy.
-- **Landing site (aweb.ai)**: Live. Blog section still listed as needed
-  for aweb.ai/blog posts; first personal/problem post remains planned
+- **OSS aweb**: shipping. Latest tags `server-v1.18.6`, `aw-v1.18.6`,
+  `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27).
+- **aweb-cloud**: live. `https://app.aweb.ai/health` reports
+  `release_tag=v0.5.10`, `aweb_version=1.18.6`, `git_sha=bce92c29`,
+  `awid_service_version=0.5.1`. db/redis/awid/coordination_api
+  healthy.
+- **awid registry**: live. `https://api.awid.ai/health` reports
+  `version=0.5.2`, redis/db/schema healthy.
+- **@awebai/claude-channel**: 1.3.3 published.
+- **Landing site (aweb.ai)**: live. Blog section still listed as
+  needed for aweb.ai/blog posts; first personal/problem post planned
   for juanreyero.com.
 
 ## Outreach state
 
-- **Blog post "5 agents"**: Draft ready since 2026-04-09; still not
-  published per `publishing/history.md`.
-- **Contacts**: Public status still says identified but uncontacted.
-  Private outreach files show no daily briefs and no recorded outreach
-  actions.
-- **Daily scanning**: Not running.
+- **Blog post "5 agents"**: draft ready since 2026-04-09. Awaiting
+  Juan's voice pass. Iris owns the packaging.
+- **Contacts**: identified in `co.aweb` (private), uncontacted.
+- **Daily scanning**: not running.
 - **Conversations joined**: 0.
 
 ## Support / user feedback
 
-- Amy asked for product classification on internal-alias-only rename.
-  Answer sent 2026-04-28: classify as **intentional today, possibly
-  reconsidered**. Customer-facing line: alias-only rename is not
-  supported; archive + create new is the current path, with history
-  continuity tradeoff.
-- No external user feedback surfaced in the public handoffs beyond
-  internal attestation and support-runbook shaping.
+- KI#1 closed empirically (Aida 4/4 + a second-shape probe on
+  2026-04-27).
+- Aida's runbook PR with the v0.5.10 deltas is the in-flight
+  product-facing artifact. See `status/support.md`.
+- No external user feedback recorded in public status beyond
+  internal attestation and runbook shaping.
 
 ## Priorities
 
-1. **Finish the responsibility-area reorg (`aweb-aals`)** — permanent
-   areas are now direction, engineering, outreach, support, operations,
-   analytics; remaining work is review and task conversion.
-2. **Make active work queryable (`aweb-aals.1`)** — use the `Work
-   contract:` block until `aweb-aals.7` makes builder/reviewer/feedback
-   native in `aw`.
-3. **Reactivate distribution** — blocker is closed; operations should
-   now flag distribution loops that are not running.
-4. **Repair outreach execution path** — outreach needs a reachable
-   workspace identity, current outreach status, and a first daily brief.
-5. **Keep engineering in release-discipline mode, not feature-expansion
-   mode** — recent v0.5.9 work is exactly the kind of correctness
-   discipline needed before inviting users, but the next product step
-   is usage, not more hidden polish.
+1. **Reactivate distribution.** The product side is no longer the
+   blocker; running the first distribution action is.
+2. **Make the role transition real.** Identity setup + ops runbook
+   close the loop on the new model. Until both are done, the
+   restructure is cosmetic.
+3. **Land Aida's v0.5.10 runbook PR.** Three customer-visible
+   additions identified.
+4. **Engineering posture stays release-discipline mode**, not feature
+   expansion. The 1.18.4–1.18.6 trust-model arc is the correct mode;
+   the next product step is usage, not more polish.
 
-## Open questions for Juan
+## Open questions
 
-- Do we still want the collision video before the first blog post, or
-  should the blog post publish first now that v0.5.9 is live?
-- What is the first distribution action, and what feedback signal do we
-  record after it runs?
+- Do we want the collision video before the first blog post, or does
+  the blog post publish first now that v0.5.10 is live?
+- What's the first distribution action, and what feedback signal does
+  Metis record after it runs?
+- When does Hestia's first end-to-end ship (under the new model)
+  happen, and what release does it qualify on?

@@ -10,9 +10,11 @@ feedback signal or task that came out of the support case. Tracking
 task: `aweb-aals.8`.
 
 Cloud rolled forward to **v0.5.10 / aweb 1.18.6** on 2026-04-30 05:54 UTC
-(release_tag=v0.5.10, git_sha=bce92c29). Per Randy's commit-traced
-review (mail 320be732), v0.5.10 layered auth-gate + personal-org
-invariants + admin write tools. Three customer-visible runbook deltas
+(release_tag=v0.5.10, git_sha=bce92c29). Per Athena's commit-traced
+engineering review (mail 320be732, sent before the role rename so it
+reads as "from randy" in the inbox), v0.5.10 layered auth-gate +
+personal-org invariants + admin write tools. Three customer-visible
+runbook deltas
 to land in the next runbook PR:
 
 1. **1.9 NOT-boundary**: pre-v0.5.10 personal teams may need
@@ -28,7 +30,8 @@ to land in the next runbook PR:
    1.9 covers org/namespace creation, cite the 409 shape.
 
 Sections 1.7 (conversation policy) and 1.9 (create-new-agent) happy
-paths fill from the existing plan unchanged per Randy's verdict.
+paths fill from the existing plan unchanged per the engineering
+verdict.
 
 ## Open customer blockers
 

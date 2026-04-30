@@ -1,7 +1,7 @@
 # Audiences — who uses aweb and why
 
-Preliminary. Avi, Enoch, and Randy should refine these as we learn
-from real users.
+Preliminary. Sofia, Hestia, and Athena should refine these as we
+learn from real users.
 
 **Known gaps:**
 - These personas are hypothetical — no real user data yet

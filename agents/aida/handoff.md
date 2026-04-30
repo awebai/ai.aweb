@@ -100,7 +100,12 @@ accuracy slice only; Sofia owns product/content approval.
    ...` and `aw chat send-and-leave randy ...` work under default
    active team aweb:aweb.ai without `--team` override. The 1.18.6 CLI
    classifier picks the appropriate membership cert based on the
-   recipient's namespace.
+   recipient's namespace. **Note (2026-04-30 role rename)**: the
+   engineering peer is now `athena`, not `randy`. Until the AWID
+   identity setup runs, the `randy` alias still resolves to Athena's
+   workspace (same `.aw/identity.yaml`); after setup, use `athena`.
+   The runbook at `../../docs/support/runbook.md` already uses the
+   new alias.
 
    **Resolution chain** (kept for reference; future support threads):
    - Mode 1 (server-side `_recipient_identity_matches` regression

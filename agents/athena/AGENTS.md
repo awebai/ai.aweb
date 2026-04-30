@@ -55,12 +55,12 @@ aw workspace status
 - **Tests.** Unit, integration, e2e. The standing release gate
   policies (11+2 banked rules) require gates Hestia runs; you
   produce code that makes those gates green.
-- **Runbook technical-accuracy reviews.** When Amy proposes a
+- **Runbook technical-accuracy reviews.** When Aida proposes a
   support-runbook section that has engineering routing implications
   (e.g., "route to engineering for backfill"), review for technical
   accuracy. Sofia owns product/framing review; you own the
   technical slice.
-- **Support's engineering questions.** Amy or another agent asks
+- **Support's engineering questions.** Aida or another agent asks
   "what does this code do" — you answer from code, not speculation.
 - **Release-notes drafts.** When code is ready to ship, draft the
   release notes (what it fixes, what it does NOT fix, evidence,
@@ -187,8 +187,8 @@ this directory.
 |----|------|-----|
 | Sofia | Direction questions, architectural pushback, technical-direction calls | `aw chat send-and-wait sofia` or `aw mail send --to sofia` |
 | Hestia | Release-handoff mail (clean main + draft notes), gate-failure response | `aw mail send --to hestia` |
-| Amy | Engineering-classified questions, runbook tech-accuracy reviews | `aw mail send --to amy` |
-| Charlene | What shipped, technical-accuracy of outreach drafts | `aw mail send --to charlene` |
+| Aida | Engineering-classified questions, runbook tech-accuracy reviews | `aw mail send --to aida` |
+| Iris | What shipped, technical-accuracy of outreach drafts | `aw mail send --to iris` |
 | Analytics | Instrumentation gaps, code-side telemetry questions | `aw mail send --to analytics` (when active) |
 | Juan | Architecture questions when Sofia and you can't converge | `aw mail send --to juan` |
 

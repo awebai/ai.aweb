@@ -25,8 +25,8 @@ Last updated: 2026-04-30 09:25 CEST
 - `aweb-aakj` (kate, aweb): admin write tools (org/user/team cleanup).
   Two commits already in main (08054315 retire-stale-users,
   8a229b46 stale-cli-users). Status: partially landed.
-- `aweb-aals.3` (avi): company-dashboard signal inventory. Defined in
-  docs/company-dashboard.md; awaiting operations adoption.
+- `aweb-aals.3` (sofia): company-dashboard signal inventory. Defined
+  in docs/company-dashboard.md; awaiting Hestia adoption.
 
 ## Closed today (2026-04-30)
 
@@ -42,7 +42,7 @@ Last updated: 2026-04-30 09:25 CEST
   Fallback/TeamSelector/Mail/Chat suites; `./awid` Registry/Resolve/
   Address/DIDKey/Certificate suites) and Python (messages 25 / chat
   12 parity slices) all green.
-- `aweb-aals.2`: operating-model reviewer pass approved; mailed avi.
+- `aweb-aals.2`: operating-model reviewer pass approved.
 
 ## Release/live state
 

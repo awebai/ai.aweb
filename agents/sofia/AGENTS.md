@@ -105,7 +105,7 @@ When you and Athena agree to change priorities:
    `../../status/engineering.md`
 3. Write a decision record in `../../docs/decisions.md`
 4. Create or update `aw` tasks for the new work
-5. Notify affected surfaces (Charlene for outreach impact, Amy for
+5. Notify affected surfaces (Iris for outreach impact, Aida for
    support impact, Hestia for ops/release impact)
 
 ## Technical Direction
@@ -154,16 +154,16 @@ own timing and product fit.
 
 ### Your responsibilities
 
-- **Approve content strategy**: Charlene proposes what to write,
+- **Approve content strategy**: Iris proposes what to write,
   when, where. You approve or redirect.
 - **Decide timing**: When is the product ready for the blog post?
   For direct outreach? For HN? You make these calls based on the
   release/live state.
 - **Route user feedback**: When users report issues or requests,
-  make sure Athena (engineering), Amy (support), Charlene (outreach),
+  make sure Athena (engineering), Aida (support), Iris (outreach),
   or analytics receive a concrete task where needed.
 - **Course-correct outreach**: If content doesn't match product
-  reality or `voice.md` principles, ask Charlene to fix it.
+  reality or `voice.md` principles, ask Iris to fix it.
 
 ### What outreach owns
 
@@ -199,8 +199,8 @@ but you don't write the content yourself.
 |----|------|-----|
 | Athena | Direction changes, technical questions, architectural calls | `aw chat send-and-wait athena` or `aw mail send --to athena` |
 | Hestia | Release framing, /health drift, ops discrepancies | `aw mail send --to hestia` |
-| Charlene | Approve/redirect content, timing decisions | `aw mail send --to charlene` |
-| Amy | User feedback patterns, runbook product/framing review | `aw mail send --to amy` |
+| Iris | Approve/redirect content, timing decisions | `aw mail send --to iris` |
+| Aida | User feedback patterns, runbook product/framing review | `aw mail send --to aida` |
 | Analytics | Signal briefs, instrumentation gaps | `aw mail send --to analytics` (when active) |
 | Juan | Strategic decisions, peer-disagreement escalation | `aw mail send --to juan` |
 | Eugenie | Outreach execution, publishing readiness | `aw mail send --to eugenie` |

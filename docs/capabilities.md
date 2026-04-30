@@ -1,10 +1,10 @@
 # Capabilities — what aweb provides
 
-What the product actually does. Coordinators (John, Tom, Goto) check
-code against this: if we claim a capability, the code must deliver it.
-If the code does something not on this list, ask whether it should be.
+What the product actually does. Athena (Engineer) checks code against
+this: if we claim a capability, the code must deliver it. If the code
+does something not on this list, ask whether it should be.
 
-Preliminary. Avi and Randy should refine as the product stabilizes.
+Preliminary. Sofia and Athena should refine as the product stabilizes.
 
 **Known gaps:**
 - Not yet validated against the current codebase — some capabilities
