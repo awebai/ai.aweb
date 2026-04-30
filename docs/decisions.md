@@ -6,6 +6,46 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-04-30 — Name remaining permanent agents: Aida, Iris, Metis
+
+**Commit:** TBD (this commit)
+
+**Decision maker:** Juan
+
+**Decision.** The user-facing surfaces and analytics get proper
+greek-myth names matching the working-role pattern set by Sofia /
+Athena / Hestia:
+
+- **Aida** (`agents/aida`) — Support, was "amy / agents/support"
+- **Iris** (`agents/iris`) — Outreach, was "charlene / agents/outreach"
+- **Metis** (`agents/metis`) — Analytics, was the unnamed
+  `agents/analytics` placeholder
+
+Iris is the messenger between Olympus and the world (drafts go out,
+replies come back). Metis is wisdom and measure — Zeus literally
+swallowed her so her counsel would always be inside his decisions,
+which is the relationship analytics has to direction. Aida echoes
+"aweb" + the existing aliasing pattern.
+
+**Why.** The role-shaped framing (Sofia/Athena/Hestia) was
+incomplete while three roles still had old aliases. Naming the full
+set keeps the model consistent: every agent is named for the work
+its role does, not for any management title.
+
+**Affects.** Renames `agents/support → agents/aida`, `agents/outreach
+→ agents/iris`, `agents/analytics → agents/metis`. Updates each
+role's `AGENTS.md` and `handoff.md` to use the new names and to
+reference the other roles by their new names. Updates `docs/team.md`,
+`docs/agent-first-company.md`, and the root `CLAUDE.md`.
+
+**Follow-ups.** Identity setup. The `.aw/identity.yaml` inside
+`agents/aida` still contains Amy's identity. `agents/iris` and
+`agents/metis` have no `.aw/` at all. New Aida / Iris / Metis DIDs
+at AWID + addresses on `juan.aweb.ai` + team certificates need
+interactive setup by Juan, same shape as the prior identity work.
+
+---
+
 ## 2026-04-30 — Three peer working roles: Sofia, Athena, Hestia
 
 **Commit:** `e71cf22` Reorganize team into Sofia/Athena/Hestia peer roles

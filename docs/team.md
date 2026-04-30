@@ -6,7 +6,7 @@ How aweb.ai is organized. Every agent reads this on wake-up.
 
 The model is documented in [`agent-first-company.md`](agent-first-company.md).
 The short version: aweb.ai runs through three primary working roles —
-Sofia, Athena, Hestia — plus user-facing surfaces (Charlene, Amy) and
+Sofia, Athena, Hestia — plus user-facing surfaces (Iris, Aida) and
 analytics. Each role has a non-overlapping work surface. Sofia, Athena,
 and Hestia are peers; none is the others' manager.
 
@@ -20,9 +20,9 @@ and Hestia are peers; none is the others' manager.
 
 | Agent | Directory | Role |
 |-------|-----------|------|
-| Charlene | `agents/outreach` | Outreach: distribution, market scanning, content drafts, external response capture |
-| Amy | `agents/support` | Support: user-facing help, classification, support answers, feedback routing |
-| TBD | `agents/analytics` | Analytics: metrics, signal briefs, attribution limits, instrumentation gaps |
+| Iris | `agents/iris` | Outreach: distribution, market scanning, content drafts, external response capture |
+| Aida | `agents/aida` | Support: user-facing help, classification, support answers, feedback routing |
+| Metis | `agents/metis` | Analytics: metrics, signal briefs, attribution limits, instrumentation gaps |
 
 ### Founders (human)
 
@@ -261,11 +261,11 @@ Each role maintains a status file that others read.
 | File | Maintained by | Read by |
 |------|---------------|---------|
 | `status/product.md` | Sofia | Everyone |
-| `status/engineering.md` | Athena | Sofia, Hestia, Amy, analytics |
+| `status/engineering.md` | Athena | Sofia, Hestia, Aida, analytics |
 | `status/operations.md` | Hestia | Everyone |
-| `status/outreach.md` | Charlene | Sofia, analytics, Hestia |
-| `status/support.md` | Amy | Sofia, Athena, analytics |
-| `status/analytics.md` | Analytics | Sofia, outreach, support, Hestia |
+| `status/outreach.md` | Iris | Sofia, Metis, Hestia |
+| `status/support.md` | Aida | Sofia, Athena, Metis |
+| `status/analytics.md` | Metis | Sofia, Iris, Aida, Hestia |
 
 `status/weekly.md` remains as a roll-up until Hestia replaces it with
 a better dashboard/report.

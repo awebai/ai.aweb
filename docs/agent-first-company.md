@@ -41,9 +41,10 @@ have to be different perspectives:
   technical reality. They are peers; pushback is expected.
 - For releases: Athena drafts release notes; Sofia reviews framing;
   Hestia adds verified-live evidence before posting.
-- For support runbook: Amy drafts; Athena reviews technical accuracy
-  on engineering-routing sections; Sofia reviews product/framing.
-- For outreach: Charlene drafts; Sofia reviews timing and fit; humans
+- For support runbook: Aida drafts; Athena reviews technical
+  accuracy on engineering-routing sections; Sofia reviews
+  product/framing.
+- For outreach: Iris drafts; Sofia reviews timing and fit; humans
   publish.
 
 When the second voice is a peer, the call is "they did not converge"
@@ -60,9 +61,9 @@ peer disagreement is structural.
 
 | Surface | Agent | What |
 |---------|-------|------|
-| Outreach | Charlene | Distribution preparation, market scanning, content drafts |
-| Support | Amy | User-facing help, classification, support answers, feedback routing |
-| Analytics | TBD | Metrics, signal briefs, attribution limits, instrumentation gaps |
+| Outreach | Iris | Distribution preparation, market scanning, content drafts |
+| Support | Aida | User-facing help, classification, support answers, feedback routing |
+| Analytics | Metis | Metrics, signal briefs, attribution limits, instrumentation gaps |
 
 Direction proposes. Engineering implements. Operations ships. None of
 them approves the others' work; they hand off and escalate to Juan

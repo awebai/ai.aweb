@@ -1,6 +1,6 @@
-# Outreach Handoff
+# Iris Handoff
 
-Last updated: 2026-04-29
+Last updated: 2026-04-30 (role-model transition; was "outreach / charlene" before the rename to Iris)
 
 ## Operating focus
 
@@ -41,10 +41,23 @@ competitive notes stay in `../../../co.aweb/`.
 - Product readiness is no longer the main blocker; the next blocker is
   choosing and running the first distribution action through the runbook.
 
+## Role model context
+
+Sofia (Direction) approves product fit and timing on outreach. Athena
+(Engineer) is the technical-accuracy reviewer for drafts that mention
+product behavior. Aida (Support) sends user stories worth turning
+into content. Metis (Analytics) is the signal-strength reviewer for
+distribution outcomes. Hestia (Operations) signals when a release is
+verified-live and ready for external claim.
+
+KI#1 is closed; aweb-cloud v0.5.10 + aweb 1.18.6 + awid 0.5.2 are
+live in production as of 2026-04-30. The product is no longer the
+distribution blocker — running the first distribution action is.
+
 ## Next priorities
 
 1. Use Case 1 to package the "5 agents" draft for Juan's voice pass.
 2. Use Case 2 to write the first public market scan brief.
-3. Propose the first distribution action to Direction.
-4. Record any human action in `../../publishing/history.md`, then ask
-   Analytics for the strongest available signal read.
+3. Propose the first distribution action to Sofia.
+4. Record any human action in `../../publishing/history.md`, then
+   ask Metis for the strongest available signal read.

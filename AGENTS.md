@@ -60,8 +60,8 @@ agent:
   code in aweb and ac, tests, runbook tech-accuracy. Hestia
   (Operations) — gates, tags, deploys, live-verify, dashboard
   hygiene. They are peers; none approves the others. Disagreement
-  escalates to Juan. Plus user-facing surfaces (Charlene outreach,
-  Amy support) and analytics.
+  escalates to Juan. Plus user-facing surfaces (Iris outreach,
+  Aida support) and Metis (analytics).
 - **Feedback strength matters.** Always look for feedback. Prefer
   feedback that is close and verifiable, such as code -> test -> fix
   or release -> health check -> smoke test. For weaker surfaces like
@@ -134,15 +134,15 @@ co.aweb/
     ├── sofia/          # Sofia — Direction (priorities, decisions, technical direction)
     ├── athena/         # Athena — Engineering (code in aweb + ac)
     ├── hestia/         # Hestia — Operations (gates, tags, deploys, live-verify)
-    ├── outreach/       # Charlene — Outreach
-    ├── support/        # Amy — Support
-    └── analytics/      # TBD
+    ├── iris/           # Iris — Outreach
+    ├── aida/           # Aida — Support
+    └── metis/          # Metis — Analytics
 ```
 
 ## How agents work here
 
 Each agent runs Claude Code from their subdirectory under `agents/`
-(e.g., `agents/engineering/`). `aw` finds `.aw/workspace.yaml` in that
+(e.g., `agents/athena/`). `aw` finds `.aw/workspace.yaml` in that
 directory. Shared documents are at `../../` relative to the agent.
 
 ### Wake-up routine (mandatory, every time)

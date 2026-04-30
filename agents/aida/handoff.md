@@ -1,6 +1,6 @@
-# Support Handoff
+# Aida Handoff
 
-Last updated: 2026-04-30 (post v0.5.10 deploy)
+Last updated: 2026-04-30 (role-model transition; was "support / amy" before the rename to Aida)
 
 ## Operating focus
 
@@ -66,7 +66,7 @@ See `../../docs/decisions.md` 2026-04-21 for the full setup procedure.
 
 ## v0.5.10 runbook deltas (in flight)
 
-Per Randy's commit-traced review (mail 320be732), three customer-visible
+Per Athena's commit-traced review (mail 320be732, when Athena was still randy), three customer-visible
 additions land in the next runbook PR:
 
 1. **1.9 NOT-boundary**: pre-v0.5.10 personal teams may need
@@ -84,9 +84,9 @@ additions land in the next runbook PR:
 1.7 (conversation policy) and 1.9 (create-new-agent) happy paths fill
 from the existing plan unchanged per Randy's Q1/Q2 verdict.
 
-Review path on the PR (Randy mail f455db30): land without waiting,
-Randy reviews against main on the engineering-tech-accuracy slice
-only; Avi owns product/content approval.
+Review path on the PR (mail f455db30 when Athena was still randy): land
+without waiting, Athena reviews against main on the engineering-tech-
+accuracy slice only; Sofia owns product/content approval.
 
 ## Known issues
 
@@ -273,15 +273,17 @@ when a user goes deep — don't paraphrase from memory.
   getting-started steps. Replied to intro mail.
 - No open questions.
 
-## Escalation cheat sheet
+## Escalation cheat sheet (post role-model transition 2026-04-30)
 
 | Topic | Route |
 |-------|-------|
-| Bugs / UX / features / stories | Avi |
-| Identity / namespace / team recovery | Tom first, Randy if slow |
-| Engineering / CLI / protocol | Randy (or dave for OSS) |
-| Needs `ac` access | Tom |
-| Needs `co.aweb` access | Avi |
+| Bugs (technical) | Athena |
+| UX confusion / feature requests / product commitments | Sofia |
+| User stories / quotes / content angles | Iris |
+| Identity / namespace / team recovery | Athena (one engineer for both repos now) |
+| Engineering / CLI / protocol | Athena |
+| Needs `ac` or `co.aweb` access for support reasons | Sofia (privileged-data calls) |
+| Operational issue (queue stuck, repeated) | Hestia |
 | Urgent, no response | Juan |
 
 You do API-first triage on identity recovery cases but do not
