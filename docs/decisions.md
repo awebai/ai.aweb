@@ -8,7 +8,7 @@ handoff to detect that the world changed.
 
 ## 2026-04-30 — Name remaining permanent agents: Aida, Iris, Metis
 
-**Commit:** TBD (this commit)
+**Commit:** `810d472` Name user-facing surfaces: Aida (support), Iris (outreach), Metis (analytics)
 
 **Decision maker:** Juan
 
