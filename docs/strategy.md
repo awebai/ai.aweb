@@ -1,8 +1,6 @@
 # aweb Strategy
 
 **Known gaps:**
-- Pricing in this doc ($25/$250) doesn't match what's live ($49/$149)
-  — needs reconciliation
 - The execution timeline ("items 1-5 are this week") was written
   weeks ago and hasn't been updated against reality
 - The collision video is called "highest priority single asset" but
