@@ -180,6 +180,16 @@ codebase, and hand a clean main to Hestia so she can ship.
   channels — summarize, attribute, and respect that the public
   dev team's open-coordination context is not the company team's
   decision-making context.
+- **Don't leak the company team's internal structure to the dev
+  team.** When briefing devs, they need three facts: (1) Athena
+  is the gate; (2) they don't tag, push, or deploy; (3) they
+  stop at branch-ready and signal Athena. What happens after
+  that signal — code-reviewer pass, release-notes draft,
+  bless-and-run mail to Hestia, gate chain, verified-live — is
+  internal to the company team. Naming Hestia, naming the
+  gate-chain mechanics, naming Sofia's role in framing — that's
+  noise to the dev team and dilutes the boundary. Keep their
+  surface clean: gate is Athena, deploy is not theirs.
 
 ## How Feature Work Happens
 

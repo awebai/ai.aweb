@@ -1,111 +1,120 @@
 # Athena Handoff
-Last updated: 2026-05-01 11:30 CEST
+Last updated: 2026-05-01 23:20 CEST
 
 ## Read this first
 
 You are Athena. You own the code for aweb and ac: architecture,
-invariants, review of every diff that lands on main, and non-feature
-code you write yourself (diagnostic harnesses, reproducers,
-conformance vectors, instrumentation stubs).
+invariants, review of every diff that lands on main, and
+non-feature code you write yourself (diagnostic harnesses,
+reproducers, conformance vectors, instrumentation stubs).
 
-**The dispatch shape for feature authoring is being revised.** The
-spawn-pair flow described in `AGENTS.md` "How Feature Work Happens"
-and in `docs/decisions.md` commit `4491df5` (top entry, 2026-05-01)
-was published as the model. On Athena's first wake-up under that
-model (also 2026-05-01, second agent online after Sofia), Juan
-corrected: "do not worry about spawn. I want you to understand
-your job. We will have to talk about how we set you up, because
-the actual dev team is in another team."
+**You belong to TWO cryptographic teams.** This is the load-
+bearing setup. AGENTS.md leads with it; re-read on every
+wake-up.
 
-So: the spawn-pair-via-mail-Juan flow is *not* the authoritative
-current setup. The dev team is in a separate cryptographic team
-rather than ephemeral pairs spawned in `default:aweb.ai`. Juan
-will walk through the real shape. Don't pre-empt by drafting
-spawn briefs to mail Juan; don't claim Phase 1 / Phase 2 framing
-in chat. Wait for the walk-through, then update memory + AGENTS.md
-+ this handoff to match reality.
+| Team | Visibility | Members | Purpose |
+|------|------------|---------|---------|
+| `default:aweb.ai` | PRIVATE — company | Sofia, Hestia, Aida, Iris, Metis, you | Direction, decisions, status, release framing, support, distribution |
+| `aweb:juan.aweb.ai` | PUBLIC — dev | mia, noah, grace, kate, you | Code authoring on aweb and ac |
 
-What's stable about the role:
-- Code ownership in aweb + ac (architecture, invariants, cross-repo
-  coherence).
-- Review of every diff before it lands on main.
-- Non-feature code Athena writes directly: diagnostic harnesses
-  (e2e-amy-symptom-reproducer.sh class), reproducers, conformance
-  vectors, instrumentation stubs.
-- Runbook tech-accuracy reviews (Aida-side surfaces).
-- Release-notes drafts (Hestia-side handoff).
-- Technical content for decision records (Sofia-side framing).
+You are the only role with feet in both teams. Default active
+team is `aweb:juan.aweb.ai` (dev); use `--team default:aweb.ai`
+for coordinator chats. Three movement patterns:
+`aw chat --team <id> ...` (per-command), `aw id team switch
+<id>` (session default), `aw id team list` (memberships).
 
-## Live state at 2026-05-01 morning
+## Live state at 2026-05-01 23:20 CEST
 
-- `app.aweb.ai/health`: `release_tag=v0.5.12`,
-  `aweb_version=1.18.6`, `git_sha=962dd163`,
-  `awid_service_version=0.5.1`. db/redis/awid/coordination_api
-  healthy. Started 2026-04-30 20:07 UTC.
-- `api.awid.ai/health`: `version=0.5.2`. healthy.
+- `app.aweb.ai/health`: `release_tag=v0.5.16`,
+  `aweb_version=1.18.6`, `git_sha=842e0b5b`,
+  `awid_service_version=0.5.3`. Started 2026-05-01 20:45:10 UTC.
+  v0.5.17 (commit `9c1038ad`) tagged and image building; expect
+  Render to roll forward 20-90min after tag push.
+- `api.awid.ai/health`: `version=0.5.2`, healthy.
 - aweb OSS published tags: `server-v1.18.6`, `aw-v1.18.6`,
   `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27, no movement).
 - channel: 1.3.3.
-- ac main is **5 commits past v0.5.12** — coherent v0.5.13
-  candidate (admin tooling hardening + auth retired-user safety +
-  ship-gate fix). Holding for Hestia gate chain. See
-  `status/engineering.md` for per-commit read.
 
-## What happened today (2026-05-01 wake-up)
+## What happened today (2026-05-01)
 
-1. Read team docs, status files, decisions.md (top entry: dispatch
-   model commit 4491df5). Updated engineering.md from new
-   perspective.
-2. Sofia chat: confirmed Phase 2 deferral was the right call (she
-   pushed for it; agreed because today's bottleneck is distribution
-   not throughput). Sofia flagged the auth-path commit
-   `5818095d` as a code-reviewer-subagent-before-ship target —
-   yes, will run that as part of v0.5.13 prep.
-3. Juan corrected: drop the spawn thread; actual dev team is in
-   another cryptographic team. Setup walk-through pending.
-4. YC agent (first wake-up, separate team): five-question fact-check
-   on technical positioning claims for YC application. Grounded
-   each in code. Pushed back on "locks are repo-scoped" (wrong)
-   and "rotation log verifiable without trusting the registry"
-   (overclaim — chain holds, transparency does not). Mailed Q5
-   production-scale numbers. YC closed exchange satisfied; will
-   re-engage when draft answer touches code, with a request to
-   time `aw init` on a fresh container before publishing the
-   five-minute claim externally.
+- **Wake-up:** read team docs, status, decisions; landed initial
+  engineering.md update.
+- **Sofia chat:** confirmed Phase 2 (`aw spawn-pair` primitive)
+  deferral. She accepted my read; we agreed today's bottleneck
+  is distribution not throughput.
+- **Juan corrected the spawn-pair framing:** the actual dev team
+  is in `aweb:juan.aweb.ai`, persistent agents (mia, noah, grace,
+  kate). The published spawn-pair-via-mail-Juan flow was
+  speculative and is now superseded.
+- **YC agent (separate team) fact-check:** five-question
+  technical positioning review for YC application. Pushed back
+  on locks-are-repo-scoped (wrong) and rotation-log-verifiable-
+  without-trusting-the-registry (overclaim — chain holds,
+  transparency does not). Mailed Q5 production scale numbers (91
+  AWID identities, 44 cloud users — dogfooding scale).
+- **Two-team setup:** Juan added me to `aweb:juan.aweb.ai`. I
+  verified bidirectional cross-team chat (test ping to Sofia via
+  `--team default:aweb.ai`). Confirmed `aw id team switch` is
+  the canonical default-team command.
+- **AGENTS.md rewritten:** leads with the two-team-bridge
+  section. Spawn-pair framing removed throughout. Communication
+  table now shows `--team` flags. Commit `937e248`.
+- **Hestia first wake-up:** asked three real questions on v0.5.17
+  (routing, code-reviewer pass, local reproducer). Routing
+  decision made: dev team stops tagging from here on; Hestia
+  owns gate+tag+deploy+verify going-forward. v0.5.17 already
+  tagged by Mia; Hestia running `make release-ready`
+  retroactively as runbook-seed exercise tonight. Mia briefed,
+  Sofia aligned.
+- **Mia chat (juan.aweb.ai team):** clean handoff on aalr.2
+  (starts tomorrow morning, persist-refactor first); aaly.6
+  closure context (Grace's commit `20419936`); confirmed v0.5.17
+  is on origin (Render lag explanation).
+- **Code-reviewer subagent on `937f37b0`:** ran successfully.
+  Two real findings — test assertion at AgentsPage.test.tsx:181
+  is fragile against `--aweb-url` regression; `whitespace-pre`
+  on `<pre>` is dead weight. Forwarded to Mia (mail 4dfa7f75).
+  Gap closes at e2e level via the upcoming Playwright
+  reproducer.
+- **Engineering.md resynced** to current state (commit `0a91d8f`).
 
-## Production scale snapshot (queried 2026-05-01 morning)
+## Active engineering surface
 
-AWID registry: 91 did_aw_mappings, 57 dns_namespaces, 45 teams,
-33 public_addresses, 3 team_certificates.
-
-Cloud: 44 active users (46 inc soft-deleted), 53 organizations,
-46 managed_namespaces, 12 team_members rows, 0 oss_public_teams,
-8 active sessions, 155 cloud_agent_certificates,
-178 cloud_workspace_metadata.
-
-Honest framing: dogfooding scale; distribution begins this week.
+`aw work active` — Mia is on aalr.2 (starts tomorrow morning).
+aalz (no-mocks-of-internals) is her parallel P1; my Add-Existing
+Playwright reproducer lands inside aalz scope as the concrete
+first deliverable.
 
 ## Pending artifacts owed (Athena side)
 
-1. **KI#1 closure decision record technical content.** Sofia
-   drafts framing; supply cert-presentation auth correction +
-   aalk continuity arc + 1.18.6 trust-model arc + Aida 4/4
-   attestation. Source: `aale-trust-contract.md` in this dir +
-   aweb commit `7759abc`.
-2. **Code-reviewer subagent pass** on the v0.5.13 5-commit cluster
-   (962dd163, cf49c282, 0e0f73a6, 37762328, 5818095d). Per
-   policy 13.
-3. **Aida runbook PR tech-accuracy review.** Mentioned in earlier
-   handoff but inbox is empty; verify state with Aida when she
-   comes online.
-4. **Time `aw init` on a fresh container** before YC publishes
-   the five-minute claim externally. Not blocking now; YC asked
-   to coordinate when the draft is closer to publish.
+1. **Playwright-MCP reproducer for Add-Existing dialog** — my
+   non-feature-code authoring. Lands as
+   `ac/frontend/e2e/add-existing.spec.ts`, wired into
+   `make test-cloud-user-journeys`. Targets in
+   `status/engineering.md`. Tomorrow morning fresh-headed.
+2. **KI#1 closure technical content for Sofia's decision
+   record.** Sofia drafts framing; I supply cert-presentation
+   auth correction + aalk continuity arc + 1.18.6 trust-model
+   arc + Aida 4/4 attestation. Source: `aale-trust-contract.md`
+   in this dir + aweb commit `7759abc`. Pending Sofia framing
+   draft.
+3. **aalr.2 review** when Mia signals branch-ready (tomorrow).
+4. **YC fresh-container `aw init` timing** before they publish
+   the five-minute claim externally. Not blocking; YC will
+   re-engage when their draft answer is closer to publish.
 
-## Standing release-discipline policies (banked through 2026-04-26)
+## Standing tasks via `aw task`
 
-Hestia enforces these at gate-time. They hold under any dispatch
-shape.
+- Task #2: Author Playwright-MCP reproducer (pending).
+- Task #3: KI#1 closure technical content (pending Sofia
+  framing).
+- Task #5: Review aalr.2 (pending Mia signal).
+- (#1, #4 completed today.)
+
+## Standing release-discipline (banked through 2026-04-26)
+
+Hestia enforces these at gate-time. They hold under any
+dispatch shape.
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree (not chat-pasted diffs)
@@ -118,56 +127,66 @@ shape.
 9. Published artifact ≠ deployed service
 10. Browser-verify UI-surface releases
 11. Closure framing rests on empirical attestation
-12. Reproducer-as-gate
-13. Code-reviewer subagent for gate-input commits (Athena runs
-    before signaling Hestia)
+12. Reproducer-as-gate (Add-Existing Playwright spec is the
+    next instance — covers the iteration-cost class)
+13. Code-reviewer subagent for gate-input commits BEFORE
+    bless-and-run mail to Hestia (canonical handoff step now)
 
 ## Architectural context worth not losing
 
 - **Server is data substrate; verification is client-side.** The
-  trust-contract design space is two clients (Go + TS), not three.
+  trust-contract design space is two clients (Go + TS), not
+  three.
 - **Cert-presentation + signature + non-revocation is the auth
   predicate.** The 1.18.6 architectural correction (commit
   `7759abc`, 922 lines) replaced row-existence-as-authorization.
-  AWID is no longer a membership oracle. Don't reintroduce that
-  pattern.
-- **Single consolidated migration files mean every additive change
-  goes in a NEW ordered file.** Editing existing 001 in place
-  trips pgdbm's checksum guard and forces a destructive cutover.
+  AWID is no longer a membership oracle.
+- **Single consolidated migration files mean every additive
+  change goes in a NEW ordered file.** Editing existing 001 in
+  place trips pgdbm's checksum guard.
 - **Reproducer-as-gate works.** The
-  `e2e-amy-symptom-reproducer.sh` pattern from KI#1 is the model
-  for any future symptom-driven closure.
-- **Locks are team-scoped reservations on opaque resource keys, not
-  repo-scoped or file-system locks.** Convention to use file paths
-  is convention. (Calibrated during YC fact-check 2026-05-01.)
+  `e2e-amy-symptom-reproducer.sh` pattern is the model.
+- **Locks are team-scoped reservations on opaque resource keys**,
+  not repo-scoped or filesystem locks. Convention to use file
+  paths is convention.
 - **Rotation log: chain self-verifies; full transparency on
-  roadmap.** Don't claim "verifiable without trusting the registry"
-  flat — split-brain is theoretically possible until transparency
-  lands.
+  roadmap.** Don't claim "verifiable without trusting the
+  registry" flat — split-brain is theoretically possible until
+  transparency lands.
+- **Cross-system deadlock framing** is why aalr.2 persist-
+  refactor is non-optional even after John's ensure-team
+  endpoint cuts the round-trip count. Keep AWID I/O strictly
+  outside open transactions.
 
 ## Working docs in this dir
 
 - `aale-trust-contract.md`: working doc from the 2026-04-26
-  architecture pivot. Promote to `aweb/docs/` once ratified.
+  architecture pivot. Source for KI#1 technical content.
 
 ## Sibling repo symlinks under this dir
 
-- `aweb` → `../../../aweb` (OSS: server, CLI, awid, channel)
-- `ac` → `../../../ac` (cloud)
+- `aweb` → `../../../aweb`
+- `ac` → `../../../ac`
 - `awid` → `../../../aweb/awid`
 
-Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run `aw`
-from sibling repos.
+Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
+`aw` from sibling repos.
 
 ## What to check FIRST on next wake-up
 
-1. Whether Juan walked through the dispatch / dev-team setup. If
-   yes, update memory `project_athena_dispatch_model.md`,
-   `AGENTS.md`, and this handoff to match reality.
-2. `aw mail inbox` — including any YC follow-up, Sofia chat
-   reply, Aida runbook PR status.
-3. `aw work active` — pick up anything claimed.
-4. Hestia state: did her runbook land? Is identity setup done?
-   Did v0.5.13 candidate move?
-5. Status/operations.md and status/product.md for new entries
-   since 2026-05-01.
+1. `aw id team list` — confirm both team memberships still
+   active.
+2. Both teams' inbox + chat:
+   ```bash
+   aw chat pending; aw mail inbox
+   aw chat --team default:aweb.ai pending
+   aw mail --team default:aweb.ai inbox
+   ```
+3. Did Render roll forward to v0.5.17? Cross-check
+   `app.aweb.ai/health`.
+4. Hestia's runbook-seed exercise output (her runbook draft +
+   verified-live mail).
+5. Mia's aalr.2 branch-ready signal.
+6. `aw task list` — open tasks (#2 reproducer, #3 KI#1 content,
+   #5 aalr.2 review).
+7. Sofia's KI#1 framing draft.
