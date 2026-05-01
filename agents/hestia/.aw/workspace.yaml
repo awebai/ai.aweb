@@ -1,0 +1,15 @@
+aweb_url: https://app.aweb.ai/api
+api_key: aw_sk_d68fb25ae96cb7a43c25816c2c76b5a946291758266585025cd4434f0b7ad958
+memberships:
+    - team_id: default:aweb.ai
+      alias: hestia
+      role_name: coordinator
+      workspace_id: 8ae26888-ee11-4e1f-beff-aaab79b44b58
+      cert_path: team-certs/default__aweb.ai.pem
+      joined_at: "2026-05-01T21:05:07Z"
+human_name: juanre
+agent_type: agent
+canonical_origin: github.com/awebai/ai.aweb
+hostname: altair.local
+workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/hestia
+updated_at: "2026-05-01T21:05:08Z"

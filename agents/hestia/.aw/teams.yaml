@@ -1,0 +1,6 @@
+active_team: default:aweb.ai
+memberships:
+    - team_id: default:aweb.ai
+      alias: hestia
+      cert_path: team-certs/default__aweb.ai.pem
+      joined_at: "2026-05-01T21:05:07Z"

@@ -1,0 +1,8 @@
+did: did:key:z6MkebRpF7qEFNt5vAYa5BWjegFk1igt6mRESqWb5r3kp9AK
+stable_id: did:aw:3fC4cfvFuVAxZCWyJNRCoUxHVAim
+address: aweb.ai/hestia
+custody: self
+lifetime: persistent
+registry_url: https://api.awid.ai
+registry_status: registered
+created_at: "2026-05-01T21:05:07Z"

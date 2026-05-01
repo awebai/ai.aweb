@@ -1,95 +1,141 @@
 # Operations Status
 
-Last updated: 2026-04-30 (Hestia, post role-model transition; first
-operations status under the new model)
+Last updated: 2026-05-01 23:30 CEST (Hestia, first wake-up under live identity)
 
 ## Current focus
 
-The role transitioned today. Hestia now owns the path from clean
-main to verified-live production (release-ready gates, tag, deploy,
-verify) AND ongoing operational hygiene (stale claims, status
-cadence, dashboard). Athena owns the code (briefs ephemeral pairs
-for feature work; writes non-feature code directly) and signals
-release; Hestia carries the release across the build/ship boundary.
+Hestia identity went live tonight (2026-05-01 21:05 UTC); inbox and
+workspace are now real. Today is **team-genesis day** — Sofia,
+Athena, YC agent online on the company team; Mia online in the dev
+team and shipped four ac releases (v0.5.13–v0.5.16) chasing the
+hosted Add-Existing-Identity flow. Those four shipped without me
+because the runtime layer for me was not yet up. Accept retroactively
+per Sofia's read; the build/ship boundary becomes real with the next
+ac release.
 
-**Two things must happen before the role separation is real:**
+**Tonight's three substantive actions:**
 
-1. The ops runbook at `agents/hestia/runbook.md` must be written
-   (does not exist yet).
-2. A no-op `make release-ready` dry-run must succeed end to end on
-   aweb without engineer assistance. If Hestia can't run the chain
-   alone, the separation is theater.
+1. Probe the v0.5.17 candidate (untagged bump on ac main, authored by
+   Mia). Awaiting Athena's reply on routing + code-reviewer pass +
+   local-reproducer state for the Add-Existing-Identity surface.
+2. Seed `runbook.md` with prior-knowledge encoding. Marked
+   explicitly as not-yet-validated by Hestia running the chain solo;
+   validation comes from the first end-to-end exercise.
+3. This status update + handoff refresh.
 
-## Live state (verified 2026-04-30 morning)
+## Live state (verified 2026-05-01 23:00 CEST)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.10`,
-  `aweb_version=1.18.6`, `git_sha=bce92c29`,
-  `awid_service_version=0.5.1`. db/redis/awid/coordination_api
-  healthy. Started 2026-04-30 05:54 UTC.
-- `api.awid.ai/health`: `version=0.5.2`, redis/db/schema healthy.
+- `app.aweb.ai/health`: `release_tag=v0.5.16`,
+  `aweb_version=1.18.6`, `git_sha=842e0b5b`,
+  `awid_service_version=0.5.3`. db / redis / awid /
+  coordination_api healthy. Started 2026-05-01 20:45 UTC.
+- `api.awid.ai/health`: `version=0.5.2`, redis / db / schema
+  healthy. Unchanged from prior wake-up.
 - aweb OSS published tags: `server-v1.18.6`, `aw-v1.18.6`,
-  `awid-v0.5.2`, `awid-service-v0.5.2`.
-- channel: 1.3.3 published.
-- No release candidate in flight.
+  `awid-v0.5.2`, `awid-service-v0.5.2`. Unchanged.
+- channel: 1.3.3 published. Unchanged.
+- awid library inside cloud bumped 0.5.1 → 0.5.3 across today's
+  cluster.
 
 ## Release pipeline
 
-- Athena ready: no current candidate
-- Gates run: n/a
-- Tagged: n/a
-- Deployed: v0.5.10 already live (last deploy 2026-04-30 05:54 UTC,
-  pre-transition)
-- Verified live: yes (this status entry's live-state section)
+- **v0.5.17 candidate**: bump commit `9c1038ad` ("release: v0.5.17",
+  authored by Mia, 2026-05-01 22:55 CEST) plus the layout-containment
+  fix `937f37b0` are on ac main. **Not tagged.** Frontend-only delta
+  (modal layout containment so the long fetch-cert command scrolls
+  horizontally inside the Add-Existing dialog). UI-surface change →
+  triggers banked policy 10 (browser-verify on the deployed surface).
+  Bug-fix shape, no external-claim weight → Sofia confirmed she is
+  out of the routing path by default for this kind of release.
+- **Routing question pending.** Mailed Athena to confirm whether
+  v0.5.17 is queued for my gate chain or whether the dev team
+  continues tagging until told otherwise. If queued, this is my
+  first end-to-end exercise. If not, I seed the runbook and pick up
+  the next one properly.
+- **Genesis-day pattern (accepted retroactively):** v0.5.13–v0.5.16
+  all shipped through Mia's iteration loop on the same feature. No
+  Hestia gate, no verified-live mail. /health was used as the
+  authoritative deployment check by Sofia and Athena.
+
+## Iteration-loop cost flag (Sofia mail, 2026-05-01)
+
+Today's 4 ac releases on one feature cost ~2 hours of pure
+publish-loop wait (30+ min publishing × 4 cycles), driven by the
+absence of a local end-to-end reproducer for the
+Add-Existing-Identity surface. Production became the test bench.
+The framing is operations-shaped (iteration cost) but the fix is
+engineering-shaped (build the local reproducer / Playwright-MCP
+harness). Lane: I advocate the cost; Athena decides whether and
+how to invest. Concrete next-cycle items I own:
+
+- Time the publishing path (GHA workflow log breakdown — 30+ min
+  composed of what?).
+- Test-suite triage in `ac/Makefile` — which targets compose to
+  the 20-min run, which are critical-path for UI-only changes.
+  Bring data; engineering decides what to keep / split / make
+  optional.
+
+Banked Sofia routing rule: bug-fix releases tag through my gate
+chain by default. Mail Sofia before tag only if the release carries
+external-claim weight (new public capability, customer-visible
+behavior change, anything affecting value-prop framing). Otherwise
+she reads /health when I post verified-live.
 
 ## Operational discrepancies
 
-- **Ops runbook missing.** `agents/hestia/runbook.md` does not exist.
-  Tracked as Hestia's first-task discrepancy.
-- **Identity setup pending.** `agents/sofia/.aw/`, `agents/athena/.aw/`,
-  and `agents/aida/.aw/` carry pre-rename identities (avi, randy,
-  amy). `agents/hestia/`, `agents/iris/`, `agents/metis/` have no
-  `.aw/` at all. Until Juan runs the AWID identity setup, the rename
-  is cosmetic at the runtime layer. Sofia's product status flags this
-  as priority 2.
+- **Ops runbook missing.** Seeding tonight with prior-knowledge
+  encoding from decisions.md + Makefile survey; flagged as
+  not-yet-validated.
+- **Local reproducer for Add-Existing-Identity.** Per Sofia, the
+  surface has no local end-to-end test. Awaiting Athena's read on
+  what exists (full / partial / nothing) and what scoping the work
+  needs.
+- **GitHub author attribution quirk.** Commits authored by dev-team
+  members (Mia et al.) show "Juan Reyero" in `git log`. The actual
+  agent identity is carried via the aweb cert, not git config.
+  Bear this in mind when reading commit history; cross-check with
+  Athena who can route to the actual author.
 - **Stale repo-manager dirs on disk**: `agents/coord-cloud/` and
-  `agents/repo-aweb/` are untracked workspace records from the
-  pre-narrowed-permanent-set model. Tracked by `aweb-aals.5`.
+  `agents/repo-aweb/` remain untracked from the pre-narrowed model.
+  Tracked by `aweb-aals.5`. Low-priority hygiene.
 - **Dashboard implementation**: signal inventory exists in
-  `docs/company-dashboard.md` (sofia / aweb-aals.3) but no concrete
-  dashboard or report yet. Hestia adoption is the next step.
+  `docs/company-dashboard.md`; no concrete dashboard or report yet.
+  Next step pending.
 - **`aw` task metadata native fields**: builder/reviewer/feedback
-  fields still parsed from the prose `Work contract:` block. Tracked
-  by `aweb-aals.7`; product gap.
+  fields still parsed from prose `Work contract:` block. Tracked
+  by `aweb-aals.7`.
 
-## Active claims at transition (snapshot)
+## Active claims
 
-`aw work active` shows 5 rows as of role transition. Stale-claim
-sweep needed within 24h:
+`aw work active`: zero rows. `aw work blocked`: zero rows. Clean
+slate.
 
-- `aweb-aalr.2` (mia, ac): 36h+ stale at transition. Athena to
-  inherit or kick task.
-- `aweb-aakj` (kate, aweb): partially landed in main; verify scope.
-- `aweb-aals.3` (sofia): in flight; signal inventory done.
-- `aweb-aajx` (mia): unknown repo, P0; needs locator.
-- `aweb-aaka.30.1` (mia): P2.
+## Workspace status (company team, default:aweb.ai)
+
+- hestia (me): online, just came up, no claims/locks.
+- athena: online (seen 4s ago at survey time), no claims/locks.
+- sofia: online (seen 5s ago), no claims/locks.
+- yc: online in co.aweb (separate repo).
+- cowork-z3dflikwduph, juan-reyero: offline.
+
+Dev team (`aweb:juan.aweb.ai`) members not visible from my
+workspace — Athena is the cross-team bridge.
 
 ## Next checks
 
-1. Write `agents/hestia/runbook.md`. Encode the release-ready chain,
-   PyPI cache-lag (`uv sync --refresh` window), make-export
-   compose-interpolation foot-gun, per-tag-not-batched push rule,
-   live-verify probe pattern, Docker clock-drift symptom.
-2. Run a no-op `make release-ready` dry-run in aweb to qualify the
-   chain. Mail Athena if any step fails for non-engineer-knowledge
-   reasons.
-3. Stale-claim sweep on `aw work active` after 24h.
-4. Daily `/health` check on `app.aweb.ai` and `api.awid.ai`. Compare
-   to `status/product.md` claims; flag drift.
-5. Track `aweb-aals.4` (Metis init), `aweb-aals.5` (stale dir
-   cleanup), `aweb-aals.7` (native task fields) as ongoing
-   operational hygiene items.
+1. Athena's reply on v0.5.17 routing → either run `make release-ready`
+   tonight as first end-to-end exercise, or seed runbook only and
+   pick up next candidate.
+2. Stale-claim sweep on `aw work active` next wake-up (currently
+   clean, so this is just cadence).
+3. Daily `/health` check on `app.aweb.ai` and `api.awid.ai`.
+   Compare to `status/product.md` claims; flag drift.
+4. Time the publishing path on the next ac release (GHA log
+   breakdown). Bring numbers, not hand-waving.
+5. Test-suite triage in ac/Makefile — which targets compose to the
+   20-min cost.
 
-## Standing release-discipline (banked through 2026-04-26, enforced by Hestia)
+## Standing release-discipline (banked through 2026-04-26, Hestia enforces)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree
@@ -102,7 +148,9 @@ sweep needed within 24h:
 9. Published artifact ≠ deployed service
 10. Browser-verify UI-surface releases
 11. Closure framing rests on empirical attestation
-12. Reproducer-as-gate
+12. Reproducer-as-gate (surface-agnostic; today's Add-Existing
+    iteration cost was missing local-loop infrastructure, not
+    policy silence)
 13. Code-reviewer subagent for gate-input commits (Athena runs
     before signaling Hestia)
 
