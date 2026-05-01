@@ -8,8 +8,9 @@ operations status under the new model)
 The role transitioned today. Hestia now owns the path from clean
 main to verified-live production (release-ready gates, tag, deploy,
 verify) AND ongoing operational hygiene (stale claims, status
-cadence, dashboard). Athena writes code and signals release; Hestia
-runs the chain. Athena does NOT tag. Hestia does NOT touch code.
+cadence, dashboard). Athena owns the code (briefs ephemeral pairs
+for feature work; writes non-feature code directly) and signals
+release; Hestia carries the release across the build/ship boundary.
 
 **Two things must happen before the role separation is real:**
 

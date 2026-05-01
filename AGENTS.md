@@ -70,12 +70,14 @@ agent:
   decide — that escalation should be rare and worth using.
 - **Six working surfaces.** Sofia (Direction) — priorities,
   decisions, technical direction, release-claim framing. Athena
-  (Engineering) — code in aweb and ac, tests, runbook tech-accuracy,
-  release-notes drafts. Hestia (Operations) — gates, tags, deploys,
-  live-verify, dashboard hygiene. Aida (Support) — customer
-  success, runbook, customer voice. Iris (Outreach) — distribution
-  drafts, market scanning, response capture. Metis (Analytics) —
-  signal, briefs, attribution.
+  (Engineering) — code ownership in aweb and ac (architecture,
+  invariants, review of every diff, spawn briefs for ephemeral
+  builder+reviewer pairs that author feature changes, non-feature
+  code she writes herself). Hestia (Operations) — gates, tags,
+  deploys, live-verify, dashboard hygiene. Aida (Support) —
+  customer success, runbook, customer voice. Iris (Outreach) —
+  distribution drafts, market scanning, response capture. Metis
+  (Analytics) — signal, briefs, attribution.
 - **Feedback strength matters.** Always look for feedback. Prefer
   feedback that is close and verifiable, such as code -> test -> fix
   or release -> health check -> smoke test. For weaker surfaces like

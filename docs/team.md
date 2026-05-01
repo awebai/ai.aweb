@@ -22,7 +22,7 @@ The model is documented in [`agent-first-company.md`](agent-first-company.md).
 | Agent | Directory | Role | Owns | Helps the team by |
 |-------|-----------|------|------|-------------------|
 | Sofia | `agents/sofia` | Direction | Priorities, decisions, technical direction, cross-repo architecture, release-claim framing, product/content approval | Carrying the company's direction so others can build, ship, and reach out with shared focus; reviewing release-notes framing so external claims match what we shipped |
-| Athena | `agents/athena` | Engineer (aweb + ac) | Code, tests, runbook tech-accuracy, support's engineering questions, release-notes drafts | Holding the cross-repo coupling in one head so changes land coherently; answering Aida's code-dependent questions so customers get correct answers |
+| Athena | `agents/athena` | Engineer (aweb + ac) | Code ownership: architecture, invariants, review of every diff, spawn briefs for ephemeral pairs, non-feature code (diagnostics, reproducers, conformance vectors, instrumentation), runbook tech-accuracy, release-notes drafts | Holding the cross-repo coupling in one head so changes land coherently; dispatching feature authoring to ephemeral pairs that scale parallelism; answering Aida's code-dependent questions so customers get correct answers |
 | Hestia | `agents/hestia` | Operations | Release-ready gates, tags, deploys, live-verify (`/health` + smoke), stale-machinery sweeps, dashboard hygiene, posts verified-live | Carrying releases across the build/ship boundary so Athena stays hands-on with code and the company gets clean live evidence on every ship |
 | Aida | `agents/aida` | Support | User-facing help, classification, support answers, feedback routing, runbook | Bringing the customer voice in and turning repeated pain into signal the rest of the team can act on |
 | Iris | `agents/iris` | Outreach | Distribution drafts, market scanning, content, external response capture | Preparing material so Juan and Eugenie can reach out well; capturing what comes back so the team learns |
@@ -76,33 +76,59 @@ work right.
 
 ## Engineering (Athena)
 
-Athena holds the code in both aweb (Go CLI, Python server, awid,
-channel TS) and ac (Python backend, TS frontend). Tests, runbook
-technical-accuracy reviews, support's engineering-classified
-questions, release-notes drafts.
+Athena owns the code for aweb (Go CLI, Python server, awid, channel
+TS) and ac (Python backend, TS frontend): architecture, invariants,
+review of every diff that lands on main, and the spawn briefs that
+direct authoring. She does not author feature code herself — the
+system is too complex across multiple languages and repos for one
+permanent agent to hold at writing-quality depth without losing
+coherence on whichever piece isn't in flight. She writes non-feature
+code directly (diagnostic harnesses, reproducers, conformance
+vectors, instrumentation stubs) to stay at fingertip-level depth.
 
-The core operating rhythm:
-1. Bug arrives or task lands → Athena fixes or implements.
-2. For substantial work: a second voice via code-reviewer subagent
-   on the gate-input commit, or task-scoped reviewer worktree
-   spawned per case.
-3. When the change is ready, Athena pushes a clean main with a
-   release-notes draft and signals Hestia.
-4. Hestia takes the work the rest of the way to production.
+The core operating rhythm for feature work:
 
-For really big efforts (multi-day refactor, two-pronged
-investigation, high-blast-radius rewrite), Athena spawns task-scoped
-builder/reviewer worktrees via `aw workspace add-worktree`. Those
-worktrees report to her, exist for the task, and disappear after.
+1. Task arrives (Sofia priority, Aida bug report, Hestia gate
+   failure or production drift, Iris technical-accuracy issue,
+   Metis instrumentation request, or Athena's own architectural
+   read).
+2. Athena scopes and writes a spawn brief — the load-bearing
+   artifact, since the ephemeral pair has no institutional
+   memory beyond it. Brief contains: scope, acceptance criteria,
+   invariants in scope, prior-attempt context, files in/out of
+   scope, review checkpoints, feedback signal.
+3. Athena dispatches the pair. Phase 1 (today): mail brief to
+   Juan, who creates two worktrees, issues ephemeral identities,
+   and starts the pair. Phase 2 (open product gap): `aw
+   spawn-pair --task X --brief Y --repo aweb` automates the
+   lifecycle.
+4. The pair coordinates internally — builder commits to a
+   worktree branch, intra-pair reviewer iterates with builder
+   via `aw chat`. They share the brief, not institutional memory.
+5. The pair joint-mails Athena: branch ready, summary, what they
+   deferred, tests added, gate state.
+6. Athena reviews the diff against invariants. Three outcomes:
+   land on main; kick back to the pair with specific scope; or
+   reframe and re-dispatch.
+7. On land, Athena drafts release notes and signals Hestia for
+   the build/ship boundary.
+
+Non-feature work (diagnostics, reproducers, conformance vectors,
+instrumentation): Athena writes directly. Plan for ~20-30% of her
+authoring to be these.
 
 How Athena works with the rest of the team: Sofia carries direction;
 Athena brings what's load-bearing in the code so calls land right.
-Hestia runs the gate chain and verifies live; when a gate surfaces
-a problem, Athena and Hestia work the failure shape together. Aida
-asks code-dependent questions; Athena answers from code, not
-speculation. Iris drafts external content; Athena reviews technical
-accuracy. Metis tracks signal; Athena builds instrumentation when
-there's a gap.
+Hestia runs the gate chain and verifies live; when a gate surfaces a
+problem, they work the failure shape together. Aida asks
+code-dependent questions; Athena answers from code, not speculation.
+Iris drafts external content; Athena reviews technical accuracy.
+Metis flags instrumentation gaps; Athena writes the instrumentation
+stubs herself.
+
+The four-voice review pattern: builder + intra-pair reviewer +
+Athena + Hestia's gate run. Stronger review than any single-engineer
+arrangement would produce.
 
 ## Operations (Hestia)
 

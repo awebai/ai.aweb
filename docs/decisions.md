@@ -6,6 +6,76 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-01 — Athena owns code; ephemeral pairs author feature changes
+
+**Commit:** TBD (this commit)
+
+**Decision maker:** Juan + Athena (planning)
+
+**Decision.** Code authoring splits into two paths. Athena owns the
+code for aweb and ac — architecture, invariants, review of every
+diff, and spawn briefs — but does not author feature code herself.
+Feature changes go through ephemeral builder+reviewer pairs that
+Athena briefs and dispatches; they exist for the task, identity
+issued at spawn and revoked at close. Athena writes non-feature
+code directly (diagnostic harnesses, reproducers, conformance
+vectors, instrumentation stubs) to keep her hands on the codebase.
+
+**Why.** The system is complex enough across multiple languages and
+repos (Go CLI, Python server, awid registry, channel TS, ac backend,
+ac frontend) that a single permanent agent cannot hold both at
+writing-quality depth without burning context on whichever piece is
+in flight. Splitting authoring (ephemeral pairs) from ownership
+(Athena) lets parallelism scale to whatever Athena's review
+bandwidth can absorb while keeping cross-repo coherence in one
+head.
+
+This is also a structural improvement over the prior
+John+Tom-dispatching-permanent-devs shape: ephemeral identities
+and worktrees mean no claim-decay drift, no offline-mid-task state,
+and identity reuse blurring accountability across tasks.
+
+**Mitigations.** Reading-only knowledge degrades faster than
+reading-and-writing knowledge; the architect-drift failure mode is
+real. Athena writes non-feature code directly (target: ~20-30% of
+her code authoring). If a quarter goes by where she's authored
+nothing, that's a signal to flag to Sofia and pick up a deep-dive
+task to recalibrate.
+
+**Phase 1 (today, no `aw` changes).** Athena drafts a spawn brief,
+mails it to Juan, who creates the two worktrees, issues ephemeral
+identities, and starts the pair. The pair joint-mails Athena when
+the branch is ready. Athena reviews against invariants and lands
+or kicks back. On land/abandon, Juan tears down the worktrees and
+revokes the ephemeral identities.
+
+**Phase 2 (open product gap).** `aw` learns to spawn pairs:
+`aw spawn-pair --task X --brief Y --repo aweb` automates the
+lifecycle (worktree creation, ephemeral DID registration at AWID,
+cert issuance from Athena's controller, Claude Code process
+startup, cleanup at close). Itself a feature change — a pair
+spawned manually under Phase 1 will eventually implement it.
+
+**Open: identity model for ephemeral devs.** Three options under
+consideration:
+- (a) Each spawn registers a fresh DID at AWID, revoked at close.
+- (b) Pool of pre-issued ephemeral certs that get reused.
+- (c) Sub-team certs under Athena's controller, ephemeral lifetimes.
+
+(a) and (c) preferred over (b); decision deferred until Phase 2
+implementation.
+
+**Four-voice review pattern.** Feature changes now get four
+perspectives: builder + intra-pair reviewer + Athena's invariant
+review + Hestia's gate run. Stronger review than any single-
+engineer arrangement would produce.
+
+**Affects.** `agents/athena/AGENTS.md`, `agents/athena/handoff.md`,
+`docs/agent-first-company.md` (Section 4 rewritten),
+`docs/team.md` (Athena row + section), root `CLAUDE.md`.
+
+---
+
 ## 2026-04-30 — Name remaining permanent agents: Aida, Iris, Metis
 
 **Commit:** `810d472` Name user-facing surfaces: Aida (support), Iris (outreach), Metis (analytics)

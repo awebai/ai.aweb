@@ -87,18 +87,49 @@ what they need; Iris reaches out so users hear about us; Metis turns
 what comes back into signal we can act on. Each role owns its
 surface; the outcome belongs to all of us.
 
-### 4. Athena Holds The Code In One Head
+### 4. Athena Owns The Code; Ephemeral Pairs Author It
 
-Athena is the engineer for both aweb and ac. The cross-repo
-coupling between them (ac pins aweb; aweb's CLI talks to ac's API)
-sits in one head, which means a single decision lands a coherent
-change instead of a coordinated negotiation between two engineers.
+Athena owns the code for both aweb and ac: architecture, invariants,
+review of every diff before it lands on main, and the briefs that
+direct authoring. The cross-repo coupling between aweb and ac (ac
+pins aweb; aweb's CLI talks to ac's API) sits in one head — hers —
+which keeps changes coherent across the boundary.
 
-Task-scoped builder/reviewer pairs are a tool Athena spawns when
-parallelism genuinely helps — a multi-day refactor, a two-pronged
-investigation, a high-blast-radius rewrite. Pairs report to her,
-exist for the task, and disappear after. Most code work is just
-Athena working through it directly.
+She does not author feature code herself. The system is complex
+enough across multiple languages and repos that a single permanent
+agent can't hold both at writing-quality depth without burning
+context on whichever piece is in flight at the moment. Feature work
+goes through ephemeral builder+reviewer pairs that Athena briefs and
+dispatches:
+
+```text
+Athena: scope + brief + invariants in scope + acceptance + prior context
+       → spawn pair (Phase 1: via Juan; eventually `aw spawn-pair`)
+Pair:   builder commits to worktree branch
+        intra-pair reviewer iterates with builder
+        joint-mail back to Athena: branch ready + summary + deferred items
+Athena: review diff against invariants → land on main, or kick back
+        cleanup pair (revoke ephemeral identities, archive worktrees)
+        signal Hestia for the build/ship boundary
+```
+
+Pairs are ephemeral: identity issued for the task, revoked at close;
+worktrees created at spawn, torn down at land or abandon. No
+permanent dev pool, no claim-decay drift, no offline-mid-task state.
+
+Athena writes non-feature code directly to keep her hands on the
+codebase: diagnostic harnesses (the
+`e2e-amy-symptom-reproducer.sh` class), reproducers for new bug
+classes, conformance vectors when contracts grow, instrumentation
+stubs Metis flags as gaps. Reading-only knowledge degrades faster
+than reading-and-writing knowledge; non-feature authoring is how
+she stays at fingertip-level depth without holding the
+implementation surface for features.
+
+The four-voice review pattern strengthens this: builder + intra-pair
+reviewer + Athena's invariant-correctness review + Hestia's gate run
+= four perspectives on every feature change, an order of magnitude
+more review than a single engineer would receive.
 
 ### 5. The Build/Ship Boundary
 
