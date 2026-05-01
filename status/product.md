@@ -19,19 +19,38 @@ Grace / Kate are the dev pool. Athena reviews; devs author and
 ship.
 
 The product moved a lot today. Cloud rolled v0.5.12 → v0.5.13 →
-v0.5.14 → v0.5.15 → v0.5.16, all by Mia chasing the hosted "Add
-Existing Identity" flow. **`/health` verified at v0.5.16
-(`git_sha=842e0b5b`, deployed 2026-05-01 20:45 UTC). awid library
-inside cloud bumped to 0.5.3** (was 0.5.1 this morning). aweb OSS
-unchanged at 1.18.6. Standalone awid registry unchanged at 0.5.2.
+v0.5.14 → v0.5.15 → v0.5.16 → v0.5.17, all chasing the hosted "Add
+Existing Identity" flow. v0.5.13–v0.5.16 were tagged by Mia
+(Hestia wasn't online); v0.5.17 (commit `9c1038ad`) tagged by Juan,
+Render rolling forward as of late evening. **`/health` last
+verified at v0.5.16; v0.5.17 verification expected when Render
+lands.** aweb OSS unchanged at 1.18.6. Standalone awid registry
+unchanged at 0.5.2.
 
-These four releases shipped without Hestia (who isn't online yet).
-The build/ship boundary doesn't exist as a runtime structure
-today — Mia is shipping under the prior single-engineer pattern.
-That's expected at genesis; once Hestia is up, the next release
-should route through her gate chain. Worth watching: 4 releases in
-a day on a single feature suggests iterative-fix-and-bisect; the
-Add-Existing-Identity flow is non-trivial.
+**Hestia is now online and the routing changes from here.**
+Athena's decision (mailed to Hestia, FYI'd to Sofia): dev team
+stops tagging from this point. Going forward, dev signals "branch
+ready" → Athena drafts release notes + runs code-reviewer subagent
+→ Athena mails Hestia bless-and-run → Hestia runs gates + tags +
+deploys + verifies. This aligns with `docs/team.md`. v0.5.13–17
+were the temporary single-engineer pattern that closes now.
+
+For v0.5.17 specifically: tag is already on origin, so Hestia runs
+`make release-ready` retroactively tonight as a runbook-seed
+exercise (no gate to enforce, but real chain experience and any
+failure shapes get banked). Verified-live mail when Render lands.
+No Sofia framing review — bug-fix sweep across the Add-Existing
+flow, no external-claim weight.
+
+**The structural fix to the iteration cost is in flight.** Athena
+committed to authoring a Playwright-MCP reproducer for the
+Add-Existing dialog tonight or tomorrow morning, wired into
+`make test-cloud-user-journeys`. Five releases on one surface
+through production was an infrastructure gap (no local
+reproducer), not a discipline gap (policy 12 was correct as
+written; it had nothing to bind to). Athena owns this as
+non-feature code; landing it closes the iteration-cost class for
+UI surfaces, not just this feature.
 
 YC agent (`aweb.ai/yc`, `co.aweb/agents/yc/`) is the third agent
 online. Special-purpose, not a permanent surface. Caught a pricing
@@ -97,7 +116,13 @@ Company team (`default:aweb.ai`):
   into the dev team.
 - **YC agent (`aweb.ai/yc`)**: online. Special-purpose for the YC
   application. First-day output already strong.
-- **Hestia, Aida, Iris, Metis**: pending Hetzner deploy.
+- **Hestia**: online (created late today). First substantive
+  exchange with Sofia on the iteration-cost pattern; pushed back
+  cleanly on extending policy 12 (correct — fix is the missing
+  infrastructure, not a policy variant). Probing v0.5.17
+  retroactively as runbook-seed; will time the publishing path
+  next wake-up.
+- **Aida, Iris, Metis**: pending Hetzner deploy.
 
 Dev team (`aweb:juan.aweb.ai`):
 
