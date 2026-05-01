@@ -1,52 +1,65 @@
 # Product Status
 
-Last updated: 2026-04-30 (Sofia, post role-model transition)
+Last updated: 2026-05-01 (Sofia, second wake-up under new model)
 
 ## Current focus
 
-The product is live. **Distribution is the bottleneck.** KI#1 (the
-last engineering blocker) closed in production on 2026-04-26 with
-aweb 1.18.3 and the trust-model architectural correction shipped in
-1.18.6 on 2026-04-27. Cloud has been on v0.5.10 since 2026-04-30
-05:54 UTC. Engineering's side is green for the first human-led
-conversations and the blog-post voice pass.
+The product is live and engineering has continued shipping. Cloud
+moved from v0.5.10 → v0.5.11 → v0.5.12 across the afternoon/evening
+of 2026-04-30; current /health reports `release_tag=v0.5.12`,
+deployed 2026-04-30 20:07 UTC, uptime ~12h. Four ac commits sit past
+v0.5.12 on main (admin actor default + cross-scope hard-delete
+hardening). aweb OSS unchanged since 2026-04-27.
 
-The team transitioned today (2026-04-30) to three peer working roles
-(Sofia / Athena / Hestia) plus user-facing surfaces (Aida, Iris) and
-analytics (Metis). See `docs/decisions.md` top entries for the role
-model and `docs/team.md` for current bounds.
+The role separation is **not yet real at the runtime layer.** v0.5.11
+and v0.5.12 shipped without going through Hestia's gate chain
+(workspace status shows only Sofia active; no Hestia wake-up since
+the rename, no `agents/hestia/runbook.md` written, no identity setup
+performed). That is a meaningful operational observation: under the
+prior shape these would have been Tom→Randy releases; under the new
+shape they should be Athena-signal→Hestia-gate-chain. Right now the
+model exists in docs only.
 
-This week:
+The Athena-dispatch decision landed today (commit `4491df5`,
+docs/decisions.md top entry): Athena owns the code; ephemeral
+builder+reviewer pairs author feature changes, with Athena reviewing
+diffs against invariants before they land. Phase 1 = Juan spawns
+manually; Phase 2 = `aw spawn-pair` primitive (itself a feature
+change, will be one of the first pair-authored deliverables).
 
-1. Run the first distribution action. Iris stages, Juan and Eugenie
-   publish/engage, Metis records the signal with attribution limits.
-2. Hestia writes the ops runbook and runs a no-op release-ready
-   dry-run to qualify the role separation. Until that runs, the
-   build-vs-ship boundary is theoretical.
-3. AWID identity setup for the renamed agents (Sofia, Athena, Hestia,
-   Aida, Iris, Metis) — interactive task for Juan, same shape as
-   Amy's 2026-04-21 second-address sequence.
-4. Athena absorbs in-flight engineering work (`aweb-aalr.2`,
-   `aweb-aakj`) and writes `status/engineering.md` from her
-   perspective on first wake-up.
-5. Aida's runbook PR with the v0.5.10 deltas (1.9 NOT-boundary,
-   login-failure section, 409 conflict messaging) lands; Athena
-   does technical-accuracy review, Sofia does product/framing.
+This week, in priority order:
+
+1. **Get Hestia exercising the gate chain.** Either the next ac
+   release goes through her end-to-end or the role separation stays
+   theater. Runbook + identity setup are the unblockers.
+2. **Distribution still at zero.** No published post, no daily
+   brief, no recorded conversation. Engineering's side has been
+   green for days; the bottleneck is starting outreach.
+3. **Land Aida's v0.5.10 runbook PR with the customer-visible
+   deltas** (1.9 NOT-boundary, login-failure section, 409 conflict
+   messaging). Note: now it's also a v0.5.10/.11/.12 sweep — Aida
+   should check whether v0.5.11 (admin AWID namespace release) or
+   v0.5.12 (B.3b hosted custodial CLI coverage) introduce any
+   customer-visible deltas worth folding in.
+4. **Engineering posture stays release-discipline + invariant
+   correctness.** No feature expansion. v0.5.11/.12 fit that mode.
 
 ## Product readiness
 
-- **OSS aweb**: shipping. Latest tags `server-v1.18.6`, `aw-v1.18.6`,
-  `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27).
-- **aweb-cloud**: live. `https://app.aweb.ai/health` reports
-  `release_tag=v0.5.10`, `aweb_version=1.18.6`, `git_sha=bce92c29`,
+- **OSS aweb**: stable. Latest tags `server-v1.18.6`, `aw-v1.18.6`,
+  `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27). No commits on
+  main since.
+- **aweb-cloud**: live at v0.5.12. `https://app.aweb.ai/health`
+  reports `release_tag=v0.5.12`, `aweb_version=1.18.6`,
+  `git_sha=962dd163c59875c5a7aebfbaf88b1a4b889f2dd4`,
   `awid_service_version=0.5.1`. db/redis/awid/coordination_api
-  healthy.
-- **awid registry**: live. `https://api.awid.ai/health` reports
-  `version=0.5.2`, redis/db/schema healthy.
+  healthy. Started 2026-04-30 20:07:14 UTC. **Four commits past
+  v0.5.12 on ac main**, no release candidate flagged.
+- **awid registry**: live at `version=0.5.2`, redis/db/schema
+  healthy. Unchanged since 2026-04-27.
 - **@awebai/claude-channel**: 1.3.3 published.
-- **Landing site (aweb.ai)**: live. Blog section still listed as
-  needed for aweb.ai/blog posts; first personal/problem post planned
-  for juanreyero.com.
+- **Landing site (aweb.ai)**: live. Blog section still TBD; first
+  personal/problem post planned for juanreyero.com.
 
 ## Outreach state
 
@@ -56,33 +69,47 @@ This week:
 - **Daily scanning**: not running.
 - **Conversations joined**: 0.
 
+No movement since yesterday's wake-up.
+
 ## Support / user feedback
 
 - KI#1 closed empirically (Aida 4/4 + a second-shape probe on
-  2026-04-27).
-- Aida's runbook PR with the v0.5.10 deltas is the in-flight
-  product-facing artifact. See `status/support.md`.
-- No external user feedback recorded in public status beyond
-  internal attestation and runbook shaping.
+  2026-04-27). No regression observed across the 2026-04-30
+  releases.
+- Aida's runbook PR with the v0.5.10 customer-visible deltas is the
+  in-flight product-facing artifact. v0.5.11 + v0.5.12 may add to
+  it; Aida to scope on next wake-up.
+- No external user feedback recorded in public status.
 
 ## Priorities
 
-1. **Reactivate distribution.** The product side is no longer the
-   blocker; running the first distribution action is.
-2. **Make the role transition real.** Identity setup + ops runbook
-   close the loop on the new model. Until both are done, the
-   restructure is cosmetic.
-3. **Land Aida's v0.5.10 runbook PR.** Three customer-visible
-   additions identified.
-4. **Engineering posture stays release-discipline mode**, not feature
-   expansion. The 1.18.4–1.18.6 trust-model arc is the correct mode;
-   the next product step is usage, not more polish.
+1. **Exercise the Hestia gate chain on the next ac release.** Until
+   that happens, the role separation is documentation. Runbook +
+   identity setup are the unblockers; both pre-conditions named in
+   `status/operations.md`.
+2. **Reactivate distribution.** Engineering side has been green for
+   five days. Iris drafts, Juan/Eugenie publish, Metis records the
+   signal.
+3. **Land the Aida runbook PR**, expanded to cover any v0.5.11/.12
+   deltas if applicable.
+4. **KI#1 closure decision record (still owed).** Sofia drafts the
+   framing; Athena supplies technical content for the cert-
+   presentation auth correction. Goal: one decision record covering
+   the aalk continuity + 1.18.6 trust-model arc + empirical
+   attestation, so the closure narrative is durable.
 
 ## Open questions
 
-- Do we want the collision video before the first blog post, or does
-  the blog post publish first now that v0.5.10 is live?
-- What's the first distribution action, and what feedback signal does
-  Metis record after it runs?
-- When does Hestia's first end-to-end ship (under the new model)
-  happen, and what release does it qualify on?
+- Does the next ac release go through Hestia's gate chain, or do
+  more releases ship past her under the prior workflow? Decision is
+  Athena+Hestia's once Hestia wakes; Sofia's contribution is
+  framing — the role separation is theater until exercised at least
+  once.
+- Are v0.5.11 and v0.5.12 worth a verified-live mail in retrospect,
+  or do we accept that they shipped before Hestia was online and
+  move on? (Lean: accept; the verified-live discipline applies
+  going forward, not retroactively. Hestia's call when she wakes.)
+- Does the collision video belong before or after the first blog
+  post? (Open since last wake-up.)
+- What's the first concrete distribution action this week? Iris
+  needs a target.

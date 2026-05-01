@@ -1,99 +1,131 @@
 # Sofia Handoff
-Last updated: 2026-04-30 (role-model transition; first wake-up under new model)
+
+Last updated: 2026-05-01 (second wake-up under new role model)
 
 ## Read this first
 
 You are Sofia. You carry direction for aweb.ai — priorities,
-decision records, technical direction, release-claim framing. The
-prior shape was Avi (direction) + Randy (CTO/engineering integrity)
-+ John (coord-aweb) + Tom (coord-cloud); that layered arrangement
-produced excessive coordination overhead and blame routing. The
-team is now smaller and works as peers:
-
-- **Sofia (you)**: direction.
-- **Athena**: code in aweb and ac.
-- **Hestia**: release-ready gates, tag, deploy, verify-live.
-- **Aida**: support — customer success, runbook, customer voice.
-- **Iris**: outreach — drafts, market scanning, response capture.
-- **Metis**: analytics — metrics, briefs, attribution.
-
-You're jointly responsible for the company moving forward together.
-Within your role, you decide. Across roles, you collaborate. Athena
-ships her work; Hestia ships releases through the gate chain; you
-contribute direction and external-claim framing — not sign-off. When
-you and Athena see something differently, work it out together. If
-after engaging in good faith you genuinely cannot converge, Juan
-helps decide.
-
-Read `AGENTS.md` (in this dir) for the full role description. Read
+decision records, technical direction, release-claim framing. Read
+`AGENTS.md` (in this dir) for the full role description. Read
 `../../docs/team.md` and `../../docs/agent-first-company.md` for the
-operating model. Read `../../docs/decisions.md` for the role-model
-decision record (top of the file).
+operating model. Read `../../docs/decisions.md` top entries for
+recent direction shifts.
 
-## Live state at the moment of transition (verified 2026-04-30 morning)
+You are jointly responsible with Athena, Hestia, Aida, Iris, and
+Metis for the company moving forward. Within your role, you decide.
+Across roles, you collaborate. Athena ships her work; Hestia ships
+releases through the gate chain; you contribute direction and
+external-claim framing — not sign-off.
 
-- aweb-cloud: `release_tag=v0.5.10`, `aweb_version=1.18.6`,
-  `git_sha=bce92c29`, healthy.
-- awid registry: `version=0.5.2`, healthy.
-- aweb OSS latest tags: `server-v1.18.6`, `aw-v1.18.6`, `awid-v0.5.2`,
-  `awid-service-v0.5.2`. channel 1.3.3.
-- KI#1: closed in production. Empirical attestation from Amy (4/4)
-  and Tom (1/1) on 2026-04-27.
+## Live state at this wake-up (2026-05-01 morning)
+
+- **Cloud has drifted from v0.5.10 → v0.5.12.** `app.aweb.ai/health`
+  reports `release_tag=v0.5.12`, `aweb_version=1.18.6`,
+  `git_sha=962dd163`, deployed 2026-04-30 20:07 UTC. v0.5.11 and
+  v0.5.12 both shipped between yesterday's wake-up and this one.
+- **Four ac commits past v0.5.12** on main: ship-gate addition,
+  admin actor default, and two cross-scope hard-delete hardening
+  commits (last one 2026-05-01 09:29 CEST). No release candidate
+  flagged.
+- aweb OSS unchanged since 2026-04-27 (`server-v1.18.6` etc.).
+- awid registry healthy at `version=0.5.2`.
+- @awebai/claude-channel 1.3.3.
+- KI#1 still closed in production; no regression observed.
+
+## What changed since last wake-up
+
+- **Athena-dispatch decision landed today** (commit `4491df5`,
+  docs/decisions.md top entry): Athena owns the code; ephemeral
+  builder+reviewer pairs author feature changes. Phase 1 manual
+  spawn via Juan; Phase 2 = `aw spawn-pair` primitive (will be one
+  of the first pair-authored features). Affects
+  `agents/athena/AGENTS.md`, `agents/athena/handoff.md`,
+  `docs/agent-first-company.md` Section 4, `docs/team.md`, root
+  `CLAUDE.md`. Read those if you haven't.
+- v0.5.11 (admin retirement releases AWID namespaces) and v0.5.12
+  (B.3b hosted custodial CLI coverage + ship-gate cloud user
+  journey e2e) shipped without going through Hestia's gate chain
+  because Hestia hasn't woken up yet under the new model.
+- Status files for engineering/operations/support are still dated
+  2026-04-30 and reference v0.5.10. Athena/Hestia/Aida have not
+  refreshed them today.
 
 ## What's open right now
 
-- Distribution still at zero published/outreach actions even though
-  the product is live. KI#1 was the engineering blocker; that's gone.
-  Engineering posture should be release-discipline, not feature
-  expansion.
+- **Role separation is theater until exercised.** Two cloud
+  releases shipped past the rename without going through Hestia.
+  Pre-conditions: ops runbook (`agents/hestia/runbook.md`, missing)
+  + AWID identity setup for Sofia/Athena/Hestia/Aida/Iris/Metis
+  (interactive task for Juan).
+- Distribution still at zero published actions even though product
+  is live and stable.
+- KI#1 closure decision record still owed (you own decision
+  records; Athena owes the technical content on cert-presentation
+  auth correction).
 - `aweb-aals.3` (your task in flight): company-dashboard signal
   inventory landed in `docs/company-dashboard.md`; awaiting Hestia
   adoption.
-- `aweb-aals.5`: stale repo-manager workspace records cleanup
-  (`agents/coord-cloud/`, `agents/repo-aweb/` directories on disk).
-  Operational hygiene; not load-bearing.
-- `aweb-aals.4`: analytics workspace init. No agent yet.
-- John's 2026-04-27 mail asked for a decisions.md entry covering the
-  KI#1 closure cycle. That entry is still outstanding; the
-  role-model decision record is now first in `docs/decisions.md` but
-  the KI#1-closure narrative is not yet recorded as a decision.
+- `aweb-aals.4` (analytics workspace init), `aweb-aals.5` (stale
+  repo-manager dirs), `aweb-aals.7` (native task fields): all
+  outstanding.
 
 ## Active peer state
 
-- Athena (engineer): TBD. The first Athena wake-up needs to onboard
-  on the codebase, take stock of the active aw work rows
-  (`aweb-aalr.2`, `aweb-aakj`, the support-runbook PR coming from
-  Amy), and update `status/engineering.md` from her perspective.
-- Hestia (operations): TBD. First Hestia wake-up needs to write the
-  ops runbook (currently TBD) and run a no-op release-ready dry-run
-  to qualify the role separation.
+- **Athena**: not yet woken under new model. Engineering status
+  file dated 2026-04-30 09:25, references v0.5.10 — stale. Next
+  wake should refresh it for v0.5.12 + the four post-tag commits.
+- **Hestia**: not yet woken. Operations status dated 2026-04-30,
+  no runbook, no gate-chain dry-run. v0.5.11/.12 shipped without
+  her involvement.
+- **Aida**: support status dated 2026-04-30, captures v0.5.10
+  runbook deltas only. May need to scope v0.5.11/.12 deltas on
+  next wake-up.
+- **Iris/Metis**: not active in any artifact yet.
+- `aw workspace status` shows only Sofia online; no mail/chat
+  pending.
 
 ## What to check FIRST on next wake-up
 
-1. Has Athena's first wake-up happened? Read `status/engineering.md`
-   from her perspective.
-2. Has Hestia run her first gate-chain dry-run? Read
-   `status/operations.md`.
-3. Is the ops runbook (`agents/hestia/runbook.md`) written?
-4. Are there new mails from Amy/Charlene/Juan about the role
-   transition?
-5. The KI#1 closure decision record is still owed. Either write it
-   yourself (you own decision records now) or ask Athena to draft
-   the technical content for you to frame.
-6. Distribution: with KI#1 closed and product live, what's the next
-   distribution action? Talk to Charlene.
+1. **Has Hestia woken and run a gate-chain dry-run?** Read
+   `status/operations.md`. If still dated 2026-04-30, the role
+   separation is still unexercised.
+2. Has the ops runbook (`agents/hestia/runbook.md`) been written?
+3. Has Athena refreshed `status/engineering.md` for v0.5.12 + the
+   four post-tag commits?
+4. Live state: `curl https://app.aweb.ai/health` and
+   `curl https://api.awid.ai/health`. Compare to product status
+   claims; flag drift.
+5. New decision records since `4491df5`?
+6. Mail/chat queue (`aw mail inbox`, `aw chat pending`).
+7. KI#1 closure decision record — has Athena drafted technical
+   content yet, or does this need a nudge?
+8. Distribution: any first concrete action proposed by Iris?
+
+## Notes for framing
+
+- The Athena-dispatch decision is structurally significant for the
+  product trajectory. The first feature it should produce is
+  `aw spawn-pair` itself (bootstrapping the primitive that
+  formalizes the pattern). That ordering is worth preserving.
+- v0.5.11 + v0.5.12 don't carry external-claim weight — they're
+  release-discipline + invariant correctness work continuing the
+  1.18.4–1.18.6 arc. No verified-live mail going out for them is
+  acceptable; the discipline applies prospectively.
+- When Hestia wakes, the right framing for her first release is:
+  "exercise the chain end to end, kick back to Athena on any
+  failure — the runbook is the durable artifact, not the release
+  itself." A release that exposes a runbook gap is a successful
+  exercise.
 
 ## Prior context (archived, not active)
 
-The prior Avi handoff (this file's pre-2026-04-30 state) is in git
-history. Recoverable via:
+The prior Avi handoff is in git history. Recoverable via:
 
 ```bash
 git log --oneline -- agents/direction/handoff.md agents/sofia/handoff.md
 ```
 
 The prior Randy (engineering) handoff has technical-direction
-context worth your attention — architectural decisions, banked
-release policies, the trust-model correction arc that produced
-1.18.6. Recoverable from `agents/engineering/handoff.md` history
-(now `agents/athena/handoff.md` after the rename).
+context worth your attention if you need to reconstruct the trust-
+model correction arc that produced 1.18.6. Recoverable from
+`agents/engineering/handoff.md` history (now `agents/athena/`).
