@@ -1,7 +1,7 @@
 # Hestia Handoff
 
-Last updated: 2026-05-01 23:45 CEST (mid-exercise; v0.5.17 retroactive
-gate run is in flight in the background)
+Last updated: 2026-05-01 23:55 CEST (post-Juan-call; v0.5.17
+retroactive exercise called off; waiting on next bless-and-run)
 
 ## Read this first
 
@@ -36,45 +36,40 @@ working agreements" below.
 
 ## What's in flight tonight
 
-**v0.5.17 retroactive exercise.**
+**Nothing.** The v0.5.17 retroactive exercise was kicked off
+(Athena's bless-and-run, ~21:15Z) and called off by Juan ~22:00Z —
+v0.5.17 ships without my retroactive verification. Local
+`make release-ready` was terminated; the log at
+`/tmp/hestia-release-ready-v0.5.17.log` is partial and not worth
+reading. No verified-live mail to post.
+
+The first real exercise comes on the **next** bless-and-run mail
+from Athena — that is what wakes me into a release.
+
+**What's true about v0.5.17 for the record:**
 
 - Tag `v0.5.17` (annotated, `b6c6e088`) is on origin pointing at
-  `9c1038ad` (ac main). Authored by Mia at 22:55 CEST today.
-  Render is rolling the image — at 23:45 CEST `app.aweb.ai/health`
-  still reports `release_tag=v0.5.16`.
-- The fix: layout containment in `AgentsPage.tsx` so the long
+  `9c1038ad` (ac main). Authored by Mia at 22:55 CEST 2026-05-01.
+- Fix: layout containment in `AgentsPage.tsx` so the long
   fetch-cert command list scrolls horizontally inside the
   Add-Existing dialog instead of widening the modal.
-- Athena's bless-and-run signal (mail 2026-05-01 ~23:30): run
-  `make release-ready` locally against `9c1038ad` to seed the
-  runbook with real timing/output observations, post verified-live
-  mail when Render rolls forward. No tag step (already done by Mia
-  pre-routing-decision); no rollback.
-- Background gate run: started 2026-05-01 ~23:45 CEST; output at
-  `/tmp/hestia-release-ready-v0.5.17.log`. Background bash task ID:
-  `biirc1l0p`.
+- GHA "Build Release Image" run id `25233272933` started 21:09:18Z;
+  was 27+ min in when last checked (vs ~13 min for v0.5.16).
+- /health was still v0.5.16 at hand-off time. Render rollout state
+  is no longer my concern for this release.
 
 **Next instance reads first:**
 
-1. The log file. Did the chain complete? What was the per-gate
-   timing? Any unexpected gate failures?
-2. `/health` on `app.aweb.ai`. Has Render rolled to v0.5.17?
-   Expected: `release_tag=v0.5.17`, `git_sha=9c1038ad…`,
-   `aweb_version=1.18.6`, `awid_service_version=0.5.3`.
-3. Inbox + chat (`aw mail inbox`, `aw chat pending`). Athena's
-   code-reviewer-subagent pass on `937f37b0` was queued for
-   tonight; if her result is in the inbox, fold it into the
-   verified-live framing.
-4. Whether the verified-live mail was posted. If not, draft and
-   send per the runbook step 10 template:
-   - To: athena, sofia, juan
-   - Subject: `verified-live: ac v0.5.17 add-existing dialog layout containment`
-   - Body: what fixed (modal containment, plain `aw init`,
-     conditional caption); what NOT (no Add-Existing local
-     reproducer yet — Athena lane); what evidence (gate-chain
-     output snippet); what live check (/health version+sha
-     match + browser probe of the Add-Existing dialog with a
-     long fetch-cert command).
+1. `aw mail inbox` and `aw chat pending`. The release-handoff
+   mail from Athena is what kicks the next exercise.
+2. `/health` on `app.aweb.ai` and `api.awid.ai`. Compare to
+   `status/product.md` claims; flag drift to Sofia if any.
+3. `aw work active` and `aw work blocked`. Sweep stale claims.
+4. If a release-handoff mail arrived, run the runbook end-to-end.
+   That's the first real validation of the seeded runbook.
+5. If no handoff but a clean-main commit appeared on ac/aweb that
+   looks candidate-shaped (version bump in pyproject + uv.lock),
+   mail Athena: "is X queued for my chain?"
 
 ## Banked working agreements (from tonight's exchanges)
 
@@ -165,18 +160,18 @@ actual error output.
 
 ## What to check FIRST on next wake-up
 
-1. **Read `/tmp/hestia-release-ready-v0.5.17.log`** — did the gate
-   chain complete? Per-gate timing? Any failures?
-2. `curl https://app.aweb.ai/health` — has Render rolled to
-   v0.5.17?
-3. `aw mail inbox` and `aw chat pending` — Athena's code-reviewer
-   result, any other peer signal.
-4. If chain passed AND Render rolled AND no posted verified-live
-   yet: post the verified-live mail per runbook step 10.
-5. If chain failed: mail Athena the failure shape immediately.
-6. Update operations.md with v0.5.17 verified-live state and fold
-   gate-timing observations into the runbook.
-7. Begin the publishing-path timing breakdown (Sofia owed).
+1. `aw mail inbox` and `aw chat pending` — release-handoff or peer
+   signal.
+2. `curl https://app.aweb.ai/health` and `curl https://api.awid.ai/health`
+   — current live state. Note whatever release_tag and git_sha are
+   showing in operations.md for the wake-up.
+3. `aw work active` and `aw work blocked` — sweep stale claims.
+4. If a release-handoff mail arrived, work the runbook end-to-end
+   on the new candidate.
+5. The publishing-path timing breakdown is owed to Sofia (Sofia's
+   first question of four). v0.5.16 baseline: 13m GHA + 7m Render =
+   20m tag-to-live. v0.5.17 GHA was 27+ min (slower; investigate
+   why). Pre-seed numbers when picking this up.
 
 ## Sibling repo symlinks under this dir
 

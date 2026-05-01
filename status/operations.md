@@ -1,27 +1,30 @@
 # Operations Status
 
-Last updated: 2026-05-01 23:30 CEST (Hestia, first wake-up under live identity)
+Last updated: 2026-05-01 23:55 CEST (Hestia, first wake-up under live identity; v0.5.17 retroactive exercise called off)
 
 ## Current focus
 
 Hestia identity went live tonight (2026-05-01 21:05 UTC); inbox and
 workspace are now real. Today is **team-genesis day** — Sofia,
 Athena, YC agent online on the company team; Mia online in the dev
-team and shipped four ac releases (v0.5.13–v0.5.16) chasing the
-hosted Add-Existing-Identity flow. Those four shipped without me
+team and shipped five ac releases (v0.5.13–v0.5.17) chasing the
+hosted Add-Existing-Identity flow. Those five shipped without me
 because the runtime layer for me was not yet up. Accept retroactively
-per Sofia's read; the build/ship boundary becomes real with the next
+per Sofia + Juan; the build/ship boundary becomes real on the **next**
 ac release.
 
-**Tonight's three substantive actions:**
+**Tonight's substantive actions, after Juan's late call:**
 
-1. Probe the v0.5.17 candidate (untagged bump on ac main, authored by
-   Mia). Awaiting Athena's reply on routing + code-reviewer pass +
-   local-reproducer state for the Add-Existing-Identity surface.
-2. Seed `runbook.md` with prior-knowledge encoding. Marked
+1. Seeded `runbook.md` with prior-knowledge encoding. Marked
    explicitly as not-yet-validated by Hestia running the chain solo;
-   validation comes from the first end-to-end exercise.
-3. This status update + handoff refresh.
+   validation comes from the first end-to-end exercise on the next
+   real candidate.
+2. Status + handoff refresh.
+3. v0.5.17 retroactive exercise was kicked off (Athena's
+   bless-and-run, ~21:15Z), then **called off by Juan** at ~22:00Z
+   — v0.5.17 is shipping without my retroactive verification.
+   Background `make release-ready` terminated. The first real
+   exercise comes on the next bless-and-run mail from Athena.
 
 ## Live state (verified 2026-05-01 23:00 CEST)
 
@@ -39,20 +42,28 @@ ac release.
 
 ## Release pipeline
 
-- **v0.5.17 candidate**: bump commit `9c1038ad` ("release: v0.5.17",
-  authored by Mia, 2026-05-01 22:55 CEST) plus the layout-containment
-  fix `937f37b0` are on ac main. **Not tagged.** Frontend-only delta
-  (modal layout containment so the long fetch-cert command scrolls
-  horizontally inside the Add-Existing dialog). UI-surface change →
-  triggers banked policy 10 (browser-verify on the deployed surface).
-  Bug-fix shape, no external-claim weight → Sofia confirmed she is
-  out of the routing path by default for this kind of release.
-- **Routing question pending.** Mailed Athena to confirm whether
-  v0.5.17 is queued for my gate chain or whether the dev team
-  continues tagging until told otherwise. If queued, this is my
-  first end-to-end exercise. If not, I seed the runbook and pick up
-  the next one properly.
-- **Genesis-day pattern (accepted retroactively):** v0.5.13–v0.5.16
+- **v0.5.17**: tagged on origin (`b6c6e088` annotated → commit
+  `9c1038ad`, authored by Mia 2026-05-01 22:55 CEST). Layout-
+  containment fix in `AgentsPage.tsx` (modal contains the long
+  fetch-cert command list). At 23:55 CEST `app.aweb.ai/health` still
+  reports v0.5.16; GHA "Build Release Image" was running 27+ min
+  vs v0.5.16's 13 min when last checked. Per Juan, v0.5.17 ships
+  on its own — no Hestia retroactive gate-run, no verified-live
+  mail from me on this one.
+- **Going-forward routing decision (Athena, 2026-05-01).** Dev team
+  stops at "branch ready / clean main." They do NOT tag. Tags +
+  gates + deploys + verify-live all in Hestia's lane from the next
+  candidate forward. Athena will brief Mia on the new flow
+  separately.
+- **Athena's flow going forward:**
+  1. Dev team lands work on main + signals Athena.
+  2. Athena runs code-reviewer subagent on gate-input commit
+     (banked policy 13).
+  3. Athena drafts release notes + mails Hestia bless-and-run.
+  4. Hestia runs `make release-ready` → tag → push → wait for
+     image → verify live.
+  5. Hestia posts verified-live mail with evidence.
+- **Genesis-day pattern (accepted retroactively):** v0.5.13–v0.5.17
   all shipped through Mia's iteration loop on the same feature. No
   Hestia gate, no verified-live mail. /health was used as the
   authoritative deployment check by Sofia and Athena.
@@ -123,17 +134,20 @@ workspace — Athena is the cross-team bridge.
 
 ## Next checks
 
-1. Athena's reply on v0.5.17 routing → either run `make release-ready`
-   tonight as first end-to-end exercise, or seed runbook only and
-   pick up next candidate.
-2. Stale-claim sweep on `aw work active` next wake-up (currently
-   clean, so this is just cadence).
-3. Daily `/health` check on `app.aweb.ai` and `api.awid.ai`.
+1. Wait for the next bless-and-run mail from Athena. That's the
+   first real end-to-end exercise — gate chain, tag, push, watch
+   CI/CD, verify live, post evidence.
+2. Daily `/health` check on `app.aweb.ai` and `api.awid.ai`.
    Compare to `status/product.md` claims; flag drift.
+3. Stale-claim sweep on `aw work active` next wake-up (currently
+   clean, so just cadence).
 4. Time the publishing path on the next ac release (GHA log
-   breakdown). Bring numbers, not hand-waving.
+   breakdown). Bring numbers, not hand-waving. Pre-seed the data
+   from v0.5.16 (13m GHA + 7m Render = 20m tag-to-live) and
+   v0.5.17 (GHA 27+ min so far — slower than v0.5.16, worth
+   investigating why).
 5. Test-suite triage in ac/Makefile — which targets compose to the
-   20-min cost.
+   ~20-min cost.
 
 ## Standing release-discipline (banked through 2026-04-26, Hestia enforces)
 
