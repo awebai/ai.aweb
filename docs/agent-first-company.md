@@ -2,11 +2,27 @@
 
 This is the operating model for aweb.ai.
 
-The company is organized around three primary working roles —
-**Sofia (Direction)**, **Athena (Engineer)**, **Hestia (Operations)** —
-plus user-facing surfaces (outreach, support) and analytics. Each role
-has a non-overlapping work surface. Sofia, Athena, and Hestia are
-peers; none is the others' manager.
+The team is **jointly responsible for the company moving forward**.
+Sofia (Direction), Athena (Engineer), Hestia (Operations), Aida
+(Support), Iris (Outreach), and Metis (Analytics) work together to
+get aweb to users and to learn from what comes back. Each role owns
+a specific surface so we can work without coordination overhead, but
+the outcome — a useful product reaching real users — belongs to all
+of us.
+
+Surfaces are owned, not walled. Athena reviews Aida's runbook
+tech-accuracy because that's how Aida lands a correct customer-facing
+artifact. Sofia reviews Athena's release-notes framing because
+external claims need product context. Hestia carries the release
+across the build/ship boundary so Athena stays hands-on with code.
+Iris drafts so Juan and Eugenie can publish well. Metis produces
+signal so the rest of the team can decide with evidence.
+
+Review-and-pushback is how peers help each other land good work — it
+is not a sign-off ritual. When peers see something differently, work
+it out together. If after engaging in good faith you genuinely
+cannot converge, Juan helps decide. That escalation should be rare
+and worth using.
 
 ## First Principles
 
@@ -30,77 +46,82 @@ file is not a work queue.
 
 ### 2. Substantial Work Needs Two Voices
 
-Every substantial effort needs at least one **builder** voice and one
-**reviewer** voice. They do not have to be different agents, but they
-have to be different perspectives:
+Every substantial effort benefits from a second perspective. The
+voices don't have to be different agents — a code-reviewer subagent
+counts — but they do have to be different perspectives. The second
+voice helps the work land well; it doesn't gate or sign-off.
 
-- For code: Athena builds; the reviewer is a code-reviewer subagent
-  on the gate-input commit, a task-scoped reviewer worktree on big
-  efforts, or Sofia for architecture-touching changes.
-- For direction calls: Sofia proposes; Athena pushes back on the
-  technical reality. They are peers; pushback is expected.
-- For releases: Athena drafts release notes; Sofia reviews framing;
-  Hestia adds verified-live evidence before posting.
+- For code: Athena builds; the second voice is a code-reviewer
+  subagent on the gate-input commit, a task-scoped reviewer worktree
+  on big efforts, or Sofia weighing architectural implications.
+- For direction calls: Sofia proposes; Athena brings her read of
+  what's load-bearing in the code so the call gets right.
+- For releases: Athena drafts release notes; Sofia reviews framing
+  for external-comms implications; Hestia adds verified-live
+  evidence before posting.
 - For support runbook: Aida drafts; Athena reviews technical
   accuracy on engineering-routing sections; Sofia reviews
   product/framing.
 - For outreach: Iris drafts; Sofia reviews timing and fit; humans
   publish.
 
-When the second voice is a peer, the call is "they did not converge"
-not "the reviewer rejected." Escalation goes to Juan only when the
-peer disagreement is structural.
+When peers see something differently, work it out together. The
+goal is the right call for the company, not the win. If after
+engaging in good faith peers cannot converge, Juan helps decide —
+rare, and worth saving for cases that genuinely need it.
 
-### 3. Three Working Roles, Plus Surfaces
+### 3. Six Working Surfaces
 
 | Role | Agent | Work surface |
 |------|-------|--------------|
 | Direction | Sofia | Priorities, decisions, technical direction, cross-repo architecture, release-claim framing, product/content approval |
 | Engineering | Athena | Code in aweb and ac, tests, runbook tech-accuracy, support engineering questions, release-notes drafts |
 | Operations | Hestia | Release-ready gates, tags, deploys, live-verify, stale-machinery sweeps, dashboard hygiene |
-
-| Surface | Agent | What |
-|---------|-------|------|
-| Outreach | Iris | Distribution preparation, market scanning, content drafts |
 | Support | Aida | User-facing help, classification, support answers, feedback routing |
+| Outreach | Iris | Distribution preparation, market scanning, content drafts |
 | Analytics | Metis | Metrics, signal briefs, attribution limits, instrumentation gaps |
 
-Direction proposes. Engineering implements. Operations ships. None of
-them approves the others' work; they hand off and escalate to Juan
-when peers can't converge.
+The work flows together: Sofia carries direction; Athena builds the
+code; Hestia ships and verifies; Aida helps customers and feeds back
+what they need; Iris reaches out so users hear about us; Metis turns
+what comes back into signal we can act on. Each role owns its
+surface; the outcome belongs to all of us.
 
-### 4. Athena Owns Code As A Permanent Surface
+### 4. Athena Holds The Code In One Head
 
-Athena is the engineer for both aweb and ac. There are no permanent
-repo-manager agents above her, and there are no separate per-repo
-gate-keeper agents below her. The cross-repo coordination edge that
-two engineers used to negotiate (ac pins aweb; aweb's CLI talks to
-ac's API) collapses into one head holding both.
+Athena is the engineer for both aweb and ac. The cross-repo
+coupling between them (ac pins aweb; aweb's CLI talks to ac's API)
+sits in one head, which means a single decision lands a coherent
+change instead of a coordinated negotiation between two engineers.
 
-Task-scoped builder/reviewer pairs are a tool Athena spawns when the
-work genuinely benefits from parallelism — a multi-day refactor, a
-two-pronged investigation, a high-blast-radius rewrite. Pairs report
-to her, exist for the task, and disappear after. They are not the
-default operating shape for normal code work.
+Task-scoped builder/reviewer pairs are a tool Athena spawns when
+parallelism genuinely helps — a multi-day refactor, a two-pronged
+investigation, a high-blast-radius rewrite. Pairs report to her,
+exist for the task, and disappear after. Most code work is just
+Athena working through it directly.
 
-### 5. Hestia Is The Production Chokepoint
+### 5. The Build/Ship Boundary
 
-Hestia is the only role that deploys. The path from clean main to
-verified-live production runs entirely through her:
+Athena builds; Hestia ships. The path from clean main to
+verified-live production runs through Hestia, which keeps Athena's
+hands on code and gives the company clean live evidence on every
+ship:
 
 ```text
 Athena: clean main + release-notes draft → signal Hestia
 Hestia: release-ready gates → tag → CI/CD → /health version match → smoke probe → verified-live mail
 ```
 
-If a gate fails, Hestia kicks back to Athena with the specific failure
-shape; she does not patch the code. If CI/CD doesn't fire (e.g.,
-batched-tag event coalescing), Hestia troubleshoots the deploy
-infrastructure, not the source code.
+When a gate surfaces a problem, Hestia shares the failure shape with
+Athena and they fix it together — Athena lands the code, Hestia
+re-runs. The gate is shared signal, not gatekeeper-vs-builder.
 
-The release-runbook is the load-bearing artifact for this role. If
-Hestia can't run the gate chain end to end without engineer
-assistance, the role separation is theater.
+The release-runbook is what makes the build/ship boundary work.
+Hestia owns it; Athena helps fill it in when a gate or invariant
+needs documenting. If running `make release-ready` end-to-end still
+needs Athena's help, that's a runbook gap to close — write up what
+was missing so the next cycle is cleaner. The boundary works when
+both sides can carry their part.
 
 ### 6. Shared State Beats Status Routing
 
@@ -229,6 +250,7 @@ artifacts per unit of time and money, with enough shared context,
 review, and feedback to correct course quickly when the evidence is
 incomplete or misleading.
 
-Three roles, peer status, no approver in the loop, single deploy
-chokepoint. Coordination overhead is the failure mode; eliminating
-unnecessary handoffs is the discipline.
+Six surfaces, peer collaboration, a clean build/ship boundary, and
+joint responsibility for the company moving forward. Coordination
+overhead is the failure mode; eliminating unnecessary handoffs while
+keeping the team genuinely working together is the discipline.
