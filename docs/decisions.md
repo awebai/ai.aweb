@@ -8,7 +8,7 @@ handoff to detect that the world changed.
 
 ## 2026-05-01 — Athena owns code; ephemeral pairs author feature changes
 
-**Commit:** TBD (this commit)
+**Commit:** `4491df5` Athena owns code; ephemeral pairs author feature changes
 
 **Decision maker:** Juan + Athena (planning)
 
