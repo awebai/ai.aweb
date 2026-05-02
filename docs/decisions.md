@@ -6,6 +6,52 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-02 — Unpark "conversations as first-class": Juan-directed, Grace authors
+
+**Commit:** `TBD` Unpark conversations-as-first-class: Juan-directed, Grace authors
+
+**Decision maker:** Juan (operator-level override of the peer-converged park entry below).
+
+**Decision.** `aweb-aame` is unparked and active immediately. Grace
+authors: decompose into sub-tasks → implement → mail Athena for review
+when done → delete the working doc at
+`aweb/docs/conversations-as-first-class.md` when tasks are complete.
+Athena reviews per the feature-work flow in her `AGENTS.md`. The four
+named triggers from the prior entry (cross-team conv volume, customer
+pull, Athena-relay saturation, distribution evidence) are no longer
+operational gates; they remain in the entry below as historical
+context for the original parking reasoning.
+
+**Why.** Juan made an operator-level call to unpark; specific
+reasoning not yet captured in shared artifacts as of this entry.
+Possible context Athena and Sofia considered (without committing to
+any of them): relay-pattern saturation Juan is seeing operationally,
+wanting the conversation primitive in place before distribution
+lands and surfaces cross-org cases, or strategic order-of-investment
+factors. Neither peer is on the founder-side of that view; the
+entry stands on operator authority and will be amended if Juan
+surfaces the reasoning.
+
+**What this overrides.** The "Park 'conversations as first-class'
+with named triggers" entry below (commit `c874f2a`). That entry's
+analysis of engineering cost (~weeks of cross-repo work;
+mail-threading-first prerequisite; 1.18.6 trust-model arc recently
+stable) is unchanged factually — Juan accepted those costs in the
+unpark decision.
+
+**What this does not change.** Invariant 8 in `docs/invariants.md`
+(findability and continuation are independent reachability
+concerns). The architectural truth is unaffected by sequencing.
+
+**Affects.** `aweb-aame` epic moves from P3-parked to active under
+Grace's authoring lane. The working doc at
+`aweb/docs/conversations-as-first-class.md` becomes the
+implementation-target/spec rather than a parked artifact; deleted on
+task completion per Juan's brief to Athena. No invariant changes,
+no other doc changes in this commit.
+
+---
+
 ## 2026-05-02 — Park "conversations as first-class" with named triggers
 
 **Commit:** `c874f2a` Bank invariant 8 + park conversations-as-first-class with named triggers
