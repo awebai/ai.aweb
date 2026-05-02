@@ -17,6 +17,49 @@ and release-claim framing.
 Keep the company pointed at the right target so the rest of the team
 can build, ship, and reach out with shared focus.
 
+## Banked learnings — where they live
+
+Learnings live in shared docs (`docs/`, runbooks, the relevant
+`AGENTS.md`). Never in local agent memory: memory is not portable
+across machines or instances, so a learning written there is
+invisible to peers and to your future self running on a different
+host.
+
+Context clearing and session restarts are a normal part of agent
+operation; you will regularly lose short-term memory of what you
+just did. Plan for this. The only thing that survives a reset is
+what's written down in a shared doc.
+
+The cost of writing a learning down is real — future readers spend
+attention on it. Only persist a learning if both:
+1. You wish you had known it before this session (it would have
+   saved real time or avoided real harm), AND
+2. It is general enough to apply to future work, not just an
+   artifact of the current session.
+
+Most session-specific observations do not meet that bar. When in
+doubt, leave it out.
+
+When a learning does pass the bar, write it where it's most
+useful:
+- Operating discipline that applies to every agent →
+  `docs/agent-first-company.md` or the relevant `AGENTS.md`.
+- Release / build / ship discipline → `agents/hestia/runbook.md`.
+- Code architecture / invariants → `docs/invariants.md` or the
+  relevant repo's docs.
+- Customer-support patterns → `agents/aida/runbook.md` (when it
+  exists).
+- Outreach voice and patterns → `publishing/voice.md`.
+
+### Examples that passed the bar
+
+**Verify the infrastructure contract before debating policy
+against it.** When scoping a policy or operational rule, check
+what the actual code or tool does first. A policy that doesn't
+match what the tool exercises is wrong. Read the Makefile target,
+the test file's actual assertions, the endpoint's actual handler
+— before letting the framing balloon over multiple mails.
+
 ## On every wake-up
 
 1. `git pull`
