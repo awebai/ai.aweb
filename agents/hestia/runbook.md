@@ -22,6 +22,60 @@ When validation discovers a gap, the runbook updates. When Athena
 adds a new gate, the runbook updates. When a banked memory adds an
 operational lesson, the runbook updates.
 
+## Artifact map and release dependencies
+
+Six distinct artifacts ship from two repos with five distribution
+channels.
+
+**aweb repo (5 artifacts):**
+
+| Artifact | Tag pattern | Distribution | Pinned by |
+|---|---|---|---|
+| aweb server (Python) | `server-vX.Y.Z` | PyPI `aweb` | ac (`aweb>=…`) |
+| aw CLI (Go) | `aw-vX.Y.Z` | GitHub Releases (goreleaser) + npm `@awebai/aw` | end-users |
+| awid lib (Python) | `awid-service-vX.Y.Z` | PyPI `awid` | ac (`awid-service>=…`) |
+| awid registry (Docker) | `awid-vX.Y.Z` | GHCR; runs at `api.awid.ai` | (independent service) |
+| @awebai/claude-channel (TS) | `channel-vX.Y.Z` | npm | end-users (Claude Code) |
+
+The version field shared between `awid-vX.Y.Z` and `awid-service-vX.Y.Z`
+points at the same `aweb/awid/pyproject.toml` — single source code, two
+distribution channels (Docker image + PyPI library).
+
+**ac repo (1 artifact):**
+
+| Artifact | Tag pattern | Distribution | Live at |
+|---|---|---|---|
+| aweb-cloud (Docker) | `vX.Y.Z` | GHCR; auto-deploys via Render | `app.aweb.ai` |
+
+ac pins `aweb` and `awid-service` in `backend/pyproject.toml`.
+
+### Release-as-needed, not lockstep
+
+Per Juan: artifacts ship as needed, not always together.
+
+- **aweb server bump usually drags ac.** When the server changes
+  contract or behavior that ac depends on, ac picks up the new pin
+  in a follow-on release. `cross-repo-change` skill summary:
+  OSS lands first → tag → CI publishes to PyPI → wait for
+  propagation → bump ac pin (with `uv sync --refresh`) → ac tag
+  → ac deploy.
+- **awid tends to be more independent.** Both the Docker image
+  (`awid-vX.Y.Z` → GHCR → api.awid.ai) and the PyPI lib
+  (`awid-service-vX.Y.Z` → PyPI) can move on their own cadence
+  unless ac needs the new client features.
+- **aw CLI (Go) often moves in lockstep with aweb server** but
+  isn't required to. The `release-all-tag` Makefile target cuts
+  server + aw + channel + awid + awid-service from the same
+  commit; that target exists for the all-together case, not as
+  a default.
+
+**Per-case rule:** which artifacts move and in what order is
+discussed with Athena on each release. Her bless-and-run mail
+names: target repo, expected SHA of clean main, change shape, the
+code-reviewer-pass result, and which other artifacts (if any)
+need to move in the same wave. If the wave touches aweb, she
+also names whether ac needs to follow and in what order.
+
 ## What gets you to a release candidate (input)
 
 A release candidate enters my surface as a mail from Athena:
@@ -151,30 +205,48 @@ users.
 #### aweb
 
 ```sh
-cd aweb && make release-all-check
+cd aweb && make ship
 ```
 
-aweb is multi-component. The check target verifies all components
-are release-ready. Per-component check / tag / push targets exist
-separately:
+`make ship` is the canonical comprehensive pre-tag-push gate for
+aweb. It composes:
+
+- `make test` — `test-server` + `test-awid` + `test-cli` +
+  `test-channel`
+- `make release-server-check` — server build + tests + dist
+  artifact verification
+- `make release-channel-check` — channel test + build + npm
+  pack dry-run + plugin-version match
+- `make release-awid-check` — awid lock + tests + build + Docker
+  build verification
+- `make test-e2e` — full e2e user journey (banked 2026-04-22
+  standing policy: no release cut before this passes green)
+
+The Makefile comment explicitly says `make ship` is the canonical
+pre-tag-push gate; do NOT substitute `make test` alone. Banked
+discipline: 1.18.3 / 1.18.4 / 1.18.5 / 1.18.6 each ran `make test`
+instead of the canonical comprehensive gate, and even though GHA
+caught build failures downstream the local gate is supposed to be
+authoritative before tag-push.
+
+**`make ship` does NOT push.** It prints "Ready for tag-push" at
+the end. Tag-push is always the explicit per-component sequence
+(see step 7 below).
+
+Per-component check / tag / push targets:
 
 - `release-server-check` / `-tag` / `-push`
 - `release-cli-tag` / `-push`
 - `release-awid-check` / `-tag` / `-push` / `-pypi-tag` / `-pypi-push`
 - `release-channel-check` / `-tag` / `-push`
 
-`release-all-check` composes the check targets across all
-components. `release-all-tag` and `release-all-push` exist for full
-multi-component releases (aala epic shape).
+`release-all-check` runs the check arms together. `release-all-tag`
++ `release-all-push` exist for the all-together case (aala-epic
+shape) but are NOT the default. Most releases move only the
+artifacts that need moving.
 
-The gate to run as part of release-ready for aweb is `make test-e2e`
-(banked 2026-04-22 standing policy: "no release of anything is cut
-before the full e2e user journey test passes"). `make test`
-composes `test-server` + `test-awid` + `test-cli` + `test-channel`.
-
-**[unvalidated]** Whether `make release-all-check` already calls
-`make test-e2e` internally or whether it must be run separately.
-First aweb release exercise resolves this.
+**[unvalidated]** First aweb release exercise validates timing
+and per-component sequencing under the new role model.
 
 ### 5. SOT analysis (when needed)
 
@@ -366,13 +438,26 @@ Editing the existing consolidated file in place trips pgdbm's
 checksum guard and forces a destructive dump-restore cutover.
 Banked from awid 0.3.1 → 0.5.1 prod cutover.
 
-### `make ship` short-circuits approval
+### `make ship` semantics differ between repos
 
-`make ship` (in both aweb and ac) is the auto-tag-and-push target.
-It bypasses the manual approval / per-tag-discipline step. Per
-banked release protocol: do NOT use `make ship` for production
-releases. Tag manually with `git tag -a` and push individually with
-`git push origin <tag>`.
+- **aweb `make ship`**: comprehensive pre-tag check. Runs
+  `release-all-check` + `release-awid-check` + `test-e2e`. Does
+  NOT tag and does NOT push. Prints "Ready for tag-push" at the
+  end. Use it as the gate; tag and push manually per step 7.
+- **ac `make ship`**: runs `release-ready` (via `ship-tag`'s
+  dependency) AND tags + pushes the version from
+  `scripts/get_release_version.py`. Auto-pushes the tag, which
+  fires GHA immediately. Use this when you want one-shot
+  gate-and-ship; use the explicit `make release-ready` →
+  `git tag -a` → `git push origin <tag>` sequence when you want
+  to inspect gate output before tag exists, or to control when
+  GHA fires.
+
+Default for production releases under the new role model: use the
+explicit sequence in both repos. The runbook step 4 (gates) and
+step 7 (tag and push) sit in separate boxes for a reason — they
+deserve separate eyes-on. The auto-ship targets are convenient for
+quick local iteration, not the standing release path.
 
 ## Standing policies (banked through 2026-04-26, Hestia enforces)
 
