@@ -542,8 +542,49 @@ make invocation rather than ad-hoc DB access. That target
 doesn't exist yet — filed as engineering follow-up against
 task #13 below.
 
-**Verify-applied query block (bankable now, regardless of how the
-apply mechanism resolves):**
+**Pre-flight check for 003 specifically (and any future
+constraint-adding migration):**
+
+`003_conversations_constraints.sql` adds `CHECK` constraints via
+`ALTER TABLE ADD CONSTRAINT`. PostgreSQL full-table-scans existing
+rows at constraint-add time. If the prod aweb-cloud DB carries any
+row that violates the new constraint, the migration fails at the
+ALTER step — the constraint doesn't land, the schema-migrations
+row doesn't land, the ship is blocked until data-repair clears the
+offenders. Not destructive (retry is possible after fix-up), but
+does halt verified-live.
+
+Run these BEFORE applying 003 against an environment with
+durable data (staging, prod):
+
+```sql
+-- Rows that would fail conversations_created_by_did_not_blank
+SELECT COUNT(*) AS bad_created_by
+FROM aweb.conversations
+WHERE BTRIM(created_by_did) = '';
+
+-- Rows that would fail conversation_participants_alias_not_blank
+SELECT COUNT(*) AS bad_alias
+FROM aweb.conversation_participants
+WHERE BTRIM(alias) = '';
+
+-- Rows that would fail conversation_participants_reachable
+SELECT COUNT(*) AS bad_reachable
+FROM aweb.conversation_participants
+WHERE address IS NULL AND transport_hint IS NULL;
+```
+
+If any count is non-zero: flag the failure shape to Athena before
+running the migration. Options are (a) a fix-up migration that
+data-repairs first, or (b) accept the constraint failure and the
+migration aborts. Athena's call.
+
+For ephemeral test databases (fresh schema per run): this check
+is a no-op; nothing to clean up. Only environments with durable
+data from the 002-era state need the pre-check.
+
+**Verify-applied query block (run AFTER apply, regardless of
+mechanism):**
 
 ```sql
 -- Migration metadata
