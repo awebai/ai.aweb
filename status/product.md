@@ -32,12 +32,15 @@ The morning's setup that fed this:
 - **v0.5.17** shipped without Hestia's retroactive gate-run (Juan
   called it off last night; v0.5.18 became the first real exercise
   instead).
-- **Conversations-as-first-class direction call settled today**
-  (decision `c874f2a`): parked with four named triggers; invariant 8
-  banked (findability and continuation are independent reachability
-  concerns); architectural framing preserved in
-  `aweb/docs/conversations-as-first-class.md` (working doc, not
-  promoted). Athena filed `aweb-aame` epic, P3, parked.
+- **Conversations-as-first-class**: parked midday with four named
+  triggers (decision `c874f2a`), then unparked late afternoon by
+  Juan's operator-level call (decision `325556a`). aweb-aame moves
+  from P3-parked to active under Grace's authoring lane; Athena
+  reviews per the standard feature-work flow. Invariant 8
+  (findability and continuation are independent reachability
+  concerns) stands either way — architectural truth is unaffected
+  by sequencing. Specific reasoning for Juan's override not yet
+  captured in shared artifacts; pending.
 
 ## Today's priorities (status at end of day)
 

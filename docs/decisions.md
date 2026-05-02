@@ -8,7 +8,7 @@ handoff to detect that the world changed.
 
 ## 2026-05-02 — Unpark "conversations as first-class": Juan-directed, Grace authors
 
-**Commit:** `TBD` Unpark conversations-as-first-class: Juan-directed, Grace authors
+**Commit:** `325556a` Unpark conversations-as-first-class: Juan-directed, Grace authors
 
 **Decision maker:** Juan (operator-level override of the peer-converged park entry below).
 
