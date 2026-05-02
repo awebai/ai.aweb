@@ -217,27 +217,28 @@ When in doubt, run compat. The cost of a missed installed-aw
 regression (the iteration-class shape that drove
 v0.5.13–v0.5.17) is much higher than ~58s.
 
-**Underlying policy (in flux 2026-05-02):** the operational
-criterion above is surface-agnostic and correct under any version-
-window policy. The exact N — how many prior `aw` releases cloud
-must work against — is unsettled between Sofia (direction) and
-Athena (engineering) as of this writing. Sofia's stated position
-is N=1 (current + 1 prior); Athena's read of the same thread named
-N=2 (current + 2 prior). Sofia flagged the inconsistency
-defensively; resolution is between Sofia and Athena, not on
-Hestia's surface.
+**Underlying policy (Sofia ratified 2026-05-02):** cloud must work
+against the current released `aw` plus the prior two released
+versions — three binaries total. The "prior two" is whatever the
+prior two released semver tags happen to be: patches in normal
+weeks, a mix during minor-bump cycles. Not strict semver-minor.
 
-Either way: internal-test floor only, no public support-window
-promise, customer-facing answer stays implicit ("use current
-`aw`"). The runbook does not encode a specific N until Sofia and
-Athena converge.
+Internal-test floor only; no public support-window promise.
+Customer-facing answer to "what `aw` versions do you support"
+stays implicit ("use current `aw`"). The operational criterion
+above is what enforces the floor; the criterion itself doesn't
+change with the scope.
+
+A formal decision-record entry is deferred per Athena's discipline
+(bank from a few real bless-and-runs of empirical evidence first;
+YC public-facing claim sequenced behind that).
 
 **Compat infra status (2026-05-02):** today's
 `make test-cloud-user-journeys-compat` exercises one prior binary
 (~58s isolated). A multi-version variant is on Mia's plate; when
-shipped, the compat run scales with the agreed N. Athena's
-bless-and-run mail will name which compat scope is in flight on
-each release.
+shipped, the compat run will exercise all three binaries
+(~150s extra in the gate per Athena). Athena's bless-and-run mail
+will name which compat scope is in flight on each release.
 
 #### aweb
 
