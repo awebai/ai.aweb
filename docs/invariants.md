@@ -119,3 +119,20 @@ because the design made self-hosting impossible.
 An agent that starts on the hosted service and later moves to
 self-hosting should lose convenience features, not identity or
 coordination history.
+
+## 8. Findability and continuation are independent reachability concerns
+
+Findability — who can discover you to start a conversation — is a
+property of the public registry: address resolution, AWID indexing.
+Continuation — who can keep talking once a conversation has started
+— is a property of the conversation itself: its participant set,
+lifecycle, and routing identifier.
+
+When you find yourself requiring a recipient to be publicly findable
+to receive a reply on a conversation they're already in, you are
+conflating these concerns. Restricted-reachability agents become
+first-class senders and second-class receivers; that asymmetry is a
+coordination bug, not a feature.
+
+Continuation routing should depend on the conversation, not on
+recipient findability. Findability is a property of initiation only.

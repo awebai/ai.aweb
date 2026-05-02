@@ -6,6 +6,70 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-02 — Park "conversations as first-class" with named triggers
+
+**Commit:** `TBD` Bank invariant 8 + park conversations-as-first-class with named triggers
+
+**Decision maker:** Sofia + Athena (peer-converged via direction-thread mail, 2026-05-02).
+
+**Decision.** Park investment in making conversations a first-class
+object in the protocol. Bank the architectural framing in two
+artifacts: a working doc at `aweb/docs/conversations-as-first-class.md`
+(Athena, banked separately, not promoted) and a new invariant in
+`docs/invariants.md` (added in this commit). Athena files a
+tracked-but-unscoped epic in aw tasks. No engineering scope begins
+until a named trigger fires.
+
+**Why.** Distribution is the current bottleneck, not protocol features
+(invariant 6). The reachability asymmetry — address-based routing
+404s for restricted-reachability recipients (e.g.
+`aweb.ai/aida → juan.aweb.ai/mia`) — bites rarely at 44-user
+dogfooding scale; Athena-relay handles it operationally. Mail-
+threading-first is itself non-trivial engineering work; opening a
+multi-week cross-repo protocol change while distribution hasn't
+started would burn cycles on a problem that isn't yet load-bearing.
+The 1.18.6 trust-model arc is recent and stable; re-opening protocol
+shape so soon is real cost. The trigger system below addresses the
+"deferring forever" risk: park with named triggers means we revisit
+on signal, not vibes.
+
+**Triggers (any one fires the revisit):**
+
+1. **A**: 8+ cross-team coordination moments per week (volume signal
+   — raw agent count conflates with team growth for unrelated
+   reasons, so volume is the right axis).
+2. **B**: customer use case actually pulls for cross-org agent
+   coordination.
+3. **C**: Athena-relay saturation — 5+ relays in any 24h window where
+   Athena is the bridge. Self-reported by Athena (operational mail to
+   Sofia) until Metis comes online and instruments it.
+4. **D**: distribution evidence of pull — real users surfacing the
+   cross-org need.
+
+**The fix when we go.** Conversations as first-class objects in the
+protocol, with explicit lifecycle and participant set. Mail threading
+as prerequisite (mail today has only `reply_to UUID` chains; chat
+already has `session_id`). Cert-presentation auth (already in 1.18.6,
+commit `7759abc`) as the verification anchor. AWID stays a pure
+findability registry. The verification gap originally hypothesized in
+Athena's brief was a false alarm — Mia confirmed both directions
+verified via `aw mail inbox --show-all --json`; the `verified=false`
+was a renderer artifact (separate P1/P2 fix, not architectural).
+
+**Customer-facing claim deferred behind evidence.** When the
+engineering work ships, "first-class conversations across
+organizational boundaries" is positioning gold for YC and outreach.
+Until then, no public claim — banked-too-early protocol promises
+become stale.
+
+**Affects.** `docs/invariants.md` (new invariant 8: findability and
+continuation are independent reachability concerns),
+`aweb/docs/conversations-as-first-class.md` (working doc, Athena
+banks separately), aw epic (Athena to file). No code changes in this
+commit.
+
+---
+
 ## 2026-05-01 — Athena owns code; ephemeral pairs author feature changes
 
 **Commit:** `4491df5` Athena owns code; ephemeral pairs author feature changes
