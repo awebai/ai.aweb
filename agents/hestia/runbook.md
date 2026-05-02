@@ -314,8 +314,9 @@ artifacts that need moving.
 
 **First-exercise observation (aw CLI 1.18.8, 2026-05-02):**
 - `make ship` end-to-end (test + 3 release-*-checks + test-e2e
-  Phases 0-22): **7m6s**. Much faster than the pre-flight estimate
-  of 30-45 min.
+  Phases 0-22): **7m6s baseline**. Anomaly threshold: future runs
+  over 10 min are a signal worth investigating (test-e2e regressing
+  in performance, Docker image build slowing, etc).
 - aw CLI version coupling: the Makefile's `CLI_VERSION := SERVER_VERSION`
   is a stale assumption when CLI moves but server doesn't. For aw-only
   releases, tag directly with `git tag -a aw-vX.Y.Z <commit> -m "…"`
@@ -535,12 +536,19 @@ See step 7 above. Banked from aweb 1.18.0 ghost-tag.
 See step 9c. Banked symptom: HTTP 401 timestamp errors on signed
 requests after laptop sleep. Restart the stack.
 
-### Gate failure in compat — diagnose by arm-pattern, not just exit code
+### Gate failure in compat — script gaps masquerade as CLI bugs
 
 **[banked from v0.5.18 first-exercise gate failure 2026-05-02]**
 
-When `make test-cloud-user-journeys-compat` fails, look at WHICH arm
-fails:
+When `make test-cloud-user-journeys-compat` fails on what looks like
+a CLI/contract regression, also check whether the e2e script's
+invocation matches the new contract. Script gaps look like CLI bugs
+because the failure surfaces from a CLI command, but the actual root
+is in `scripts/e2e-cloud-user-journey.sh` not honoring the new
+contract.
+
+Diagnose by arm-pattern, not just exit code. When the compat target
+fails, look at WHICH arm fails:
 
 - **Only the installed-aw arm fails** (local-aw passes): real
   installed-aw regression OR an intentional break per the release
