@@ -99,28 +99,54 @@ the PyPI cache-lag window can mask a stale resolution. Always
 cd ac && make release-ready
 ```
 
-Composes (per `ac/Makefile`):
+Composes (per `ac/Makefile`, post-commit `24cb7c68`):
 
 - `release-verify-remote` — confirms remote state matches expectation.
 - `release-verify-model` — model-side verification.
 - `release-verify-migrations` — migrations are forward-only, ordered,
   checksum-clean.
-- `test-backend` — pytest suite. ~1170 tests as of v0.5.6 era; growth
-  since.
+- `test-backend` — pytest suite. ~1250 selected as of v0.5.17 (1263
+  collected, 13 deselected).
 - `test-frontend` — vitest suite. ~96 tests as of v0.5.5; ~25 files.
 - `test-two-service` — Docker two-service stack (cloud + awid).
   ~9–10 tests depending on era.
-- `test-cloud-user-journeys` — added by Athena in commit `962dd163`
-  (pre-v0.5.13). Composes `test-cloud-user-journeys-local-aw` +
-  `test-cloud-user-journeys-installed-aw`. Adds ~25 min total.
+- `test-cloud-user-journeys` — local-aw arm only as of `24cb7c68`
+  (the chain previously composed local-aw + installed-aw; the
+  installed-aw arm moved to the explicit `test-cloud-user-journeys-compat`
+  target, ~233s saving on the default chain). Mia's per-Mia mail
+  reports release-ready total of 244.56s under the new shape.
 
 All must be green. Per banked policy 4, trust the Makefile's chain;
 do not chase adjacent targets that aren't in `release-ready`.
 
-**[unvalidated]** The full chain timing under the new
-`test-cloud-user-journeys` gate. Sofia's iteration-cost mail flagged
-~20 min for the test suite; that includes the new gate. First
-exercise will produce real timing data.
+##### When to also run `make test-cloud-user-journeys-compat`
+
+Compat covers the installed-aw arm — i.e., it exercises ac against
+the published `aw` package on PyPI rather than the sibling
+checkout. The default chain skips it for speed; invoke it
+explicitly when the release shape risks breaking installed users.
+
+**[unvalidated — Athena's starting policy 2026-05-02; will tighten
+when Mia confirms]**
+
+Always run compat when:
+
+- The release changes any `aweb` ↔ `ac` endpoint contract
+  (response shape, required fields, status semantics).
+- The release changes auth / cert / identity flows.
+- The release ships ac without bumping the `aweb` pin.
+
+Skip compat when:
+
+- Pure ac-internal changes (admin tooling, frontend layout,
+  internal refactor with no contract shift).
+- Releases that bump the `aweb` pin AND publish a matching `aw`
+  on npm/PyPI in the same wave (users upgrade together).
+
+When in doubt, run compat. The cost is ~4 min added (4 default + 4
+compat = 8 min for compat-flagged releases vs 4 min for compat-skip
+releases). Worth it when the release shape can break installed-aw
+users.
 
 #### aweb
 
