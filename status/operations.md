@@ -143,9 +143,11 @@ workspace — Athena is the cross-team bridge.
    clean, so just cadence).
 4. Time the publishing path on the next ac release (GHA log
    breakdown). Bring numbers, not hand-waving. Pre-seed the data
-   from v0.5.16 (13m GHA + 7m Render = 20m tag-to-live) and
-   v0.5.17 (GHA 27+ min so far — slower than v0.5.16, worth
-   investigating why).
+   from v0.5.16 (~13m GHA build; the 7m gap to /health-shows-new-tag
+   was Juan's manual deploy window, not auto-rollout — Render is
+   manual). v0.5.17 GHA ran 27+ min so far — slower than v0.5.16,
+   worth investigating the GHA-build side; deploy timing depends
+   on when Juan triggers it.
 5. Test-suite triage in ac/Makefile — which targets compose to the
    ~20-min cost.
 

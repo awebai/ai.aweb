@@ -45,7 +45,7 @@ distribution channels (Docker image + PyPI library).
 
 | Artifact | Tag pattern | Distribution | Live at |
 |---|---|---|---|
-| aweb-cloud (Docker) | `vX.Y.Z` | GHCR; auto-deploys via Render | `app.aweb.ai` |
+| aweb-cloud (Docker) | `vX.Y.Z` | GHCR; Juan deploys manually from GHCR | `app.aweb.ai` |
 
 ac pins `aweb` and `awid-service` in `backend/pyproject.toml`.
 
@@ -57,8 +57,9 @@ Per Juan: artifacts ship as needed, not always together.
   contract or behavior that ac depends on, ac picks up the new pin
   in a follow-on release. `cross-repo-change` skill summary:
   OSS lands first → tag → CI publishes to PyPI → wait for
-  propagation → bump ac pin (with `uv sync --refresh`) → ac tag
-  → ac deploy.
+  propagation → bump ac pin (with `uv sync --refresh`) →
+  `make release-ready` on ac → ac tag → GHA builds image →
+  Juan deploys manually from GHCR → verify live.
 - **awid tends to be more independent.** Both the Docker image
   (`awid-vX.Y.Z` → GHCR → api.awid.ai) and the PyPI lib
   (`awid-service-vX.Y.Z` → PyPI) can move on their own cadence
@@ -311,23 +312,32 @@ workflows failed to fire (event-coalescing on same-commit batched
 tags), nothing reached PyPI/npm. The 1.18.1 recovery pushed
 individually and all 5 workflows fired.
 
-### 8. Watch CI/CD
+### 8. Watch CI/CD and signal Juan for the deploy step
 
 After each tag push, the corresponding GHA workflow fires. For ac,
-that's the cloud CI/CD run (image build + GHCR publish + auto-deploy
-to app.aweb.ai). For aweb, that's per-component (PyPI for server /
-cli / awid / awid-service; npm for channel).
+that's the cloud CI/CD run (image build → GHCR publish). For aweb,
+that's per-component (PyPI for server / cli / awid-service; npm for
+channel; GHCR Docker for awid registry image).
 
 Use `gh run list` and `gh run view <id> --log` (or the GHA web UI)
 to watch the run. Confirm it fired (banked failure: workflow
 silently doesn't fire when tag push is batched).
 
+**ac deploy step is manual.** Render does NOT auto-deploy from
+GHCR. When the GHA build completes and the image is at GHCR, Juan
+deploys manually. Mail or chat Juan when the image is ready:
+"v<version> image at GHCR — ready to deploy when you are." Then
+wait for him to deploy before moving to verify-live. Do not
+attempt to automate the deploy; stay in operations lane (gates,
+signal, verify, post evidence).
+
 ### 9. Verify live
 
 **[partly validated tonight via /health probe]** GHA green ≠ live.
-Package published ≠ live. Tag pushed ≠ live. The release is live
-when the deployed service reports the new version AND the changed
-surface behaves correctly.
+Package published ≠ live. Tag pushed ≠ live. Image at GHCR ≠ live.
+The release is live only after Juan has deployed AND the deployed
+service reports the new version AND the changed surface behaves
+correctly.
 
 #### Step 9a: /health version match
 
@@ -344,9 +354,12 @@ Assert:
 - `aweb_version` and `awid_service_version` match the pin in
   `backend/pyproject.toml` post-bump.
 
-If any field doesn't match, the deploy hasn't rolled — wait, then
-re-check. If after a reasonable window (~10 min) the fields still
-don't match and GHA shows green, troubleshoot the deploy infra.
+If any field doesn't match, Juan hasn't deployed yet (or the
+deploy is still rolling). Wait, re-check. If GHA is green and the
+image is at GHCR but /health doesn't show the new version after
+Juan signals "deployed," ask him to confirm the deploy completed.
+Don't troubleshoot deploy infra — that's outside the operations
+lane.
 
 #### Step 9b: Smoke probe of the changed surface
 

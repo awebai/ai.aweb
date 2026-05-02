@@ -55,8 +55,8 @@ from Athena — that is what wakes me into a release.
   Add-Existing dialog instead of widening the modal.
 - GHA "Build Release Image" run id `25233272933` started 21:09:18Z;
   was 27+ min in when last checked (vs ~13 min for v0.5.16).
-- /health was still v0.5.16 at hand-off time. Render rollout state
-  is no longer my concern for this release.
+- /health was still v0.5.16 at hand-off time. Juan's manual deploy
+  state is no longer my concern for this release.
 
 **Next instance reads first:**
 
