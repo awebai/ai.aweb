@@ -479,6 +479,56 @@ For each release, exercise what actually changed:
   probe returns 401 timestamp errors, restart the local stack
   before suspecting the release.
 
+### 9.5. Run pending migrations (when applicable)
+
+**[banked from Athena's mail 2026-05-02]**
+
+**SQL migrations in aweb-server do NOT run automatically when a
+new aweb-cloud image deploys to Render.** This is filed as a bug
+(task #13, auto-migration bug). Until it's fixed, every release
+whose aweb pin includes new migration files requires a manual
+migration run on the production aweb-cloud DB after Juan's
+deploy completes.
+
+If you skip this step on a release that has migrations: queries
+against the new tables/columns fail in production. The release
+shows healthy on `/health` because the API server starts fine,
+but anything that touches the new schema breaks.
+
+**When this step applies:**
+
+- Athena's bless-and-run mail explicitly names migration files
+  (going forward, she'll surface them when relevant), OR
+- Git-log check at gate-run time: `git -C aweb log --diff-filter=A
+  --name-only <prev-aweb-tag>..<this-aweb-tag> -- "**/migrations/**"`
+  shows new files.
+
+If either condition is true, sequence is:
+
+1. Verify Juan has deployed (step 9 /health match).
+2. Run the pending migration(s) against the prod aweb-cloud DB.
+3. Verify migration applied (schema_migrations row added; new
+   tables/columns exist).
+4. Smoke probe of the changed schema (e.g., a query that
+   exercises the new column or table).
+5. THEN post verified-live mail (step 10).
+
+**Concrete invocation: TBD pending Mia/Grace input via Athena.**
+Uses pgdbm migration tooling or the aweb-server's built-in
+migration runner against the cloud DB (the cloud has the
+embedded aweb schema). Mailed Athena to relay; this section
+updates with the exact command before the next release with
+migrations arrives.
+
+**Pending migrations as of 2026-05-02:**
+
+- aame.1 added `aweb/server/src/aweb/migrations/aweb/002_conversations.sql`
+  on aweb main (commit 6b0f28e). Not yet released; will need running
+  when a future ac release bumps the aweb pin past this commit.
+- aame consolidation commit (Grace landing soon) will add
+  `003_conversations_constraints.sql`.
+- Each new migration file = one manual run.
+
 ### 10. Post verified-live mail
 
 Compose the release post mail:
