@@ -34,7 +34,7 @@ channels.
 | aweb server (Python) | `server-vX.Y.Z` | PyPI `aweb` | ac (`aweb>=…`) |
 | aw CLI (Go) | `aw-vX.Y.Z` | GitHub Releases (goreleaser) + npm `@awebai/aw` | end-users |
 | awid lib (Python) | `awid-service-vX.Y.Z` | PyPI `awid` | ac (`awid-service>=…`) |
-| awid registry (Docker) | `awid-vX.Y.Z` | GHCR; runs at `api.awid.ai` | (independent service) |
+| awid registry (Docker) | `awid-vX.Y.Z` | GHCR; Juan deploys manually; runs at `api.awid.ai` | (independent service) |
 | @awebai/claude-channel (TS) | `channel-vX.Y.Z` | npm | end-users (Claude Code) |
 
 The version field shared between `awid-vX.Y.Z` and `awid-service-vX.Y.Z`
@@ -323,13 +323,28 @@ Use `gh run list` and `gh run view <id> --log` (or the GHA web UI)
 to watch the run. Confirm it fired (banked failure: workflow
 silently doesn't fire when tag push is batched).
 
-**ac deploy step is manual.** Render does NOT auto-deploy from
-GHCR. When the GHA build completes and the image is at GHCR, Juan
-deploys manually. Mail or chat Juan when the image is ready:
-"v<version> image at GHCR — ready to deploy when you are." Then
-wait for him to deploy before moving to verify-live. Do not
-attempt to automate the deploy; stay in operations lane (gates,
-signal, verify, post evidence).
+**Docker-image deploys are manual.** This applies to both:
+
+- ac (`vX.Y.Z` → GHCR → live at `app.aweb.ai`)
+- awid registry (`awid-vX.Y.Z` → GHCR → live at `api.awid.ai`)
+
+Render does NOT auto-deploy from GHCR for either. When the GHA
+build completes and the image is at GHCR, Juan deploys manually.
+Mail or chat Juan when the image is ready:
+"<service> v<version> image at GHCR — ready to deploy when you
+are." Then wait for him to deploy before moving to verify-live.
+Do not attempt to automate the deploy; stay in operations lane
+(gates, signal, verify, post evidence).
+
+**PyPI / npm / GitHub Releases publishes don't have a manual
+deploy step** — once GHA finishes the publish workflow, the
+artifact is "live" in the sense of available to consumers. The
+remaining wait is just PyPI/npm propagation before downstream
+`uv sync --refresh` / `npm install` resolves the new version.
+Applies to: `server-vX.Y.Z` (PyPI `aweb`),
+`awid-service-vX.Y.Z` (PyPI `awid`), `aw-vX.Y.Z` (GitHub
+Releases + npm `@awebai/aw`), `channel-vX.Y.Z` (npm
+`@awebai/claude-channel`).
 
 ### 9. Verify live
 
@@ -408,13 +423,14 @@ runbook.
 
 ## Verified-live probe pattern (compact reference)
 
-| Surface          | Match field on /health         | Smoke probe                              |
-|------------------|--------------------------------|------------------------------------------|
-| ac (cloud)       | `release_tag`, `git_sha`       | curl the changed endpoint or browser-probe the UI |
-| aweb-server      | n/a (OSS — PyPI publish check) | `pip install` + import smoke             |
-| aw CLI           | n/a (PyPI publish check)       | `aw --version` + smoke command           |
-| awid-service     | api.awid.ai/health `version`   | endpoint smoke against api.awid.ai       |
-| channel          | n/a (npm publish check)        | `npm install` smoke                      |
+| Surface          | Deploy step | Live check                                                   | Smoke probe                              |
+|------------------|------------|---------------------------------------------------------------|------------------------------------------|
+| ac (cloud)       | Juan manual | `app.aweb.ai/health` `release_tag` + `git_sha` match          | curl changed endpoint or browser-probe the UI |
+| awid registry    | Juan manual | `api.awid.ai/health` `version` matches `awid-vX.Y.Z`          | endpoint smoke against `api.awid.ai`     |
+| aweb server (PyPI)  | none (GHA publishes) | check on PyPI                                       | `pip install aweb==X.Y.Z` + import smoke |
+| awid lib (PyPI)     | none (GHA publishes) | check on PyPI                                       | `pip install awid==X.Y.Z` + import smoke |
+| aw CLI              | none (GHA publishes to GH Releases + npm) | check on GH Releases + npm | `aw --version` + smoke command           |
+| @awebai/claude-channel | none (GHA publishes to npm) | check on npm                                | `npm install` smoke                      |
 
 ## Foot-guns and known failure modes
 
