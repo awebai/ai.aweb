@@ -513,21 +513,91 @@ If either condition is true, sequence is:
    exercises the new column or table).
 5. THEN post verified-live mail (step 10).
 
-**Concrete invocation: TBD pending Mia/Grace input via Athena.**
-Uses pgdbm migration tooling or the aweb-server's built-in
-migration runner against the cloud DB (the cloud has the
-embedded aweb schema). Mailed Athena to relay; this section
-updates with the exact command before the next release with
-migrations arrives.
+**Apply mechanism — partially understood (Grace + Athena, 2026-05-02):**
+
+OSS aweb-server applies bundled migrations automatically at
+startup via `AsyncMigrationManager.apply_pending_migrations()`,
+called from `DatabaseInfra.initialize(run_migrations=True)`
+(`server/src/aweb/db.py`). So in theory the deploy SHOULD
+auto-apply — the contradiction with Juan's "doesn't run
+automatically on Render" is AC/Render/Neon-side: either the
+deploy doesn't restart the aweb-server cleanly, OR initializes
+without `run_migrations=True`, OR ac wraps the server in a way
+that bypasses the auto-migration path. **Mia owns the AC-side
+answer; pending her reply.**
+
+Until that resolves: assume the migration is NOT auto-applied
+and run it manually post-deploy. Pessimistic default; turning
+out to be auto-applied means the manual run is a no-op
+(idempotent) — turning out NOT to be means we caught a real
+production-broken state.
+
+**Concrete invocation: TBD.** Pending Mia on the AC-side
+mechanism + prod auth (env file / secret manager source for
+`AWEB_DATABASE_URL` or `DATABASE_URL` against the prod
+aweb-cloud DB). Grace recommends adding a Makefile target
+(`aweb-prod-migrate` + `aweb-prod-pending`) that wraps
+`AsyncMigrationManager` so the operator command is a single
+make invocation rather than ad-hoc DB access. That target
+doesn't exist yet — filed as engineering follow-up against
+task #13 below.
+
+**Verify-applied query block (bankable now, regardless of how the
+apply mechanism resolves):**
+
+```sql
+-- Migration metadata
+SELECT filename, module_name, checksum, applied_at, applied_by, execution_time_ms
+FROM aweb.schema_migrations
+WHERE module_name = 'aweb-aweb'
+ORDER BY filename;
+-- Expect: 001_initial.sql, 002_conversations.sql, 003_conversations_constraints.sql
+-- (and any subsequent aame migration files as Grace's epic progresses)
+
+-- Object existence
+SELECT to_regclass('aweb.conversations'),
+       to_regclass('aweb.conversation_participants');
+
+-- Constraints from 003 specifically
+SELECT conname
+FROM pg_constraint
+WHERE connamespace = 'aweb'::regnamespace
+  AND conname IN ('conversations_created_by_did_not_blank',
+                  'conversation_participants_alias_not_blank',
+                  'conversation_participants_reachable');
+
+-- updated_at trigger from 003
+SELECT tgname
+FROM pg_trigger
+WHERE tgrelid = 'aweb.conversations'::regclass
+  AND tgname = 'trg_conversations_updated_at'
+  AND NOT tgisinternal;
+```
+
+These probe both sides: schema_migrations records the filename
+AND the actual schema objects exist. Catches partial-apply
+states where the row landed but the DDL didn't. Run after the
+migration step (whichever way it gets applied), before posting
+verified-live.
 
 **Pending migrations as of 2026-05-02:**
 
 - aame.1 added `aweb/server/src/aweb/migrations/aweb/002_conversations.sql`
-  on aweb main (commit 6b0f28e). Not yet released; will need running
-  when a future ac release bumps the aweb pin past this commit.
+  on aweb main (commit 6b0f28e). Not yet released; will need
+  attention when a future ac release bumps the aweb pin past
+  this commit.
 - aame consolidation commit (Grace landing soon) will add
   `003_conversations_constraints.sql`.
-- Each new migration file = one manual run.
+
+**Engineering follow-ups (not Hestia surface):**
+
+- task #13: auto-migration bug (the Render contradiction). Sofia +
+  Hestia on direction when bandwidth.
+- New: add `aweb-prod-migrate` + `aweb-prod-pending` Makefile
+  targets in aweb wrapping `AsyncMigrationManager`. Folds cleanly
+  into task #13 as a stop-gap if the auto-migration fix takes
+  longer (a single-command manual path is better than ad-hoc DB
+  access regardless).
 
 ### 10. Post verified-live mail
 
