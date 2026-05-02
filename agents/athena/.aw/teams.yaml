@@ -1,6 +1,10 @@
 active_team: aweb:juan.aweb.ai
 memberships:
+    - team_id: default:aweb.ai
+      alias: athena
+      cert_path: team-certs/default__aweb.ai.pem
+      joined_at: "2026-05-01T08:25:45Z"
     - team_id: aweb:juan.aweb.ai
-      alias: randy
+      alias: athena
       cert_path: team-certs/aweb__juan.aweb.ai.pem
-      joined_at: "2026-04-21T22:01:35Z"
+      joined_at: "2026-05-01T19:54:36Z"

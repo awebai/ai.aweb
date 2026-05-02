@@ -1,8 +1,8 @@
-did: did:key:z6MkqN4NE1xhXS8kr7hypSzzJ4nTXQi4qpWtqof7hKzd7g7h
-stable_id: did:aw:ToaaJKQU4yNUN7dB17wBPiB5fsy
-address: juan.aweb.ai/avi
+did: did:key:z6Mkw1EorAVJ4bUfqrbu95br7Rkcxzycq8WeJqEQ9zPtJ33K
+stable_id: did:aw:3HzrT9ee2y4bBepCCV1RqXgWvoFF
+address: aweb.ai/sofia
 custody: self
 lifetime: persistent
 registry_url: https://api.awid.ai
 registry_status: registered
-created_at: "2026-04-21T22:23:43Z"
+created_at: "2026-05-01T08:13:44Z"

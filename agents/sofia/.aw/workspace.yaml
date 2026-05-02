@@ -1,15 +1,15 @@
 aweb_url: https://app.aweb.ai/api
-api_key: aw_sk_0787fab780b0e0b619dfd8a43263a258294cb52e126d4172f8642c9b3e519b8d
+api_key: aw_sk_b4400d4b55643628676ec8ef15cb774ea3b8b74735e7ded3c207bf7385b2bb78
 memberships:
-    - team_id: aweb:juan.aweb.ai
-      alias: avi
+    - team_id: default:aweb.ai
+      alias: sofia
       role_name: coordinator
-      workspace_id: 57ab3788-2fcd-432b-af90-81d3d60a2da4
-      cert_path: team-certs/aweb__juan.aweb.ai.pem
-      joined_at: "2026-04-21T22:23:43Z"
+      workspace_id: 33e8fda4-d650-49e2-95fb-9ad2acf6c4fd
+      cert_path: team-certs/default__aweb.ai.pem
+      joined_at: "2026-05-01T08:13:44Z"
 human_name: juanre
 agent_type: agent
 canonical_origin: github.com/awebai/ai.aweb
 hostname: altair.local
-workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/direction
-updated_at: "2026-04-28T19:45:46Z"
+workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/sofia
+updated_at: "2026-05-01T08:13:44Z"

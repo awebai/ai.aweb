@@ -1,1 +1,8 @@
 agents/*/.aw/signing.key
+.env
+.env.*
+**/.env
+**/.env.*
+.emacs-bu/
+*.emacs-bu*
+
