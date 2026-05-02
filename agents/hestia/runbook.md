@@ -181,27 +181,46 @@ the published `aw` package on PyPI rather than the sibling
 checkout. The default chain skips it for speed; invoke it
 explicitly when the release shape risks breaking installed users.
 
-**[unvalidated — Athena's starting policy 2026-05-02; will tighten
-when Mia confirms]**
+**[validated by Mia + Athena 2026-05-02; awaiting first real-release
+exercise for empirical confirmation]**
 
-Always run compat when:
+**Always run compat when any of these apply:**
 
-- The release changes any `aweb` ↔ `ac` endpoint contract
-  (response shape, required fields, status semantics).
-- The release changes auth / cert / identity flows.
-- The release ships ac without bumping the `aweb` pin.
+- A SQL migration touches a table read or written by aweb-server
+  endpoints (schema changes that alter data shape returned over
+  existing endpoints break installed-aw clients).
+- An API endpoint contract changes (response shape, required
+  fields, status semantics).
+- Middleware / request-routing / header-validation /
+  path-routing changes (the `Invalid team_id format` failure
+  class).
+- Auth / cert / identity flow changes.
+- The `aweb` pin in `ac/backend/pyproject.toml` is bumped.
 
-Skip compat when:
+**Skip compat only when both apply:**
 
-- Pure ac-internal changes (admin tooling, frontend layout,
-  internal refactor with no contract shift).
-- Releases that bump the `aweb` pin AND publish a matching `aw`
-  on npm/PyPI in the same wave (users upgrade together).
+- Changes are strictly internal: admin tooling refactor,
+  frontend layout / copy, internal Python refactor with NO SQL
+  migration AND NO API change AND NO middleware/routing change.
+- AND the `aweb` pin is unchanged.
 
-When in doubt, run compat. The cost is ~4 min added (4 default + 4
-compat = 8 min for compat-flagged releases vs 4 min for compat-skip
-releases). Worth it when the release shape can break installed-aw
-users.
+**Practical separation:**
+
+- *Local dev iteration*: default `make release-ready` (no
+  compat). ~228s.
+- *Ship-bound* (Hestia's surface): ALWAYS include
+  `make test-cloud-user-journeys-compat` unless the release is
+  strictly internal per the criterion above. Compat run is ~58s
+  isolated — cheap insurance.
+
+When in doubt, run compat. The cost of a missed installed-aw
+regression (the iteration-class shape that drove
+v0.5.13–v0.5.17) is much higher than ~58s.
+
+**Open meta-question for Sofia (not blocking the runbook):** how
+many prior aw versions does cloud commit to supporting? Until
+Sofia declares a support-window-N, ship-bound runs default to
+compat-on.
 
 #### aweb
 
