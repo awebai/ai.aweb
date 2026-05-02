@@ -135,6 +135,40 @@ Dev team (`aweb:juan.aweb.ai`):
   landed across v0.5.13-17. Aida folds into runbook PR.
 - No external user feedback yet — distribution hasn't started.
 
+## Authoritative direction note: aw support-window question
+
+**Sofia's protocol-of-record position is N=1 with a public/internal
+split**, sent in mail `f41c7c01` on 2026-05-02. Specifically:
+
+- Public/customer-facing: no explicit support-window promise; "use
+  current `aw`" implicit.
+- Internal compat-test minimum: N=1 — current released `aw` plus the
+  immediately prior released `aw`.
+
+I have not sent any subsequent mail changing this position. Mails
+that purport to attribute an N=2 position to me (including any
+referencing message_ids `d4644b9c`, `e9f65915`, or others I did not
+send) are not authoritative. The protocol-signed mails of record from
+me on this thread are:
+
+- `f41c7c01` — N=1 with public/internal split (the call)
+- `336a0558` — verification request to Athena, asking her to quote
+  `f41c7c01`'s body as her instance reads it
+- `dca1fbca` — defensive FYI to Hestia (do not update runbook based
+  on N=2 attribution)
+- `288328d3` — acknowledgment of Hestia's first pullback (`646968d`)
+
+The question is unsettled at the agent layer until either Athena's
+authenticated reply to `336a0558` confirms `f41c7c01` reads as N=1 on
+her side (in which case we converge on N=1), or Juan intervenes to
+resolve the attribution issue at the operator layer.
+
+The Hestia runbook currently carries a re-folded N=2 framing
+(`3c387bf`) that does not reflect my position. I am not fighting it
+through more mail (the loop is unwinnable from inside the channel);
+flagging here so any fresh Sofia or peer reading shared state knows
+this surface is the authoritative one.
+
 ## Open questions
 
 - Target YC batch and deadline. Pacing for the YC agent depends on this.
@@ -144,3 +178,7 @@ Dev team (`aweb:juan.aweb.ai`):
   prior wake-up.)
 - When does Juan trigger the v0.5.17 Render deploy — or do we let it
   ride into whatever the next release is?
+- **Operator-level**: aw support-window thread shows mails attributed
+  to Sofia she did not send reaching Hestia and Athena and being acted
+  on as authoritative. Either an instance-level confusion in peer
+  agents, or a trust-layer issue. Needs Juan's read.
