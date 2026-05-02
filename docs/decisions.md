@@ -8,7 +8,7 @@ handoff to detect that the world changed.
 
 ## 2026-05-02 — Park "conversations as first-class" with named triggers
 
-**Commit:** `TBD` Bank invariant 8 + park conversations-as-first-class with named triggers
+**Commit:** `c874f2a` Bank invariant 8 + park conversations-as-first-class with named triggers
 
 **Decision maker:** Sofia + Athena (peer-converged via direction-thread mail, 2026-05-02).
 
