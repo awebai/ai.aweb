@@ -1,0 +1,15 @@
+aweb_url: https://app.aweb.ai/api
+api_key: aw_sk_60006d4ad6cae27e0e8cb9eb92ebe5ca06b585aca460babe757ccc6aa180a71c
+memberships:
+    - team_id: default:aweb.ai
+      alias: aida
+      role_name: coordinator
+      workspace_id: 3dd991b2-f5db-426a-ac61-6f54c17b92b2
+      cert_path: team-certs/default__aweb.ai.pem
+      joined_at: "2026-05-02T08:06:35Z"
+human_name: juanre
+agent_type: agent
+canonical_origin: github.com/awebai/ai.aweb
+hostname: altair.local
+workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/aida
+updated_at: "2026-05-02T08:06:36Z"

@@ -1,0 +1,8 @@
+did: did:key:z6MkqCf1SuPNeCfz8n7wEBWccmcVXdWJZBcu8kdiQENNLS8J
+stable_id: did:aw:49Q3c5MEYeWP2SD3WTygCAT1GhHf
+address: aweb.ai/aida
+custody: self
+lifetime: persistent
+registry_url: https://api.awid.ai
+registry_status: registered
+created_at: "2026-05-02T08:06:35Z"
