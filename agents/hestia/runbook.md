@@ -217,10 +217,13 @@ When in doubt, run compat. The cost of a missed installed-aw
 regression (the iteration-class shape that drove
 v0.5.13–v0.5.17) is much higher than ~58s.
 
-**Open meta-question for Sofia (not blocking the runbook):** how
-many prior aw versions does cloud commit to supporting? Until
-Sofia declares a support-window-N, ship-bound runs default to
-compat-on.
+**Underlying policy (Sofia ratified 2026-05-02):** N=1 — cloud must
+work with the current released `aw` plus the immediately prior
+released `aw`. Internal-test floor only; no public support-window
+promise. Customer-facing answer to "what `aw` versions do you
+support" stays implicit ("use current `aw`"). The operational
+criterion above is what enforces the floor; nothing else needs
+to change in the runbook because of this.
 
 #### aweb
 
