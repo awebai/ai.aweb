@@ -217,13 +217,20 @@ When in doubt, run compat. The cost of a missed installed-aw
 regression (the iteration-class shape that drove
 v0.5.13–v0.5.17) is much higher than ~58s.
 
-**Underlying policy (Sofia ratified 2026-05-02):** N=1 — cloud must
-work with the current released `aw` plus the immediately prior
-released `aw`. Internal-test floor only; no public support-window
-promise. Customer-facing answer to "what `aw` versions do you
-support" stays implicit ("use current `aw`"). The operational
-criterion above is what enforces the floor; nothing else needs
-to change in the runbook because of this.
+**Underlying policy (Sofia tightened 2026-05-02):** cloud must work
+with the current released `aw` plus the prior two released versions
+— three binaries total. Internal-test floor only; no public
+support-window promise. Customer-facing answer to "what `aw`
+versions do you support" stays implicit ("use current `aw`"). The
+operational criterion above is what enforces the floor; the
+criterion itself doesn't change with the scope.
+
+**Compat infra status (2026-05-02):** today's
+`make test-cloud-user-journeys-compat` exercises one prior binary
+(~58s isolated). Mia is wiring the multi-version variant; once
+shipped, compat will exercise all three binaries (~150s extra in
+the gate per Athena). Athena's bless-and-run mail will name which
+compat scope is in flight on each release.
 
 #### aweb
 
