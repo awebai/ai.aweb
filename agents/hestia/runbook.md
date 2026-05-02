@@ -11,12 +11,15 @@ release decisions in `../../docs/decisions.md`, the Makefile survey
 on this same day, and the standing release-discipline policies
 (banked through 2026-04-26).
 
-**Not yet validated by Hestia running the chain solo.** The first
-end-to-end exercise (under live identity, without engineer
-walk-through) is pending. Sections marked **[unvalidated]** mean the
-shape comes from prior decisions but the runbook has not yet seen me
-execute them. After the first exercise, those markers come off and
-real failure-mode notes get added.
+**First end-to-end exercise complete 2026-05-02** (ac v0.5.18 +
+aw CLI 1.18.8, claim-human cli_signup orphan vector + BYOD username
+contract). The chain ran solo end-to-end including a gate-failure
+detour and recovery. Sections marked **[unvalidated]** below have
+been removed where the exercise validated them; remaining
+unvalidated markers are for shapes that the v0.5.18 release didn't
+exercise (e.g., aweb-only releases, awid registry releases). Real
+timing and failure-mode notes from the first exercise are folded
+in below.
 
 When validation discovers a gap, the runbook updates. When Athena
 adds a new gate, the runbook updates. When a banked memory adds an
@@ -91,12 +94,30 @@ self-spawn a release on a bump commit I find sitting on main —
 that would skip the build/ship boundary and decouple the gate from
 engineering's signal.
 
-**[unvalidated]** Today's pattern (genesis-day v0.5.13–v0.5.16) had
-Mia in the dev team tagging directly without an Athena handoff.
-The shape of "what does an Athena release-handoff mail look like"
-is therefore prior-knowledge from the v0.5.4 / v0.5.5 / v0.5.6
-era; the new shape under the dev-team / Athena-bridges arrangement
-will surface on the first real handoff and this section updates.
+**Bless-and-run mail shape (validated v0.5.18, 2026-05-02):**
+
+Athena's release-handoff mail under the new role model includes:
+
+- Subject `Bless-and-run: <one-line change summary> (<repos involved>)`.
+- Repos and commits: each repo + commit SHA, with one-line
+  description per commit. "Already on main" if pushed; flag
+  otherwise.
+- Cross-repo dependency check: which artifacts move together,
+  which can ship independently, which decisions she leaves to
+  Hestia.
+- Compat-test invocation guidance: which compat scope applies to
+  this release per the operational rule.
+- Release notes draft: closes / does NOT close / code evidence
+  (key commits + tests added) / affects / live verification
+  (smoke probe + browser-verify if UI surface).
+- Failure-mode pre-warning: any expected gate output that should
+  be treated as "intentional break observed correctly" rather
+  than regression.
+- Bless-and-run signal: explicit "you own the release from here."
+
+Hestia confirms gate-run readiness, runs the chain. Mails back
+the failure shape if anything goes red; mails back verified-live
+when the release is on `/health`.
 
 ## The chain (step-by-step)
 
@@ -173,6 +194,15 @@ Composes (per `ac/Makefile`, post-commit `24cb7c68`):
 
 All must be green. Per banked policy 4, trust the Makefile's chain;
 do not chase adjacent targets that aren't in `release-ready`.
+
+**First-exercise timing (v0.5.18, 2026-05-02):**
+- `make release-ready` end-to-end: 198s (3m18s)
+- `make test-cloud-user-journeys-compat` (one prior binary): 57s
+- Total ac gate run: ~4m15s
+
+Faster than Mia's pre-runbook 244s baseline, possibly cache effects
+from a back-to-back run earlier the same evening. Single-run baseline
+expected ~225-250s.
 
 ##### When to also run `make test-cloud-user-journeys-compat`
 
@@ -282,8 +312,19 @@ Per-component check / tag / push targets:
 shape) but are NOT the default. Most releases move only the
 artifacts that need moving.
 
-**[unvalidated]** First aweb release exercise validates timing
-and per-component sequencing under the new role model.
+**First-exercise observation (aw CLI 1.18.8, 2026-05-02):**
+- `make ship` end-to-end (test + 3 release-*-checks + test-e2e
+  Phases 0-22): **7m6s**. Much faster than the pre-flight estimate
+  of 30-45 min.
+- aw CLI version coupling: the Makefile's `CLI_VERSION := SERVER_VERSION`
+  is a stale assumption when CLI moves but server doesn't. For aw-only
+  releases, tag directly with `git tag -a aw-vX.Y.Z <commit> -m "…"`
+  bypassing `make release-cli-tag`. The tag is the source of truth
+  for goreleaser; no in-tree version bump needed.
+- aweb-side downstream chain: tag-push triggers `aw Sync and Release`
+  workflow on awebai/aweb → syncs to awebai/aw repo → triggers
+  `aw Release` on awebai/aw → goreleaser publishes GH Releases +
+  npm. End-to-end aw-on-npm: ~3 min from tag push.
 
 ### 5. SOT analysis (when needed)
 
@@ -493,6 +534,34 @@ See step 7 above. Banked from aweb 1.18.0 ghost-tag.
 
 See step 9c. Banked symptom: HTTP 401 timestamp errors on signed
 requests after laptop sleep. Restart the stack.
+
+### Gate failure in compat — diagnose by arm-pattern, not just exit code
+
+**[banked from v0.5.18 first-exercise gate failure 2026-05-02]**
+
+When `make test-cloud-user-journeys-compat` fails, look at WHICH arm
+fails:
+
+- **Only the installed-aw arm fails** (local-aw passes): real
+  installed-aw regression OR an intentional break per the release
+  shape. Check Athena's bless-and-run mail for whether the break
+  was named.
+- **Only the local-aw arm fails** (installed-aw passes): the new
+  CLI commit broke a contract the prior CLI honored. Real
+  CLI-side regression — failure shape goes to Athena.
+- **BOTH arms fail identically**: the failure is in the e2e shell
+  script (`scripts/e2e-cloud-user-journey.sh`) — both arms run the
+  same script, just with different `$AW_INSTALLED_BINARY`. The
+  script's expectations don't match the new server contract. Fix
+  is in the script, not in the CLI. Failure shape still goes to
+  Athena (script lives in ac, engineering surface).
+
+The v0.5.18 case: A.18 claim-human assertion failed both arms with
+empty status/email because the script didn't pass `--username`,
+which the new contract required. `run_aw_json` redirected stderr
+to stdout, so the CLI's usageError got captured into the JSON
+parse and `jq_field` returned empty. Fixed by Athena in 1be46c42
+adding `--username "$ORG_SLUG"` to the A.18 invocation.
 
 ### Migration file editing
 
