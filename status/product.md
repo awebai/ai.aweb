@@ -1,104 +1,89 @@
 # Product Status
 
-Last updated: 2026-05-01 evening (Sofia, after dev team came online)
+Last updated: 2026-05-02 morning (Sofia, Day-2 of team-genesis)
 
 ## Current focus
 
-Today is **team-genesis day.** Sofia, Athena, and the YC agent came
-online in the company team (`default:aweb.ai`); Athena is now also
-in the dev team (`aweb:juan.aweb.ai`) and that team has activated —
-Mia is the first dev online. Athena confirmed cross-team chat works
-bidirectionally.
+Day-2 of team-genesis. Yesterday brought Sofia + Athena + YC agent online,
+plus the dev team activating with Mia, plus Hestia coming up late. Today
+the loop is tightening:
 
-The dispatch shape has resolved: the "ephemeral pairs" sketch in
-commit `4491df5` was speculative; the real arrangement is a
-permanent dev team in its own cryptographic namespace, with Athena
-spanning both teams (architecture/invariants/review on the company
-side; brief and review of dev work on the dev side). Mia / Noah /
-Grace / Kate are the dev pool. Athena reviews; devs author and
-ship.
+- **Aida is online** as of last night (commits `571ad94 Created aida` and
+  `ab4f915 Added keys`). Workspace status shows her active. Her own
+  status/handoff are still dated 2026-04-30 (pre-rename); she'll refresh
+  on her own wake-up.
+- **Hestia hardened the runbook overnight via the right loop.** Five
+  commits banking real operational discoveries: Render auto-deploy was a
+  wrong assumption (Juan deploys manually); awid registry is also
+  manual-deploy; verify-live table now split by deploy shape; artifact
+  map + dependency rule added; ac gate-default narrowing + compat-
+  invocation policy folded in. This is exactly the kind of
+  prior-knowledge encoding the runbook needs before validation.
+- **Athena landed test-infra work in ac**: parallelize pytest, reuse
+  migrated DB across runs, reuse release image across docker e2e, make
+  installed-CLI journey optional, plus a Shipping-section update for
+  the new role boundaries. Direct response to the iteration-cost flag
+  Hestia raised. Counts as Athena's non-feature authoring (the
+  pattern from `4491df5`).
+- **Playwright reproducer for Add-Existing dialog** — Athena committed
+  to authoring it "tomorrow morning fresh-headed" yesterday. Not yet
+  visible in ac main. Today is that morning; expect it during her wake-up.
 
-The product moved a lot today. Cloud rolled v0.5.12 → v0.5.13 →
-v0.5.14 → v0.5.15 → v0.5.16 → v0.5.17, all chasing the hosted "Add
-Existing Identity" flow. v0.5.13–v0.5.16 were tagged by Mia
-(Hestia wasn't online); v0.5.17 (commit `9c1038ad`) tagged by Juan,
-Render rolling forward as of late evening. **`/health` last
-verified at v0.5.16; v0.5.17 verification expected when Render
-lands.** aweb OSS unchanged at 1.18.6. Standalone awid registry
-unchanged at 0.5.2.
+**v0.5.17 deploy state.** Tagged by Juan last night (commit `9c1038ad`),
+GHA built, but `app.aweb.ai/health` still reports `v0.5.16` this morning
+(uptime ~12h). This is consistent with the runbook correction Hestia
+banked: Render is manual; Juan presses the deploy button. Per Juan's
+call last night, v0.5.17 ships without Hestia's retroactive gate-run,
+no verified-live mail. Not a discrepancy — a state observation.
 
-**Hestia is now online and the routing changes from here.**
-Athena's decision (mailed to Hestia, FYI'd to Sofia): dev team
-stops tagging from this point. Going forward, dev signals "branch
-ready" → Athena drafts release notes + runs code-reviewer subagent
-→ Athena mails Hestia bless-and-run → Hestia runs gates + tags +
-deploys + verifies. This aligns with `docs/team.md`. v0.5.13–17
-were the temporary single-engineer pattern that closes now.
-
-For v0.5.17 specifically: tag is already on origin, so Hestia runs
-`make release-ready` retroactively tonight as a runbook-seed
-exercise (no gate to enforce, but real chain experience and any
-failure shapes get banked). Verified-live mail when Render lands.
-No Sofia framing review — bug-fix sweep across the Add-Existing
-flow, no external-claim weight.
-
-**The structural fix to the iteration cost is in flight.** Athena
-committed to authoring a Playwright-MCP reproducer for the
-Add-Existing dialog tonight or tomorrow morning, wired into
-`make test-cloud-user-journeys`. Five releases on one surface
-through production was an infrastructure gap (no local
-reproducer), not a discipline gap (policy 12 was correct as
-written; it had nothing to bind to). Athena owns this as
-non-feature code; landing it closes the iteration-cost class for
-UI surfaces, not just this feature.
-
-YC agent (`aweb.ai/yc`, `co.aweb/agents/yc/`) is the third agent
-online. Special-purpose, not a permanent surface. Caught a pricing
-inconsistency on first wake-up (fixed; commit `2fbf16f`), then
-rewrote `positioning.md` and its own `AGENTS.md` into substantially
-sharper, fact-checked artifacts.
+**Build/ship boundary becomes real on the NEXT ac release.** That's
+likely Mia's aalr.2 (AWID ensure-team + ac persist refactor) when it
+reaches branch-ready, or whichever feature lands first. Athena drafts
+release notes + runs code-reviewer subagent + bless-and-runs Hestia;
+Hestia runs `make release-ready` end-to-end + tags + watches CI/CD +
+verifies live + posts evidence.
 
 ## Today's priorities
 
-1. **Deploy the permanent team to Hetzner.** Hestia/Aida/Iris/Metis
-   come online via this work. Juan's hands today since Hestia is
-   being deployed by it.
-2. **Start blog posts + outreach.** The "5 agents" draft has been
-   sitting since 2026-04-09; first action is moving it through the
-   founder voice pass and getting it published.
-3. **YC application** — agent is staged and the positioning is
-   sharp; founder material and batch deadline are the next-step
-   inputs from Juan.
+1. **Aida sweeps the runbook for v0.5.10-17 customer-visible deltas.**
+   Original scope was v0.5.10 (1.9 NOT-boundary, login-failure section,
+   409 conflict messaging). Now expanded: the Add-Existing-Identity
+   dialog UX landed across v0.5.13-17 and is new customer-facing
+   surface. Aida should fold those deltas. Athena reviews tech-accuracy;
+   I review framing.
+2. **Athena lands the Playwright-MCP reproducer for Add-Existing.**
+   Reproducer-as-gate (banked policy 12) applied to the UI surface that
+   generated five iterations. Closes the iteration-cost class for UI
+   changes, not just this feature.
+3. **Mia's aalr.2 reaches branch-ready.** First real exercise of the
+   build/ship boundary under the new model. Athena reviews; bless-and-
+   runs Hestia.
 
 This week, beyond today:
 
-1. **Get Hestia exercising the gate chain on the next ac release.**
-   Today's 4-release sprint shows shipping velocity is real;
-   inserting Hestia for the next one starts the runbook emerging
-   from notes during the joint exercise.
-2. **Land Aida's runbook PR** when she comes online. Original scope
-   was v0.5.10 deltas (1.9 NOT-boundary, login-failure section, 409
-   conflict messaging); now expanded — Aida should sweep across
-   v0.5.10 through v0.5.16 for any customer-visible changes,
-   especially around the new "Add Existing Identity" flow Mia just
-   landed.
-3. **KI#1 closure decision record.** Athena drafting technical
-   content; Sofia frames once she sends it.
+1. **First distribution action.** The "5 agents" blog post draft has
+   sat since 2026-04-09 awaiting Juan's voice pass. Iris not yet
+   online; until she is, this is an open priority that hasn't moved.
+2. **KI#1 closure decision record.** Athena drafts technical content
+   (cert-presentation auth correction + aalk continuity arc + 1.18.6
+   trust-model arc + Aida 4/4 attestation); I frame.
+3. **Bring Iris and Metis online.** Directories exist; identity setup
+   pending Juan-interactive Hetzner work.
 
 ## Product readiness
 
 - **OSS aweb**: stable. Latest tags `server-v1.18.6`, `aw-v1.18.6`,
   `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27). No commits on
   main since.
-- **aweb-cloud**: live at v0.5.16. `https://app.aweb.ai/health`
-  reports `release_tag=v0.5.16`, `aweb_version=1.18.6`,
-  `git_sha=842e0b5b`, `awid_service_version=0.5.3`. db / redis /
-  awid / coordination_api healthy. Started 2026-05-01 20:45 UTC.
-  Four releases shipped today by Mia (v0.5.13–v0.5.16), all
-  chasing the hosted Add-Existing-Identity flow.
-- **awid registry (standalone)**: live at `version=0.5.2`,
-  redis/db/schema healthy. Unchanged. (The awid library inside
-  cloud bumped independently to 0.5.3.)
+- **aweb-cloud**: live at v0.5.16. `https://app.aweb.ai/health` reports
+  `release_tag=v0.5.16`, `aweb_version=1.18.6`, `git_sha=842e0b5b`,
+  `awid_service_version=0.5.3`. db / redis / awid / coordination_api
+  healthy. Started 2026-05-01 20:45 UTC (~12h uptime). v0.5.17 tagged
+  on origin (`9c1038ad`) but Render deploy is manual; Juan hasn't
+  triggered it.
+- **awid registry (standalone)**: live at `version=0.5.2`, redis/db/
+  schema healthy. Unchanged. (awid library inside cloud at 0.5.3,
+  bumped during yesterday's release cluster.)
 - **@awebai/claude-channel**: 1.3.3 published.
 - **Landing site (aweb.ai)**: live. Blog section TBD; first
   personal/problem post planned for juanreyero.com.
@@ -106,32 +91,32 @@ This week, beyond today:
   `ac/backend/src/aweb_cloud/models/billing.py` (commit `2fbf16f`,
   caught by YC agent on first wake-up).
 
-## Team state (genesis day)
+## Team state
 
 Company team (`default:aweb.ai`):
 
 - **Sofia (me)**: online. Direction surface.
-- **Athena**: online. Engineering surface; reviews code, holds
-  invariants, drafts release notes for the company side. Spans
-  into the dev team.
-- **YC agent (`aweb.ai/yc`)**: online. Special-purpose for the YC
-  application. First-day output already strong.
-- **Hestia**: online (created late today). First substantive
-  exchange with Sofia on the iteration-cost pattern; pushed back
-  cleanly on extending policy 12 (correct — fix is the missing
-  infrastructure, not a policy variant). Probing v0.5.17
-  retroactively as runbook-seed; will time the publishing path
-  next wake-up.
-- **Aida, Iris, Metis**: pending Hetzner deploy.
+- **Athena**: online. Engineering surface; bridged into dev team.
+  Test-infra work last night addresses iteration-cost; Playwright
+  reproducer pending today.
+- **Hestia**: online. Runbook hardening overnight produced real banked
+  discoveries (Render manual, awid manual, verify-live by deploy
+  shape). Idle for next bless-and-run from Athena.
+- **Aida**: online (came up last night). Status/handoff still
+  pre-rename; will refresh on her wake-up. Runbook PR scope
+  expansion is on her plate.
+- **YC agent (`aweb.ai/yc`)**: offline (seen 19h ago in co.aweb).
+  Special-purpose for the YC application.
+- **Iris, Metis**: directories exist; identity setup pending Juan-
+  interactive Hetzner work.
 
 Dev team (`aweb:juan.aweb.ai`):
 
 - **Athena**: cross-team membership.
-- **Mia**: active. Shipped today's v0.5.13–v0.5.16 cluster. Gave
-  Athena a clean handoff on `aweb-aalr.2`; persist-refactor starts
-  tomorrow morning.
-- **Noah, Grace, Kate**: in the team; activity not yet visible
-  from my surface. Athena will know.
+- **Mia**: shipped v0.5.13-17 cluster yesterday; aalr.2 starts today
+  per Athena's status.
+- **Noah, Grace, Kate**: in the team; activity not yet visible from
+  my surface.
 
 ## Outreach state
 
@@ -144,21 +129,18 @@ Dev team (`aweb:juan.aweb.ai`):
 ## Support / user feedback
 
 - KI#1 closed empirically (4/4 attestation + second-shape probe on
-  2026-04-27). No regression observed across today's releases.
-- The hosted Add-Existing-Identity flow is new customer-facing
-  surface that landed today across v0.5.13–v0.5.16. Aida should
-  scope a runbook section for it once she's online.
+  2026-04-27). No regression observed across yesterday's release
+  cluster.
+- Add-Existing-Identity dialog UX is new customer-facing surface
+  landed across v0.5.13-17. Aida folds into runbook PR.
 - No external user feedback yet — distribution hasn't started.
 
 ## Open questions
 
-- Target YC batch and deadline. Pacing for the YC agent depends
-  on this.
-- First concrete distribution action this week — Iris needs a
-  target once she's online.
-- Collision video before or after the first blog post? (Open
-  from prior wake-up.)
-- Once Hestia is online, does the gate chain start with the next
-  release, or does Mia's prior shipping pattern continue while
-  Hestia builds the runbook? Athena + Hestia decide; Sofia frames
-  external claims.
+- Target YC batch and deadline. Pacing for the YC agent depends on this.
+- First concrete distribution action this week — Iris needs a target
+  once she's online.
+- Collision video before or after the first blog post? (Open from
+  prior wake-up.)
+- When does Juan trigger the v0.5.17 Render deploy — or do we let it
+  ride into whatever the next release is?
