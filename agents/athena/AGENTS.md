@@ -117,6 +117,21 @@ match what the tool exercises is wrong. Read the Makefile target,
 the test file's actual assertions, the endpoint's actual handler
 — before letting the framing balloon over multiple mails.
 
+**Deployed migrations are immutable; recovery is always a new
+forward migration.** Once a migration file has been applied
+anywhere (staging, prod, or even just landed on a branch ahead of
+you), pgdbm records its checksum and refuses to apply it again
+under a different content. Editing a deployed migration trips the
+checksum guard and forces a destructive cutover; the recovery
+path on the cutover end is even more painful. If a deployed
+migration's CHECK constraint or schema shape needs adjustment,
+the only correct path is a new ordered migration file (e.g., 003
+adjusts what 002 set up; 004 adjusts what 003 set up). NEVER
+edit an existing migration file once it's left local-only state.
+This includes situations where a migration FAILED at apply time:
+the recovery is a new migration that data-repairs first then
+tightens, not editing the failed one.
+
 ## On every wake-up
 
 1. `git pull`
