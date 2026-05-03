@@ -583,6 +583,34 @@ For ephemeral test databases (fresh schema per run): this check
 is a no-op; nothing to clean up. Only environments with durable
 data from the 002-era state need the pre-check.
 
+**[banked from Athena's mail 2026-05-03] NEVER edit a deployed
+migration.** Once a migration file (e.g., 003) has even attempted
+to apply, pgdbm records its checksum. Editing the file in place
+to fix a failure trips the checksum guard on every future
+deploy and forces a destructive dump-restore cutover (banked
+from awid 0.3.1 → 0.5.1 prod cutover; same shape, same pain).
+
+Recovery scenarios for any constraint-adding migration that
+fails or partially applies:
+
+- **Migration succeeds**: schema_migrations row records; done.
+- **Migration fails at apply time** (e.g., 003 ALTER TABLE finds
+  offending rows): file the next-numbered migration (004 for
+  this case) as a data-repair-then-tighten. Pattern:
+  1. UPDATE: data-repair offending rows (set sentinel value;
+     populate fallback fields; or DELETE orphaned rows if
+     appropriate per the data shape).
+  2. ALTER TABLE: re-attempt the constraint that the prior
+     migration couldn't apply.
+  Apply 004 via the same prod-migrate command.
+- **Migration partially applied** (DDL succeeded but row insert
+  failed mid-way): same rule, file the next-numbered migration
+  to complete the work. Don't edit the partially-applied file.
+
+This applies forward forever: every constraint addition that
+might fail on persistent data needs its successor data-repair
+migration. Never edit a deployed migration.
+
 **Verify-applied query block (run AFTER apply, regardless of
 mechanism):**
 
