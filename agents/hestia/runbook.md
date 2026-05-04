@@ -906,6 +906,23 @@ the routing fixes is published in Render.
    proven. Different diff = consolidation has drift; reject and ask
    Grace to fix.
 
+   Scripted scaffolding lives at
+   `agents/hestia/scripts/cutover_schema_equivalence.sh`. Athena
+   runs it as part of architectural review:
+
+   ```bash
+   ./agents/hestia/scripts/cutover_schema_equivalence.sh \
+       main feature/aweb-consolidation
+   ```
+
+   Script orchestrates: two AC git worktrees from each ref → `uv sync`
+   each → `createdb` two scratch DBs → `aweb-db --env=development setup`
+   against each → `pg_dump --schema-only` both → normalize (strip
+   pg_dump headers, version-sensitive SETs, schema_migrations data
+   blocks) → `diff -u`. Exits 0 with "IDENTICAL" on success, exits
+   1 leaving worktrees+DBs in `/tmp/cutover-schema-eq-<ts>/` for
+   inspection on diff.
+
 ### Local roundtrip gate (mandatory before prod cutover)
 
 `make verify-db-reset-roundtrip` against the new consolidation
@@ -1105,6 +1122,35 @@ for `/health` to come up:
 # Loop until /health shows the new release_tag and aweb_version 1.19.x:
 curl -sS https://app.aweb.ai/health | jq .build
 ```
+
+**Window-shape note (banked from Athena 2026-05-04)**: between
+the deploy completing (Phase 5) and the schema cutover completing
+(Phase 4 in pipeline order: dump → drop → migrate → restore is
+Phases 2-4, then the deploy in Phase 5 brings the new binary up
+against the post-aame schema).
+
+If the cutover is sequenced AFTER the deploy (deploy first → new
+binary running against old pre-aame schema → then cutover swaps
+schema underneath it), then in the window between deploy and
+cutover-complete:
+- /v1/conversations endpoint will 5xx (relation missing)
+- mail send with conversation_id will 5xx (column missing on messages)
+- chat continuation with verified_legacy gating will 5xx
+- SSE wake events including conversation_id will 5xx
+
+The other sequencing — cutover BEFORE deploy (drop schema while
+v0.5.18 is still live → v0.5.18 binary's queries against missing
+schema 5xx until deploy completes) — has the same problem with
+the old binary.
+
+Both shapes have a window where some queries 5xx. Window length
+depends on how fast you advance phases. Sprint phases 4→5 (or
+the symmetric pair) tightly so the window is measured in minutes,
+not hours. If the window concerns Juan operationally, a feature
+flag at deploy time that returns 503 with structured body for
+all aame paths until cutover completes is the bigger-mitigation
+option (NOT mandatory; just naming the shape so it's not a
+surprise during execution).
 
 **Phase 6 — Live verification**
 
