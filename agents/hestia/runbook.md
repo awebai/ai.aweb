@@ -1123,7 +1123,29 @@ for `/health` to come up:
 curl -sS https://app.aweb.ai/health | jq .build
 ```
 
-**Window-shape note (banked from Athena 2026-05-04)**: between
+**Phase-pacing SLO (banked from Athena 2026-05-04)**: the
+cutover-irreversible phases (Phase 2 drop → Phase 5 deploy live)
+are a window where some queries 5xx. Sprint these phases under
+explicit time targets — do NOT take coffee-break-shaped pauses
+between them. Suggested SLO targets (operator clock-checks,
+not hard-fail thresholds):
+
+| Phase transition | Target | Notes |
+|------|--------|-------|
+| Phase 1 (dump complete) → Phase 2 (drop start) | ≤ 2 min | quick file-size/head sanity |
+| Phase 2 (drop) → Phase 3 (migrate) | ≤ 30 sec | psql DROP returns immediately |
+| Phase 3 (migrate complete) → Phase 4 (restore start) | ≤ 2 min | run verify-applied SQL block + sanity |
+| Phase 4 (restore complete) → Phase 5 (deploy start) | ≤ 2 min | row-count verifier returns; signal Juan |
+| Phase 5 (deploy live on /health) → Phase 6 (smoke probes complete) | ≤ 3 min | new binary up; mail/chat probes |
+| **Phase 2 start → Phase 6 complete (TOTAL window)** | **≤ 10 min** | hard ceiling worth pre-coordinating |
+
+If any individual phase is going to overshoot, mail/chat Juan and
+Athena before continuing — better to escalate than to leave the
+window stretched. If the total window approaches 15 min, treat it
+as an incident and consider rollback to safety-net dump per the
+phase-specific rollback paths below.
+
+**Window-shape note (the why)**: between
 the deploy completing (Phase 5) and the schema cutover completing
 (Phase 4 in pipeline order: dump → drop → migrate → restore is
 Phases 2-4, then the deploy in Phase 5 brings the new binary up
