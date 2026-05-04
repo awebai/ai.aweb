@@ -60,6 +60,18 @@ NORMALIZED_AFTER="${SCRATCH_DIR}/schema-after.norm.sql"
 mkdir -p "${SCRATCH_DIR}"
 echo "Scratch: ${SCRATCH_DIR}"
 
+# aweb-db setup uses Pydantic Settings which refuses defaults for these
+# secrets; worktrees don't inherit ac/backend/.env from the host. Export
+# minimal scratch values so setup runs end-to-end. Mirrors the defaults
+# verify_db_reset_roundtrip.py uses (script note in script.py:122-148).
+export SECRET_KEY="${SECRET_KEY:-cutover-eq-secret-key-32-bytes-ok}"
+export SESSION_SECRET_KEY="${SESSION_SECRET_KEY:-cutover-eq-session-secret-32-bytes}"
+export JWT_SECRET_KEY="${JWT_SECRET_KEY:-cutover-eq-jwt-secret-32-bytes-ok}"
+export AWEB_INTERNAL_AUTH_SECRET="${AWEB_INTERNAL_AUTH_SECRET:-cutover-eq-internal-auth}"
+export AWEB_CUSTODY_KEY="${AWEB_CUSTODY_KEY:-$(printf 'aa%.0s' {1..32})}"
+export AWEB_PARENT_CONTROLLER_KEY="${AWEB_PARENT_CONTROLLER_KEY:-$(printf '11%.0s' {1..32})}"
+export AWID_REGISTRY_URL="${AWID_REGISTRY_URL:-https://awid.invalid}"
+
 cleanup_failure_artifacts_kept() {
     echo "FAILED. Leaving worktrees + DBs for inspection:"
     echo "  Worktrees: ${WORKTREE_BEFORE} ${WORKTREE_AFTER}"
@@ -116,11 +128,15 @@ pg_dump --schema-only --no-owner --no-privileges \
 echo
 echo "=== Phase 6: Normalize and diff ==="
 # Strip pg_dump's "-- Dumped by..." / "-- Dumped from..." headers and any
-# SET that varies between runs (search_path quoting, transaction_timeout
-# from PG17, etc). Keep DDL.
+# SET / metadata that varies between runs:
+# - SET (search_path quoting, transaction_timeout from PG17, etc).
+# - \restrict / \unrestrict <random-token> emitted by pg_dump 17+;
+#   tokens differ between every run and produce noisy diffs.
+# Keep DDL.
 normalize() {
     grep -vE '^-- Dumped (by|from) ' "$1" \
         | grep -vE '^SET (transaction_timeout|search_path|idle_in_transaction|lock_timeout|client_min_messages|row_security|standard_conforming_strings|client_encoding|check_function_bodies|xmloption|default_tablespace|default_table_access_method|statement_timeout) ' \
+        | grep -vE '^\\(restrict|unrestrict) ' \
         | grep -vE '^-- (Name: schema_migrations|Data for Name:)' \
         | sed -E 's/[[:space:]]+$//' \
         | awk 'NF || prev { print; prev = NF }'
