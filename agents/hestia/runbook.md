@@ -532,15 +532,31 @@ out to be auto-applied means the manual run is a no-op
 (idempotent) — turning out NOT to be means we caught a real
 production-broken state.
 
-**Concrete invocation: TBD.** Pending Mia on the AC-side
-mechanism + prod auth (env file / secret manager source for
-`AWEB_DATABASE_URL` or `DATABASE_URL` against the prod
-aweb-cloud DB). Grace recommends adding a Makefile target
-(`aweb-prod-migrate` + `aweb-prod-pending`) that wraps
-`AsyncMigrationManager` so the operator command is a single
-make invocation rather than ad-hoc DB access. That target
-doesn't exist yet — filed as engineering follow-up against
-task #13 below.
+**Concrete invocation (folded from Athena's bless-and-run mail
+968d03a3, 2026-05-02):**
+
+```sh
+cd ac && make prod-migrate-direct PROD_ENV_FILE=.env.production
+```
+
+The Makefile target wraps the multi-schema migration runner against
+the prod aweb-cloud DB. `.env.production` is the operational secret
+file holding `AWEB_DATABASE_URL` / `DATABASE_URL` for prod (Juan's
+machine; not in the repo). Mia/Grace confirmed this is the
+canonical path until task #13 (auto-migration on Render deploy)
+lands.
+
+Runs both ac and aweb schemas — applies any pending migrations
+in either schema. For an aame-shape ship, that's
+`aweb/server/src/aweb/migrations/aweb/002_conversations.sql` and
+`003_conversations_constraints.sql`. Idempotent — already-applied
+migrations are no-ops; applies only the pending ones.
+
+Grace recommended a more operator-friendly variant
+(`aweb-prod-migrate` + `aweb-prod-pending` with
+`AsyncMigrationManager.get_pending_migrations()` / dry-run
+support) but `make prod-migrate-direct` is the working command
+today.
 
 **Pre-flight check for 003 specifically (and any future
 constraint-adding migration):**
