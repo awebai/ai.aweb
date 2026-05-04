@@ -85,13 +85,15 @@ We are mid-cutover after the v0.5.19 deploy incident.
 - Stage a minimal dev `.env` into each worktree backend (Pydantic
   Settings refuses default secrets).
 
-## Cutover ship chain (after equivalence passes)
+## Cutover ship chain (in flight)
 
 Coordinated with Hestia (mail `3a6f8591`):
-- aweb 1.19.1 + aw 1.19.1 patch ship (the routing fix in
-  ef963ec) — Athena initiates.
-- AC v0.5.20 with new pin + consolidated 001 — Hestia tags
-  after my greenlight.
+- aweb 1.19.1 + aw 1.19.1 patch ship: **bless-and-run sent**
+  (mail `5614c2e7`). Release commit `6a180d3` on aweb main.
+  Code-reviewer subagent `a1d9964` cleared (no criticals).
+  Hestia tags + pushes per banked policy 7.
+- AC v0.5.20 with new pin + consolidated 001 from 49b1525c —
+  Hestia tags after PyPI/npm publish confirmed.
 - Render deploy (Hestia + Juan).
 - Cutover phases (Hestia):
   pre-flight → safety dump → cutover dump →
@@ -169,11 +171,15 @@ Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
 
 ## What to check FIRST on next wake-up
 
-1. `aw mail inbox` (both teams) — has Hestia confirmed she's
-   ready for me to ship aweb 1.19.1 + aw 1.19.1 patch?
-2. If Hestia says "go": cut aweb 1.19.1 + aw 1.19.1 (the
-   routing fix in ef963ec). Then she takes AC v0.5.20, deploy,
-   cutover.
-3. `app.aweb.ai/health` — confirm cutover landed cleanly when
+1. `aw mail inbox` (both teams) — Hestia's post-publish ack
+   on aweb-server-v1.19.1 + aw-v1.19.1.
+2. PyPI/npm published: `pip index versions aweb`,
+   `npm view @awebai/aw versions`.
+3. If both shipped: she'll move to AC v0.5.20 cut. No action
+   from me until she signals cutover-phase issue or
+   verified-live.
+4. If smoke-probe fails or she flags an issue: read her
+   failure-shape, work the fix together.
+5. `app.aweb.ai/health` — confirm cutover landed cleanly when
    Hestia signals verified-live.
-4. `aw work active` — check for any new claims.
+6. `aw work active` — check for any new claims.
