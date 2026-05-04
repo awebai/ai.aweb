@@ -1,16 +1,18 @@
 # Hestia Handoff
 
-Last updated: 2026-05-02 22:15 CEST (post first end-to-end exercise;
-ac v0.5.18 + aw CLI 1.18.8 verified-live)
+Last updated: 2026-05-04 12:30 CEST (post aame rollback + diagnosis;
+ff5f2ec + a93c69be queued, awaiting Athena review verdict)
 
 ## Read this first
 
 You are Hestia. You carry every release across the build/ship boundary
-and keep the company machinery healthy in between. Today (2026-05-02)
-was the first real end-to-end exercise of the runbook surface — a
-clean cycle from Athena's bless-and-run through verified-live, with
-a recoverable gate-failure detour in the middle. Real timing,
-real failure-mode, real cross-repo dance now live in the runbook.
+and keep the company machinery healthy in between. Today (2026-05-04)
+was a hard cycle: the aame OSS ship landed on PyPI/npm cleanly
+(aweb 1.19.0, aw 1.19.0, awid 0.5.4, channel 1.4.0), but the cloud
+uptake (ac v0.5.19) broke same-team mail/chat routing in production
+and Juan rolled back to v0.5.18. Diagnosis is complete; both fixes
+are on respective mains awaiting release coordination. Banked
+learnings folded into runbook.md.
 
 The team:
 
@@ -18,6 +20,7 @@ The team:
   default; mail before tag only for external-claim weight.
 - **Athena**: code in aweb and ac. Briefs you with bless-and-run
   mail after running code-reviewer subagent on gate-input commits.
+  Currently reviewing Grace's `ff5f2ec` architecturally.
 - **Mia / Noah / Grace / Kate**: dev team (`aweb:juan.aweb.ai`,
   separate cryptographic team). Author feature work, Athena reviews.
 - **Aida / Iris / Metis**: pending Hetzner deploy. Not yet online.
@@ -26,126 +29,166 @@ The team:
 
 - did: `did:key:z6MkebRpF7qEFNt5vAYa5BWjegFk1igt6mRESqWb5r3kp9AK`
 - stable: `did:aw:3fC4cfvFuVAxZCWyJNRCoUxHVAim`
-- address: `aweb.ai/hestia`
+- address: `aweb.ai/hestia` (registered with reachability=nobody;
+  see "Open follow-ups" — does not break cloud-mediated routing)
 - active team: `default:aweb.ai`
 - workspace_id: `8ae26888-ee11-4e1f-beff-aaab79b44b58`
 - registry: registered at `https://api.awid.ai`
 
-## What's live (verified 2026-05-02 21:50 UTC)
+## What's live (verified 2026-05-04 ~10:00 UTC)
 
-- ac: v0.5.18 at `app.aweb.ai`, git_sha `4ace97702077a43e7067f296848145c40204444a`,
-  aweb_version 1.18.6, awid_service_version 0.5.3.
-- aw CLI: 1.18.8 on npm `@awebai/aw` and GitHub Releases.
-- aweb server: 1.18.6 (unchanged this cycle).
-- awid registry: 0.5.2 at `api.awid.ai` (unchanged).
-- channel: 1.3.3 (unchanged).
+- ac: **rolled back to v0.5.18** at `app.aweb.ai`, git_sha
+  `4ace97702077a43e7067f296848145c40204444a`, aweb_version 1.18.6,
+  awid_service_version 0.5.3. Started 2026-05-04 09:49 UTC.
+- aw CLI: 1.19.0 published on npm (`@awebai/aw`) and GH Releases.
+  My local CLI sends mail/chat fine against rolled-back cloud.
+- aweb server: 1.19.0 on PyPI; **NOT** in the running cloud (rolled
+  back).
+- awid registry: 0.5.4 at `api.awid.ai`. Healthy.
+- channel: 1.4.0 on npm. Unchanged in cloud.
+- Mail/chat (verified 2026-05-04): both alias and DID-direct paths
+  work from my CLI; chat threads with Athena round-tripped clean.
 
-## What just shipped (cycle complete)
+## Today's cycle (2026-05-03 → 2026-05-04)
 
-ac v0.5.18 + aw CLI 1.18.8 closes:
+1. **aame OSS ship** (2026-05-03): tagged + published aweb 1.19.0,
+   aw 1.19.0, awid 0.5.4, channel 1.4.0. Make ship green. PyPI +
+   npm publish confirmed.
+2. **ac v0.5.19** bumped pin to aweb 1.19.0, ac gates ran with a
+   pre-existing test-DB-fixture limitation (gate-failure on
+   `column "conversation_id" does not exist` — ac test fixture
+   doesn't apply aweb migrations on ephemeral test DB). Juan
+   authorized gate override given the diagnosis.
+3. **Manual deploy**: Juan deployed v0.5.19 from GHCR to Render.
+4. **Migration apply** via `make prod-migrate-direct
+   PROD_ENV_FILE=.env.production` failed: 001 checksum mismatch
+   `3953210a…` vs prod `f0331940…`. 002 + 003 not applied.
+5. **Mail/chat broke in prod** post-deploy (with v0.5.19 + aweb
+   1.19.0): same-team-private routing 404'd on the new guard
+   Grace had added to `aweb/messaging/...` for unsigned-AWID-miss
+   protection.
+6. **Rollback**: Juan rolled cloud back to v0.5.18 manually at
+   09:49 UTC.
+7. **Awid investigation chase**: probed reachability/listing
+   endpoints; concluded the public-namespace 404 is cosmetic and
+   has been there since April. Cloud-mediated routing uses a
+   different path. NO awid reset required.
+8. **Grace's diagnosis** (relayed via Athena):
+   - **Issue 1** (checksum): the `3953210a…` was AC's embedded
+     `backend/src/aweb_cloud/migrations/aweb/001_initial.sql`,
+     edited in place by AC commit `133a7d94` (made
+     `tasks.parent_task_id` DEFERRABLE). Fix on AC main:
+     `a93c69be` restored 001 to `f0331940…`, kept 002 + 003,
+     filed `004_tasks_parent_task_deferrable.sql` as the
+     successor migration. Tests green.
+   - **Issue 2** (routing): the v0.5.19 guard rejected local
+     persistent address fallback when
+     `registry_client.resolve_address` returned None. The cloud's
+     unsigned AWID lookup misses private/team-scoped (nobody-
+     reachability) records → guard 404s. Fix on aweb main:
+     `ff5f2ec` allows same-team private routing if (a) authenticated
+     sender is in same local coordination team OR (b) signed
+     payload binds. Validation: 6 focused + 120 messaging + 33
+     MCP + 427 full pytest passed.
+9. **Probes from rolled-back state** (Hestia, 2026-05-04): mail
+   alias-path + DID-direct + chat all 200. Confirms v0.5.18 routing
+   is healthy and Grace's diagnosis is consistent.
 
-- claim-human cli_signup orphan vector at claim time (98cfc278);
-  validate-first / write-last router refactor + atomic
-  cli_signup-upgrade UPDATE.
-- BYOD-domain-as-username auto-inference removed from CLI (443151d);
-  CLI now requires explicit `--username` for BYOD users.
+## Queued (waiting on Grace's next ff5f2ec iteration → Athena re-review)
 
-Open follow-ups in **Athena's lane** (filed):
+**2026-05-04 ~12:30: Athena kicked `ff5f2ec` back to Grace.** Two
+security gaps in the implementation:
 
-- aamb (CLI signup AWID-existing-namespace check)
-- aamc (TOCTOU on cli_signup-upgrade email-conflict check)
-- aama (unowned-team orphan vector at init.py:2107-2127)
-- A.18a/A.18b e2e-script split (architectural-tests follow-up;
-  current A.18 mocks the contract via `--username "$ORG_SLUG"` —
-  splitting documents the managed-vs-BYOD distinction in the
-  e2e surface; may connect to bob's API-key-bootstrapped identity
-  address shape, possibly fold into aamb).
+- `_local_recipient_visible_to_auth` includes a DID-overlap branch
+  outside the spec — any sender whose did_aw or did_key matches the
+  recipient's passes the guard (self-send case + any
+  key-collision-by-mistake = bypass).
+- `_signed_payload_matches_address_binding` doesn't actually verify
+  the cryptographic signature; it only parses JSON and compares
+  fields. Anyone can craft a JSON blob claiming any address binding
+  and route to any private recipient.
 
-## First-exercise debrief (banked into runbook.md)
+Architectural framing of the fix is right; implementation legs are
+unsafe. Shipping as-is would replace a "regression rejecting
+legitimate same-team traffic" with a "regression accepting spoofed
+same-team-claimed traffic" — worse posture. Grace iterates: remove
+DID-overlap branch, add real signature verification, add
+cross-team / spoof / bad-signature rejection tests. Athena will
+mail when next iteration is reviewable.
 
-The cycle ran ~80 min from Athena's bless-and-run to verified-live,
-including a gate-failure-and-recovery loop:
+AC's `a93c69be` migration restoration is independent but releasing
+AC without the aweb routing fix is also unsafe (both needed to
+unblock the v0.5.19 regression cleanly).
 
-1. Bless-and-run mail at ~18:00Z (ac 98cfc278 + aweb 443151d,
-   pre-flight already done by Athena+Mia).
-2. Pre-flight: HEADs verified, ac pin semantics confirmed
-   (`aweb` package = server, server unchanged → no pin bump).
-3. aweb `make ship` in background (7m6s, GREEN).
-4. ac bump 0.5.17 → 0.5.18, `uv sync --refresh`, commit 4ace9770.
-5. ac `make release-ready` + compat: FAILED at A.18 phase — both
-   arms identically — diagnosed as test-script gap (script
-   didn't pass `--username`).
-6. Mailed Athena failure shape; she landed 1be46c42 with
-   `--username "$ORG_SLUG"`.
-7. ac re-run: GREEN (release-ready 198s, compat 57s).
-8. Tag `aw-v1.18.8` on aweb 443151d → push.
-9. Tag `v0.5.18` on ac 4ace9770 → push.
-10. GHA fired both: aweb sync → awebai/aw → goreleaser + npm
-    (~3 min); ac aweb-cloud CI/CD image build (~13 min) → GHCR.
-11. Juan deployed ac manually from GHCR.
-12. Verified live: /health version match + smoke probe
-    (`aw whoami` works; `aw claim-human` with bogus slug returns
-    "Requested username does not match this team" — confirms
-    new validation chain is enforced live).
-13. Verified-live mail to athena, sofia, juan with full evidence.
-14. Runbook updated with first-exercise observations.
+Once Athena greenlights the next iteration:
 
-Key learnings folded into runbook:
+1. aweb patch tag (1.19.x) + aw CLI patch tag
+   individually (banked policy 7) → PyPI + npm publish.
+3. ac release: bump `aweb` pin to the new patch + uv.lock
+   refresh + bundle Grace's `a93c69be` (migration restore + 004)
+   → `make ship` → tag → push → CI/CD → Juan deploys.
+4. Apply migrations to prod via `make prod-migrate-direct
+   PROD_ENV_FILE=.env.production`. Expect the
+   `f0331940…` 001 checksum to verify, AND 002 + 003 + 004 to apply
+   clean.
+5. Verify-applied SQL block per runbook §"Verify-applied query
+   block".
+6. Smoke probe (mail send + chat send) from new-binary CLI
+   against new-binary cloud — closes the loop.
+7. Verified-live mail to Athena/Sofia/Iris/Juan (this is the
+   verified-live mail owed for the aame epic; #16 task).
 
-- aweb `make ship` baseline 7m6s (anomaly threshold > 10 min).
-- aw CLI version-coupling foot-gun: Makefile `CLI_VERSION :=
-  SERVER_VERSION` is stale when CLI moves alone. Tag directly
-  with `git tag -a aw-vX.Y.Z <commit>`.
-- Compat-failure-by-arm-pattern diagnostic: BOTH arms failing
-  identically = e2e script gap (script gaps masquerade as CLI
-  bugs); only installed-aw = real regression / intentional
-  break; only local-aw = new-CLI regression.
-- Validated bless-and-run mail shape under the new role model.
-- Manual-deploy step for ac AND awid registry (Render does NOT
-  auto-deploy — Juan triggers each).
+## Banked into runbook today (2026-05-04)
 
-## Banked working agreements (held through 2026-05-02)
-
-**Sofia (mail thread 2026-05-01):**
-- Bug-fix / no-external-claim-weight releases tag through Hestia's
-  gate chain. Sofia OUT of routing.
-- Mail Sofia BEFORE tag only when external-claim weight applies.
-- Otherwise she reads `/health` on verified-live mail.
-
-**Athena (mail thread 2026-05-01 + 2026-05-02):**
-- Dev team stops at clean-main. Tags + gates + deploys + verify-
-  live in Hestia's lane.
-- Code-reviewer subagent runs BEFORE bless-and-run mail.
-- Bless-and-run mail names: target repo, expected SHA, change
-  shape, code-reviewer-pass result, cross-repo dependency
-  decisions, compat scope, expected failure-shapes (if any).
-- Failure during gate run → mail Athena failure shape; she lands
-  the fix; you re-run.
-
-## What to check FIRST on next wake-up
-
-1. `aw mail inbox` and `aw chat pending` — release-handoff or
-   peer signal.
-2. `curl https://app.aweb.ai/health` and `curl https://api.awid.ai/health`
-   — current live state vs operations.md.
-3. `aw work active` and `aw work blocked` — sweep stale claims.
-4. If a release-handoff mail arrived: run the runbook end-to-end
-   on the new candidate. Compat scope per Athena's mail.
-5. If Athena's A.18a/A.18b split landed: a future ac release
-   exercising it would update the compat-criterion observation
-   in the runbook (specifically: managed-aw should pass A.18a
-   without `--username`; that path doesn't exist today).
+- **NEVER edit a deployed migration — applies to AC's embedded
+  copy too.** AC bundles its own copies of aweb migrations under
+  `backend/src/aweb_cloud/migrations/aweb/`; pgdbm hashes those,
+  not the OSS wheel. When chasing a checksum mismatch, check
+  `git log` on the AC embedded file. Diff commands documented in
+  runbook.
+- **Asymmetric compat-test gap.** AC's
+  `make test-cloud-user-journeys-compat` covers (old-client +
+  new-server) only. (new-client + old-server) is uncovered. Hit
+  three times in 24h: BYOD-username script gap, mail
+  conversation_id payload mismatch, signed-vs-unsigned AWID
+  resolve. Manual workaround documented (smoke-probe new client
+  against rolled prod before pushing tags); real fix is
+  engineering — add the missed direction to compat matrix.
 
 ## Open follow-ups (Hestia's lane)
 
-1. **Publishing-path timing breakdown** for Sofia. Compose a
-   doc: GHA build, GHCR push, image-pull, deploy-rollout. Pull
-   from v0.5.18 specific timing once the GHA run has logged.
-2. **Test-suite triage** in ac/Makefile — which targets compose
-   to the ~20-min cost (deferred).
-3. **Stale repo-manager dirs** (`agents/coord-cloud/`,
-   `agents/repo-aweb/`). Untracked, low-priority. Tracked under
-   aweb-aals.5.
+1. **Verified-live mail for aame epic** — owed once `ff5f2ec`-based
+   re-ship lands and cloud uptake completes. Task #16.
+2. **Hold for Juan's go on Makefile edit** — remove
+   `awid-prod-drop` / `awid-prod-reset` from `aweb/Makefile`. Diff
+   drafted; Athena green; awaiting Juan. Task #19.
+3. **Asymmetric compat-test gap** — flagged to Athena; engineering
+   decides countermeasure. Manual smoke-probe workaround used in
+   meantime.
+4. **AWID reachability=nobody on hestia/sofia/athena** — cosmetic,
+   not blocking. Public-namespace listing 404s; cloud-mediated
+   routing fine. If external resolvers ever start needing public
+   visibility, file an UPDATE to flip those rows to
+   `team_members_only`. Not urgent.
+5. **Publishing-path timing breakdown** for Sofia (long-standing
+   from v0.5.18 cycle).
+6. **Test-suite triage** in ac/Makefile (deferred from v0.5.18
+   cycle).
+
+## What to check FIRST on next wake-up
+
+1. `aw mail inbox` and `aw chat pending` — Athena's verdict on
+   `ff5f2ec` review is the unblocker.
+2. `curl https://app.aweb.ai/health` and `curl https://api.awid.ai/health`
+   — confirm v0.5.18 still in place.
+3. `aw work active` and `aw work blocked` — sweep stale claims
+   (clean as of last check).
+4. If Athena's mail says `ff5f2ec` accepted: run aweb patch ship
+   chain per "Queued" steps 2–7 above.
+5. If Juan greenlights Makefile edit: apply diff (lines 4, 36–37,
+   108–114 of `aweb/Makefile`); decide also whether to strip
+   `drop-schema` / `reset` subcommands from
+   `awid/scripts/prod_db_reset.py`.
 
 ## Sibling repo symlinks under this dir
 
@@ -154,11 +197,13 @@ Key learnings folded into runbook:
 
 Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
 `aw` from sibling repos. Read sibling repos to run gates and
-verify what shipped; do NOT edit code there (Athena's surface).
+verify what shipped; do NOT edit code there (Athena's surface)
+without explicit Juan-instruction-or-Athena-coordination.
 
 ## Note on git author attribution
 
-Commits authored by dev-team members (Mia et al.) appear as
-"Juan Reyero" in `git log`. The actual agent identity is carried
-via the aweb cert. Cross-check author with Athena when attribution
-matters; she routes to the actual author.
+Commits authored by dev-team members (Mia / Grace et al.) appear
+as "Juan Reyero" in `git log`. The actual agent identity is
+carried via the aweb cert. Cross-check author with Athena when
+attribution matters; she routes to the actual author. Today's
+`a93c69be` (AC) and `ff5f2ec` (aweb) are Grace's work.

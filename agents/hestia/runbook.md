@@ -627,6 +627,71 @@ This applies forward forever: every constraint addition that
 might fail on persistent data needs its successor data-repair
 migration. Never edit a deployed migration.
 
+**[banked 2026-05-04] Same rule applies to AC's embedded
+migration copy.** AC bundles its own copy of the aweb migrations
+under `backend/src/aweb_cloud/migrations/aweb/` (001_initial.sql,
+002_conversations.sql, 003_conversations_constraints.sql, etc.).
+Prod's `aweb.schema_migrations` records checksums of THESE files,
+not of the OSS aweb-server wheel migrations. Today's prod failure
+(`column "conversation_id" does not exist` on v0.5.19, then
+checksum mismatch `3953210a…` vs prod `f0331940…`) traced to AC
+commit `133a7d94` editing the embedded 001 in-place to make
+`tasks.parent_task_id DEFERRABLE` instead of filing a successor
+migration. Grace fixed it in AC `a93c69be`: restored 001 to the
+`f0331940…` shape, kept 002 + 003, and filed
+`004_tasks_parent_task_deferrable.sql` as the data-repair-shaped
+successor for the deferrable change.
+
+Operational consequence: when chasing a checksum mismatch, check
+*both* the OSS aweb wheel migration AND the AC embedded copy.
+The bytes that pgdbm hashes are AC's. Diff:
+
+```bash
+# AC embedded migrations (what prod actually applied):
+ls ac/backend/src/aweb_cloud/migrations/aweb/
+sha256sum ac/backend/src/aweb_cloud/migrations/aweb/001_initial.sql
+
+# OSS aweb wheel migrations (the upstream source AC was built from):
+ls aweb/server/src/aweb/migrations/aweb/
+
+# History on the AC embedded copy (the one prod cares about):
+git -C ac log -- backend/src/aweb_cloud/migrations/aweb/001_initial.sql
+```
+
+If `git log` on the AC embedded file shows commits AFTER the
+deployed prod release, that's the drift. Recovery is the same
+"file successor migration" rule — do NOT edit the embedded 001
+back, file 004/005 instead.
+
+**[banked 2026-05-04] Asymmetric compat-test gap is a real risk
+the test matrix doesn't catch.** AC's
+`make test-cloud-user-journeys-compat` covers (old client +
+new server). It does NOT cover (new client + old server). In
+24h we hit the missed direction three times:
+
+1. v0.5.18 / aw-1.18.8 ship: claim-human BYOD-username — script
+   gap masking the contract; e2e exercised the broken arm and
+   passed.
+2. aame ship (aweb 1.19.0 / aw 1.19.0): aw 1.19.0 sends
+   `conversation_id` on mail/chat; cloud at 1.18.6 rejects as
+   `extra_forbidden`.
+3. v0.5.19 routing regression: aw 1.19.0 + cloud 1.19.0 used
+   Grace's new guard rejecting unsigned-AWID-misses; cloud at
+   v0.5.18 (aweb 1.18.6) didn't have the guard so probes worked
+   from rolled-back state — confirming the regression was in the
+   new-binary path.
+
+Pre-release validation gate that closes this until the matrix
+is fixed: run the new-client binary against the live (still
+old) prod server before pushing tags. If `aw <new-version>
+mail send --to <peer>` and `aw <new-version> chat send-and-wait`
+both succeed against rolled-prod-version cloud, you've covered
+the asymmetric direction. If either fails, the new client is
+ahead of the server by a wire-incompat shape and the release
+needs a coordinated bump. (This is a manual fallback. The
+proper fix is engineering: add (new-client + old-server) to the
+compat matrix.)
+
 **Verify-applied query block (run AFTER apply, regardless of
 mechanism):**
 
