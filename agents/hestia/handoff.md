@@ -94,6 +94,63 @@ The team:
    alias-path + DID-direct + chat all 200. Confirms v0.5.18 routing
    is healthy and Grace's diagnosis is consistent.
 
+## Pivot to destructive-cutover recovery (2026-05-04 ~13:30)
+
+Juan authorized PREP work for a destructive-cutover recovery:
+dump prod, drop the `aweb` schema, apply a single consolidated
+new 001 representing post-aame state, restore data with any
+needed transforms. Same shape as the awid 0.3.1→0.5.1 cutover
+of record. Drop is GATED on Juan's explicit go on the day,
+after Athena's fixes ship in the AC patch published in Render.
+
+**Lane split**: Grace authors consolidated 001 + transformation
+script. Hestia executes cutover phases. Athena reviews
+consolidation (schema-equivalence proof) + transformation
+(explicit enumeration of every NOT NULL/CHECK/FK delta). Juan
+authorizes.
+
+**Banked operational gates** (cutover playbook now in
+`runbook.md` § "Destructive-cutover recovery (aweb-cloud)"):
+
+1. Schema-equivalence proof: consolidated 001 produces same
+   end-state as `[old-001 + 002 + 003 + 004]` applied to a
+   clean local DB. Diffed schema-only pg_dumps must be identical.
+2. Transformation enumeration: explicit list of every additive-
+   chain delta that affects existing prod-data shape (for the
+   aame chain: all additive on existing data shape, transform
+   should be empty/trivial — but Grace asserts that explicitly).
+3. Local `verify_db_reset_roundtrip.py` green against new
+   consolidation + real prod-shape dump + target binary.
+4. Pre-cutover safety-net dump (from current v0.5.18 prod), kept
+   independent of cutover dump, copied off the cutover machine.
+5. Cutover phases step-gated; each pauses for explicit Juan-go
+   between phases (no orchestrated single-shot reset).
+6. Verify-applied SQL block AFTER consolidated 001 applies,
+   BEFORE restore data goes in.
+7. Post-cutover smoke probes (mail/chat alias + DID-direct +
+   send-and-wait) before posting verified-live.
+
+**Schema delta the consolidation must capture** (mapped from
+AC's embedded `backend/src/aweb_cloud/migrations/aweb/`):
+
+- 002_conversations.sql: new tables `aweb.conversations`,
+  `aweb.conversation_participants`; new nullable column
+  `aweb.messages.conversation_id` with FK; 5 indexes.
+- 003_conversations_constraints.sql: DROP DEFAULTs on
+  conversations.created_by_did + conversation_participants.alias,
+  add 3 CHECK constraints (not-blank x2, reachable), trigger
+  + function for updated_at.
+- 004_tasks_parent_task_deferrable.sql: tasks.parent_task_id
+  FK becomes DEFERRABLE INITIALLY IMMEDIATE.
+- All deltas additive on existing-row data shape; no destructive
+  transforms expected.
+
+**No prod-state changes performed during prep**. Only reads
+(`make awid-prod-verify` already ran read-only; cloud equivalent
+not yet exercised). Local prereqs confirmed: postgres@17 +
+redis running, uv 0.11.7, psql/pg_dump from PG17 (script handles
+PG16-server compat via `_INCOMPATIBLE_SET_PREFIXES` strip).
+
 ## Queued (waiting on Grace's next ff5f2ec iteration → Athena re-review)
 
 **2026-05-04 ~12:30: Athena kicked `ff5f2ec` back to Grace.** Two

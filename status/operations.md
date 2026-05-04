@@ -37,9 +37,22 @@ branch outside the spec; "signed-payload-binding" path doesn't
 actually verify signatures, just parses JSON + compares fields).
 Architectural framing is right; implementation is unsafe; would
 replace one regression with a worse spoofing posture. Grace
-iterates. AC's `a93c69be` is independent but cannot ship without
-the aweb routing fix — both are needed to unblock cleanly. Release
-chain queues from Grace's next iteration → Athena re-review.
+iterates.
+
+**Update 2026-05-04 ~13:30: Pivot to destructive-cutover recovery.**
+Juan authorized PREP work for the awid-style cutover shape applied
+to aweb-cloud's `aweb` schema: dump prod, drop schema, apply
+consolidated single 001 representing post-aame state, restore data.
+Cutover playbook drafted in runbook.md §"Destructive-cutover
+recovery (aweb-cloud)" with phased execution chain (each phase
+pauses for explicit Juan-go), schema-equivalence proof gate,
+transformation-enumeration gate, local-roundtrip-green gate,
+safety-net dump as separate pre-cutover artifact, and rollback
+shapes per phase. **Drop is GATED on Juan's explicit go on the
+day, after the AC patch carrying Athena's fixes ships in Render.**
+Grace authors consolidated 001 + transforms in parallel; Athena
+reviews schema-equivalence + transformation correctness; Hestia
+executes the cutover phases under direct authorization.
 
 ## Live state (verified 2026-05-04 ~10:00 UTC)
 

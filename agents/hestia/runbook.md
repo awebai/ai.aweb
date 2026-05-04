@@ -854,6 +854,331 @@ Editing the existing consolidated file in place trips pgdbm's
 checksum guard and forces a destructive dump-restore cutover.
 Banked from awid 0.3.1 → 0.5.1 prod cutover.
 
+## Destructive-cutover recovery (aweb-cloud)
+
+This is the recovery shape for irrecoverable migration-history
+drift on aweb-cloud's `aweb` schema (the embedded coordination
+schema in AC). The pattern: dump prod data, drop the schema,
+apply a single consolidated 001 representing the post-state, restore
+data with any required transforms. Drops migration-history entirely
+and replaces it with a single fresh row in `schema_migrations`.
+
+**Use this path only when**: forward-additive recovery via successor
+migrations is unsound or has been rejected (e.g., the additive chain
+itself triggers checksum mismatch on prod, or migration history is
+considered too fragile to leave intact). Routine schema work uses
+forward-additive successors per the "NEVER edit a deployed migration"
+rule.
+
+**Authorization model**: the destructive cutover is a Juan-direct-
+authorization shape. Athena's relay carries strong signal but the
+schema-drop step is irreversible-against-current-prod, so Hestia
+holds for Juan's explicit go on the day, after the AC patch carrying
+the routing fixes is published in Render.
+
+### Lane split
+
+| Role | Owner |
+|------|-------|
+| Author consolidated 001 + transformation script | Grace (dev team) |
+| Architectural review (schema-equivalence + transformation enumeration) | Athena |
+| Cutover execution | Hestia |
+| Cutover authorization | Juan |
+
+### Pre-cutover authoring (parallel, no prod risk)
+
+1. **Consolidated 001** representing post-aame schema. All historical
+   edits baked in. Replaces existing 001 + 002 + 003 + 004 in
+   `ac/backend/src/aweb_cloud/migrations/aweb/`. The other 3 files
+   are deleted in the same commit.
+2. **Transformation script** enumerating any data-shape changes
+   needed during restore. For aame's chain (002 + 003 + 004): all
+   changes are additive on existing data shape (new tables, new
+   nullable column on messages, new constraints on new tables only,
+   FK shape change on tasks) — transformation should be empty/trivial
+   unless prod data unexpectedly diverges. Grace lists what does
+   need transforming, with assertions baked in (every NOT NULL /
+   CHECK / FK in the deltas vs. pre-002 prod data).
+3. **Schema-equivalence proof** (Athena's review): apply
+   [old-001 + 002 + 003 + 004] to a clean local DB; apply [new
+   consolidated-001] to a second clean local DB; pg_dump both
+   schemas (--schema-only); diff. Identical diff = schema-equivalence
+   proven. Different diff = consolidation has drift; reject and ask
+   Grace to fix.
+
+### Local roundtrip gate (mandatory before prod cutover)
+
+`make verify-db-reset-roundtrip` against the new consolidation
++ a real prod-shape data dump (sourced from a recent prod-dump kept
+read-only). Script does:
+
+1. `dropdb` if exists, then `createdb` for a fresh local DB.
+2. Apply the new consolidated 001 (and any other new migrations)
+   via `aweb-db --env=development setup`.
+3. Restore the filtered prod-shape dump (schema_migrations stripped
+   per `_write_filtered_restore_dump`).
+4. Verify expected clean-schema columns (`messages.from_address`,
+   `chat_messages.from_address`, `chat_participants.address`).
+5. Verify row counts per table match dump's COPY/INSERT counts.
+6. Run `make test-backend` against the restored DB.
+
+All steps must pass. Failure here means the cutover would fail
+on prod the same way; do not proceed. Loop with Grace + Athena
+on the failure shape.
+
+### Pre-cutover safety net
+
+Just-before-cutover (with prod still on the working v0.5.18 binary):
+
+```bash
+# From ac/ root with .env.production loaded (AWID env elsewhere):
+TS=$(date -u +%Y%m%dT%H%M%SZ)
+make prod-dump PROD_ENV_FILE=.env.production \
+    DB_RESET_DUMP=/tmp/aweb-cloud-safety-net-${TS}/full-data-dump.sql
+
+# Verify dump size and head:
+ls -la /tmp/aweb-cloud-safety-net-${TS}/full-data-dump.sql
+head -50 /tmp/aweb-cloud-safety-net-${TS}/full-data-dump.sql
+```
+
+This is a separate operation from the cutover dump (different
+filename, different timestamp). Copy the safety-net dump off the
+machine running cutover (workstation copy + Juan's machine if he
+can hold one). The safety-net is the rollback artifact: if cutover
+goes sideways, restore THIS dump onto a fresh re-migrated DB at
+v0.5.18 schema and re-deploy v0.5.18.
+
+DO NOT compose the safety-net path with the cutover path. Keep
+them independent so a failure in one cannot corrupt the other.
+
+### Cutover execution chain
+
+Each phase pauses for explicit Juan-go before the next runs. No
+orchestrated single-shot reset: the awid script's `reset` subcommand
+exists for awid because awid prod is much smaller and lower-stakes;
+aweb-cloud cutover steps individually so we can inspect between.
+
+**Phase 0 — Pre-flight checks**
+
+```bash
+# Confirm we're on the cutover commit (the one carrying both
+# consolidated 001 AND the routing fix shipped in the patch):
+git -C ac log --oneline -5
+
+# Confirm /health is what the safety-net dump represents:
+curl -sS https://app.aweb.ai/health | jq .build
+
+# Confirm AWID is healthy (we're not touching it):
+curl -sS https://api.awid.ai/health
+```
+
+Pause. Juan goes on phase 1.
+
+**Phase 1 — Cutover dump (just before drop, fresh)**
+
+```bash
+# Fresh dump for restore, separate from safety net:
+make prod-dump PROD_ENV_FILE=.env.production \
+    DB_RESET_DUMP=/tmp/aweb-cloud-cutover-${TS}/full-data-dump.sql
+
+# Sanity-check row count signal:
+grep -c '^COPY ' /tmp/aweb-cloud-cutover-${TS}/full-data-dump.sql || true
+grep -c '^INSERT INTO ' /tmp/aweb-cloud-cutover-${TS}/full-data-dump.sql || true
+```
+
+Pause. Confirm dump file size is comparable to prior known-good
+dumps. Juan goes on phase 2.
+
+**Phase 2 — Drop schema aweb**
+
+This is the irreversible step. Before running, verify:
+
+- `/health` was just confirmed in phase 0
+- Dump in phase 1 is on disk, readable, non-empty
+- Safety-net dump from earlier exists on at least one off-machine copy
+
+The script subcommand for cloud's aweb schema doesn't exist
+pre-built (aweb-cloud doesn't have an exact equivalent of awid's
+`prod_db_reset.py drop-schema`). Use `aweb-db drop` (it's the
+non-Makefile CLI tool) — but `aweb-db drop` drops the WHOLE database,
+not just schema aweb. If we want to keep aweb_cloud and server
+schemas intact (Athena confirmed yes — only aweb schema gets
+consolidated), use direct psql:
+
+```bash
+DATABASE_URL=$(grep -E '^DATABASE_URL=' ac/.env.production | sed -E 's/^DATABASE_URL="?(.*)"?$/\1/')
+psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -c "DROP SCHEMA aweb CASCADE;"
+```
+
+This drops ONLY the `aweb` schema. The `aweb_cloud` and `server`
+schemas remain. Their `schema_migrations` tables remain intact.
+The `aweb.schema_migrations` row(s) for aweb's chain are dropped
+along with the schema.
+
+(If Grace's transformation script + cutover script grow into a
+proper helper, a future PR can wrap this in
+`scripts/cloud_aweb_schema_reset.py` analogous to awid's. For now,
+direct psql is the operational path.)
+
+Pause. Phase complete: aweb schema is gone. Juan goes on phase 3.
+
+**Phase 3 — Apply consolidated 001 (clean migration baseline)**
+
+```bash
+make prod-migrate-direct PROD_ENV_FILE=.env.production
+```
+
+This invokes `aweb_cloud.cli migrate` against prod. Without an
+existing `aweb.schema_migrations` table or rows for the aweb chain,
+the migrate runner sees the chain as fresh and applies the
+consolidated 001 from scratch. New checksum row gets recorded.
+
+After it returns, run the verify-applied SQL block:
+
+```sql
+-- Migration metadata (should be ONE row, the consolidated 001):
+SELECT filename, module_name, checksum, applied_at, applied_by, execution_time_ms
+FROM aweb.schema_migrations
+WHERE module_name = 'aweb-aweb'
+ORDER BY filename;
+
+-- Object existence (post-aame schema):
+SELECT to_regclass('aweb.conversations'),
+       to_regclass('aweb.conversation_participants'),
+       to_regclass('aweb.messages'),
+       to_regclass('aweb.tasks'),
+       to_regclass('aweb.teams'),
+       to_regclass('aweb.agents');
+
+-- Constraints from 003 (now baked into consolidated 001):
+SELECT conname FROM pg_constraint
+WHERE connamespace = 'aweb'::regnamespace
+  AND conname IN ('conversations_created_by_did_not_blank',
+                  'conversation_participants_alias_not_blank',
+                  'conversation_participants_reachable');
+
+-- Updated_at trigger from 003:
+SELECT tgname FROM pg_trigger
+WHERE tgrelid = 'aweb.conversations'::regclass
+  AND tgname = 'trg_conversations_updated_at'
+  AND NOT tgisinternal;
+
+-- 004's deferrable FK shape:
+SELECT conname, condeferrable, condeferred
+FROM pg_constraint
+WHERE conrelid = 'aweb.tasks'::regclass
+  AND conname = 'tasks_parent_task_id_fkey';
+```
+
+Schema must be present and constraint shape must match what the
+consolidation 001 declared. If anything is missing, do NOT proceed
+to restore — the schema apply was incomplete.
+
+Pause. Juan goes on phase 4.
+
+**Phase 4 — Restore filtered dump**
+
+```bash
+make prod-restore PROD_ENV_FILE=.env.production \
+    DUMP=/tmp/aweb-cloud-cutover-${TS}/full-data-dump.sql
+```
+
+`prod_db_reset.py restore` does:
+- TRUNCATE all tables in (aweb, aweb_cloud, server) RESTART IDENTITY CASCADE.
+- Disable `users_create_principal` trigger.
+- Apply filtered dump (schema_migrations COPY blocks stripped).
+- Re-enable trigger.
+- Verify row counts match dump's COPY/INSERT counts.
+
+Watch for row-count mismatches in the verifier output. Any mismatch
+= ABORT, investigate.
+
+Pause. Juan goes on phase 5.
+
+**Phase 5 — Re-deploy aame-aware binary**
+
+Juan deploys the AC patch carrying the consolidated 001 + Grace's
+routing fix from GHCR (manual deploy per existing pattern). Wait
+for `/health` to come up:
+
+```bash
+# Loop until /health shows the new release_tag and aweb_version 1.19.x:
+curl -sS https://app.aweb.ai/health | jq .build
+```
+
+**Phase 6 — Live verification**
+
+```bash
+# Schema verification still passes after deploy:
+psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -c "
+SELECT to_regclass('aweb.conversations'),
+       (SELECT count(*) FROM aweb.schema_migrations WHERE module_name='aweb-aweb');
+"
+
+# Smoke probes from new-binary CLI:
+aw mail send --to athena --subject cutover-smoke-1 --body "..."
+aw chat send-and-wait athena "cutover smoke probe"
+aw mail send --to-did did:aw:<athena-did> --subject cutover-smoke-2 --body "..."
+```
+
+All probes succeed = cutover verified-live. Mail Athena/Sofia/Iris/Juan
+with full evidence: dump filename + size, drop SQL output,
+verify-applied SQL output, restore row-count verification,
+post-deploy /health, smoke-probe message_ids.
+
+### Rollback path (if any phase fails)
+
+The rollback target is the safety-net dump (taken pre-cutover).
+
+**If failure at phase 1 (cutover dump itself fails)**: nothing
+destructive happened; standdown, investigate, retry next window.
+
+**If failure at phase 2 (DROP SCHEMA fails)**: schema didn't drop
+cleanly; psql error halts the operation. No data lost; investigate.
+
+**If failure at phase 3 (consolidated 001 doesn't apply)**: schema
+is gone, no replacement schema. App at v0.5.18 cannot use a
+migrated state because v0.5.18 expects pre-aame schema, but the
+cutover commit only has consolidated 001. Two recovery shapes:
+- Re-deploy v0.5.18 (it'll fail to start until schema_migrations
+  has a matching 001 row); restore safety-net dump pre-bind to
+  the v0.5.18 schema by running v0.5.18's old 001 directly via
+  psql. Heavy; needs a v0.5.18-compatible 001 file.
+- Quicker: fix the consolidated 001 problem, retry phase 3 (no
+  data has been restored yet, so phase 3 is idempotent against
+  an empty aweb schema).
+
+**If failure at phase 4 (restore row-count mismatch or psql
+error)**: data is partially restored. ABORT immediately. Recovery
+shape: drop schema again, re-apply consolidated 001, retry
+restore from same dump. If the restore CONSISTENTLY fails, fall
+back to safety-net: drop schema, apply v0.5.18-era 001, restore
+safety-net dump, re-deploy v0.5.18.
+
+**If failure at phase 5 (deploy)**: schema and data are at
+post-aame shape, but binary is still v0.5.18 (which expects pre-aame
+schema). App will misbehave (boot with extra columns, but
+logic-paths against `conversation_id` won't exist in v0.5.18 code).
+Recovery: get the AC patch deploying ASAP, or restore safety-net
+dump (TRUNCATE + restore) onto the pre-aame schema after dropping
++ re-applying v0.5.18-era 001.
+
+**Treat every failure mode as "stop, don't compose, escalate to
+Juan + Athena"**. The cutover is high-stakes and chained; don't
+attempt clever recovery moves under pressure.
+
+### Post-cutover hygiene
+
+- Verified-live mail to Athena / Sofia / Iris / Juan with full
+  evidence trail.
+- Bank what worked + what failed into this runbook section.
+- Sweep stale aw work claims after the cycle.
+- Update operations.md and handoff.md to reflect new live state
+  (release_tag, aweb_version, awid_service_version).
+- Decide whether the awid-shaped wrapper script
+  (`scripts/cloud_aweb_schema_reset.py`) should land for next time.
+  If we cutover more than once, the wrapper saves time.
+
 ### `make ship` semantics differ between repos
 
 - **aweb `make ship`**: comprehensive pre-tag check. Runs
