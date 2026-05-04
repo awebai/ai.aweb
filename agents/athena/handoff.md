@@ -1,16 +1,14 @@
 # Athena Handoff
-Last updated: 2026-05-01 23:20 CEST
+Last updated: 2026-05-04 14:55 CEST
 
 ## Read this first
 
 You are Athena. You own the code for aweb and ac: architecture,
 invariants, review of every diff that lands on main, and
-non-feature code you write yourself (diagnostic harnesses,
-reproducers, conformance vectors, instrumentation stubs).
+non-feature code you write yourself.
 
-**You belong to TWO cryptographic teams.** This is the load-
-bearing setup. AGENTS.md leads with it; re-read on every
-wake-up.
+**You belong to TWO cryptographic teams.** AGENTS.md leads with
+this; re-read on every wake-up.
 
 | Team | Visibility | Members | Purpose |
 |------|------------|---------|---------|
@@ -18,103 +16,131 @@ wake-up.
 | `aweb:juan.aweb.ai` | PUBLIC — dev | mia, noah, grace, kate, you | Code authoring on aweb and ac |
 
 You are the only role with feet in both teams. Default active
-team is `aweb:juan.aweb.ai` (dev); use `--team default:aweb.ai`
-for coordinator chats. Three movement patterns:
-`aw chat --team <id> ...` (per-command), `aw id team switch
-<id>` (session default), `aw id team list` (memberships).
+team is `aweb:juan.aweb.ai`; use `--team default:aweb.ai` for
+coordinator chats. Coders do NOT need to know about Hestia — to
+them, Athena is the gate; they don't deploy.
 
-## Live state at 2026-05-01 23:20 CEST
+## Current critical-path work: aame cutover
 
-- `app.aweb.ai/health`: `release_tag=v0.5.16`,
-  `aweb_version=1.18.6`, `git_sha=842e0b5b`,
-  `awid_service_version=0.5.3`. Started 2026-05-01 20:45:10 UTC.
-  v0.5.17 (commit `9c1038ad`) tagged and image building; expect
-  Render to roll forward 20-90min after tag push.
-- `api.awid.ai/health`: `version=0.5.2`, healthy.
-- aweb OSS published tags: `server-v1.18.6`, `aw-v1.18.6`,
-  `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27, no movement).
-- channel: 1.3.3.
+We are mid-cutover after the v0.5.19 deploy incident.
 
-## What happened today (2026-05-01)
+**Sequence of events (2026-05-02 → 2026-05-04):**
+1. aame epic (aweb-aame, 10 sub-tasks .1-.10): conversations as
+   first-class, lazy 30-day TTL, cert-presentation auth on the
+   conversation primitive. Grace authored sub-tasks; reviewed by
+   Athena + Mia dual-review.
+2. Released as aweb 1.19.0 / aw 1.19.0 / awid 0.5.4 / channel
+   1.4.0 / ac v0.5.19. Production deploy FAILED:
+   - AC's embedded aweb 001 had been edited by AC commit
+     133a7d94 (made `tasks.parent_task_id` DEFERRABLE),
+     producing a checksum mismatch against prod's recorded
+     `f0331940` — pgdbm refused to apply.
+   - aweb 1.19.0 added a guard in `RegistryClient.resolve_address`
+     that broke the local persistent fallback when AWID resolved
+     to None — but unsigned lookups (no signing_key) miss
+     private/team-scoped records, so cloud's same-team mail/chat
+     broke.
+3. Cloud rolled back to v0.5.18 (Render image
+   `ghcr.io/awebai/ac:0.5.18` — note no leading `v`,
+   `docker/metadata-action` strips it).
+4. Grace authored two recovery commits:
+   - **a93c69be** (ac): restored AC-embedded 001 to f0331940
+     checksum, added 002+003+004 as additive aame migrations.
+   - **ff5f2ec** → **ef963ec** (aweb): routing fix with two
+     critical security gaps closed in iteration. Now uses
+     `address_auth.py` shared helpers: same-team-projected
+     team_id-equality (DID-overlap branch removed) +
+     cryptographic signature verification before
+     signed_payload-binding match.
+5. Juan chose cutover over forward-additive: dump prod data,
+   DROP SCHEMA, apply consolidated 001 (containing all of
+   001+002+003+004 merged), restore data.
+6. Grace authored **0423bccf** (ac): consolidated AC-embedded
+   001 (single file, 002/003/004 deleted), updated
+   `test_migration_paths.py`, added orphan-FK pre-check to
+   `verify_db_reset_roundtrip.py` and wired it into
+   `prod_db_reset.py` before TRUNCATE.
 
-- **Wake-up:** read team docs, status, decisions; landed initial
-  engineering.md update.
-- **Sofia chat:** confirmed Phase 2 (`aw spawn-pair` primitive)
-  deferral. She accepted my read; we agreed today's bottleneck
-  is distribution not throughput.
-- **Juan corrected the spawn-pair framing:** the actual dev team
-  is in `aweb:juan.aweb.ai`, persistent agents (mia, noah, grace,
-  kate). The published spawn-pair-via-mail-Juan flow was
-  speculative and is now superseded.
-- **YC agent (separate team) fact-check:** five-question
-  technical positioning review for YC application. Pushed back
-  on locks-are-repo-scoped (wrong) and rotation-log-verifiable-
-  without-trusting-the-registry (overclaim — chain holds,
-  transparency does not). Mailed Q5 production scale numbers (91
-  AWID identities, 44 cloud users — dogfooding scale).
-- **Two-team setup:** Juan added me to `aweb:juan.aweb.ai`. I
-  verified bidirectional cross-team chat (test ping to Sofia via
-  `--team default:aweb.ai`). Confirmed `aw id team switch` is
-  the canonical default-team command.
-- **AGENTS.md rewritten:** leads with the two-team-bridge
-  section. Spawn-pair framing removed throughout. Communication
-  table now shows `--team` flags. Commit `937e248`.
-- **Hestia first wake-up:** asked three real questions on v0.5.17
-  (routing, code-reviewer pass, local reproducer). Routing
-  decision made: dev team stops tagging from here on; Hestia
-  owns gate+tag+deploy+verify going-forward. v0.5.17 already
-  tagged by Mia; Hestia running `make release-ready`
-  retroactively as runbook-seed exercise tonight. Mia briefed,
-  Sofia aligned.
-- **Mia chat (juan.aweb.ai team):** clean handoff on aalr.2
-  (starts tomorrow morning, persist-refactor first); aaly.6
-  closure context (Grace's commit `20419936`); confirmed v0.5.17
-  is on origin (Render lag explanation).
-- **Code-reviewer subagent on `937f37b0`:** ran successfully.
-  Two real findings — test assertion at AgentsPage.test.tsx:181
-  is fragile against `--aweb-url` regression; `whitespace-pre`
-  on `<pre>` is dead weight. Forwarded to Mia (mail 4dfa7f75).
-  Gap closes at e2e level via the upcoming Playwright
-  reproducer.
-- **Engineering.md resynced** to current state (commit `0a91d8f`).
+## Cutover review status (today 2026-05-04)
 
-## Active engineering surface
+**0423bccf is currently kicked back to Grace.**
 
-`aw work active` — Mia is on aalr.2 (starts tomorrow morning).
-aalz (no-mocks-of-internals) is her parallel P1; my Add-Existing
-Playwright reproducer lands inside aalz scope as the concrete
-first deliverable.
+- Code-reviewer subagent: no criticals. Three minor warnings
+  (hardcoded `aweb.` schema in trigger function, parser-
+  assumption comment, dual-call-site doc gap).
+- Hestia's `cutover_schema_equivalence.sh a93c69be 0423bccf`:
+  **FAILED** with one drift: `aweb.messages` column physical
+  order. Additive chain has `conversation_id` last (ALTER TABLE
+  ADD COLUMN appends); consolidated 001 placed it between
+  `signed_payload` and `read_at`.
+- Functional impact on cutover: zero (pg_dump's COPY blocks
+  name columns explicitly, PostgreSQL maps by name). But
+  Hestia's policy is "non-trivial diff = reject"; fix is one
+  line.
+- Mailed Grace (msg `e959ca0a`) the kick-back. Mailed Hestia
+  (msg `dc269e72`) holding the AC ship trigger.
 
-## Pending artifacts owed (Athena side)
+**Scratch artifacts preserved at:**
+- `/tmp/cutover-schema-eq-20260504T124916Z/` (worktrees)
+- DBs `aweb_eq_before_72691`, `aweb_eq_after_72691`
 
-1. **Playwright-MCP reproducer for Add-Existing dialog** — my
-   non-feature-code authoring. Lands as
-   `ac/frontend/e2e/add-existing.spec.ts`, wired into
-   `make test-cloud-user-journeys`. Targets in
-   `status/engineering.md`. Tomorrow morning fresh-headed.
-2. **KI#1 closure technical content for Sofia's decision
-   record.** Sofia drafts framing; I supply cert-presentation
-   auth correction + aalk continuity arc + 1.18.6 trust-model
-   arc + Aida 4/4 attestation. Source: `aale-trust-contract.md`
-   in this dir + aweb commit `7759abc`. Pending Sofia framing
-   draft.
-3. **aalr.2 review** when Mia signals branch-ready (tomorrow).
-4. **YC fresh-container `aw init` timing** before they publish
-   the five-minute claim externally. Not blocking; YC will
-   re-engage when their draft answer is closer to publish.
+## Next actions when Grace's fixup arrives
 
-## Standing tasks via `aw task`
+1. Pull ac. Confirm her commit moves `conversation_id` to last
+   in messages CREATE TABLE.
+2. Re-run `cutover_schema_equivalence.sh <new-ref> a93c69be`
+   (or whatever the BEFORE ref should be — likely keep
+   a93c69be).
+3. If IDENTICAL: greenlight Grace; mail Hestia for AC ship.
+4. If still drifts: kick back again with the residual finding.
 
-- Task #2: Author Playwright-MCP reproducer (pending).
-- Task #3: KI#1 closure technical content (pending Sofia
-  framing).
-- Task #5: Review aalr.2 (pending Mia signal).
-- (#1, #4 completed today.)
+## Cutover ship chain (after equivalence passes)
 
-## Standing release-discipline (banked through 2026-04-26)
+Coordinated with Hestia (mail `3a6f8591`):
+- aweb 1.19.1 + aw 1.19.1 patch ship (the routing fix in
+  ef963ec) — Athena initiates.
+- AC v0.5.20 with new pin + consolidated 001 — Hestia tags
+  after my greenlight.
+- Render deploy (Hestia + Juan).
+- Cutover phases (Hestia):
+  pre-flight → safety dump → cutover dump →
+  DROP SCHEMA aweb CASCADE → apply consolidated 001 →
+  verify-applied SQL → restore from filtered dump →
+  smoke probes → verified-live.
 
-Hestia enforces these at gate-time. They hold under any
-dispatch shape.
+## Banked invariants from this cycle
+
+- **Migrations are immutable once deployed.** Recovery is always
+  a NEW forward migration, never editing the old. Banked in
+  `aweb/docs/aweb-sot.md` (commit 67f4cfa) per Sofia's routing
+  call. Athena AGENTS.md cross-references it.
+- **Asymmetric compat-test gap, two categories:**
+  (a) wire-shape compat (old-client/new-server,
+      new-client/old-server),
+  (b) auth-correctness inside new code (cert-presentation
+      realism + spoof-rejection).
+  Each needs its own test-matrix discipline. Both bit us in
+  the v0.5.19 cycle.
+- **`uv sync --refresh` after a PyPI publish:** uv's index cache
+  lags. Always `--refresh` in the post-publish hour.
+
+## YC artifact (one-off, not load-bearing)
+
+`/Users/juanre/Desktop/grace-athena-security-review.md` —
+verbatim 13-message chat history of the ff5f2ec → ef963ec
+security-review iteration, for Y-Combinator application.
+Untrimmed per Juan's explicit request.
+
+## Pending pre-cutover work
+
+- (Outside the cutover) Task #2: Author Playwright-MCP
+  reproducer for Add-Existing dialog. Deferred from 2026-05-01.
+  Picks up after cutover lands.
+- Task #3: Supply KI#1 closure technical content for Sofia's
+  decision record. Pending Sofia framing draft.
+- Task #5: Review aweb-aalr.2 when Mia signals branch ready.
+
+## Standing release-discipline (banked through 2026-04-26 + this cycle)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree (not chat-pasted diffs)
@@ -127,36 +153,14 @@ dispatch shape.
 9. Published artifact ≠ deployed service
 10. Browser-verify UI-surface releases
 11. Closure framing rests on empirical attestation
-12. Reproducer-as-gate (Add-Existing Playwright spec is the
-    next instance — covers the iteration-cost class)
+12. Reproducer-as-gate
 13. Code-reviewer subagent for gate-input commits BEFORE
-    bless-and-run mail to Hestia (canonical handoff step now)
-
-## Architectural context worth not losing
-
-- **Server is data substrate; verification is client-side.** The
-  trust-contract design space is two clients (Go + TS), not
-  three.
-- **Cert-presentation + signature + non-revocation is the auth
-  predicate.** The 1.18.6 architectural correction (commit
-  `7759abc`, 922 lines) replaced row-existence-as-authorization.
-  AWID is no longer a membership oracle.
-- **Single consolidated migration files mean every additive
-  change goes in a NEW ordered file.** Editing existing 001 in
-  place trips pgdbm's checksum guard.
-- **Reproducer-as-gate works.** The
-  `e2e-amy-symptom-reproducer.sh` pattern is the model.
-- **Locks are team-scoped reservations on opaque resource keys**,
-  not repo-scoped or filesystem locks. Convention to use file
-  paths is convention.
-- **Rotation log: chain self-verifies; full transparency on
-  roadmap.** Don't claim "verifiable without trusting the
-  registry" flat — split-brain is theoretically possible until
-  transparency lands.
-- **Cross-system deadlock framing** is why aalr.2 persist-
-  refactor is non-optional even after John's ensure-team
-  endpoint cuts the round-trip count. Keep AWID I/O strictly
-  outside open transactions.
+    bless-and-run mail to Hestia
+14. **Migration files are immutable post-deploy. Recovery is
+    additive. (this cycle)**
+15. **Equivalence-test policy: non-trivial diff = reject the
+    consolidation, even if functionally invisible. Restore
+    correctness ≠ schema equivalence. (this cycle)**
 
 ## Working docs in this dir
 
@@ -174,19 +178,11 @@ Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
 
 ## What to check FIRST on next wake-up
 
-1. `aw id team list` — confirm both team memberships still
-   active.
-2. Both teams' inbox + chat:
-   ```bash
-   aw chat pending; aw mail inbox
-   aw chat --team default:aweb.ai pending
-   aw mail --team default:aweb.ai inbox
-   ```
-3. Did Render roll forward to v0.5.17? Cross-check
-   `app.aweb.ai/health`.
-4. Hestia's runbook-seed exercise output (her runbook draft +
-   verified-live mail).
-5. Mia's aalr.2 branch-ready signal.
-6. `aw task list` — open tasks (#2 reproducer, #3 KI#1 content,
-   #5 aalr.2 review).
-7. Sofia's KI#1 framing draft.
+1. `aw mail inbox` — has Grace responded with a fixup commit?
+2. `aw chat pending` — same.
+3. If Grace pushed a fix: pull ac, re-run
+   `cutover_schema_equivalence.sh` against the new ref.
+4. If equivalence passes: greenlight + signal Hestia.
+5. `app.aweb.ai/health` — confirm prod is still on
+   `release_tag=v0.5.18` (rollback steady state).
+6. `aw work active` — check for any new claims.
