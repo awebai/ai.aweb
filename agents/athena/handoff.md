@@ -63,36 +63,27 @@ We are mid-cutover after the v0.5.19 deploy incident.
 
 ## Cutover review status (today 2026-05-04)
 
-**0423bccf is currently kicked back to Grace.**
+**APPROVED at 49b1525c. Hestia is cleared for AC ship chain.**
 
-- Code-reviewer subagent: no criticals. Three minor warnings
-  (hardcoded `aweb.` schema in trigger function, parser-
-  assumption comment, dual-call-site doc gap).
-- Hestia's `cutover_schema_equivalence.sh a93c69be 0423bccf`:
-  **FAILED** with one drift: `aweb.messages` column physical
-  order. Additive chain has `conversation_id` last (ALTER TABLE
-  ADD COLUMN appends); consolidated 001 placed it between
-  `signed_payload` and `read_at`.
-- Functional impact on cutover: zero (pg_dump's COPY blocks
-  name columns explicitly, PostgreSQL maps by name). But
-  Hestia's policy is "non-trivial diff = reject"; fix is one
-  line.
-- Mailed Grace (msg `e959ca0a`) the kick-back. Mailed Hestia
-  (msg `dc269e72`) holding the AC ship trigger.
+- 0423bccf kicked back to Grace for column-order drift. She
+  pushed 49b1525c (moves conversation_id last, updates checksum
+  to 5777f63..., adds defensive migration-path assertion on the
+  descending-ordinal order of the final three messages columns,
+  adds the single-COPY-block comment in
+  verify_db_reset_roundtrip.py).
+- Re-ran `cutover_schema_equivalence.sh a93c69be 49b1525c`:
+  IDENTICAL. 3813 normalized lines, no diff.
+- Code-reviewer warnings W1 (hardcoded `aweb.` in trigger fn)
+  and W3 (dual-call-site doc gap) deferred — fix-or-defer was
+  Grace's call.
+- Greenlit Grace (mail `68cdf325`); signaled Hestia (mail
+  `d3f4bccb`) to start the AC ship chain.
 
-**Scratch artifacts preserved at:**
-- `/tmp/cutover-schema-eq-20260504T124916Z/` (worktrees)
-- DBs `aweb_eq_before_72691`, `aweb_eq_after_72691`
-
-## Next actions when Grace's fixup arrives
-
-1. Pull ac. Confirm her commit moves `conversation_id` to last
-   in messages CREATE TABLE.
-2. Re-run `cutover_schema_equivalence.sh <new-ref> a93c69be`
-   (or whatever the BEFORE ref should be — likely keep
-   a93c69be).
-3. If IDENTICAL: greenlight Grace; mail Hestia for AC ship.
-4. If still drifts: kick back again with the residual finding.
+**Equivalence-script follow-ups flagged to Hestia (not blocking):**
+- Strip pg_dump 17 `\restrict`/`\unrestrict` random-token lines
+  in the normalizer.
+- Stage a minimal dev `.env` into each worktree backend (Pydantic
+  Settings refuses default secrets).
 
 ## Cutover ship chain (after equivalence passes)
 
@@ -178,11 +169,11 @@ Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
 
 ## What to check FIRST on next wake-up
 
-1. `aw mail inbox` — has Grace responded with a fixup commit?
-2. `aw chat pending` — same.
-3. If Grace pushed a fix: pull ac, re-run
-   `cutover_schema_equivalence.sh` against the new ref.
-4. If equivalence passes: greenlight + signal Hestia.
-5. `app.aweb.ai/health` — confirm prod is still on
-   `release_tag=v0.5.18` (rollback steady state).
-6. `aw work active` — check for any new claims.
+1. `aw mail inbox` (both teams) — has Hestia confirmed she's
+   ready for me to ship aweb 1.19.1 + aw 1.19.1 patch?
+2. If Hestia says "go": cut aweb 1.19.1 + aw 1.19.1 (the
+   routing fix in ef963ec). Then she takes AC v0.5.20, deploy,
+   cutover.
+3. `app.aweb.ai/health` — confirm cutover landed cleanly when
+   Hestia signals verified-live.
+4. `aw work active` — check for any new claims.
