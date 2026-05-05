@@ -1,77 +1,72 @@
 # Operations Status
 
-Last updated: 2026-05-05 09:50 CEST (Hestia, post cutover #2 + immutability gate landed)
+Last updated: 2026-05-05 22:00 CEST (Hestia, post v0.5.22 deploy + multi-team-agent bug pinned)
 
 ## Current focus
 
-**aame epic verified-live, both AC cutovers closed clean, hard gate
-landed.** Returning to operational hygiene cadence. Active claims:
-zero. Active blockers: zero.
+**aame epic verified-live (1.20.0/1.20.1 + AC v0.5.22 shipped + duplicate-1to1
+cleanup executed).** One open multi-team-agent mail-409 bug pinned to
+CLI-side `mailConversationMatchesTarget` after empirical /v1/conversations
+probe — fix path: aweb 1.20.2 + AC v0.5.23. Awaiting Athena's brief to Grace.
 
-This morning's three structural fixes (commits below) close out the
-v0.5.19 incident class:
+## Live state (verified 2026-05-05 22:00Z)
 
-1. **Cutover #2 on aweb_cloud schema (AC v0.5.21).** Destructive
-   recovery via Grace's `8fa36cd0` (file-revert + forward-additive
-   002 deferrable). Schema-equivalence proven IDENTICAL pre-cut.
-   226-constraint baseline restored, all 6 cross-schema FKs that
-   silently CASCADE-dropped in cutover #1 are recreated. 65 tables
-   restored. Smoke probes (mail-alias + mail-DID-direct) green.
-   Constraint-diff audit: PROD=226 == AUDIT=226, ZERO drift.
-2. **Hard gate `release-verify-migration-immutability` (AC commits
-   3d7f878b + 70bd2b2d).** Connects to .env.production at
-   release-ready time, queries every schema's schema_migrations
-   (aweb, aweb_cloud, server), computes pgdbm-checksum on disk, asserts
-   match per filename. Fail-closed when env file absent unless
-   explicit MIGRATION_GATE_BYPASS=1 (visible bypass). Verified end-to-end
-   by Athena against pgdbm/migrations.py:343-347 and the v0.5.19 trace.
-3. **Destructive Makefile targets removed (aweb commit 4a4eb92).**
-   `awid-prod-drop` / `awid-prod-reset` no longer one CONFIRM=yes
-   from DROP SCHEMA awid CASCADE. Underlying scripts/prod_db_reset.py
-   subcommands remain available for explicitly-authorized recovery.
-
-## Live state (verified 2026-05-05 07:11Z)
-
-- `app.aweb.ai/health`: `release_tag=v0.5.21`,
-  `aweb_version=1.19.1`, `awid_service_version=0.5.4`,
-  `git_sha=8d6b37a28c35dc87b3ac2bfc50efe80f6ee8ba01`. Started
-  2026-05-05T07:11:15Z.
-- `api.awid.ai/health`: `version=0.5.4`, db / redis / schema healthy.
-- aweb OSS published: `server-v1.19.0`, `server-v1.19.1`, `aw-v1.19.0`,
-  `aw-v1.19.1`, `awid-v0.5.4`, `channel@1.4.0` — running cloud carries
-  1.19.1.
-- Mail/chat probes 2026-05-05 07:30Z: alias path → message_id
-  `a246c499…` arrived verified; DID-direct path → message_id
-  `06c6aec0…` arrived verified.
+- `app.aweb.ai/health`: `release_tag=v0.5.22`, `aweb_version=1.20.1`,
+  `awid_service_version=0.5.4`,
+  `git_sha=f6c27c619d0c5e37e3aa096c177d11e40a0984a0`. Started
+  2026-05-05T21:27:26Z.
+- `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
+- aweb OSS published: server 1.20.0/1.20.1 on PyPI; aw 1.20.0/1.20.1 on
+  npm + GH Releases. AC v0.5.22 pins aweb-server 1.20.1.
+- Migration-immutability gate: passed at release-ready ("OK: 4 migration
+  file(s) match prod recorded checksums across schemas
+  ['aweb', 'aweb_cloud', 'server']"). First real-world use post-landing.
+- Smoke probes 2026-05-05: alias + `--to-address` both attach to
+  existing conversation 96317ca9 (athena↔hestia) cleanly,
+  `verification_status=verified`.
 
 ## Release pipeline
 
-- aame OSS: shipped 2026-05-03/04 (PyPI/npm/GHCR). Verified-live.
-- aweb 1.19.1 (routing fix): shipped 2026-05-04. Verified-live.
-- AC v0.5.20 (cutover #1, aweb-schema clean): shipped 2026-05-05 ~05Z.
-  Verified-live.
-- AC v0.5.21 (cutover #2, aweb_cloud-schema clean + immutability gate):
-  shipped 2026-05-05 07:11Z. Verified-live.
-- Verified-live mail to Sofia sent (b09e4cad). Sofia confirmed framing
-  via channel mail eb5e3f99. Athena chat ack on session 0271e5b6.
-  Iris: agent not yet online (Hetzner identity setup pending) — framing
-  routes via decision record 7d915e8 + 90eeda0 per Sofia's note.
+- aame epic: aweb 1.20.0 r1 (1c70821) shipped → Phase 12 chat-reply abort
+  diagnosed (CLI stderr-suppression masking 409). Hotfix d666119 + test
+  mocks 18b4d75 → r2 (1510821) green. Published 1.20.0 + 1.20.1.
+- AC v0.5.22 r1: A.6a 409 on identity-DIDKey passthrough →
+  oss_auth.py allowlist fix (commit f6c27c61) → r2 green.
+- Pre-deploy duplicate-1to1 cleanup procedure executed cleanly via
+  Athena's collapse-only doc — 195 conversations closed across 16 pairs.
+  Smoke probe attached to pre-deploy 96317ca9 cleanly post-deploy:
+  counterexample to "all pre-deploy 409s" framing.
+- Verified-live for v0.5.22 deferred until multi-team-agent bug is
+  closed (Juan: "do not ship anything until all is fixed and fully
+  e2e tested").
 
 ## Operational discrepancies
 
-- **Iris agent not registered.** Mail send to iris fails ("agent not
-  found"). Hetzner identity bootstrap pending; Sofia signaled this
-  is awaiting rollout. No action from my side; flag if blocking
-  outreach.
-- **Asymmetric compat-test gap.** Compat covers (old-client + new-server)
-  but not (new-client + old-server). Manual workaround: probe new-client
-  against rolled-back prod before tag-push. Engineering follow-up in
-  Athena's lane.
-- **Verified-live mail for the engineering-discipline narrative.**
-  Sofia flagged the disciplined-cutover recovery (8fa36cd0 + schema-
-  equivalence IDENTICAL) as adjacent-to-aame story worth surfacing
-  to Iris/YC when broader positioning picks up. Holding for that
-  trigger.
+- **Multi-team-agent mail 409 (open).** athena (or any agent on
+  multiple teams) hitting some pre-deploy conversations 409s on reply
+  via `aw mail send --to <peer>`. Empirical probe: server
+  /v1/conversations surfaces 83 distinct conversations for both of
+  athena's agent_ids; both broken (70f1c868) and working (96317ca9)
+  appear in both runs with identical participant rows. Bug pinned
+  to CLI `mailConversationMatchesTarget` (mail.go) — server visibility
+  is correct. Mailed Athena (4752259d) with the diagnosis; Grace fix
+  → aweb 1.20.2 + AC v0.5.23.
+- **Pre-aame chat sessions 403 on continuation.** W3 protection
+  rejects chat replies on conversations whose signed messages predate
+  binding. Workaround: `aw chat send-and-wait <peer> "msg"
+  --start-conversation`. DELETE-240 chat_sessions explicitly off the
+  table (banked: customer history is not destroyable; real fix in
+  code on 1.20.2 cycle).
+- **chat_sessions schema gotcha.** Athena's pre-deploy close-cleanup
+  procedure UPDATEs `expires_at`/`updated_at` — neither column exists
+  on `chat_sessions`. Procedure broken; held until rewrite. Same
+  schema-gotcha class as `aweb.agents.updated_at` (banked).
+- **Iris agent not registered.** Mail send to iris fails. Hetzner
+  identity bootstrap pending. No action my side.
+- **Asymmetric compat-test gap.** Compat covers (old-client +
+  new-server) but not (new-client + old-server). Manual workaround:
+  probe new-client against rolled-back prod before tag-push. Athena's
+  lane.
 
 ## Active claims
 
@@ -79,27 +74,27 @@ v0.5.19 incident class:
 
 ## Workspace status (company team, default:aweb.ai)
 
-- hestia (me): online, no claims/locks, monitoring.
-- athena: online, validated immutability gate end-to-end.
-- sofia: online, framing routed to Iris via decision record.
+- hestia (me): online, monitoring; bug diagnosed, mailed Athena.
+- athena: online, awaiting fix-path brief reception.
+- sofia: online.
 - aida: online, idle.
 - iris/metis: not yet registered (Hetzner pending for iris).
-- yc: offline 3+ days.
 
 Dev team (`aweb:juan.aweb.ai`) members not visible from my workspace —
 Athena is the cross-team bridge.
 
 ## Next checks
 
-1. Daily `/health` on `app.aweb.ai` and `api.awid.ai`. Compare to
-   claims; flag drift.
-2. Watch for next release cycle — gate chain now includes the
-   immutability check, so any in-place edit to a deployed migration
-   will fail at release-ready, not at deploy.
-3. Iris agent registration: signal Sofia when status changes so
-   future verified-live mails reach her.
-4. Bank Athena's Engineering #17 (fail-closed gates with explicit
-   bypass) into runbook §Standing release-discipline next session.
+1. Watch for Athena's bless-and-run on aweb 1.20.2 + AC v0.5.23.
+   Run full release-ready chain (discipline #21) on receipt.
+2. Daily `/health` on app.aweb.ai + api.awid.ai. Flag drift.
+3. After 1.20.2 ship, re-probe the multi-team-agent mail path against
+   the 70f1c868-class conversations to verify CLI predicate fix.
+4. Bank discipline #21 (full release-ready chain on bless-and-run)
+   into runbook §Standing release-discipline.
+5. Bank schema-gotcha (aweb.agents/teams/chat_sessions lack updated_at;
+   chat_sessions lacks expires_at) into runbook §Schema gotchas.
+6. Bank 8-table identity-routing doctrine (post-launch, with Sofia).
 
 ## Standing release-discipline (banked through 2026-05-05)
 
@@ -120,10 +115,18 @@ Athena is the cross-team bridge.
 15. Run new-client smoke probes against rolled prod before patch tags
 16. Destructive cutover with cross-schema FKs requires constraint-diff
     audit (prod vs clean baseline) as explicit verification step
-    (banked 2026-05-05 from cutover #1's silent FK drop)
 17. Pre-deploy gates with environment-specific prerequisites must
     fail-closed with explicit bypass, not skip-on-missing
-    (banked 2026-05-05 from immutability-gate review)
+18. Verified-live evidence cites the actually-committed SHA, not a
+    bumped-but-unreverified SHA
+19. Work in flight (uncommitted bumps, in-progress procedures) does not
+    count as released until tag is pushed and live-verified
+20. Reproducer must match the empirical surface (CLI 409 reproducer
+    must surface 409 from production CLI binary against production
+    server, not just unit-test logic)
+21. Bless-and-run from peer = run the FULL release-ready chain end-to-end,
+    don't shortcut to bump+tag (banked 2026-05-05 from v0.5.22 r1
+    where 1.20.0 → 1.20.1 hop nearly skipped re-running gates)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
