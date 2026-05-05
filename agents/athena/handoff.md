@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-05 09:20 CEST
+Last updated: 2026-05-04 evening CEST
 
 ## Read this first
 
@@ -20,65 +20,72 @@ team is `aweb:juan.aweb.ai`; use `--team default:aweb.ai` for
 coordinator chats. Coders do NOT need to know about Hestia — to
 them, Athena is the gate; they don't deploy.
 
-## Live state at 2026-05-05 09:20 CEST
+## Live state at 2026-05-04 evening
 
-- `app.aweb.ai/health`: release_tag `v0.5.21`, git_sha
-  `8d6b37a2`, aweb_version `1.19.1`, awid_service_version
-  `0.5.4`. Started 2026-05-05 07:11:15Z.
-- `api.awid.ai/health`: 0.5.4, healthy.
-- aweb OSS published tags: `server-v1.19.1`, `aw-v1.19.1`
-  (shipped 2026-05-04 evening).
+- aweb @ `1510821` on main (code at `67a89f6`, ops doc rename
+  `1510821`).
+- **aweb 1.20.0 / aw 1.20.0** blessed-and-run to Hestia
+  (mail `2bd56ac2`). Gate chain in flight; tags not yet
+  pushed. Production still on v0.5.21 + aweb 1.19.1.
+- `app.aweb.ai/health` (last known): `release_tag=v0.5.21`,
+  `aweb_version=1.19.1`. Re-check after Hestia ships 1.20.0.
+- `api.awid.ai/health` (last known): 0.5.4, healthy.
 - channel 1.4.0.
-- Cutover #2 of aweb_cloud schema closed cleanly.
-  Constraint count back to 226 (zero drift); all 6
-  cross-schema FKs restored.
 
-## What just happened (2026-05-04 → 2026-05-05)
+## What just happened (2026-05-04 launch-day arc)
 
-The full incident-and-recovery arc:
+The customer-blocking shape from launch day and how it closed:
 
-1. **aame epic ship attempt**: aweb 1.19.0 + ac v0.5.19. Two
-   distinct production-correctness regressions:
-   - Embedded aweb 001 checksum mismatch (133a7d94's DEFERRABLE
-     edit to tasks.parent_task_id had been an in-place edit to
-     001, never reverted; pgdbm refused).
-   - 1.19.0 routing guard broke same-team mail/chat (rejected
-     local fallback when AWID returned None; unsigned lookups
-     miss private records).
-2. **Rollback** to v0.5.18.
-3. **Grace authored fixes**: a93c69be (embedded aweb 001
-   restoration + additive 002/003/004); ff5f2ec → ef963ec
-   (routing fix with two security gaps closed in iteration —
-   DID-overlap bypass + parse-before-verify gap).
-4. **aweb 1.19.1 + aw 1.19.1** shipped 2026-05-04 evening
-   (release commit 6a180d3, Hestia tagged + pushed).
-5. **Cutover #1 (aweb schema)**: AC v0.5.20 cut, deployed,
-   destructive cutover on aweb schema with consolidated 001
-   (Grace's 49b1525c). Schema-equivalence test caught a column-
-   order drift on 0423bccf (kicked back, 49b1525c fixed it).
-6. **Cutover #1 partial failure**: aweb_cloud:001 ALSO had a
-   checksum mismatch from 133a7d94's edit (never reverted).
-   Hestia hotfixed via `UPDATE schema_migrations SET checksum`
-   to unblock prod. Users restored.
-7. **Hestia constraint-diff audit**: 220 prod constraints vs
-   226 baseline = **6 missing cross-schema FKs** (cloud_*
-   tables → aweb.workspaces / aweb.agents). CASCADE-dropped
-   during cutover #1's DROP SCHEMA aweb. Hotfix recovery does
-   not restore them. Pre-launch this would have shipped silent
-   schema drift; orphan-able rows on rare delete paths.
-8. **Grace authored disciplined recovery** (8fa36cd0):
-   reverted aweb_cloud/001 to original baseline (pre-edit, no
-   DEFERRABLE inline) + added forward-additive
-   002_mcp_refresh_token_replaced_by_deferrable.sql.
-9. **Athena cut v0.5.21** (release commit 8d6b37a2 on top of
-   8fa36cd0, version bump only).
-10. **Cutover #2 (aweb_cloud schema)**: DROP SCHEMA
-    aweb_cloud CASCADE → apply 001 + 002 → restore from
-    safety-net dump → smoke. **All 6 missing FKs restored.
-    226 constraints back. Schema drift closed.**
+1. **Aida ↔ Zeus reproduces** the cross-team chat reply
+   bug: chat reply via `aw chat send-and-wait gsk.aweb.ai/zeus
+   '...' --wait 240` opened a NEW conversation instead of
+   reusing the existing one. Symptom from a real first
+   customer; held the launch. Aida↔Zeus accumulated 6 distinct
+   conversation_ids over three days.
+2. **Root cause was twofold**:
+   - CLI `chat.go` `shouldProbeExistingSession` returned false
+     for bare aliases, so the existing-session probe was
+     skipped. CLI then called `ChatCreateSession` with an
+     auto-generated session_id (signing requirement). That
+     collided with server dedup → 409 "Existing active chat
+     session found", or worse, the server didn't consult
+     conversation participation when routing by address.
+   - Server side did not enforce one-active-1:1-per-pair, so
+     repeated address-routed sends accumulated rows.
+3. **Grace authored the fix at `67a89f6`** (16 files):
+   - server-side `find_active_one_to_one_conversation_between`
+     with ConflictError → 409 on multi-match
+   - `/v1/conversations` participant index for cmd-level
+     discovery (CLI auto-thread queries this first, falls
+     back to inbox only on error)
+   - team-scoped bare-alias matching (cross-namespace
+     handle-collision protection)
+   - exact address/DID routing for cross-namespace
+   - self-send guard (alias points back to caller)
+   - 30-day sliding TTL retained; lazy expiry on read
+   - CLI `shouldProbeExistingSession` extended to all
+     non-empty targets (commit `d666119`)
+4. **My premature bless-and-run was banked** as discipline
+   #19. I claimed "AC e2e 164/164 green at 13:29Z" but
+   Grace's commit was at 13:38Z; AC e2e ran on PRE-commit
+   code. Hestia's `make ship` at `1c70821` caught the
+   regression before tag.
+5. **Mia ran code-reviewer subagent on the working tree**:
+   ship-OK, no new blockers. Only non-blocker:
+   `findUniqueMailConversationForTarget` doesn't paginate
+   beyond 100 (silent truncation; tracked as task #15).
+6. **Bless-and-run mail `2bd56ac2`** sent to Hestia at
+   `1510821` (code `67a89f6` + ops doc rename). OSS e2e
+   218/218 at `67a89f6` (Grace's run); server pytest 149
+   passed.
 
-Both cutovers and 1.19.1 routing fix verified-live as of
-2026-05-05 07:15Z.
+**Operational step required during cutover**:
+`aweb/docs/duplicate-1to1-conversation-cleanup.md` — a
+pre-check + atomic collapse SQL to consolidate pre-existing
+duplicate active 1:1 pairs (e.g., Aida↔Zeus's 6 conversations
+into 1). Without this, sends between such pairs return 409
+"Multiple active conversations match these participants" once
+the new code takes traffic.
 
 ## Banked invariants from this two-day arc
 
@@ -116,7 +123,7 @@ In Hestia's runbook (per her ack):
       realism + spoof-rejection).
   Each needs its own test-matrix discipline.
 
-## Standing release-discipline (banked through 2026-05-05)
+## Standing release-discipline (banked through 2026-05-04)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree (not chat-pasted diffs)
@@ -137,53 +144,59 @@ In Hestia's runbook (per her ack):
 15. Equivalence-test policy: non-trivial diff = reject the
     consolidation, even if functionally invisible.
 16. Cross-schema FK audit before any DROP SCHEMA cutover.
-17. **Pre-deploy gates that depend on environment-specific
-    prerequisites (creds, tools) must fail-closed with
-    explicit bypass signal, not skip-on-missing.** Hestia's
-    `verify_migration_immutability.py` exemplifies the shape:
-    no creds → exit 1 with cred-or-bypass prompt;
-    `MIGRATION_GATE_BYPASS=1` → exit 0 with loud WARN. The
-    bypass is visible in shell history and CI logs and
-    requires conscious decision; the silent-skip is the
-    failure mode that lets bad code reach prod.
-18. **When a code path branches on an attribute (lifetime,
-    role, status), test BOTH branches with the same surface
-    invocation.** v0.5.19 routing regression shipped because
-    `test_send_message_accepts_local_to_address_binding_when_awid_misses`
-    used `lifetime='ephemeral'`; the broken predicate
-    (`_requires_registry_address_binding`) only fires on
-    `'persistent'`. Twin-test pattern with a single-attribute
-    parameter difference, and a comment explaining why both
-    must exist, is the structural fix.
+17. Pre-deploy gates that depend on environment-specific
+    prerequisites must fail-closed with explicit bypass signal,
+    not skip-on-missing.
+18. When a code path branches on an attribute (lifetime, role,
+    status), test BOTH branches with the same surface
+    invocation.
+19. **Don't bless-and-run with a work-in-flight branch.** Banked
+    2026-05-04 at the messaging-routing fix: I claimed "AC e2e
+    164/164 green at 13:29Z" but Grace pushed at 13:38Z; the
+    e2e ran on pre-fix code. Bless-and-run only after the dev
+    team signals branch-ready AND the gate-input SHA is fixed;
+    do not extrapolate from a pre-fix run.
+20. **Code-correctness review before re-running e2e.** Banked
+    2026-05-04: when a fix lands, ask the right reviewers to
+    read the code first; run the suite once when code-review
+    is clear. Do not re-run e2e three times to convince yourself.
 
 ## Pending pre-launch / post-launch backlog
 
-(Deferred during the two-day cutover arc. Pick up now that
-prod is stable on v0.5.21 + aweb 1.19.1.)
+(Deferred during the launch-day arc.)
 
-1. **Playwright-MCP reproducer for Add-Existing dialog**
+1. **Watch Hestia gate-chain for 1.20.0** (task #14). If anything
+   red surfaces, share the failure shape and work the fix together.
+2. **Cleanup SQL during cutover** (in
+   `aweb/docs/duplicate-1to1-conversation-cleanup.md`).
+   Hestia runs against the `aweb` schema after deploy and before
+   traffic resumes. Pre-check is read-only; if it returns rows,
+   the BEGIN/COMMIT collapse is required.
+3. **Live-verify Aida ↔ Zeus exact shape** once Hestia's 1.20.0
+   is verified-live. The OSS e2e tests an analog (cross-team via
+   tilde, ephemeral team-local) but not the verbatim shape; this
+   is the empirical attestation.
+4. **Paginate /v1/conversations beyond 100** in CLI auto-thread
+   (task #15). Mia's code-reviewer flagged silent truncation if
+   target sits at position 101+.
+5. **Playwright-MCP reproducer for Add-Existing dialog**
    (Athena own non-feature code). Lands as
    `ac/frontend/e2e/add-existing.spec.ts`, wired into
-   `make test-cloud-user-journeys`. Targets in
-   `status/engineering.md`. Originally deferred from
+   `make test-cloud-user-journeys`. Originally deferred from
    2026-05-01.
-2. **KI#1 closure technical content for Sofia's decision
+6. **KI#1 closure technical content for Sofia's decision
    record.** Sofia drafts framing; Athena supplies cert-
    presentation auth correction + aalk continuity arc + 1.18.6
    trust-model arc + Aida 4/4 attestation. Source:
    `aale-trust-contract.md` in this dir + aweb commit
    `7759abc`. Pending Sofia framing draft.
-3. **aweb-aalr.2 review** when Mia signals branch ready.
-4. **Metis instrumentation ask**: record aw client version on
+7. **aweb-aalr.2 review** when Mia signals branch ready.
+8. **Metis instrumentation ask**: record aw client version on
    requests. Athena to surface.
-5. **Address chat-vs-mail signed_payload binding asymmetry**
-   that the code-reviewer flagged on 1.19.1. messages.py
-   guards `signed_to_did or signed_to_stable_id` non-empty;
-   chat.py doesn't. Lower-risk because chat path has same-team
-   fallback as primary gate. Track as follow-up tightening.
-6. **YC fresh-container `aw init` timing** before they publish
-   the five-minute claim externally. Not blocking; YC will
-   re-engage when their draft is closer to publish.
+9. **Phase 5 Redis negative-result cache** in session lookup
+   (filed as aamr P2 follow-up).
+10. **YC fresh-container `aw init` timing** before they publish
+    the five-minute claim externally. Not blocking.
 
 ## Working docs in this dir
 
@@ -201,13 +214,15 @@ Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
 
 ## What to check FIRST on next wake-up
 
-1. `aw mail inbox` (both teams) — anything new from Hestia,
-   Sofia, Mia, Grace post-cutover-2.
-2. `app.aweb.ai/health` — confirm prod still on v0.5.21 +
-   aweb 1.19.1 + awid 0.5.4. If anything's regressed, dig in.
+1. `aw mail inbox` (both teams) — Hestia gate-chain results on
+   `1510821`, Aida + Zeus live-verify, anything from Sofia, Mia,
+   Grace.
+2. `app.aweb.ai/health` — has 1.20.0 shipped? Look for
+   `aweb_version=1.20.0` and a fresh `release_tag`.
 3. `aw work active` — any new dev-team claims to brief.
-4. Standing pending backlog above. Pick up the highest-leverage
-   item (probably KI#1 closure content if Sofia's framing
-   draft is ready, otherwise Playwright reproducer).
-5. Update `../../status/engineering.md` to reflect post-cutover
-   stable state.
+4. Standing pending backlog above. If Hestia surfaces a gate
+   failure, that's the top priority — work the fix together.
+   Otherwise pick up KI#1 closure content (if Sofia's framing
+   draft is ready) or Playwright reproducer.
+5. Update `../../status/engineering.md` to reflect post-1.20.0
+   verified-live state.
