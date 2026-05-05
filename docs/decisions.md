@@ -6,6 +6,116 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-05 — aame architectural completion verified-live: writing creates a reply channel (aweb 1.20.1, ac v0.5.22)
+
+**Commit:** `TBD` aame architectural completion: writing-creates-a-reply-channel verified-live + 1.20.1 misclaim caveat banked
+
+**Decision maker:** Sofia (framing) + Athena (technical content + bless-and-run) + Hestia (gate chain + verified-live + misclaim flag).
+
+**What shipped (architectural completion of aame).** The protocol
+primitive that shipped this morning (aweb 1.19.1 / ac v0.5.21 — see
+the decision entry below) was incomplete for AC managed identity:
+cloud customers' did:keys without team-cert mode could not reliably
+continue conversations across team boundaries via address routing.
+Aida's onboarding flow surfaced the gap as customer-blocking shape
+A.6a during the day. Today's ship closes it.
+
+The customer-facing claim that becomes accurate at v0.5.22:
+
+- Writing to someone creates a reply channel they can use back,
+  end-to-end across team boundaries
+- AC managed identity (cloud customers without team-cert mode) can
+  continue conversations via address routing
+- Cross-team chat reply with private team-members-only target lands
+  in the same conversation
+- Mail auto-thread to an existing 1:1 works for both alias-routing
+  and address-routing
+
+**Empirical attestation.**
+
+- Morning ship (decision `7d915e8`): aweb 1.19.1 / ac v0.5.21 —
+  protocol primitive verified-live 2026-05-05 07:11Z.
+- Aida's onboarding A.6a surfaced the AC managed identity gap during
+  the day.
+- aweb 1.20.0 + aweb 1.20.1 shipped through Athena's iteration.
+- **aweb 1.20.1 was a misclaim release**: its release notes claimed
+  a fix that was empirically null on A.6a; the actual A.6a fix
+  landed in AC commit `f6c27c61`. **If external posting cites aweb
+  1.20.1 as the fix release, that's wrong — cite AC `f6c27c61`.**
+  Caveat banked here so future agents reading commit history don't
+  get confused.
+- ac v0.5.22 deployed 2026-05-05 21:27Z. `app.aweb.ai/health`:
+  `release_tag=v0.5.22`, `git_sha=f6c27c61`, `aweb_version=1.20.1`,
+  `awid_service_version=0.5.4`. Healthy.
+- Two Hestia smoke probes post-deploy (after duplicate-1:1 cleanup):
+  `aw mail send --to athena` → conversation `96317ca9`;
+  `aw mail send --to-address aweb.ai/athena` → SAME conversation
+  `96317ca9`. Athena's reply confirmed
+  `verification_status=verified`. The exact dual of A.6a — the
+  failure shape that drove three rounds of iteration — now passes in
+  production.
+- Migration-immutability gate (commit `3d7f878b`, banked this
+  morning) proved its keep on this deploy: no migration drift
+  through gate-time → deploy.
+
+**External framing (for outreach + future verified-live mails + YC
+posting moments).**
+
+Customer-facing version (use in verified-live mail body and outreach
+drafts):
+
+> When you write to someone in aweb, they can now reply back to you
+> in the same conversation — across team boundaries, across hosted
+> and self-hosted identities, regardless of whether you addressed
+> them by alias or address. Writing creates a reply channel; that
+> channel works end-to-end.
+
+Protocol-positioning version (for YC-grade language at external
+posting moments — coordinate with Iris and the YC agent on timing):
+
+> aweb's conversation primitive is now a fully reciprocal
+> addressable unit. Cross-team agent coordination works without
+> either side requiring the other to be publicly findable to receive
+> a reply. The cert-presentation auth model (1.18.6) extends to
+> conversation-scope (1.19.1) and now operates symmetrically across
+> all identity-routing paths (1.20.1 + ac v0.5.22).
+
+**What this is not.**
+
+- Not always-encrypted payloads (separate concern).
+- Not a new auth model (extends the 1.18.6 cert-presentation
+  predicate).
+- Not the first messaging in aweb (mail/chat shipped in 1.16.x; the
+  conversation primitive is the binding/lifecycle layer).
+- **aweb 1.20.1 release notes are misclaim-grade**: the actual A.6a
+  fix landed in AC `f6c27c61`. External posting must cite the AC
+  commit, not the aweb tag.
+
+**Cross-references.**
+
+- Morning ship decision (`7d915e8`): protocol primitive verified-live
+  (aweb 1.19.1 / ac v0.5.21). This entry is the architectural
+  completion that makes the customer-facing claim accurate.
+- 1.18.6 trust-model pivot (commit `7759abc`): cert-presentation
+  auth predicate, foundation that aame extends to conversation-scope
+  and now operates symmetrically across identity-routing paths.
+- Migration-immutability gate (commit `3d7f878b`): structural
+  prevention from this morning's banked discipline; proved its keep
+  on tonight's deploy.
+- Invariant 8 (`docs/invariants.md`: findability and continuation
+  are independent reachability concerns) — aame's symmetric
+  reciprocal routing is the operational realization.
+- KI#1 closure decision record: still pending; Athena's tech content
+  is owed.
+
+**Affects.** Cloud at v0.5.22 carries the rollup. Customer-facing
+flow (Aida's onboarding A.6a) is unblocked. External framing ready
+for outreach (Iris when online) and YC posting work; voice-shape per
+`publishing/voice.md`. Migration-immutability gate now mechanically
+enforced at AC release-ready.
+
+---
+
 ## 2026-05-05 — aame verified-live: conversations as first-class primitive (aweb 1.19.1, ac v0.5.21)
 
 **Commit:** `7d915e8` aame verified-live: decision record for conversations as first-class primitive
