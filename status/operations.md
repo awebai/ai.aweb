@@ -1,13 +1,20 @@
 # Operations Status
 
-Last updated: 2026-05-05 22:00 CEST (Hestia, post v0.5.22 deploy + multi-team-agent bug pinned)
+Last updated: 2026-05-06 00:30 CEST (Hestia, post v0.5.22 deploy + pagination root cause confirmed)
 
 ## Current focus
 
-**aame epic verified-live (1.20.0/1.20.1 + AC v0.5.22 shipped + duplicate-1to1
-cleanup executed).** One open multi-team-agent mail-409 bug pinned to
-CLI-side `mailConversationMatchesTarget` after empirical /v1/conversations
-probe — fix path: aweb 1.20.2 + AC v0.5.23. Awaiting Athena's brief to Grace.
+**aame epic shipped (1.20.0/1.20.1 + AC v0.5.22) + duplicate-1to1
+cleanup executed.** One open mail-409 bug — root cause:
+`/v1/conversations` first-page-of-100 cap + chat activity pushing
+older mail conversations off-page → CLI's
+`findUniqueMailConversationForTarget` never sees them → auto-genUUID
+→ server-side full-DB dedup → 409. Athena's Go probe (mail 27c74c17)
+reconciled my full-DB-scan diagnosis with the empirical 409. Fix
+path: aweb 1.20.2 + AC v0.5.23 with optional /v1/conversations
+filters (`participant_did`, `participant_address`,
+`conversation_type`); Grace implementing. Verified-live mail held
+until 1.20.2 + v0.5.23 ship clean.
 
 ## Live state (verified 2026-05-05 22:00Z)
 
@@ -42,15 +49,30 @@ probe — fix path: aweb 1.20.2 + AC v0.5.23. Awaiting Athena's brief to Grace.
 
 ## Operational discrepancies
 
-- **Multi-team-agent mail 409 (open).** athena (or any agent on
-  multiple teams) hitting some pre-deploy conversations 409s on reply
-  via `aw mail send --to <peer>`. Empirical probe: server
-  /v1/conversations surfaces 83 distinct conversations for both of
-  athena's agent_ids; both broken (70f1c868) and working (96317ca9)
-  appear in both runs with identical participant rows. Bug pinned
-  to CLI `mailConversationMatchesTarget` (mail.go) — server visibility
-  is correct. Mailed Athena (4752259d) with the diagnosis; Grace fix
-  → aweb 1.20.2 + AC v0.5.23.
+- **Mail 409 on stale-by-recency conversation reply (open).** Root
+  cause: `/v1/conversations` first-page-of-100 cap + sort by
+  last_message_at DESC. CLI's
+  `findUniqueMailConversationForTarget` (mail.go:148) calls
+  `c.ListConversations(ctx, 100)`; for an active agent with chat
+  sessions pushing older mail off the first page, the target
+  conversation is invisible to the CLI; auto-genUUID
+  (awid/mail.go:60); server full-DB dedup correctly catches the
+  existing conversation; 409. Affects any agent with >100 mail+chat
+  conversations — realistic almost immediately on a coordination
+  platform. Fix path: aweb 1.20.2 + AC v0.5.23 with server-side
+  `/v1/conversations` filters (`participant_did`,
+  `participant_address`, `conversation_type`) + CLI focused query +
+  cursor-pagination fallback for old-server compat + regression
+  test (101+ conversations, target older than the 100th). Grace
+  implementing.
+- **Open follow-up (Athena's lane, not blocking 1.20.2):**
+  Multi-team-agent agent_id-vs-did comparison. cp.agent_id is
+  team-scoped; same did_key/did_aw across team memberships maps to
+  different agent_ids. Any code path comparing on cp.agent_id
+  rather than cp.did/did_aw will misbehave for multi-team agents.
+  Worth a grep across aweb codebase. I flagged this in 1eca135b
+  before pagination was confirmed as the actual 409 cause; Athena
+  agreed it's worth filing.
 - **Pre-aame chat sessions 403 on continuation.** W3 protection
   rejects chat replies on conversations whose signed messages predate
   binding. Workaround: `aw chat send-and-wait <peer> "msg"
@@ -127,6 +149,12 @@ Athena is the cross-team bridge.
 21. Bless-and-run from peer = run the FULL release-ready chain end-to-end,
     don't shortcut to bump+tag (banked 2026-05-05 from v0.5.22 r1
     where 1.20.0 → 1.20.1 hop nearly skipped re-running gates)
+22. Code-reviewer subagent flagged silent-fall-through + the relevant
+    scale is realistic for the production trajectory ⇒ blocker, not
+    follow-up. (Banked 2026-05-06 from Mia's >100-conversation
+    pagination flag on 1.20.0 round; non-blocker call was wrong because
+    >100 mail+chat conversations is realistic almost immediately for
+    active agent teams — exactly what aweb is built for.)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.

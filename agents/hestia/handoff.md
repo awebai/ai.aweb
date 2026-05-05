@@ -1,7 +1,8 @@
 # Hestia Handoff
 
-Last updated: 2026-05-05 22:00 CEST (post v0.5.22 deploy + multi-team-agent
-bug pinned to CLI; awaiting Athena's 1.20.2 brief)
+Last updated: 2026-05-06 00:30 CEST (post v0.5.22 deploy + pagination
+root cause confirmed; awaiting Grace's branch + Athena's bless-and-run
+on aweb 1.20.2 + AC v0.5.23)
 
 ## Read this first
 
@@ -23,24 +24,42 @@ The 2026-05-05 launch-day cycle is **mostly closed**:
 
 **Open bug** (Juan's launch-hold still in effect):
 
-Multi-team-agent mail 409 on some pre-deploy conversations. athena
-(member of `default:aweb.ai` and `aweb:juan.aweb.ai`) gets 409 on
-reply via `aw mail send --to <peer>` for some conversations but not
-others. Diagnosis pinned to **CLI `mailConversationMatchesTarget`
-(mail.go)**, not server visibility:
+Mail 409 on stale-by-recency conversation reply. Root cause:
+**`/v1/conversations` returns first 100 sorted by last_message_at
+DESC; CLI's `findUniqueMailConversationForTarget` (mail.go:148)
+calls ListConversations(100); for active agents with chat sessions
+pushing older mail off page 1, the conversation is invisible to
+CLI; CLI auto-generates conversation UUID; server's full-DB dedup
+correctly catches the existing conversation; 409.**
 
-- Empirical /v1/conversations probe with both athena agent_ids
-  (d75fe9d3 default, fdeb842d aweb-juan) returned 83 distinct
-  conversation_ids each run.
-- BOTH 70f1c868 (broken, sofia↔athena) AND 96317ca9 (works,
-  hestia↔athena) surfaced in BOTH runs.
-- Participant rows API returns: identical shape — athena (did=yumP9TQf,
-  address=aweb.ai/athena) paired with sofia/hestia. transport_hint is
-  NOT in the API response.
+My initial diagnosis (server visibility correct, agent_id
+discriminator surfaced) was reconciled by Athena's Go probe (mail
+27c74c17): same data, different visibility window. The full-DB
+scan saw 70f1c868 (correct); CLI's first-page-of-100 didn't (also
+correct). Pagination is the actual cause. The agent_id /
+multi-team observation I flagged is real but separate — filed as
+ops follow-up, not blocking 1.20.2.
 
-Server visibility is correct. Bug is in CLI's matching predicate
-deciding 70f1c868 doesn't match. Mailed Athena (4752259d) with the
-diagnosis. Fix path: aweb 1.20.2 + AC v0.5.23 with Grace's CLI fix.
+This affects any agent with >100 mail+chat conversations —
+realistic almost immediately for active coordination teams. Mia's
+>100-conversation pagination follow-up on the 1.20.0 round was
+flagged as non-blocker; that call was wrong. Banked as standing
+policy #22.
+
+Fix shape (Grace + Athena converged):
+1. Server: optional `/v1/conversations` filters
+   `conversation_type`, `participant_did`, `participant_address`.
+   Filter applied AFTER actor-scope; cannot expose conversations
+   the actor isn't already in.
+2. CLI: `findUniqueMailConversationForTarget` uses focused query.
+   Falls back to cursor pagination of unfiltered ListConversations
+   for old-server compat (capped at 500 / 5 pages).
+3. Regression test: actor with 101+ conversations spanning
+   mail+chat; target's conversation older than the 100th
+   most-recent must auto-thread.
+
+Grace implementing on a branch. Athena will run code-reviewer
+subagent + full release-ready before bless-and-run mail to me.
 
 ## The team
 
@@ -82,6 +101,11 @@ diagnosis. Fix path: aweb 1.20.2 + AC v0.5.23 with Grace's CLI fix.
   chain end-to-end. Don't shortcut to bump+tag — re-run gates each
   time. Banked from v0.5.22 r1 where the 1.20.0→1.20.1 hop nearly
   skipped re-running gates.
+- **Discipline #22**: code-reviewer subagent flagged silent-fall-through
+  + relevant scale realistic for production trajectory ⇒ blocker, not
+  follow-up. Banked from Mia's >100-conversation pagination flag on
+  1.20.0; non-blocker call was wrong (>100 mail+chat conversations is
+  realistic immediately for active agent teams).
 - **Schema gotcha (banked, runbook §Schema gotchas pending)**:
   `aweb.agents`, `aweb.teams`, `aweb.chat_sessions` lack `updated_at`.
   `aweb.chat_sessions` also lacks `expires_at`. Athena's close-cleanup
@@ -95,8 +119,10 @@ diagnosis. Fix path: aweb 1.20.2 + AC v0.5.23 with Grace's CLI fix.
 ## Open follow-ups (Hestia's lane)
 
 1. **Watch for Athena's 1.20.2 + v0.5.23 bless-and-run.** Run full
-   release-ready chain (discipline #21). Re-probe multi-team-agent
-   mail path against 70f1c868-class conversations after deploy.
+   release-ready chain (discipline #21). Re-probe stale-by-recency
+   reply path: simulate or directly trigger an athena-side reply to
+   conversation 70f1c868 (or any mail conversation pushed off the
+   first 100 by chat activity) — must auto-thread, not 409.
 2. **Bank discipline #21 into runbook** — first real session post-launch
    when ops cadence resumes.
 3. **Bank schema-gotcha into runbook §Schema gotchas** — pgdbm-style
