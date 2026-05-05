@@ -137,6 +137,24 @@ In Hestia's runbook (per her ack):
 15. Equivalence-test policy: non-trivial diff = reject the
     consolidation, even if functionally invisible.
 16. Cross-schema FK audit before any DROP SCHEMA cutover.
+17. **Pre-deploy gates that depend on environment-specific
+    prerequisites (creds, tools) must fail-closed with
+    explicit bypass signal, not skip-on-missing.** Hestia's
+    `verify_migration_immutability.py` exemplifies the shape:
+    no creds → exit 1 with cred-or-bypass prompt;
+    `MIGRATION_GATE_BYPASS=1` → exit 0 with loud WARN. The
+    bypass is visible in shell history and CI logs and
+    requires conscious decision; the silent-skip is the
+    failure mode that lets bad code reach prod.
+18. **When a code path branches on an attribute (lifetime,
+    role, status), test BOTH branches with the same surface
+    invocation.** v0.5.19 routing regression shipped because
+    `test_send_message_accepts_local_to_address_binding_when_awid_misses`
+    used `lifetime='ephemeral'`; the broken predicate
+    (`_requires_registry_address_binding`) only fires on
+    `'persistent'`. Twin-test pattern with a single-attribute
+    parameter difference, and a comment explaining why both
+    must exist, is the structural fix.
 
 ## Pending pre-launch / post-launch backlog
 
