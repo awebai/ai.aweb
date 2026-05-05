@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-04 14:55 CEST
+Last updated: 2026-05-05 09:20 CEST
 
 ## Read this first
 
@@ -20,120 +20,103 @@ team is `aweb:juan.aweb.ai`; use `--team default:aweb.ai` for
 coordinator chats. Coders do NOT need to know about Hestia — to
 them, Athena is the gate; they don't deploy.
 
-## Current critical-path work: aame cutover
+## Live state at 2026-05-05 09:20 CEST
 
-We are mid-cutover after the v0.5.19 deploy incident.
+- `app.aweb.ai/health`: release_tag `v0.5.21`, git_sha
+  `8d6b37a2`, aweb_version `1.19.1`, awid_service_version
+  `0.5.4`. Started 2026-05-05 07:11:15Z.
+- `api.awid.ai/health`: 0.5.4, healthy.
+- aweb OSS published tags: `server-v1.19.1`, `aw-v1.19.1`
+  (shipped 2026-05-04 evening).
+- channel 1.4.0.
+- Cutover #2 of aweb_cloud schema closed cleanly.
+  Constraint count back to 226 (zero drift); all 6
+  cross-schema FKs restored.
 
-**Sequence of events (2026-05-02 → 2026-05-04):**
-1. aame epic (aweb-aame, 10 sub-tasks .1-.10): conversations as
-   first-class, lazy 30-day TTL, cert-presentation auth on the
-   conversation primitive. Grace authored sub-tasks; reviewed by
-   Athena + Mia dual-review.
-2. Released as aweb 1.19.0 / aw 1.19.0 / awid 0.5.4 / channel
-   1.4.0 / ac v0.5.19. Production deploy FAILED:
-   - AC's embedded aweb 001 had been edited by AC commit
-     133a7d94 (made `tasks.parent_task_id` DEFERRABLE),
-     producing a checksum mismatch against prod's recorded
-     `f0331940` — pgdbm refused to apply.
-   - aweb 1.19.0 added a guard in `RegistryClient.resolve_address`
-     that broke the local persistent fallback when AWID resolved
-     to None — but unsigned lookups (no signing_key) miss
-     private/team-scoped records, so cloud's same-team mail/chat
-     broke.
-3. Cloud rolled back to v0.5.18 (Render image
-   `ghcr.io/awebai/ac:0.5.18` — note no leading `v`,
-   `docker/metadata-action` strips it).
-4. Grace authored two recovery commits:
-   - **a93c69be** (ac): restored AC-embedded 001 to f0331940
-     checksum, added 002+003+004 as additive aame migrations.
-   - **ff5f2ec** → **ef963ec** (aweb): routing fix with two
-     critical security gaps closed in iteration. Now uses
-     `address_auth.py` shared helpers: same-team-projected
-     team_id-equality (DID-overlap branch removed) +
-     cryptographic signature verification before
-     signed_payload-binding match.
-5. Juan chose cutover over forward-additive: dump prod data,
-   DROP SCHEMA, apply consolidated 001 (containing all of
-   001+002+003+004 merged), restore data.
-6. Grace authored **0423bccf** (ac): consolidated AC-embedded
-   001 (single file, 002/003/004 deleted), updated
-   `test_migration_paths.py`, added orphan-FK pre-check to
-   `verify_db_reset_roundtrip.py` and wired it into
-   `prod_db_reset.py` before TRUNCATE.
+## What just happened (2026-05-04 → 2026-05-05)
 
-## Cutover review status (today 2026-05-04)
+The full incident-and-recovery arc:
 
-**APPROVED at 49b1525c. Hestia is cleared for AC ship chain.**
+1. **aame epic ship attempt**: aweb 1.19.0 + ac v0.5.19. Two
+   distinct production-correctness regressions:
+   - Embedded aweb 001 checksum mismatch (133a7d94's DEFERRABLE
+     edit to tasks.parent_task_id had been an in-place edit to
+     001, never reverted; pgdbm refused).
+   - 1.19.0 routing guard broke same-team mail/chat (rejected
+     local fallback when AWID returned None; unsigned lookups
+     miss private records).
+2. **Rollback** to v0.5.18.
+3. **Grace authored fixes**: a93c69be (embedded aweb 001
+   restoration + additive 002/003/004); ff5f2ec → ef963ec
+   (routing fix with two security gaps closed in iteration —
+   DID-overlap bypass + parse-before-verify gap).
+4. **aweb 1.19.1 + aw 1.19.1** shipped 2026-05-04 evening
+   (release commit 6a180d3, Hestia tagged + pushed).
+5. **Cutover #1 (aweb schema)**: AC v0.5.20 cut, deployed,
+   destructive cutover on aweb schema with consolidated 001
+   (Grace's 49b1525c). Schema-equivalence test caught a column-
+   order drift on 0423bccf (kicked back, 49b1525c fixed it).
+6. **Cutover #1 partial failure**: aweb_cloud:001 ALSO had a
+   checksum mismatch from 133a7d94's edit (never reverted).
+   Hestia hotfixed via `UPDATE schema_migrations SET checksum`
+   to unblock prod. Users restored.
+7. **Hestia constraint-diff audit**: 220 prod constraints vs
+   226 baseline = **6 missing cross-schema FKs** (cloud_*
+   tables → aweb.workspaces / aweb.agents). CASCADE-dropped
+   during cutover #1's DROP SCHEMA aweb. Hotfix recovery does
+   not restore them. Pre-launch this would have shipped silent
+   schema drift; orphan-able rows on rare delete paths.
+8. **Grace authored disciplined recovery** (8fa36cd0):
+   reverted aweb_cloud/001 to original baseline (pre-edit, no
+   DEFERRABLE inline) + added forward-additive
+   002_mcp_refresh_token_replaced_by_deferrable.sql.
+9. **Athena cut v0.5.21** (release commit 8d6b37a2 on top of
+   8fa36cd0, version bump only).
+10. **Cutover #2 (aweb_cloud schema)**: DROP SCHEMA
+    aweb_cloud CASCADE → apply 001 + 002 → restore from
+    safety-net dump → smoke. **All 6 missing FKs restored.
+    226 constraints back. Schema drift closed.**
 
-- 0423bccf kicked back to Grace for column-order drift. She
-  pushed 49b1525c (moves conversation_id last, updates checksum
-  to 5777f63..., adds defensive migration-path assertion on the
-  descending-ordinal order of the final three messages columns,
-  adds the single-COPY-block comment in
-  verify_db_reset_roundtrip.py).
-- Re-ran `cutover_schema_equivalence.sh a93c69be 49b1525c`:
-  IDENTICAL. 3813 normalized lines, no diff.
-- Code-reviewer warnings W1 (hardcoded `aweb.` in trigger fn)
-  and W3 (dual-call-site doc gap) deferred — fix-or-defer was
-  Grace's call.
-- Greenlit Grace (mail `68cdf325`); signaled Hestia (mail
-  `d3f4bccb`) to start the AC ship chain.
+Both cutovers and 1.19.1 routing fix verified-live as of
+2026-05-05 07:15Z.
 
-**Equivalence-script follow-ups flagged to Hestia (not blocking):**
-- Strip pg_dump 17 `\restrict`/`\unrestrict` random-token lines
-  in the normalizer.
-- Stage a minimal dev `.env` into each worktree backend (Pydantic
-  Settings refuses default secrets).
+## Banked invariants from this two-day arc
 
-## Cutover ship chain (in flight)
+In `aweb/docs/aweb-sot.md` (Migrations section):
 
-Coordinated with Hestia (mail `3a6f8591`):
-- aweb 1.19.1 + aw 1.19.1 patch ship: **bless-and-run sent**
-  (mail `5614c2e7`). Release commit `6a180d3` on aweb main.
-  Code-reviewer subagent `a1d9964` cleared (no criticals).
-  Hestia tags + pushes per banked policy 7.
-- AC v0.5.20 with new pin + consolidated 001 from 49b1525c —
-  Hestia tags after PyPI/npm publish confirmed.
-- Render deploy (Hestia + Juan).
-- Cutover phases (Hestia):
-  pre-flight → safety dump → cutover dump →
-  DROP SCHEMA aweb CASCADE → apply consolidated 001 →
-  verify-applied SQL → restore from filtered dump →
-  smoke probes → verified-live.
+- **Deployed migrations are immutable. Recovery is always a
+  NEW forward migration, never editing existing.** Banked
+  during cutover #1 prep (commit 67f4cfa).
 
-## Banked invariants from this cycle
+In Hestia's runbook (per her ack):
 
-- **Migrations are immutable once deployed.** Recovery is always
-  a NEW forward migration, never editing the old. Banked in
-  `aweb/docs/aweb-sot.md` (commit 67f4cfa) per Sofia's routing
-  call. Athena AGENTS.md cross-references it.
-- **Asymmetric compat-test gap, two categories:**
+- **Multi-directory checksum audit on schema add**: when
+  adding a new schema or migration directory to a service,
+  audit ALL existing migration directories' checksums against
+  prod's recorded ones FIRST. The aweb_cloud:001 drift was
+  always there (since April 133a7d94); only surfaced when
+  v0.5.19+v0.5.20 attempted to apply embedded-aweb migrations
+  on top, scanning both chains under one deploy.
+- **Prefer file-revert over hotfix when both available**:
+  if a forward-additive migration already exists in the tree
+  for a constraint change, the disciplined fix is to revert
+  the in-place edit + keep the additive migration. Both produce
+  the same end-state DDL; the disciplined shape preserves the
+  immutability invariant.
+- **Cross-schema FK audit before any DROP SCHEMA cutover**:
+  run a constraint-diff against baseline; cross-schema FKs
+  CASCADE-drop during DROP SCHEMA but do NOT auto-recreate via
+  forward-additive migrations on the dropped schema's chain.
+  Without the audit, schema drift is invisible until a
+  customer-facing delete cascade behaves unexpectedly.
+- **Asymmetric compat-test gap**: two distinct categories:
   (a) wire-shape compat (old-client/new-server,
       new-client/old-server),
   (b) auth-correctness inside new code (cert-presentation
       realism + spoof-rejection).
-  Each needs its own test-matrix discipline. Both bit us in
-  the v0.5.19 cycle.
-- **`uv sync --refresh` after a PyPI publish:** uv's index cache
-  lags. Always `--refresh` in the post-publish hour.
+  Each needs its own test-matrix discipline.
 
-## YC artifact (one-off, not load-bearing)
-
-`/Users/juanre/Desktop/grace-athena-security-review.md` —
-verbatim 13-message chat history of the ff5f2ec → ef963ec
-security-review iteration, for Y-Combinator application.
-Untrimmed per Juan's explicit request.
-
-## Pending pre-cutover work
-
-- (Outside the cutover) Task #2: Author Playwright-MCP
-  reproducer for Add-Existing dialog. Deferred from 2026-05-01.
-  Picks up after cutover lands.
-- Task #3: Supply KI#1 closure technical content for Sofia's
-  decision record. Pending Sofia framing draft.
-- Task #5: Review aweb-aalr.2 when Mia signals branch ready.
-
-## Standing release-discipline (banked through 2026-04-26 + this cycle)
+## Standing release-discipline (banked through 2026-05-05)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree (not chat-pasted diffs)
@@ -149,11 +132,40 @@ Untrimmed per Juan's explicit request.
 12. Reproducer-as-gate
 13. Code-reviewer subagent for gate-input commits BEFORE
     bless-and-run mail to Hestia
-14. **Migration files are immutable post-deploy. Recovery is
-    additive. (this cycle)**
-15. **Equivalence-test policy: non-trivial diff = reject the
-    consolidation, even if functionally invisible. Restore
-    correctness ≠ schema equivalence. (this cycle)**
+14. Migration files are immutable post-deploy. Recovery is
+    additive.
+15. Equivalence-test policy: non-trivial diff = reject the
+    consolidation, even if functionally invisible.
+16. Cross-schema FK audit before any DROP SCHEMA cutover.
+
+## Pending pre-launch / post-launch backlog
+
+(Deferred during the two-day cutover arc. Pick up now that
+prod is stable on v0.5.21 + aweb 1.19.1.)
+
+1. **Playwright-MCP reproducer for Add-Existing dialog**
+   (Athena own non-feature code). Lands as
+   `ac/frontend/e2e/add-existing.spec.ts`, wired into
+   `make test-cloud-user-journeys`. Targets in
+   `status/engineering.md`. Originally deferred from
+   2026-05-01.
+2. **KI#1 closure technical content for Sofia's decision
+   record.** Sofia drafts framing; Athena supplies cert-
+   presentation auth correction + aalk continuity arc + 1.18.6
+   trust-model arc + Aida 4/4 attestation. Source:
+   `aale-trust-contract.md` in this dir + aweb commit
+   `7759abc`. Pending Sofia framing draft.
+3. **aweb-aalr.2 review** when Mia signals branch ready.
+4. **Metis instrumentation ask**: record aw client version on
+   requests. Athena to surface.
+5. **Address chat-vs-mail signed_payload binding asymmetry**
+   that the code-reviewer flagged on 1.19.1. messages.py
+   guards `signed_to_did or signed_to_stable_id` non-empty;
+   chat.py doesn't. Lower-risk because chat path has same-team
+   fallback as primary gate. Track as follow-up tightening.
+6. **YC fresh-container `aw init` timing** before they publish
+   the five-minute claim externally. Not blocking; YC will
+   re-engage when their draft is closer to publish.
 
 ## Working docs in this dir
 
@@ -171,15 +183,13 @@ Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
 
 ## What to check FIRST on next wake-up
 
-1. `aw mail inbox` (both teams) — Hestia's post-publish ack
-   on aweb-server-v1.19.1 + aw-v1.19.1.
-2. PyPI/npm published: `pip index versions aweb`,
-   `npm view @awebai/aw versions`.
-3. If both shipped: she'll move to AC v0.5.20 cut. No action
-   from me until she signals cutover-phase issue or
-   verified-live.
-4. If smoke-probe fails or she flags an issue: read her
-   failure-shape, work the fix together.
-5. `app.aweb.ai/health` — confirm cutover landed cleanly when
-   Hestia signals verified-live.
-6. `aw work active` — check for any new claims.
+1. `aw mail inbox` (both teams) — anything new from Hestia,
+   Sofia, Mia, Grace post-cutover-2.
+2. `app.aweb.ai/health` — confirm prod still on v0.5.21 +
+   aweb 1.19.1 + awid 0.5.4. If anything's regressed, dig in.
+3. `aw work active` — any new dev-team claims to brief.
+4. Standing pending backlog above. Pick up the highest-leverage
+   item (probably KI#1 closure content if Sofia's framing
+   draft is ready, otherwise Playwright reproducer).
+5. Update `../../status/engineering.md` to reflect post-cutover
+   stable state.
