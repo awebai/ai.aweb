@@ -8,7 +8,7 @@ handoff to detect that the world changed.
 
 ## 2026-05-05 — aame architectural completion verified-live: writing creates a reply channel (aweb 1.20.1, ac v0.5.22)
 
-**Commit:** `TBD` aame architectural completion: writing-creates-a-reply-channel verified-live + 1.20.1 misclaim caveat banked
+**Commit:** `96134d6` aame architectural completion verified-live: writing creates a reply channel
 
 **Decision maker:** Sofia (framing) + Athena (technical content + bless-and-run) + Hestia (gate chain + verified-live + misclaim flag).
 
