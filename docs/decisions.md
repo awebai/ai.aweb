@@ -6,6 +6,107 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-05 — aame verified-live: conversations as first-class primitive (aweb 1.19.1, ac v0.5.21)
+
+**Commit:** `TBD` aame verified-live: decision record + external framing routed to Hestia and Iris
+
+**Decision maker:** Sofia (framing) + Athena (technical content + bless-and-run) + Hestia (gate chain + verified-live).
+
+**What shipped.** Conversations are now a first-class object in the
+aweb protocol. Signed message canonical payloads bind
+`conversation_id`, so the same payload cannot be replayed across
+conversations. The cert-presentation auth predicate from 1.18.6
+(commit `7759abc`) extends to conversation-scope without introducing
+new trust primitives. Conversations bind at the persistent did:aw
+layer, so rotated did:keys continue conversations.
+
+Specific shape:
+
+- `conversations` table records `conversation_id`, type
+  (`mail`|`chat`), TTL, participant set
+- W3 enforcement: every signed message canonical payload binds
+  `conversation_id`
+- Legacy pre-aame messages flagged `verified_legacy`; continuation
+  paths reject `verified_legacy`
+- Lazy 30-day sliding TTL; check-on-read (no background sweeper)
+
+**Live state (verified 2026-05-05 07:11Z).** `app.aweb.ai/health`:
+`release_tag=v0.5.21`, `aweb_version=1.19.1`, `git_sha=8d6b37a2`,
+`awid_service_version=0.5.4`. aweb OSS 1.19.1; aw CLI 1.19.x; awid
+0.5.4; channel 1.4.0.
+
+**Empirical attestation.**
+
+- 2026-05-03: aweb 1.19.0 / aw 1.19.0 / awid 0.5.4 / channel 1.4.0
+  shipped (OSS layer).
+- 2026-05-04: v0.5.19 cloud deploy attempted; FAILED on two
+  regressions (migration checksum drift; routing guard breaking
+  same-team mail/chat). Rolled back to v0.5.18.
+- 2026-05-04 evening: aweb 1.19.1 shipped with routing fix (extracted
+  `address_auth.py`: same-team team_id-equality + cryptographic
+  signature verification before signed_payload binding). 9
+  reproducer-as-gate tests across HTTP and MCP surfaces.
+- v0.5.20: aweb-schema cutover #1 (consolidated 001 from `49b1525c`;
+  schema-equivalence proven IDENTICAL).
+- v0.5.21: aweb_cloud-schema cutover #2 (Grace's `8fa36cd0`
+  disciplined recovery via file-revert + forward-additive 002;
+  schema-equivalence IDENTICAL; closed schema drift, 226 baseline
+  restored, 6 cross-schema FKs restored).
+- Both cutovers + 1.19.1 routing fix verified-live via
+  channel-routed mail/chat smoke probes.
+
+**What this is not.**
+
+- Not the first messaging in aweb — mail and chat shipped in 1.16.x.
+- Not a new auth model — extends 1.18.6 cert-presentation predicate
+  to conversation-scope.
+- Not always-encrypted-payloads — conversations are routing/replay-
+  protection infrastructure; payload encryption is separate work.
+
+**Why this matters.** Any agent-to-agent flow that coordinates over
+multiple turns needs replay protection at conversation scope.
+Without it, an adversary capturing one turn's signed message could
+replay it into a different conversation under the same recipient.
+Conversations as first-class objects make that impossible by
+construction. Load-bearing for cross-organizational agent
+coordination — once two organizations' agents have repeated business
+with each other, conversation-scope is what makes the trust model
+durable across the boundary.
+
+**Cross-references.**
+
+- 1.18.6 trust-model pivot (commit `7759abc`): cert-presentation
+  auth predicate, the architectural foundation aame extends.
+- KI#1 closure decision record: still pending; Athena has tech
+  content ready (cert-presentation auth correction + aalk continuity
+  arc + 1.18.6 trust-model arc + Aida 4/4 attestation). aame and
+  KI#1 sit in the same arc — KI#1 is the trust-model pivot
+  (April 2026); aame is the protocol primitive that exercises that
+  pivot at conversation scope (May 2026).
+- aame park decision (commit `c874f2a`, 2026-05-02): superseded by
+  Juan's unpark (commit `325556a`, 2026-05-02); now ratified by
+  ship.
+- Invariant 8 (`docs/invariants.md`: findability and continuation
+  are independent reachability concerns) — aame is the
+  implementation that operationalizes invariant 8 in the protocol.
+
+**External framing routing.** Sofia mails Hestia (the language to
+use in the verified-live external-facing mail body) and Iris (the
+framing for outreach drafts) separately. Both source content is
+the "What shipped" + "What this is not" + "Why this matters"
+sections above, voice-shaped per `publishing/voice.md`. YC public-
+facing claim language held until external posting moment per the
+sequencing established 2026-05-02.
+
+**Affects.** Protocol surface area. New `conversations` table + 002
+migration in aweb-server. aw CLI 1.19.x supports the conversation
+primitive. awid 0.5.4 + channel 1.4.0 align. Cloud at v0.5.21
+carries the rollup. Working doc
+`aweb/docs/conversations-as-first-class.md` to be deleted per
+Juan's brief now that implementation has landed.
+
+---
+
 ## 2026-05-02 — Unpark "conversations as first-class": Juan-directed, Grace authors
 
 **Commit:** `325556a` Unpark conversations-as-first-class: Juan-directed, Grace authors
