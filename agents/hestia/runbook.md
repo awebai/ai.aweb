@@ -1247,6 +1247,101 @@ attempt clever recovery moves under pressure.
   (`scripts/cloud_aweb_schema_reset.py`) should land for next time.
   If we cutover more than once, the wrapper saves time.
 
+### Cross-schema FK drift is invisible to the migration chain (banked 2026-05-05)
+
+When `DROP SCHEMA X CASCADE` runs as part of a cutover, any FK
+constraint declared in another schema (`Y`) that references a
+table in `X` gets CASCADE-dropped along with `X`. The constraint
+lives in `Y`'s schema state, but only the `X`-side cutover knows
+it was destroyed. Two consequences worth distinguishing
+explicitly (per Athena, after cutover #2):
+
+**(a) Forward-additive recovery is structurally insufficient.**
+Suppose cutover #1 drops `aweb` schema; that cascade-drops 6 FK
+constraints declared in `aweb_cloud`'s 001 (each pointing into
+`aweb`). A forward-additive recovery against `aweb_cloud`'s
+chain (e.g., `aweb_cloud/002`) cannot recreate those constraints
+without violating the immutability invariant for `aweb_cloud/001`
+(the constraints belong to 001, not to 002). The only correct
+shape is destructive cutover for `aweb_cloud` so 001 re-applies
+fresh.
+
+**(b) The drift is undetectable from inside the migration chain.**
+pgdbm sees the schema_migrations table for `aweb_cloud`'s chain
+and confirms its 001 was applied. It has no visibility into
+which cross-schema constraints CASCADE-dropped during another
+schema's cutover. Without an *external* constraint-diff audit
+(prod's `pg_constraint` rows vs. a clean local DB freshly
+migrated from the same chain), the drift cannot be discovered by
+the migration system itself.
+
+**Operational consequence**: every destructive cutover involving
+DROP SCHEMA, regardless of which schema, must include a
+constraint-diff audit gate BEFORE and AFTER:
+
+- Before: spin up clean local DB from current code, snapshot
+  pg_constraint, compare to prod. Document any pre-existing
+  drift that needs separate recovery.
+- After: same query against prod and clean local; assert ZERO
+  drift in either direction.
+
+This is now standing discipline #16 (see "Standing policies"
+section). The `cutover_schema_equivalence.sh` script provides
+the schema-only piece; for constraint-diff audit a sibling
+script that exports `pg_constraint` rows from both DBs and
+diffs would be a worthwhile next-cycle addition.
+
+### Constraint-diff audit pattern (banked 2026-05-05)
+
+Concrete query used during cutover #2:
+
+```sql
+SELECT n.nspname || '.' || c.relname || '.' || con.conname AS cstr,
+       con.contype
+FROM pg_constraint con
+JOIN pg_class c ON c.oid = con.conrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname IN ('aweb','aweb_cloud','server')
+  AND con.contype IN ('f','c','p','u','x')
+ORDER BY 1;
+```
+
+Run against both prod and a clean baseline DB (created via
+`aweb-db --env=development setup`). Diff with `comm -23` /
+`comm -13`:
+
+```bash
+comm -23 <(sort baseline.txt) <(sort prod.txt)  # in baseline, missing from prod
+comm -13 <(sort baseline.txt) <(sort prod.txt)  # in prod, extra
+```
+
+Both must be empty for "zero drift" claim. Cutover #2 evidence:
+prod=226 / baseline=226, both diffs empty → claim valid.
+
+### Cutover #2 case study (2026-05-05)
+
+Two-cutover sequence (aweb-side first, then aweb_cloud-side)
+to recover from 133a7d94's pre-Render-auto-deploy in-place edit
+of TWO 001_initial.sql files. Cutover #1 (aweb) was urgent and
+took the strictly-correct destructive shape. Cutover #2
+(aweb_cloud) was authored as forward-additive (Grace's
+8fa36cd0: revert 001 + additive 002) — initial recovery
+proposal was the corresponding hotfix-style "UPDATE
+schema_migrations" path, but Juan rejected for "strictly
+correct and clean" before launch.
+
+Critical decision evidence: a constraint-diff audit on prod
+revealed 6 cross-schema FKs missing (CASCADE-dropped during
+cutover #1). The forward-additive path could neither recreate
+nor detect those. Destructive cutover #2 was the only shape
+that closed both the migration-chain-immutability concern AND
+the silent FK drift in one pass.
+
+End state: prod=226 constraints, clean baseline=226 constraints,
+zero drift in either direction. Phase timings: drop=1s,
+migrate (001+002)=917ms, restore=2min, total cutover ~3min
+(within banked 10-min SLO).
+
 ### `make ship` semantics differ between repos
 
 - **aweb `make ship`**: comprehensive pre-tag check. Runs
