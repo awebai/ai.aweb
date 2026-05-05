@@ -8,7 +8,7 @@ handoff to detect that the world changed.
 
 ## 2026-05-05 — aame verified-live: conversations as first-class primitive (aweb 1.19.1, ac v0.5.21)
 
-**Commit:** `TBD` aame verified-live: decision record + external framing routed to Hestia and Iris
+**Commit:** `7d915e8` aame verified-live: decision record for conversations as first-class primitive
 
 **Decision maker:** Sofia (framing) + Athena (technical content + bless-and-run) + Hestia (gate chain + verified-live).
 
