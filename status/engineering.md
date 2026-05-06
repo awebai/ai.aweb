@@ -1,40 +1,38 @@
 # Engineering Status
-Last updated: 2026-05-06 ~09:30 CEST
+Last updated: 2026-05-06 ~10:00 CEST
 
 ## Current focus
 
-1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.1
-   → 1.20.2 + AC v0.5.22 → v0.5.23 deployed and verified end-to-end
-   2026-05-06 06:14:33Z. Pagination fix at conversation 70f1c868 +
-   96317ca9. See Hestia closure mail 362f0be6.
-2. **aweb 1.20.3 (CLI-only) shipped.** aweb-aamx fix at SHA 809056e:
-   `--start-conversation` no longer skips `shouldProbeExistingSession`,
-   so the CLI honors existing server-side sessions instead of generating
-   fresh UUID4 in conflict with server's dedup. Single-line change at
-   cli/go/chat/chat.go:1137 + regression test. Server code unchanged
-   between 1.20.2 and 1.20.3. PyPI + npm published; no AC v0.5.24
-   needed (banked discipline #27 — don't cut deploy release for non-
-   functional changes). AC pin stays at 1.20.2 in main; pin bumps
-   only when a functional AC change ships, not as bookkeeping.
-3. **aweb-aamy (auto-update-check) ALSO shipped in 1.20.3** — Hestia's
-   release-prep commit f8c7bce sits on top of both 809056e (aamx) and
-   448a9f5 (aamy). Customers `aw upgrade`-ing to 1.20.3 get both
-   fixes together. aamy wires existing `checkLatestVersion` into
-   `rootCmd.PersistentPreRun` for user-attention commands; 1h cache
-   at $XDG_CONFIG_HOME/aw/update-check.json; skip list (run, heartbeat,
-   events, notify, control, log, instructions, upgrade, version, lock
-   renew); universal skips (--json, non-TTY, AW_NO_UPDATE_CHECK,
-   dev/empty version). Code-reviewer subagent SHIP-OK with one P3
-   non-blocker (aweb-aana — atomic temp+rename for cache write to
-   prevent concurrent-process race). Closes the distribution-cadence
-   gap Juan surfaced after 1.20.2 ship.
+1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.4
+   + AC v0.5.22 → v0.5.23 deployed and verified end-to-end. Original
+   launch-day customer-blocking shape closed empirically (pagination
+   fix + chat dedup fix + init UX cleanup).
+2. **aweb 1.20.4 (CLI-only) shipped at SHA 7adfea6**, npm @awebai/aw
+   1.20.4 latest. Cleans up `aw init` next-steps output: full channel
+   install instructions (was missing /plugin marketplace add + install
+   steps), agent guide URL (was local repo path), removed duplicate
+   hook setup in API-key path, suppressed claim-human suggestion when
+   APIKeyAuth=true. PyPI aweb stays at 1.20.3 (server unchanged
+   between 1.20.3 and 1.20.4). Per banked discipline #27a: for CLI-only
+   releases, don't bump server/pyproject.toml — tag carries the CLI
+   version via goreleaser. Avoids source-vs-deploy drift.
+3. **aamy caught its own upgrade in production** — empirical attestation
+   for the auto-update-check feature: Hestia's `aw upgrade` from 1.20.3
+   to 1.20.4 was prompted by the very feature that shipped in 1.20.3.
+   "Checking for updates... Updating aw v1.20.3 → v1.20.4" — the cleanest
+   possible verified-live signal for an auto-update-check.
+4. **Companion AC frontend fix at 2d7150a3** (already on AC main):
+   autoComplete attributes on RegisterPage + LoginPage to fix the
+   browser-prefilled-username-with-email bug. Rides next functional
+   AC release.
 
 ## Dev team work in flight
 
-Quiet post-cycle. Grace shipped aweb-aamx (809056e) and aweb-aamy
-(448a9f5) within minutes today. aweb-aana (P3 atomic-write follow-up)
-+ aweb-aamz (P3 wait-semantics carry-over) on her queue when bandwidth
-allows.
+Quiet post-cycle. Grace shipped aweb-aamx (809056e), aweb-aamy
+(448a9f5), and reviewed 7adfea6 (init UX cleanup) all in one day.
+P3 follow-ups on her queue: aweb-aamz (wait-semantics carry-over),
+aweb-aana (atomic temp+rename for update-check cache),
+aweb-aanb (full-path output test for init post-setup dedup).
 
 ## Non-feature work in flight
 
@@ -48,14 +46,14 @@ allows.
 ## Release-ready state (handoff to Hestia)
 
 Nothing in the release pipeline. Last ships:
-- aweb-server-v1.20.3 + aw-v1.20.3: PyPI + npm latest, 2026-05-06 ~09:00Z
-  (CLI-only, both aamx + aamy bundled).
-- aweb-cloud v0.5.23: app.aweb.ai released, 2026-05-06 06:14:33Z (no
-  v0.5.24 cut — aweb 1.20.3 was CLI-only).
+- aw-v1.20.4: npm latest, 2026-05-06 ~10:00Z (CLI-only, init UX cleanup).
+- aweb-server-v1.20.3 + aw-v1.20.3: PyPI + npm, 2026-05-06 ~09:00Z
+  (aamx + aamy bundled).
+- aweb-cloud v0.5.23: app.aweb.ai released, 2026-05-06 06:14:33Z.
 - AC pin stays at aweb 1.20.2 in main; bumps only when functional
   AC change ships.
-- b7e86745 (admin_analytics test fix) on AC main awaiting next AC
-  release cycle.
+- AC main has b7e86745 (admin_analytics date-fragility test fix) +
+  2d7150a3 (autoComplete on Login/Register) awaiting next AC release.
 
 ## Pending engineering artifacts owed
 
@@ -70,28 +68,24 @@ Nothing in the release pipeline. Last ships:
 
 ## Risks
 
-- **CLI distribution gap** until aweb-aamt ships. Customers on
-  pre-1.20.2 `aw` will hit the pagination 409 in production with
-  no in-band hint to upgrade. Affects support-cycle cost more
-  than user functionality (workaround: customers run `aw upgrade`
-  manually if they think to).
 - **Multi-team-agent class** unaudited across the codebase
   (task #20). Potential silent misbehavior on code paths comparing
   cp.agent_id directly. No reported customer hits yet but the
   class is real.
-- **chat-403 on pre-aame chat sessions** unchanged. Customers
-  use `aw chat send-and-wait <peer> "msg" --start-conversation`
-  as workaround. Aida documented in support runbook. Threshold
-  for code-fix priority: 2nd customer report in rolling 7d.
+- **chat-403 entry pulled from runbook by Aida (e15838c)** after
+  Hestia's empirical zero-customer-reports check. The W3-binding
+  surface we worried about may not actually hit customers under
+  realistic conditions. If a customer reports the shape, file fresh
+  with empirical evidence — don't reopen on theoretical grounds.
 
 ## Next checks
 
-- aweb-aamt P1 review when Mia/Grace claim it from the dev team
-  task queue.
-- Sofia's KI#1 framing draft when ready (to supply technical
-  content).
-- Multi-team agent_id grep at next bandwidth window.
-- Any customer-side reports of chat-403 or pagination edge cases.
+- Sofia's KI#1 framing draft already received (mail 07d78ce8); fold
+  technical content into bracketed placeholders and send back.
+- Multi-team agent_id grep at next bandwidth window (task #20).
+- P3 follow-ups on Grace's queue: aamz / aana / aanb.
+- Any customer-side reports of pagination edge cases or
+  --start-conversation 409s post-1.20.4 customer upgrades.
 
 ## Banked release-discipline (through 2026-05-06)
 
@@ -130,3 +124,25 @@ Nothing in the release pipeline. Last ships:
     signals. "It passed on rerun" is not a diagnosis. Check whether
     the rerun delay corresponds to a UTC-vs-local-midnight crossing
     or other clock-based window before declaring transient.
+24. Documented workarounds must be empirically attested against
+    the actual customer surface AND the predecessor states they
+    apply on top of, not just the surface they claim to work
+    around. Same family as #11 applied at the workaround-doc step.
+25. When the empirical surface contradicts a hypothesis, that's a
+    refutation, not a "transient." Don't double down on the
+    hypothesis. Test against a known-OK case before narrowing scope.
+26. "Affects only one customer in current base" is not a scope
+    claim about the bug class — it's an observation about THIS
+    customer base AT THIS MOMENT. Reproduce against an internal
+    pair you control to distinguish customer-data class from
+    product class.
+27. Cut-the-deploy-only-if-functional-change. Don't cut a deploy
+    release purely to keep a pin-in-tagged-release synced. Pin
+    bump on main is valid state; tags should track functional
+    changes. Same family as 'released artifact ≠ deployed service' —
+    this is 'pinned-in-main ≠ deploy-needed'.
+27a. For CLI-only releases, don't bump server/pyproject.toml. The
+    tag carries the CLI version (goreleaser uses GITHUB_REF_NAME).
+    Source pkg state stays aligned with what's on PyPI for the
+    server. Avoids 'pyproject says X but PyPI server is X-1' drift.
+    (Sharpening of #27 from Hestia's 1.20.4 release prep.)
