@@ -1,94 +1,126 @@
 # Operations Status
 
-Last updated: 2026-05-06 00:30 CEST (Hestia, post v0.5.22 deploy + pagination root cause confirmed)
+Last updated: 2026-05-06 09:30 CEST (Hestia, post v0.5.23 verified-live + chat-409 spec-lock)
 
 ## Current focus
 
-**aame epic shipped (1.20.0/1.20.1 + AC v0.5.22) + duplicate-1to1
-cleanup executed.** One open mail-409 bug — root cause:
-`/v1/conversations` first-page-of-100 cap + chat activity pushing
-older mail conversations off-page → CLI's
-`findUniqueMailConversationForTarget` never sees them → auto-genUUID
-→ server-side full-DB dedup → 409. Athena's Go probe (mail 27c74c17)
-reconciled my full-DB-scan diagnosis with the empirical 409. Fix
-path: aweb 1.20.2 + AC v0.5.23 with optional /v1/conversations
-filters (`participant_did`, `participant_address`,
-`conversation_type`); Grace implementing. Verified-live mail held
-until 1.20.2 + v0.5.23 ship clean.
+**aame architectural-completion + pagination-fix epic verified-live;
+forward-going chat-409 surface diagnosed, fix on Grace's plate for
+1.20.3 + AC v0.5.24 next cycle.** Verified-live for 1.20.2 + v0.5.23
+pagination fix STANDS — chat-409 is a separate surface, doesn't
+retroactively touch the pagination evidence. No urgent release
+pressure on 1.20.3 (Zeus has plain send-and-wait as workaround;
+no other customer hits surfaced yet).
 
-## Live state (verified 2026-05-05 22:00Z)
+## Open issue: chat --start-conversation 409 (aweb-aamx P1)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.22`, `aweb_version=1.20.1`,
+Surfaced 2026-05-06 ~08:20Z by Zeus (gsk.aweb.ai/zeus) on freshly-
+upgraded aw 1.20.2 against just-deployed v0.5.23 + 1.20.2.
+
+**Spec lock (Juan, 2026-05-06)**: Sessions are permanent, one per
+pair (Slack-style). `--start-conversation` is purely a timing
+semantic flag (5min wait vs default short wait); should NOT have
+session-creation side effects, must NOT skip existing-session
+probe, must NOT generate fresh session_id when active session
+exists.
+
+**Bug**: aweb 1.20.2 CLI at `cli/go/chat/chat.go:1137` overreaches:
+flag bypasses probe-skip condition, CLI generates fresh session_id
+UUID4, server's dedup correctly 409s. Single-line CLI fix —
+remove `!opts.StartConversation` from probe-skip condition. Server
+correct as-is (find_active_one_to_one_conversation_between +
+chat.py:709 + dedup invariant all correct).
+
+**Scope (corrected from earlier framings)**: Forward-going product
+failure, NOT backward-compat-only. Affects ANY pair with an
+existing active chat session, post-aame included. Confirmed
+empirically by Athena against her own athena↔hestia post-aame
+active session.
+
+**Customer-impact-now**: Zeus is the only customer surfaced today;
+he has working alternative (drop --start-conversation, plain
+send-and-wait works — ~80s clean roundtrip per Aida's data). Not
+blocking. Other customers hitting this surface: 0 reports as of
+2026-05-06 09:30.
+
+**Path forward**: aweb-aamx filed P1, Grace briefed by Athena.
+Ships aweb 1.20.3 + AC v0.5.24 next cycle. No prod-DB ops on
+Zeus's data (customer history preserved per standing policy).
+
+## Live state (verified 2026-05-06 06:14:33Z)
+
+- `app.aweb.ai/health`: `release_tag=v0.5.23`, `aweb_version=1.20.2`,
   `awid_service_version=0.5.4`,
-  `git_sha=f6c27c619d0c5e37e3aa096c177d11e40a0984a0`. Started
-  2026-05-05T21:27:26Z.
+  `git_sha=7705fc7ce93d17caf2cd7615984e6f0f4412094f`. Started
+  2026-05-06T06:14:33Z.
 - `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
-- aweb OSS published: server 1.20.0/1.20.1 on PyPI; aw 1.20.0/1.20.1 on
-  npm + GH Releases. AC v0.5.22 pins aweb-server 1.20.1.
-- Migration-immutability gate: passed at release-ready ("OK: 4 migration
-  file(s) match prod recorded checksums across schemas
-  ['aweb', 'aweb_cloud', 'server']"). First real-world use post-landing.
-- Smoke probes 2026-05-05: alias + `--to-address` both attach to
-  existing conversation 96317ca9 (athena↔hestia) cleanly,
-  `verification_status=verified`.
+- aweb published: server 1.20.2 on PyPI (latest, simple index ✓);
+  aw 1.20.2 on npm (dist-tag latest); awid-service 0.5.4 on PyPI;
+  channel 1.4.0 on npm.
+- Pre-deploy duplicate-1to1 cleanup executed cleanly during v0.5.22
+  cycle (195 conversations closed across 16 pairs).
+
+## Empirical attestation — pagination fix (1.20.2 + v0.5.23)
+
+Three smoke probes against deployed v0.5.23 + 1.20.2:
+
+1. **Baseline auto-thread (page-1)** — conversation 96317ca9
+   (athena↔hestia). Probe 5707b48e attached cleanly. Athena
+   confirmed (mail 20a6bf7e).
+2. **Stale-by-recency from default-team** — conversation 878c06b1
+   (sofia↔hestia, originated 2026-05-05, pushed off page 1 by
+   intervening chat activity). Probe 37c5cb9e attached cleanly.
+   Sofia confirmed (mail c2e65335).
+3. **Stale-by-recency from cross-team-agent** — conversation
+   70f1c868 (sofia↔athena, athena's default-team agent_id active).
+   This is the exact 409 case that drove 1.20.2. Athena's probe
+   72669b66 attached cleanly (mail 607dc80d).
+
+Pagination fix verified-live on every shape we hypothesized.
 
 ## Release pipeline
 
-- aame epic: aweb 1.20.0 r1 (1c70821) shipped → Phase 12 chat-reply abort
-  diagnosed (CLI stderr-suppression masking 409). Hotfix d666119 + test
-  mocks 18b4d75 → r2 (1510821) green. Published 1.20.0 + 1.20.1.
-- AC v0.5.22 r1: A.6a 409 on identity-DIDKey passthrough →
-  oss_auth.py allowlist fix (commit f6c27c61) → r2 green.
-- Pre-deploy duplicate-1to1 cleanup procedure executed cleanly via
-  Athena's collapse-only doc — 195 conversations closed across 16 pairs.
-  Smoke probe attached to pre-deploy 96317ca9 cleanly post-deploy:
-  counterexample to "all pre-deploy 409s" framing.
-- Verified-live for v0.5.22 deferred until multi-team-agent bug is
-  closed (Juan: "do not ship anything until all is fixed and fully
-  e2e tested").
+Cycle (2026-05-04 → 2026-05-06):
+- aweb 1.20.0 (aame epic): shipped. Verified-live.
+- aweb 1.20.1 (Phase 12 hotfix): shipped. Verified-live.
+- AC v0.5.22 (aame uptake + duplicate-1to1 cleanup): shipped.
+  Verified-live.
+- aweb 1.20.2 (pagination fix): shipped. Verified-live.
+- AC v0.5.23 (1.20.2 uptake): shipped. Verified-live.
+
+Verified-live mail sent to athena (362f0be6), sofia (2c69e142),
+aida (0c529a82). Athena acknowledged (cc1bf154); Sofia framing
+ladder ask is open for her lane.
 
 ## Operational discrepancies
 
-- **Mail 409 on stale-by-recency conversation reply (open).** Root
-  cause: `/v1/conversations` first-page-of-100 cap + sort by
-  last_message_at DESC. CLI's
-  `findUniqueMailConversationForTarget` (mail.go:148) calls
-  `c.ListConversations(ctx, 100)`; for an active agent with chat
-  sessions pushing older mail off the first page, the target
-  conversation is invisible to the CLI; auto-genUUID
-  (awid/mail.go:60); server full-DB dedup correctly catches the
-  existing conversation; 409. Affects any agent with >100 mail+chat
-  conversations — realistic almost immediately on a coordination
-  platform. Fix path: aweb 1.20.2 + AC v0.5.23 with server-side
-  `/v1/conversations` filters (`participant_did`,
-  `participant_address`, `conversation_type`) + CLI focused query +
-  cursor-pagination fallback for old-server compat + regression
-  test (101+ conversations, target older than the 100th). Grace
-  implementing.
-- **Open follow-up (Athena's lane, not blocking 1.20.2):**
-  Multi-team-agent agent_id-vs-did comparison. cp.agent_id is
-  team-scoped; same did_key/did_aw across team memberships maps to
-  different agent_ids. Any code path comparing on cp.agent_id
-  rather than cp.did/did_aw will misbehave for multi-team agents.
-  Worth a grep across aweb codebase. I flagged this in 1eca135b
-  before pagination was confirmed as the actual 409 cause; Athena
-  agreed it's worth filing.
-- **Pre-aame chat sessions 403 on continuation.** W3 protection
-  rejects chat replies on conversations whose signed messages predate
-  binding. Workaround: `aw chat send-and-wait <peer> "msg"
-  --start-conversation`. DELETE-240 chat_sessions explicitly off the
-  table (banked: customer history is not destroyable; real fix in
-  code on 1.20.2 cycle).
-- **chat_sessions schema gotcha.** Athena's pre-deploy close-cleanup
-  procedure UPDATEs `expires_at`/`updated_at` — neither column exists
-  on `chat_sessions`. Procedure broken; held until rewrite. Same
-  schema-gotcha class as `aweb.agents.updated_at` (banked).
-- **Iris agent not registered.** Mail send to iris fails. Hetzner
-  identity bootstrap pending. No action my side.
-- **Asymmetric compat-test gap.** Compat covers (old-client +
-  new-server) but not (new-client + old-server). Manual workaround:
-  probe new-client against rolled-back prod before tag-push. Athena's
-  lane.
+- **chat-403 on pre-aame chat sessions (status uncertain).**
+  Original framing: W3 protection rejects continuation of pre-aame
+  signed messages, workaround = --start-conversation. Aida's
+  runbook entry (commit 30c8870, currently held local) carried that
+  recommendation. **The recommendation is now known to be wrong**
+  (--start-conversation 409s on dedup pre-aamx fix; per spec is
+  pure timing flag post-aamx). Open question: is the chat-403
+  surface itself even a real customer hit, or theoretical-only?
+  Zeus's plain send-and-wait worked on his pre-aame session
+  (refutes 'plain CLI continuation 403s'). Action: Aida + me to
+  empirically verify chat-403 customer history before deciding
+  whether the entry should revise or close. Aida's commit 30c8870
+  held from push regardless of Juan's go-call until the chat-403
+  half is resolved.
+- **Multi-team-agent agent_id-vs-did comparison (open ops follow-up).**
+  cp.agent_id is team-scoped; same did_key/did_aw across team
+  memberships maps to different agent_ids. Code paths comparing
+  on cp.agent_id rather than cp.did/did_aw will misbehave for
+  multi-team agents. Athena's lane to grep aweb codebase. Non-
+  blocking; surfaced empirically during 1.20.2 diagnosis.
+- **admin_analytics test fix at b7e86745 lives on main, ships
+  next AC release.** Test-only fix (date-fragility on local-vs-
+  UTC midnight); not in v0.5.23 because v0.5.23 was already
+  pushed when the fix landed. Disposition: discipline-clean (no
+  destructive retag); next AC release picks it up.
+- **Iris agent not registered.** Hetzner identity bootstrap
+  pending; framing routes via decision record per Sofia.
 
 ## Active claims
 
@@ -96,10 +128,12 @@ until 1.20.2 + v0.5.23 ship clean.
 
 ## Workspace status (company team, default:aweb.ai)
 
-- hestia (me): online, monitoring; bug diagnosed, mailed Athena.
-- athena: online, awaiting fix-path brief reception.
-- sofia: online.
-- aida: online, idle.
+- hestia (me): online, monitoring; epic verified-live, returning
+  to ops cadence.
+- athena: online, ack'd cycle closure; multi-team agent_id
+  follow-up on her plate.
+- sofia: online, framing ladder for distribution open in her lane.
+- aida: online, runbook PR 3279c973 standalone-cleared.
 - iris/metis: not yet registered (Hetzner pending for iris).
 
 Dev team (`aweb:juan.aweb.ai`) members not visible from my workspace —
@@ -107,18 +141,18 @@ Athena is the cross-team bridge.
 
 ## Next checks
 
-1. Watch for Athena's bless-and-run on aweb 1.20.2 + AC v0.5.23.
-   Run full release-ready chain (discipline #21) on receipt.
-2. Daily `/health` on app.aweb.ai + api.awid.ai. Flag drift.
-3. After 1.20.2 ship, re-probe the multi-team-agent mail path against
-   the 70f1c868-class conversations to verify CLI predicate fix.
-4. Bank discipline #21 (full release-ready chain on bless-and-run)
-   into runbook §Standing release-discipline.
-5. Bank schema-gotcha (aweb.agents/teams/chat_sessions lack updated_at;
-   chat_sessions lacks expires_at) into runbook §Schema gotchas.
-6. Bank 8-table identity-routing doctrine (post-launch, with Sofia).
+1. Daily `/health` on app.aweb.ai + api.awid.ai. Flag drift.
+2. Watch for next release cycle — gate chain remains:
+   release-ready (with immutability gate) + browser/journey suite +
+   discipline #21 full chain on bless-and-run.
+3. Sofia's framing ladder for distribution → when ready, route to
+   Iris or Eugenie per her call.
+4. Athena's multi-team agent_id grep follow-up — re-surface if
+   another customer-shape bug trails the same root cause.
+5. admin_analytics test fix at b7e86745 ships with next AC release;
+   no separate v0.5.24 for that.
 
-## Standing release-discipline (banked through 2026-05-05)
+## Standing release-discipline (banked through 2026-05-06)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree
@@ -147,14 +181,48 @@ Athena is the cross-team bridge.
     must surface 409 from production CLI binary against production
     server, not just unit-test logic)
 21. Bless-and-run from peer = run the FULL release-ready chain end-to-end,
-    don't shortcut to bump+tag (banked 2026-05-05 from v0.5.22 r1
-    where 1.20.0 → 1.20.1 hop nearly skipped re-running gates)
+    don't shortcut to bump+tag
 22. Code-reviewer subagent flagged silent-fall-through + the relevant
     scale is realistic for the production trajectory ⇒ blocker, not
-    follow-up. (Banked 2026-05-06 from Mia's >100-conversation
-    pagination flag on 1.20.0 round; non-blocker call was wrong because
-    >100 mail+chat conversations is realistic almost immediately for
-    active agent teams — exactly what aweb is built for.)
+    follow-up. Marking such follow-ups as non-blocker requires
+    explicit threshold reasoning; absent that, treat as gate-input
+    concern.
+23. Test failures recurring at specific clock windows + reruns clean
+    later are date/timezone-math signals, NOT transient-flake signals.
+    "It passed on rerun" is not a diagnosis. When a failing test
+    passes on rerun N hours later, check whether N corresponds to a
+    UTC-vs-local-midnight crossing or other clock-based window before
+    declaring transient. (Banked 2026-05-06 from admin_analytics
+    fragility; Juan's pushback closed the loop on the "transient
+    seed" framing, fix at b7e86745 lives on main.)
+24. Documented workarounds must be empirically attested against the
+    actual customer surface AND the predecessor states they apply on
+    top of, not just the surface they claim to work around. Same
+    family as #11 (closure framing rests on empirical attestation),
+    applied at the workaround-documentation step. (Banked 2026-05-06
+    from chat-403 + --start-conversation pair documented as
+    'customers have user-side workaround' without empirical test
+    against actual customer surface; Aida's commit 30c8870 held
+    until verified.)
+25. When the empirical surface contradicts a hypothesis, that's a
+    refutation, not a "transient." Don't double down on the
+    hypothesis. The first refutation should lead to test against a
+    new shape immediately, not retreat into a narrowed framing of
+    the same hypothesis. (Banked 2026-05-06 from two refutation-vs-
+    transient confusions in one cycle: pytest-randomly seed framing
+    on admin_analytics fragility, then backward-compat-only framing
+    on chat-409 dedup. Both got clarified by Juan's "are you sure"
+    pushback before downstream work absorbed the wrong frame.)
+26. "Affects only one customer in current base" is not a scope claim
+    about the bug class — it's an observation about THIS customer
+    base AT THIS MOMENT. The product failure can be real for going-
+    forward agents even when only one current-base customer hits it
+    today. When scoping a bug to a customer-data class, reproduce
+    against an internal pair you control to distinguish customer-
+    data class from product class. (Banked 2026-05-06 from chat-409
+    initial framing as 'pre-aame backward-compat only' — Athena's
+    test against her own post-aame athena↔hestia session refuted
+    that scope.)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
