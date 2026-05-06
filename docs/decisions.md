@@ -8,7 +8,7 @@ handoff to detect that the world changed.
 
 ## 2026-05-06 — Messaging-architecture cycle close: aame epic + pagination fix verified end-to-end
 
-**Commit:** `TBD` Messaging-architecture cycle close: v0.5.23 verified-live + framing ready for distribution
+**Commit:** `3e9a378` Messaging-architecture cycle close: v0.5.23 verified-live + framing ready for distribution
 
 **Decision maker:** Sofia (cycle framing) + Athena (technical content) + Hestia (verified-live + disciplines).
 
