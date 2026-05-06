@@ -23,6 +23,10 @@ identity, custody, address ownership, or destructive actions.
 - If the answer depends on hosted cloud state, current code behavior,
   release state, or an irreversible operation, ask Engineering before
   replying.
+- Name the answer, not the internal team-set. Tell customers "we are
+  routing this to engineering," not which agents or teams handled it.
+  Internal coordination shape (company team vs dev team, who bridges)
+  is not customer-facing context.
 
 ## Case Router
 
@@ -364,6 +368,66 @@ Do:
 - route product decisions to Direction
 
 Do not promise roadmap timing.
+
+## Known Errors
+
+A symptom-keyed lookup. If a customer's exact error string matches an
+entry here, route the corresponding answer directly. If the symptom is
+close but not exact, escalate per the case rules above rather than
+guessing.
+
+### `aw claim-human` returns 422 on a BYOD domain
+
+**When this applies.** Customer runs `aw claim-human --email <email>`
+against a BYOD domain (a non-`.aweb.ai` namespace) and gets HTTP 422.
+The error body matches one of:
+
+```json
+{"detail": [{"type": "missing", "loc": ["body", "username"], "msg": "Field required", ...}]}
+```
+
+```json
+{"detail": [{"type": "string_too_short", "loc": ["body", "username"], "msg": "String should have at least 1 character", ...}]}
+```
+
+Both shapes share `"loc": ["body", "username"]` — that's the
+grep-friendly anchor.
+
+**Why this happens.** Intentional contract tightening, not a bug. The
+new `aw claim-human` (server commit `98cfc278`; client commit
+`443151d`) requires an explicit `--username` flag for BYOD users. Old
+`aw` versions either omitted `username` (Case A: missing field) or
+auto-inferred the BYOD domain into it (Case B: empty/invalid string);
+both fail server-side validation against the new schema. Hosted users
+(`*.aweb.ai`) on old `aw` still work because the legacy client derived
+the username from the managed domain.
+
+**Customer-facing answer.** Confirm they are on a BYOD domain
+(their workspace's coordination URL / cert is for a non-`.aweb.ai`
+namespace), then offer either:
+
+- **Upgrade `aw`** to a release that includes client commit
+  `443151d`, and re-run with `--username <their-dashboard-username>`
+  passed explicitly; or
+- **Pass `--username` explicitly** if their current `aw` already
+  supports the flag:
+  `aw claim-human --email <email> --username <their-dashboard-username>`.
+
+The dashboard username is the one they pick when claiming the team —
+for a team `acme.com/<team>`, the username is the local-part identifier
+they want, not derivable from the BYOD domain.
+
+**Why the message looks ugly.** The 422 is FastAPI's generic Pydantic
+v2 validation envelope, not a domain-specific upgrade-prompt. Hosted
+users are unaffected; BYOD users can read the validation message;
+engineering chose not to ship a dedicated upgrade-prompt path at
+current scale. If volume on this support route grows, route a signal
+to Engineering and Direction — that is the threshold for revisiting.
+
+**Source.** ac commit `98cfc278`, aweb commit `443151d`, Mia's runbook
+entry mail `f393168c` (2026-05-02), Athena's review mail `df41abbc`
+finding #3. Captured 422 envelopes were verified against the
+production schema by Mia on 2026-05-02.
 
 ## Escalation Packet
 
