@@ -1,50 +1,61 @@
 # Engineering Status
-Last updated: 2026-05-06 ~08:30 CEST
+Last updated: 2026-05-06 ~09:30 CEST
 
 ## Current focus
 
 1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.1
    → 1.20.2 + AC v0.5.22 → v0.5.23 deployed and verified end-to-end
-   2026-05-06 06:14:33Z. The launch-day customer-blocking shape from
-   2026-05-03 (cross-team chat reply / address-routed mail) is closed
-   empirically. See Hestia closure mail 362f0be6 for full attestation.
-2. **Pagination fix on /v1/conversations** (the load-bearing 1.20.2
-   delivery): server-side filter (conversation_type, participant_did,
-   participant_address) applied AFTER actor-scope; CLI uses focused
-   query in findUniqueMailConversationForTarget. Closes the
-   stale-by-recency 409 class for any agent with >100 mail+chat
-   conversations. Verified at conversation 70f1c868 (athena↔sofia,
-   originally bug-causing pre-deploy) AND 96317ca9 (athena↔hestia,
-   page-1 baseline).
-3. **CLI auto-update-check filed P1** (aweb-aamt, dev team). On any
-   `aw <command>` invocation, if newer GitHub release exists, print
-   "Upgrade available: vX → vY" hint to stderr (rate-limited via
-   24h cache, opt-out via AW_NO_UPDATE_CHECK=1, --json safe). Wires
-   the existing checkLatestVersion infra into rootCmd.PersistentPreRun
-   beyond just `aw version` callsite. Closes the distribution-cadence
-   gap surfaced by Juan after the 1.20.2 ship.
+   2026-05-06 06:14:33Z. Pagination fix at conversation 70f1c868 +
+   96317ca9. See Hestia closure mail 362f0be6.
+2. **aweb 1.20.3 (CLI-only) shipped.** aweb-aamx fix at SHA 809056e:
+   `--start-conversation` no longer skips `shouldProbeExistingSession`,
+   so the CLI honors existing server-side sessions instead of generating
+   fresh UUID4 in conflict with server's dedup. Single-line change at
+   cli/go/chat/chat.go:1137 + regression test. Server code unchanged
+   between 1.20.2 and 1.20.3. PyPI + npm published; no AC v0.5.24
+   needed (banked discipline #27 — don't cut deploy release for non-
+   functional changes). AC pin stays at 1.20.2 in main; pin bumps
+   only when a functional AC change ships, not as bookkeeping.
+3. **aweb-aamy (auto-update-check) ALSO shipped in 1.20.3** — Hestia's
+   release-prep commit f8c7bce sits on top of both 809056e (aamx) and
+   448a9f5 (aamy). Customers `aw upgrade`-ing to 1.20.3 get both
+   fixes together. aamy wires existing `checkLatestVersion` into
+   `rootCmd.PersistentPreRun` for user-attention commands; 1h cache
+   at $XDG_CONFIG_HOME/aw/update-check.json; skip list (run, heartbeat,
+   events, notify, control, log, instructions, upgrade, version, lock
+   renew); universal skips (--json, non-TTY, AW_NO_UPDATE_CHECK,
+   dev/empty version). Code-reviewer subagent SHIP-OK with one P3
+   non-blocker (aweb-aana — atomic temp+rename for cache write to
+   prevent concurrent-process race). Closes the distribution-cadence
+   gap Juan surfaced after 1.20.2 ship.
 
 ## Dev team work in flight
 
-(quiet post-cycle; Grace's last commit was b7e86745 test fixture
-fix landing on AC main for next-cycle ship)
+Quiet post-cycle. Grace shipped aweb-aamx (809056e) and aweb-aamy
+(448a9f5) within minutes today. aweb-aana (P3 atomic-write follow-up)
++ aweb-aamz (P3 wait-semantics carry-over) on her queue when bandwidth
+allows.
 
 ## Non-feature work in flight
 
 - **Multi-team agent_id-vs-did comparison grep** (task #20, my plate,
   bandwidth-allowing). cp.agent_id is team-scoped — multi-team agents
-  (same did_aw, multiple team memberships, multiple agent_id rows in
-  aweb.agents) hit asymmetry when code compares on cp.agent_id
-  instead of cp.did/cp.did_aw. The 1.20.2 fix bypassed this for the
-  pagination case but other code paths in aweb may still have direct
-  cp.agent_id comparisons. Grep server/src/aweb/ + cli/go/, assess
-  each callsite. Non-blocking.
+  hit asymmetry when code compares on cp.agent_id instead of
+  cp.did/cp.did_aw. The 1.20.2 fix bypassed this for the pagination
+  case but other code paths in aweb may still have direct cp.agent_id
+  comparisons.
 
 ## Release-ready state (handoff to Hestia)
 
 Nothing in the release pipeline. Last ships:
-- aweb-server-v1.20.2 + aw-v1.20.2: PyPI + npm latest, 2026-05-06 ~05:50Z
-- aweb-cloud v0.5.23: app.aweb.ai released, 2026-05-06 06:14:33Z
+- aweb-server-v1.20.3 + aw-v1.20.3: PyPI + npm latest, 2026-05-06 ~09:00Z
+  (CLI-only, both aamx + aamy bundled).
+- aweb-cloud v0.5.23: app.aweb.ai released, 2026-05-06 06:14:33Z (no
+  v0.5.24 cut — aweb 1.20.3 was CLI-only).
+- AC pin stays at aweb 1.20.2 in main; bumps only when functional
+  AC change ships.
+- b7e86745 (admin_analytics test fix) on AC main awaiting next AC
+  release cycle.
 
 ## Pending engineering artifacts owed
 
