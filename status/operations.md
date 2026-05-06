@@ -1,16 +1,25 @@
 # Operations Status
 
-Last updated: 2026-05-06 09:30 CEST (Hestia, post v0.5.23 verified-live + chat-409 spec-lock)
+Last updated: 2026-05-06 11:30 CEST (Hestia, post aweb 1.20.3 publish + AC v0.5.24 NOT cut)
 
 ## Current focus
 
-**aame architectural-completion + pagination-fix epic verified-live;
-forward-going chat-409 surface diagnosed, fix on Grace's plate for
-1.20.3 + AC v0.5.24 next cycle.** Verified-live for 1.20.2 + v0.5.23
-pagination fix STANDS — chat-409 is a separate surface, doesn't
-retroactively touch the pagination evidence. No urgent release
-pressure on 1.20.3 (Zeus has plain send-and-wait as workaround;
-no other customer hits surfaced yet).
+**aweb 1.20.3 published (CLI-only fix for aweb-aamx); no AC v0.5.24
+cut — CLI-only fix lands via customer `aw upgrade`, server code is
+byte-identical between 1.20.2 and 1.20.3.** AC main carries pin bump
+to 1.20.3 (commit ab1d978b) but stays at v0.5.23 tag; pin rides into
+next functional AC release naturally.
+
+Verified-live status:
+- Pagination fix (1.20.2 + v0.5.23): STANDS, three-probe attestation.
+- aamx fix (1.20.3): attested via Athena's make ship at 809056e (218
+  e2e tests including Phase 12 chat exercising fixed flag behavior)
+  + my own make ship at f8c7bce (same suite, 218/218). Customer-side
+  lands via `aw upgrade` / pip / npm.
+- aamy auto-update-check (also 1.20.3): rode along at 448a9f5 between
+  Athena's bless-and-run SHA (809056e) and my bump (f8c7bce). Same
+  make ship attestation. Means customers upgrading to 1.20.3 also
+  get the auto-update-check on interactive commands going forward.
 
 ## Open issue: chat --start-conversation 409 (aweb-aamx P1)
 
@@ -222,6 +231,14 @@ Athena is the cross-team bridge.
     initial framing as 'pre-aame backward-compat only' — Athena's
     test against her own post-aame athena↔hestia session refuted
     that scope.)
+27. Cut-the-deploy-only-if-functional-change. Don't cut a deploy
+    release purely to keep a pin-in-tagged-release synced. Pin bump
+    on main is valid state; tags should track functional changes.
+    Same family as released-artifact-≠-deployed-service — this is
+    pinned-in-main-≠-deploy-needed. (Banked 2026-05-06 from aweb
+    1.20.3 cycle: aweb 1.20.3 was CLI-only, server code byte-
+    identical to 1.20.2; AC v0.5.24 NOT cut, pin bump rides
+    next functional AC release naturally.)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
