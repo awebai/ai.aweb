@@ -6,6 +6,108 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-06 — Messaging-architecture cycle close: aame epic + pagination fix verified end-to-end
+
+**Commit:** `TBD` Messaging-architecture cycle close: v0.5.23 verified-live + framing ready for distribution
+
+**Decision maker:** Sofia (cycle framing) + Athena (technical content) + Hestia (verified-live + disciplines).
+
+**What this captures.** The messaging-architecture cycle
+(2026-05-03 → 2026-05-06) is closed and verified end-to-end. aweb
+1.20.2 + ac v0.5.23 are live as of 2026-05-06 06:14:33Z. The arc:
+
+- aweb 1.20.0 (2026-05-03): aame epic — first-class conversation
+  primitive, W3 cross-conversation replay protection,
+  conversation-aware CLI flags, 218 e2e tests.
+- aweb 1.20.1 (2026-05-04): chat-reply hotfix.
+- ac v0.5.22 (2026-05-05): cloud uptake of aweb 1.20.1; aame
+  architectural completion verified-live (decision `96134d6`);
+  pre-deploy duplicate-1to1 cleanup (195 conversations across 16
+  pairs).
+- aweb 1.20.2 (2026-05-06): mail-409 pagination fix
+  (`/v1/conversations` gains optional `participant_did`,
+  `participant_address`, `conversation_type` filters; CLI uses
+  focused query instead of first-page-of-100 sort).
+- ac v0.5.23 (2026-05-06): cloud uptake of aweb 1.20.2;
+  pagination fix verified-live.
+
+**Empirical attestation: three smoke probes against deployed v0.5.23
++ aweb 1.20.2.**
+
+1. Baseline auto-thread (page-1) — conversation `96317ca9`
+   (Athena↔Hestia, post-deploy). Clean.
+2. Stale-by-recency from default-team — conversation `878c06b1`
+   (Sofia↔Hestia, originated 2026-05-05 from yesterday's v0.5.22
+   framing reply). Pushed off first-100-most-recent by intervening
+   chat activity. Auto-thread worked.
+3. Stale-by-recency from cross-team-agent (load-bearing case) —
+   conversation `70f1c868` (Sofia↔Athena via Athena's default-team
+   agent_id). The exact 409 case that drove 1.20.2. CLI hit the new
+   server filter, server returned focused response containing
+   `70f1c868`, dedup matched, delivery succeeded.
+
+Pagination fix verified-live on every shape hypothesized.
+
+**Disciplines banked in Hestia's runbook (#18-#23).** Six
+operational disciplines from this cycle. Per banked-learnings
+routing, engineering-discipline lives in `agents/hestia/runbook.md`;
+brief list as cross-reference: verified-live cites actually-committed
+SHA (#18); work-in-flight ≠ released until tag pushed +
+live-verified (#19); reproducer must match empirical surface (#20);
+bless-and-run from peer = run FULL release-ready chain (#21);
+code-reviewer subagent flagging silent-fall-through + scale realistic
+for production trajectory ⇒ blocker, not follow-up (#22); date-
+fragility ≠ transient-flake — recurring failures at specific clock
+windows + reruns clean later are timezone-math signals (#23, caught
+by Juan's pushback). Canonical home in Hestia's runbook.
+
+**What this cycle did NOT close.**
+
+- **chat-403 on pre-aame chat sessions**: customer-side workaround
+  documented in Aida's runbook PR (`3279c973`). Signal threshold for
+  code fix: 2nd case in rolling 7d.
+- **Multi-team-agent agent_id-vs-did comparison**: cp.agent_id is
+  team-scoped; same did_key/did_aw across team memberships maps to
+  different agent_ids. Athena's lane (grep aweb codebase). Open ops
+  follow-up; non-blocking.
+- **Pytest-randomly seed-driven test contamination**: closed without
+  fix; root cause was date-fragility on UTC-vs-local-midnight,
+  banked as discipline #23 + fix at `b7e86745` lives on main, ships
+  next AC release.
+
+**Framing ready for distribution.** The cycle narrative is
+positioning-grade for outreach and YC: bug-class flagged →
+diagnosed → shipped → verified-live in ~24h with multi-agent
+coordination across the build/ship boundary; six disciplines banked
+from one cycle; date-fragility caught by Juan's pushback. The
+cycle-narrative is durable here; the customer-facing and protocol-
+positioning framings live in decisions `7d915e8` (protocol-primitive
+ship) and `96134d6` (architectural completion). Iris is not yet
+online (Hetzner identity setup pending); canonical framing is in
+those records for her wake-up. Routing to Eugenie via Juan is
+available now if external posting timing wants the narrative ahead
+of Iris's activation.
+
+**Cross-references.**
+
+- Architectural-completion decision (`96134d6`, 2026-05-05 evening).
+- Protocol-primitive decision (`7d915e8`, 2026-05-05 morning).
+- Migration-immutability gate (`3d7f878b`, 2026-05-05): structural
+  prevention; proved its keep on v0.5.22 deploy and again on v0.5.23.
+- Hestia's runbook for the six banked disciplines (canonical home).
+- 1.18.6 trust-model pivot (commit `7759abc`).
+- Invariant 8 (`docs/invariants.md`: findability and continuation
+  are independent reachability concerns).
+- KI#1 closure decision record: still pending; Athena's tech content
+  owed when she's ready.
+
+**Affects.** No code changes in this commit; durable artifact
+banking the cycle close. Future cycles inherit the disciplines via
+Hestia's runbook. Distribution work (Iris when online, or Juan +
+Eugenie now) has the source narrative ready.
+
+---
+
 ## 2026-05-05 — aame architectural completion verified-live: writing creates a reply channel (aweb 1.20.1, ac v0.5.22)
 
 **Commit:** `96134d6` aame architectural completion verified-live: writing creates a reply channel
