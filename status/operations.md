@@ -1,16 +1,29 @@
 # Operations Status
 
-Last updated: 2026-05-06 11:30 CEST (Hestia, post aweb 1.20.3 publish + AC v0.5.24 NOT cut)
+Last updated: 2026-05-06 12:30 CEST (Hestia, post aweb 1.20.4 publish + CLI-only-release pattern established)
 
 ## Current focus
 
-**aweb 1.20.3 published (CLI-only fixes for aweb-aamx + aweb-aamy);
-no AC v0.5.24 cut — CLI-only fixes land via customer `aw upgrade`,
-server code is byte-identical between 1.20.2 and 1.20.3.** AC pin
-stays at `aweb>=1.20.2` (Athena bumped at ab1d978b, Juan reverted at
-18dd9c4c). Pin spec reflects tested-minimum and matches what runs
-in deployed v0.5.23 (aweb 1.20.2 server). Pin will bump naturally
-with the next functional AC change.
+**aweb 1.20.3 + 1.20.4 published (all CLI-only fixes); no AC cut for
+either.** Customer-side fixes land via `aw upgrade` (now auto-
+prompted on interactive commands per aamy). AC pin stays at
+`aweb>=1.20.2` matching deployed v0.5.23 (aweb 1.20.2 server). Pin
+will bump naturally with next functional AC change.
+
+CLI-only release pattern (established 2026-05-06):
+- aweb 1.20.3 (aamx + aamy): bumped server/pyproject.toml, pushed
+  both server-v1.20.3 + aw-v1.20.3 tags. Server PyPI publish
+  occurred but server pkg was functionally identical to 1.20.2.
+- aweb 1.20.4 (init UX cleanup): **did NOT bump pyproject.toml**.
+  Tagged aw-v1.20.4 directly at the fix commit (7adfea6). No main
+  commit, no server-v1.20.4 push, no PyPI server publish. Goreleaser
+  reads version from tag (\${GITHUB_REF_NAME#aw-v}); pyproject.toml
+  not load-bearing for CLI publish path.
+
+The 1.20.4 pattern is the cleaner shape for CLI-only releases:
+honors discipline #27 fully (source-vs-deploy state coherent —
+PyPI shows 1.20.3, source shows 1.20.3). Use this pattern for
+CLI-only changes going forward.
 
 Verified-live status:
 - Pagination fix (1.20.2 + v0.5.23): STANDS, three-probe attestation.
@@ -20,8 +33,18 @@ Verified-live status:
   lands via `aw upgrade` / pip / npm.
 - aamy auto-update-check (also 1.20.3): rode along at 448a9f5 between
   Athena's bless-and-run SHA (809056e) and my bump (f8c7bce). Same
-  make ship attestation. Means customers upgrading to 1.20.3 also
-  get the auto-update-check on interactive commands going forward.
+  make ship attestation. Customers upgrading to 1.20.3 also get the
+  auto-update-check on interactive commands going forward.
+- init UX cleanup (1.20.4 at 7adfea6): attested via Athena's make
+  ship + Grace's code review SHIP-OK + my make ship at bumped tree
+  (218 e2e green). Dogfood: aamy auto-update-check from 1.20.3
+  detected 1.20.4 available, prompted upgrade; `aw upgrade` 1.20.3 →
+  1.20.4 worked clean; banner suppressed post-upgrade. NOT yet
+  dogfooded the actual init-output fixes (channel install
+  instructions, agent guide URL, hook double-run, claim-human
+  suppression) — needs real init run with API key against hosted
+  team to replay Juan's customer scenario shape. Make ship test
+  suite via init_output_test.go covers the unit-level surface.
 
 ## Open issue: chat --start-conversation 409 (aweb-aamx P1)
 
