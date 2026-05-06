@@ -4,11 +4,13 @@ Last updated: 2026-05-06 11:30 CEST (Hestia, post aweb 1.20.3 publish + AC v0.5.
 
 ## Current focus
 
-**aweb 1.20.3 published (CLI-only fix for aweb-aamx); no AC v0.5.24
-cut — CLI-only fix lands via customer `aw upgrade`, server code is
-byte-identical between 1.20.2 and 1.20.3.** AC main carries pin bump
-to 1.20.3 (commit ab1d978b) but stays at v0.5.23 tag; pin rides into
-next functional AC release naturally.
+**aweb 1.20.3 published (CLI-only fixes for aweb-aamx + aweb-aamy);
+no AC v0.5.24 cut — CLI-only fixes land via customer `aw upgrade`,
+server code is byte-identical between 1.20.2 and 1.20.3.** AC pin
+stays at `aweb>=1.20.2` (Athena bumped at ab1d978b, Juan reverted at
+18dd9c4c). Pin spec reflects tested-minimum and matches what runs
+in deployed v0.5.23 (aweb 1.20.2 server). Pin will bump naturally
+with the next functional AC change.
 
 Verified-live status:
 - Pagination fix (1.20.2 + v0.5.23): STANDS, three-probe attestation.
@@ -232,13 +234,19 @@ Athena is the cross-team bridge.
     test against her own post-aame athena↔hestia session refuted
     that scope.)
 27. Cut-the-deploy-only-if-functional-change. Don't cut a deploy
-    release purely to keep a pin-in-tagged-release synced. Pin bump
-    on main is valid state; tags should track functional changes.
-    Same family as released-artifact-≠-deployed-service — this is
-    pinned-in-main-≠-deploy-needed. (Banked 2026-05-06 from aweb
-    1.20.3 cycle: aweb 1.20.3 was CLI-only, server code byte-
-    identical to 1.20.2; AC v0.5.24 NOT cut, pin bump rides
-    next functional AC release naturally.)
+    release purely to keep a pin-in-tagged-release synced. The
+    source-pin spec reflects tested-minimum and should match what
+    runs in production; bumping the pin without a deploy that
+    exercises that minimum creates source-vs-deploy drift. If you
+    bump the pin and there's no deploy, revert the bump and let
+    the next functional change bring it forward. Same family as
+    released-artifact-≠-deployed-service — this is pinned-in-
+    main-≠-deploy-needed. (Banked 2026-05-06 from aweb 1.20.3
+    cycle: aweb 1.20.3 was CLI-only, server code byte-identical
+    to 1.20.2; AC pin bumped to >=1.20.3 at ab1d978b, then
+    reverted at 18dd9c4c per Juan's catch — pin stays at >=1.20.2
+    matching deployed v0.5.23, will bump naturally with next
+    functional AC change.)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
