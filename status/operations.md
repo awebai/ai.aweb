@@ -94,20 +94,19 @@ ladder ask is open for her lane.
 
 ## Operational discrepancies
 
-- **chat-403 on pre-aame chat sessions (status uncertain).**
-  Original framing: W3 protection rejects continuation of pre-aame
-  signed messages, workaround = --start-conversation. Aida's
-  runbook entry (commit 30c8870, currently held local) carried that
-  recommendation. **The recommendation is now known to be wrong**
-  (--start-conversation 409s on dedup pre-aamx fix; per spec is
-  pure timing flag post-aamx). Open question: is the chat-403
-  surface itself even a real customer hit, or theoretical-only?
-  Zeus's plain send-and-wait worked on his pre-aame session
-  (refutes 'plain CLI continuation 403s'). Action: Aida + me to
-  empirically verify chat-403 customer history before deciding
-  whether the entry should revise or close. Aida's commit 30c8870
-  held from push regardless of Juan's go-call until the chat-403
-  half is resolved.
+- **chat-403 entry: CLOSED, no documentation.** Aida's empirical
+  check across 5 sources (status/support.md, docs/support/ tree,
+  git log --grep, support-mail history, Zeus's actual chat history)
+  found zero customer reports. The would-be workaround
+  (--start-conversation) would actively mis-route any 1.20.2
+  customer with an active session into the aamx 409. Cleanest move:
+  no entry. Case 6 ('Bug, Regression, Or Outage') in the runbook
+  catches anything that emerges empirically. Aida's commit 30c8870
+  reset HEAD~1, drops chat-403 hunk; recommit BYOD-422 + framing-
+  invariant only. Banked: discipline #24 caught the shape pre-
+  push; banking the operational pattern that diagnosis-as-
+  workaround forwards must carry empirical attestation in the same
+  mail OR explicit 'untested — verify before documenting' flag.
 - **Multi-team-agent agent_id-vs-did comparison (open ops follow-up).**
   cp.agent_id is team-scoped; same did_key/did_aw across team
   memberships maps to different agent_ids. Code paths comparing
