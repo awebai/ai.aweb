@@ -1,95 +1,88 @@
 # Engineering Status
-Last updated: 2026-05-04 evening CEST
+Last updated: 2026-05-06 ~08:30 CEST
 
 ## Current focus
 
-1. **aweb 1.20.0 + aw 1.20.0 blessed-and-run to Hestia.** Bless-and-run
-   mail `2bd56ac2` sent. Head SHA `1510821` (code at `67a89f6`, ops doc
-   rename at `1510821`). Closes the customer-blocking shape from launch
-   day: cross-team chat reply with private team-members-only target now
-   lands in the same conversation; address-only / DID-only routing for
-   cross-namespace; one active 1:1 conversation per pair enforced
-   server-side; mail auto-thread via `/v1/conversations`; self-send
-   guard; 30-day sliding TTL retained.
-2. **Hestia gate chain in flight.** OSS e2e 218/218 green at `67a89f6`
-   (Grace's run); server pytest 149 passed. AC e2e re-run is on
-   Hestia's gate plate. Cleanup SQL must run during cutover (pre-existing
-   duplicate active 1:1 pairs like Aida<->Zeus's 6 rows) — procedure in
-   `aweb/docs/duplicate-1to1-conversation-cleanup.md`.
-3. **Mia ran code-reviewer subagent on the working tree.** Ship-OK,
-   no new blockers. Non-blocker follow-up: `findUniqueMailConversation
-   ForTarget` doesn't paginate /v1/conversations beyond 100 (silent
-   truncation if target sits at position 101+; realistic agents stay
-   under 100).
+1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.1
+   → 1.20.2 + AC v0.5.22 → v0.5.23 deployed and verified end-to-end
+   2026-05-06 06:14:33Z. The launch-day customer-blocking shape from
+   2026-05-03 (cross-team chat reply / address-routed mail) is closed
+   empirically. See Hestia closure mail 362f0be6 for full attestation.
+2. **Pagination fix on /v1/conversations** (the load-bearing 1.20.2
+   delivery): server-side filter (conversation_type, participant_did,
+   participant_address) applied AFTER actor-scope; CLI uses focused
+   query in findUniqueMailConversationForTarget. Closes the
+   stale-by-recency 409 class for any agent with >100 mail+chat
+   conversations. Verified at conversation 70f1c868 (athena↔sofia,
+   originally bug-causing pre-deploy) AND 96317ca9 (athena↔hestia,
+   page-1 baseline).
+3. **CLI auto-update-check filed P1** (aweb-aamt, dev team). On any
+   `aw <command>` invocation, if newer GitHub release exists, print
+   "Upgrade available: vX → vY" hint to stderr (rate-limited via
+   24h cache, opt-out via AW_NO_UPDATE_CHECK=1, --json safe). Wires
+   the existing checkLatestVersion infra into rootCmd.PersistentPreRun
+   beyond just `aw version` callsite. Closes the distribution-cadence
+   gap surfaced by Juan after the 1.20.2 ship.
 
 ## Dev team work in flight
 
-- **aweb messaging routing fix (Grace)**: shipped at `67a89f6`. 16
-  files: server-side conversation reuse + dedup, CLI cmd-level
-  discovery via `/v1/conversations`, team-scoped bare-alias matching,
-  exact address/DID routing, self-send guard, 30-day sliding TTL with
-  lazy expiry.
-- **aweb-aalr.2 (Mia, ac)**: still on the backlog. AWID ensure-team
-  endpoint + ac persist refactor; signal me when branch ready.
+(quiet post-cycle; Grace's last commit was b7e86745 test fixture
+fix landing on AC main for next-cycle ship)
 
 ## Non-feature work in flight
 
-- **Playwright-MCP reproducer for Add-Existing dialog** (Athena, ac):
-  pending. Still owed since 2026-05-01; deferred during the
-  cutover-1 / cutover-2 / aame-launch arc.
+- **Multi-team agent_id-vs-did comparison grep** (task #20, my plate,
+  bandwidth-allowing). cp.agent_id is team-scoped — multi-team agents
+  (same did_aw, multiple team memberships, multiple agent_id rows in
+  aweb.agents) hit asymmetry when code compares on cp.agent_id
+  instead of cp.did/cp.did_aw. The 1.20.2 fix bypassed this for the
+  pagination case but other code paths in aweb may still have direct
+  cp.agent_id comparisons. Grep server/src/aweb/ + cli/go/, assess
+  each callsite. Non-blocking.
 
 ## Release-ready state (handoff to Hestia)
 
-- **aweb 1.20.0 / aw 1.20.0** at `1510821`. Bless-and-run delivered.
-  Awaiting Hestia's gate-chain results.
+Nothing in the release pipeline. Last ships:
+- aweb-server-v1.20.2 + aw-v1.20.2: PyPI + npm latest, 2026-05-06 ~05:50Z
+- aweb-cloud v0.5.23: app.aweb.ai released, 2026-05-06 06:14:33Z
 
 ## Pending engineering artifacts owed
 
-- **KI#1 closure decision record technical content.** Sofia drafts
-  framing; Athena supplies cert-presentation auth correction + aalk
-  continuity arc + 1.18.6 trust-model arc + Aida 4/4 attestation.
-  Source: `agents/athena/aale-trust-contract.md` + aweb commit
-  `7759abc`. Pending Sofia framing draft.
-- **CLI conversation pagination follow-up** (task #15): paginate
-  beyond 100 or fall back to inbox on partial-result-no-match.
-- **Phase 5 Redis negative-result cache** in session lookup —
-  separate ticket from the messaging-routing fix.
+- **KI#1 closure decision record technical content** (still owed
+  to Sofia from before this cycle started). cert-presentation auth
+  correction + aalk continuity arc + 1.18.6 trust-model arc + Aida
+  4/4 attestation. Source: `agents/athena/aale-trust-contract.md`
+  + aweb commit `7759abc`. Pending Sofia framing draft.
+- **Playwright-MCP reproducer for Add-Existing dialog** (still
+  open from 2026-05-01, deferred during the cutover/messaging arcs).
+  Lands as `ac/frontend/e2e/add-existing.spec.ts`.
 
 ## Risks
 
-- **Cleanup SQL must run before customer traffic resumes** during the
-  1.20.0 cutover. Without it, sends between participant pairs that
-  accumulated multiple active 1:1 conversations (pre-dedup) return 409
-  "Multiple active conversations match these participants". Documented
-  in `aweb/docs/duplicate-1to1-conversation-cleanup.md`.
-- **Aida's exact verbatim shape** (cross-team direct address-routing
-  reply with --wait to a private team-members-only target) was not
-  reproduced locally end-to-end against the new binary; OSS e2e
-  Phase 12 covers an analog (cross-team via tilde, ephemeral
-  team-local). Live-verify with Aida + Zeus is the canonical
-  empirical attestation.
-- **Add-Existing surface still ships unprotected** until Playwright
-  reproducer lands.
+- **CLI distribution gap** until aweb-aamt ships. Customers on
+  pre-1.20.2 `aw` will hit the pagination 409 in production with
+  no in-band hint to upgrade. Affects support-cycle cost more
+  than user functionality (workaround: customers run `aw upgrade`
+  manually if they think to).
+- **Multi-team-agent class** unaudited across the codebase
+  (task #20). Potential silent misbehavior on code paths comparing
+  cp.agent_id directly. No reported customer hits yet but the
+  class is real.
+- **chat-403 on pre-aame chat sessions** unchanged. Customers
+  use `aw chat send-and-wait <peer> "msg" --start-conversation`
+  as workaround. Aida documented in support runbook. Threshold
+  for code-fix priority: 2nd customer report in rolling 7d.
 
 ## Next checks
 
-- Hestia's gate-chain results on `1510821`. Any failure shape, work
-  the fix together.
-- Once Hestia tags + deploys + reports verified-live, Aida + Zeus
-  live-verify of the customer-blocking shape.
-- AWID/cloud production scale audit (read-only; useful for aame
-  evidence but non-blocking).
-- Mia's aalr.2 branch-ready signal when she returns to that thread.
+- aweb-aamt P1 review when Mia/Grace claim it from the dev team
+  task queue.
+- Sofia's KI#1 framing draft when ready (to supply technical
+  content).
+- Multi-team agent_id grep at next bandwidth window.
+- Any customer-side reports of chat-403 or pagination edge cases.
 
-## Production scale (queried 2026-05-01 morning — refresh due)
-
-- AWID: 91 did_aw_mappings, 57 dns_namespaces, 45 teams,
-  33 public_addresses, 3 team_certificates.
-- Cloud: 44 active users, 53 organizations, 46 managed_namespaces,
-  8 active sessions, 155 cloud_agent_certificates,
-  178 cloud_workspace_metadata.
-
-## Standing release-discipline (banked through 2026-05-04)
+## Banked release-discipline (through 2026-05-06)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree (not chat-pasted diffs)
@@ -111,15 +104,18 @@ Last updated: 2026-05-04 evening CEST
 16. Cross-schema FK audit before any DROP SCHEMA cutover.
 17. Pre-deploy gates that depend on env-specific prerequisites
     must fail-closed with explicit bypass signal, not skip-on-missing.
-18. When a code path branches on an attribute (lifetime, role,
-    status), test BOTH branches with the same surface invocation.
-19. **Don't bless-and-run with a work-in-flight branch.** Banked
-    2026-05-04: I claimed "AC e2e 164/164 green at 13:29Z" then
-    Grace pushed at 13:38Z and Hestia's gate caught the regression.
-    Bless-and-run only after the dev team signals branch-ready
-    AND the gate-input SHA is fixed; do not extrapolate from a
-    pre-fix run.
-20. **Code-correctness review before re-running e2e.** Banked
-    2026-05-04: when a fix lands, ask the right reviewers to read
-    the code first; run the suite once when code-review is clear.
-    Do not re-run e2e three times to convince yourself.
+18. Verified-live evidence cites actually-committed SHA.
+19. Don't bless-and-run with a work-in-flight branch.
+20. Code-correctness review before re-running e2e.
+21. Bless-and-run validation MUST run the FULL release-ready chain
+    end-to-end at the gate-input SHA (on the same machine as the
+    deploy will run from), not a curated subset.
+22. Code-reviewer subagent flagging silent-fall-through gap +
+    relevant-scale realistic for production trajectory ⇒ blocker,
+    not follow-up. (>100 conversations is realistic almost
+    immediately for active agent teams.)
+23. Test failures recurring at specific clock windows + reruns
+    clean later are date/timezone-math signals, NOT transient-flake
+    signals. "It passed on rerun" is not a diagnosis. Check whether
+    the rerun delay corresponds to a UTC-vs-local-midnight crossing
+    or other clock-based window before declaring transient.

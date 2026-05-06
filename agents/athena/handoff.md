@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-04 evening CEST
+Last updated: 2026-05-06 ~08:30 CEST
 
 ## Read this first
 
@@ -20,19 +20,75 @@ team is `aweb:juan.aweb.ai`; use `--team default:aweb.ai` for
 coordinator chats. Coders do NOT need to know about Hestia — to
 them, Athena is the gate; they don't deploy.
 
-## Live state at 2026-05-04 evening
+## Live state at 2026-05-06 ~08:30 CEST
 
-- aweb @ `1510821` on main (code at `67a89f6`, ops doc rename
-  `1510821`).
-- **aweb 1.20.0 / aw 1.20.0** blessed-and-run to Hestia
-  (mail `2bd56ac2`). Gate chain in flight; tags not yet
-  pushed. Production still on v0.5.21 + aweb 1.19.1.
-- `app.aweb.ai/health` (last known): `release_tag=v0.5.21`,
-  `aweb_version=1.19.1`. Re-check after Hestia ships 1.20.0.
-- `api.awid.ai/health` (last known): 0.5.4, healthy.
+- **app.aweb.ai/health**: `release_tag=v0.5.23`,
+  `git_sha=7705fc7c`, `aweb_version=1.20.2`,
+  `awid_service_version=0.5.4`. Deployed 06:14:33Z.
+- **api.awid.ai/health**: 0.5.4, healthy.
+- **Published artifacts**: PyPI aweb 1.20.2, npm @awebai/aw 1.20.2,
+  GHCR aweb-cloud v0.5.23, PyPI awid-service 0.5.4. All "latest".
+- aweb origin/main HEAD: `b7e86745` (admin_analytics test fix lives
+  on main, ships next AC release, NOT in v0.5.23).
+- ac origin/main HEAD: `b7e86745`.
 - channel 1.4.0.
 
-## What just happened (2026-05-04 launch-day arc)
+## What just happened (2026-05-04 → 2026-05-06 messaging epic)
+
+The customer-blocking shape from launch day, the cycle's arc, and
+the closure.
+
+### Final state
+The full epic delivered: aweb 1.20.0 → 1.20.1 → 1.20.2 + AC v0.5.22
+→ v0.5.23. Verified-live 2026-05-06 06:14:33Z. The launch-day
+customer-blocking shape is closed empirically — probes confirmed
+clean attach on both 96317ca9 (page-1 baseline) and 70f1c868
+(stale-by-recency, the originally-bug-causing case). Sofia +
+Hestia confirmed receiver-side. See Hestia closure mail 362f0be6.
+
+### Key bug shapes encountered + fixed
+1. **shouldProbeExistingSession too narrow** (1.20.1 fix): bare-alias
+   chat session probe was skipped → fresh session_id collided with
+   server dedup → 409. Fix d666119: extend to all non-empty targets.
+2. **Server-side conversation reuse / dedup** (1.20.0 + 1.20.1):
+   one-active-1:1-per-pair via find_active_one_to_one_conversation_between
+   with ConflictError → 409 on multi-match. Visibility-widening on
+   /v1/conversations (1.20.1).
+3. **AC bridge allowlist gap** (AC v0.5.22 fix): /v1/conversations
+   wasn't in the AC oss_auth.py identity-DIDKey allowlist, so CLI
+   preflight got 401 instead of reaching aweb-server. Fix:
+   add /v1/conversations to _IDENTITY_DIDKEY_ALLOWLIST_PREFIXES.
+4. **Pagination on /v1/conversations** (1.20.2 fix, the load-bearing
+   one): first-page-of-100-by-recency missed older conversations. CLI
+   then auto-genUUID, server dedup catches, 409. Fix: server-side
+   filter (conversation_type, participant_did, participant_address)
+   applied AFTER actor-scope; CLI uses focused query.
+5. **Admin analytics date-fragility** (test-only, b7e86745 on main):
+   fixture used date.today() (local) but service used _utc_today()
+   (UTC). At local-vs-UTC midnight boundary they disagreed by a day.
+   Fix: monkeypatch _utc_today in fixture to match date.today().
+
+### Banked disciplines (#18-23 added this cycle)
+See engineering.md for the full list. The new ones from this cycle:
+- #18 Verified-live evidence cites actually-committed SHA.
+- #19 Don't bless-and-run with a work-in-flight branch.
+- #20 Code-correctness review before re-running e2e.
+- #21 Bless-and-run validation MUST run the FULL release-ready chain
+  end-to-end at the gate-input SHA, not a curated subset.
+- #22 Code-reviewer subagent flagging silent-fall-through gap +
+  realistic-scale ⇒ blocker, not follow-up.
+- #23 Test failures recurring at specific clock windows + reruns
+  clean later are date/timezone-math signals, NOT transient flakes.
+
+### Open from this cycle
+- chat-403 on pre-aame chat sessions (independent surface; user-side
+  workaround via `aw chat send-and-wait <peer> "msg" --start-conversation`).
+- aweb-aamt P1 dev-team task: CLI auto-update-check on every
+  command (currently only on `aw version`).
+- Multi-team-agent agent_id-vs-did comparison grep (task #20, my
+  plate, bandwidth-allowing).
+
+## OLD CONTEXT (2026-05-04 launch-day arc, retained for reference)
 
 The customer-blocking shape from launch day and how it closed:
 
