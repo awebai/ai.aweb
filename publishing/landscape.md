@@ -60,6 +60,20 @@ transport layer rather than identity or coordination.
 Federated discovery framework. How agents find each other across
 organizational boundaries.
 
+## Adjacent tools (libraries, not protocols)
+
+### AHK (Agent Harness Kit)
+TypeScript coordination harness scoped to one project's `.harness/`
+directory. [github.com/enmanuelmag/agent-harness-kit](https://github.com/enmanuelmag/agent-harness-kit)
+/ [ahk.cardor.dev](https://ahk.cardor.dev). Does atomic claiming
+and health gates before close. Fixed roles
+(Lead/Explorer/Builder/Reviewer). Adjacent to aweb at small-N
+in-project coordination; complementary rather than overlapping —
+AHK does not address cross-project or cross-organization identity
+and routing, which is the layer aweb operates at. A team wanting
+both shapes (in-project harness + cross-org coordination) could
+run them together.
+
 ## The open questions
 
 See [a2ac.io](https://a2ac.io) for the full discussion. The big ones:
