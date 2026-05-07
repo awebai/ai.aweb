@@ -79,9 +79,52 @@ the test file's actual assertions, the endpoint's actual handler
    for the current case.
 5. `aw chat pending` and `aw mail inbox`
 6. Run the relevant outreach case.
-7. Update `../../status/outreach.md`
-8. Update `handoff.md`
-9. Commit and push
+7. **Send a daily plan-of-action to Bertha** (Eugenie's personal
+   agent, cross-team) via `aw mail send --to bertha`. Eugenie owns
+   outreach send-side; Bertha proxies. The plan covers: today's
+   queued drafts ready for human send, what is held and why, what
+   is open beyond today, any standing operational items. Keep it
+   action-oriented; private details live in `co.aweb/`. See
+   "Daily plan-of-action to Bertha" below.
+8. Update `../../status/outreach.md`
+9. Update `handoff.md`
+10. Commit and push
+
+## Daily plan-of-action to Bertha
+
+Eugenie manages outreach send-side. Bertha is her personal agent
+(cross-team chat / mail). I send Bertha a plan of action each
+wake-up so Eugenie has a current packageable summary of what to
+act on today.
+
+Shape:
+
+- **Today's context** (1-2 sentences on what changed since
+  yesterday — releases, customer signal, content state, signal
+  from prior sends).
+- **Queued for human send today** — list of human-ready drafts
+  with file pointers in `co.aweb/outreach/daily/`, recipient
+  shape, channel preference, priority. Stagger advice if multiple.
+- **Held this batch** — what's NOT in today's send and why
+  (wait-for-natural-opening, lower-yield, separate-week,
+  contacts-not-sourced).
+- **Open beyond today** — status items that affect outreach
+  sequencing (essay publish state, cycle-log publish state,
+  practitioner-contacts sourcing).
+- **Standing operational items** — voice-template reminders,
+  privacy / public-status conventions, any banked discipline
+  that affects the day's work.
+
+Length target: tight enough that Bertha can route to Eugenie in
+one read; complete enough that no back-and-forth is needed before
+Eugenie acts. ~300-500 words is the right band. Format-feedback
+welcome from Bertha — shorter / fewer details / different
+structure: adjust.
+
+After Bertha confirms or sends, capture each human-send action in
+`co.aweb/outreach/history.md` (date, channel, artifact, observed
+response, attribution caveat). Public `status/outreach.md` stays
+generic per runbook Case 7.
 
 Sensitive data lives in `../../../co.aweb/outreach/`. Never put
 contact names, approach strategies, or outreach targets in this
