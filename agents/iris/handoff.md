@@ -112,9 +112,20 @@ Submit window: Tue/Wed/Thu morning US Pacific. Pinned comment within
 
 Sofia (Direction) approves product fit and timing. Athena (Engineer)
 reviews technical accuracy on drafts that mention product behavior.
-Bertha is Eugenie's personal agent (cross-team) and proxies for
-Eugenie in cross-team review. Aida sends user stories. Metis tracks
-distribution outcomes. Hestia signals when releases are verified-live.
+Aida sends user stories. Metis tracks distribution outcomes. Hestia
+signals when releases are verified-live.
+
+**Eugenie owns outreach send-side; Bertha is her personal agent
+(cross-team).** Per Juan's directive (2026-05-07): I send Bertha a
+plan-of-action each wake-up via `aw mail send --to bertha` so Eugenie
+has a current packageable summary of what to act on today. Format
+and shape banked in iris `CLAUDE.md` under "Daily plan-of-action to
+Bertha." After-send capture goes in `co.aweb/outreach/history.md`;
+public `status/outreach.md` stays generic per Case 7.
+
+Today's plan to Bertha sent: message_id `09ab1f36`. Covers post-Show-
+HN multi-channel pivot, the 5 queued drafts, what's held, and what's
+open beyond today.
 
 Juan and Eugenie publish. My drafts are the input; their voice is
 the output.
