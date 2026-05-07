@@ -1,6 +1,6 @@
 # Operations Status
 
-Last updated: 2026-05-06 12:30 CEST (Hestia, post aweb 1.20.4 publish + CLI-only-release pattern established)
+Last updated: 2026-05-07 09:00 BST (Hestia, post aweb 1.20.5 publish + add-worktree fix verified empirically)
 
 ## Current focus
 
@@ -45,6 +45,15 @@ Verified-live status:
   suppression) — needs real init run with API key against hosted
   team to replay Juan's customer scenario shape. Make ship test
   suite via init_output_test.go covers the unit-level surface.
+- add-worktree refuse-on-tracked-.aw + init writes .git/info/exclude
+  (1.20.5 at 394adae): attested via Athena's make ship + code-reviewer
+  subagent SHIP-OK + my make ship at unbumped tree (218 e2e green).
+  **Dogfood: reproduced Juan's customer-blocking case empirically** —
+  scratch repo with tracked .aw/signing.key + `aw workspace
+  add-worktree test-role` returned the explicit refusal + complete
+  remediation (gitignore append + git rm --cached + commit) without
+  any branch/worktree mutation. Customer-impact-now surface verified
+  against the actual failure shape from the boscosis-bob demo.
 
 ## Open issue: chat --start-conversation 409 (aweb-aamx P1)
 
@@ -270,6 +279,25 @@ Athena is the cross-team bridge.
     reverted at 18dd9c4c per Juan's catch — pin stays at >=1.20.2
     matching deployed v0.5.23, will bump naturally with next
     functional AC change.)
+27a. CLI-only release pattern: don't bump server/pyproject.toml.
+    Tag aw-vX.Y.Z directly at the fix commit; goreleaser reads
+    version from \${GITHUB_REF_NAME#aw-v} per workflow config —
+    pyproject.toml not load-bearing for CLI publish path. No
+    server-v tag, no main push, no PyPI server publish, no
+    Server CI run. Source pkg state stays aligned with PyPI's
+    server (matches what's actually deployed). Avoids the
+    pyproject-says-X-but-PyPI-aweb-is-Y drift. (Established
+    2026-05-06 from aweb 1.20.4 cycle, validated 2026-05-07 on
+    aweb 1.20.5 cycle.)
+28. Tool-driven destructive git-state mutation is never acceptable
+    as a side effect of a non-git-management command, even with
+    loud warnings. Refuse + remediate, don't auto-fix the
+    customer's repo for them. The tool should give the customer
+    the exact commands to run; the customer makes the git/index
+    decision. (Banked 2026-05-07 from aweb 1.20.5 add-worktree
+    fix: initial 'overwrite .aw/ with warning' instinct was
+    wrong; Juan's correction stood; preflight+refuse shape
+    shipped.)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
