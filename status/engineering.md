@@ -1,29 +1,37 @@
 # Engineering Status
-Last updated: 2026-05-07 ~10:00 CEST
+Last updated: 2026-05-07 ~14:30 CEST
 
 ## Current focus
 
-1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.5
+1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.6
    + AC v0.5.22 → v0.5.23 deployed and verified end-to-end. Original
    launch-day customer-blocking shape closed empirically.
-2. **aweb 1.20.5 (CLI-only) shipped at SHA 394adae**, npm @awebai/aw
-   1.20.5 latest. Refuses `aw workspace add-worktree` when `.aw/`
-   runtime files are tracked in git, with explicit remediation
-   (`git rm --cached -r .aw` + `.aw/` to .gitignore + commit). `aw
-   init` writes `.git/info/exclude` entry for `.aw/` (per-machine,
-   doesn't mutate project-tracked .gitignore). Closes a regression
-   from b2070a5 (Apr 16) that broke add-worktree for hosted setups
-   when the customer had `.aw/` accidentally tracked. Hestia
-   dogfooded against the exact customer-blocking case before tagging.
-3. **aweb 1.20.4 (CLI-only) shipped at 7adfea6** earlier today.
+2. **aweb 1.20.6 (CLI-only) shipped at SHA 360bfe2**, npm @awebai/aw
+   1.20.6 latest, 2026-05-07 14:14Z. Closes Grace's four review
+   findings on the 1.20.4 init UX cleanup: BYOD jargon → "The other
+   option"; doctor missing-workspace remediation drops `aw run`;
+   persistent-alias regression test
+   (TestExecuteHostedPathPersistentDoesNotSuggestUserAsAlias);
+   Windows symlink-skip helper. CLI-only #27a (no pyproject bump,
+   no AC re-deploy). Pin in AC main stays at >=1.20.2.
+3. **aweb 1.20.5 (CLI-only) shipped at SHA 394adae**, 2026-05-07
+   ~10:00Z. Refuses `aw workspace add-worktree` when `.aw/` runtime
+   files are tracked in git, with explicit remediation
+   (`printf '\n.aw/\n' >> .gitignore` + `git rm --cached -r .aw` +
+   commit + retry). `aw init` writes `.git/info/exclude` entry for
+   `.aw/` on the non-refusal path. Closes a regression from b2070a5
+   (Apr 16). Grace dogfooded against the exact customer-blocking
+   case in /Users/juanre/prj/boscosis before tagging.
+4. **aweb 1.20.4 (CLI-only) shipped at 7adfea6**, 2026-05-06.
    Cleans up `aw init` next-steps output: full channel install
    instructions, agent guide URL, removed duplicate hook setup,
    suppressed claim-human suggestion when APIKeyAuth=true.
-4. **aamy caught its own upgrade in production** — empirical attestation
-   for the auto-update-check feature: Hestia's `aw upgrade` from
-   1.20.3 → 1.20.4 → 1.20.5 was prompted by the very feature that
-   shipped in 1.20.3. Distribution-cadence loop closed.
-5. **Companion AC frontend fix at 2d7150a3** (already on AC main):
+5. **aamy now has THREE production self-upgrade attestations** —
+   the auto-update-check feature shipped in 1.20.3 caught its own
+   upgrade across 1.20.3 → 1.20.4 → 1.20.5 → 1.20.6 in Hestia's
+   workspace. Distribution-cadence loop closed; receipt strengthened
+   each ship.
+6. **Companion AC frontend fix at 2d7150a3** (already on AC main):
    autoComplete attributes on RegisterPage + LoginPage to fix the
    browser-prefilled-username-with-email bug. Rides next functional
    AC release.
@@ -49,7 +57,9 @@ error handling for ensureAwebRuntimeGitIgnored).
 ## Release-ready state (handoff to Hestia)
 
 Nothing in the release pipeline. Last ships:
-- aw-v1.20.5: npm latest, 2026-05-07 ~10:00Z (CLI-only, add-worktree
+- aw-v1.20.6: npm latest, 2026-05-07 14:14Z (CLI-only, init UX
+  cleanup follow-up addressing Grace's 4 review findings on 3a251a5).
+- aw-v1.20.5: npm, 2026-05-07 ~10:00Z (CLI-only, add-worktree
   refuses tracked .aw/ + init writes .git/info/exclude).
 - aw-v1.20.4: npm, 2026-05-06 ~10:00Z (CLI-only, init UX cleanup).
 - aweb-server-v1.20.3 + aw-v1.20.3: PyPI + npm, 2026-05-06 ~09:00Z
