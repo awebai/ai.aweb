@@ -1,38 +1,41 @@
 # Engineering Status
-Last updated: 2026-05-06 ~10:00 CEST
+Last updated: 2026-05-07 ~10:00 CEST
 
 ## Current focus
 
-1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.4
+1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.5
    + AC v0.5.22 → v0.5.23 deployed and verified end-to-end. Original
-   launch-day customer-blocking shape closed empirically (pagination
-   fix + chat dedup fix + init UX cleanup).
-2. **aweb 1.20.4 (CLI-only) shipped at SHA 7adfea6**, npm @awebai/aw
-   1.20.4 latest. Cleans up `aw init` next-steps output: full channel
-   install instructions (was missing /plugin marketplace add + install
-   steps), agent guide URL (was local repo path), removed duplicate
-   hook setup in API-key path, suppressed claim-human suggestion when
-   APIKeyAuth=true. PyPI aweb stays at 1.20.3 (server unchanged
-   between 1.20.3 and 1.20.4). Per banked discipline #27a: for CLI-only
-   releases, don't bump server/pyproject.toml — tag carries the CLI
-   version via goreleaser. Avoids source-vs-deploy drift.
-3. **aamy caught its own upgrade in production** — empirical attestation
-   for the auto-update-check feature: Hestia's `aw upgrade` from 1.20.3
-   to 1.20.4 was prompted by the very feature that shipped in 1.20.3.
-   "Checking for updates... Updating aw v1.20.3 → v1.20.4" — the cleanest
-   possible verified-live signal for an auto-update-check.
-4. **Companion AC frontend fix at 2d7150a3** (already on AC main):
+   launch-day customer-blocking shape closed empirically.
+2. **aweb 1.20.5 (CLI-only) shipped at SHA 394adae**, npm @awebai/aw
+   1.20.5 latest. Refuses `aw workspace add-worktree` when `.aw/`
+   runtime files are tracked in git, with explicit remediation
+   (`git rm --cached -r .aw` + `.aw/` to .gitignore + commit). `aw
+   init` writes `.git/info/exclude` entry for `.aw/` (per-machine,
+   doesn't mutate project-tracked .gitignore). Closes a regression
+   from b2070a5 (Apr 16) that broke add-worktree for hosted setups
+   when the customer had `.aw/` accidentally tracked. Hestia
+   dogfooded against the exact customer-blocking case before tagging.
+3. **aweb 1.20.4 (CLI-only) shipped at 7adfea6** earlier today.
+   Cleans up `aw init` next-steps output: full channel install
+   instructions, agent guide URL, removed duplicate hook setup,
+   suppressed claim-human suggestion when APIKeyAuth=true.
+4. **aamy caught its own upgrade in production** — empirical attestation
+   for the auto-update-check feature: Hestia's `aw upgrade` from
+   1.20.3 → 1.20.4 → 1.20.5 was prompted by the very feature that
+   shipped in 1.20.3. Distribution-cadence loop closed.
+5. **Companion AC frontend fix at 2d7150a3** (already on AC main):
    autoComplete attributes on RegisterPage + LoginPage to fix the
    browser-prefilled-username-with-email bug. Rides next functional
    AC release.
 
 ## Dev team work in flight
 
-Quiet post-cycle. Grace shipped aweb-aamx (809056e), aweb-aamy
-(448a9f5), and reviewed 7adfea6 (init UX cleanup) all in one day.
-P3 follow-ups on her queue: aweb-aamz (wait-semantics carry-over),
-aweb-aana (atomic temp+rename for update-check cache),
-aweb-aanb (full-path output test for init post-setup dedup).
+Quiet post-cycle. Grace shipped 5 CLI fixes in 24h: aamx (809056e),
+aamy (448a9f5), 7adfea6 (init UX), 394adae (add-worktree tracked-.aw
+refusal). P3 follow-ups on her queue: aamz (wait-semantics
+carry-over), aana (atomic temp+rename for update-check cache), aanb
+(full-path output test for init post-setup dedup), aane (best-effort
+error handling for ensureAwebRuntimeGitIgnored).
 
 ## Non-feature work in flight
 
@@ -46,7 +49,9 @@ aweb-aanb (full-path output test for init post-setup dedup).
 ## Release-ready state (handoff to Hestia)
 
 Nothing in the release pipeline. Last ships:
-- aw-v1.20.4: npm latest, 2026-05-06 ~10:00Z (CLI-only, init UX cleanup).
+- aw-v1.20.5: npm latest, 2026-05-07 ~10:00Z (CLI-only, add-worktree
+  refuses tracked .aw/ + init writes .git/info/exclude).
+- aw-v1.20.4: npm, 2026-05-06 ~10:00Z (CLI-only, init UX cleanup).
 - aweb-server-v1.20.3 + aw-v1.20.3: PyPI + npm, 2026-05-06 ~09:00Z
   (aamx + aamy bundled).
 - aweb-cloud v0.5.23: app.aweb.ai released, 2026-05-06 06:14:33Z.
@@ -146,3 +151,11 @@ Nothing in the release pipeline. Last ships:
     Source pkg state stays aligned with what's on PyPI for the
     server. Avoids 'pyproject says X but PyPI server is X-1' drift.
     (Sharpening of #27 from Hestia's 1.20.4 release prep.)
+28. Tool-driven destructive git-state mutation is never acceptable
+    as a side effect of a non-git-management command, even with
+    loud warnings. Refuse + remediate, don't auto-fix the customer's
+    repo for them. The tool gives the customer the exact commands
+    to run; the customer makes the git/index decision. (Banked
+    2026-05-07 from add-worktree fix: initial 'overwrite .aw/ with
+    warning' instinct was wrong; Juan's correction stood; preflight+
+    refuse shape shipped in 1.20.5.)
