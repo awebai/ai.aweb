@@ -48,18 +48,46 @@ draft text without checking. The banked discipline (every claim in
 HN-bound text gets a fresh-container pre-flight before submit) is
 captured in `publishing/voice-howto-comments.md` honesty checklist.
 
+## Multi-channel pivot post-Show-HN
+
+Show HN went up earlier today and sank. Energy now pivots from
+polishing the launch artifact to building parallel-channel surface
+area. The Show HN was a single-point attempt; the gap was that no
+multi-channel infrastructure was lined up behind it.
+
+5 private direct-outreach drafts prepared and queued for human send
+(Case 7 — drafts in `co.aweb/outreach/daily/`, public details stay
+generic per the runbook). Recipients are protocol-article authors
+in adjacent space and one adjacent builder; each draft is
+feedback / fit-on-your-map shape, not "look at our launch." HN URL
+deliberately not referenced.
+
+Other channels still open and unsourced:
+- Original content distribution: 5-agents essay publish on
+  juanreyero.com (Sofia's framing pass + Juan's voice pass); then
+  Twitter thread + regular HN submission of the essay (different
+  framing, not another Show HN); plus Reddit posts on r/ClaudeAI,
+  r/ChatGPTPro, r/ExperiencedDevs (problem-framed, not pitch).
+- Practitioner outreach: contacts list does not yet have
+  multi-agent practitioners running this in production today —
+  sourcing those is a separate effort against the watch list in
+  `co.aweb/outreach/watch.md`.
+- Podcast / conference / partnership outreach: not on contacts list.
+
 ## Next actions
 
-- Wait for Sofia's framing-pass routing decision between Juan's
-  body+v4 first comment vs. Athena's first-comment shape, once she
-  has both side-by-side.
-- Wait for Athena's `aw workspace add-worktree` follow-up pre-flight
-  (offered in my reply mail). If add-worktree fails too, drop to
-  single-agent claim in the first-comment draft.
-- Watch for Juan's call on the standing body items: "is itself a
-  team of agents" overclaim (suggested fix: pair-with-human-in-loop
-  framing); dashboard link incognito-browser verification.
-- Watch for cycle-log going public (Sofia's framing pass + Juan's
-  publishing platform decision).
-- After submit, capture action + signal in
-  `publishing/history.md` per Case 6 in the runbook.
+- Submit the 5 direct-outreach drafts for human send (Juan or
+  Eugenie depending on platform comfort), staggered ~30 min apart.
+  Capture each in `co.aweb/outreach/history.md` after send.
+- Land 5-agents essay (Sofia's framing pass + Juan's voice pass +
+  Athena's tech-accuracy pass on remaining product claims). Once
+  public, becomes a regular HN submission (not Show HN), Twitter
+  thread, and the seed for Reddit problem-framed posts.
+- Capture HN Show HN action + observed signal in
+  `publishing/history.md` per Case 6 in the runbook (front-page
+  reach, comments received, repo stars, signups, conversations
+  started, attribution caveats).
+- Bank the multi-channel-launch-strategy gap in the runbook or
+  decisions doc — this iteration's lesson is that single-channel
+  launches don't recover when they sink. The next iteration needs
+  3-5 channels firing the same week, each with its own merits.
