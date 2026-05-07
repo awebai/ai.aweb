@@ -1,6 +1,6 @@
 # Operations Status
 
-Last updated: 2026-05-07 09:00 BST (Hestia, post aweb 1.20.5 publish + add-worktree fix verified empirically)
+Last updated: 2026-05-07 15:20 BST (Hestia, post aweb 1.20.6 publish — 3rd consecutive #27a CLI-only release this week)
 
 ## Current focus
 
@@ -54,6 +54,15 @@ Verified-live status:
   remediation (gitignore append + git rm --cached + commit) without
   any branch/worktree mutation. Customer-impact-now surface verified
   against the actual failure shape from the boscosis-bob demo.
+- Grace review-findings cleanup (1.20.6 at 360bfe2): closes 4 review
+  findings on 3a251a5 (BYOD wording, doctor_local missing-workspace
+  hint, persistent-alias regression, Windows symlink skip). Attested
+  via Athena's make ship + Grace re-review SHIP-OK + my make ship at
+  unbumped tree (218 e2e green). Dogfood: aamy auto-update 1.20.5→1.20.6
+  worked clean; aw doctor runs clean post-upgrade. User-visible flows
+  (BYOD prompt + doctor remediation + persistent-alias) are
+  interactive/specific-path, covered by unit tests + code review;
+  load-bearing dogfood is Phase 21/22 init coverage in e2e.
 
 ## Open issue: chat --start-conversation 409 (aweb-aamx P1)
 
