@@ -198,9 +198,9 @@ the pillars section.
 
 > No developer needed
 
-**Section heading**:
+**Section heading** (interim — see Sofia mail 217eb310):
 
-> Sign up. Your agent handles the rest.
+> Most setup your agent can handle.
 
 **Subhead / intro paragraph (one line)**:
 
@@ -222,35 +222,46 @@ copy button to its right per existing `.qs-copy-btn` pattern):
 Linked to `docsUrl` (or specifically the developer-quickstart anchor
 if there's one).
 
-**Voice / honesty note**: this is the soften per Athena's pre-flight
-(mail 2f9cd979). Original brief headline was "No developer needed.
-Ask your agent to set you up." That overpromises — agent-guide
-currently requires four human-handled steps (account creation,
-plugin install, team creation at awid.ai, no-shell-access fallback).
-The honest framing splits the human-signup step from the
-agent-handles step. The "No developer needed" label survives as
-the section label because, post-signup, no developer IS needed for
-the rest. The heading is the load-bearing line; making it
-"Sign up. Your agent handles the rest." is the truth.
+**Voice / honesty note**: heading is Option A ("Most setup your
+agent can handle") interim. Sofia mail 217eb310 (2026-05-09)
+reversed her earlier stand-down: Athena's load-bearing engineering
+fix (aweb-aang, worktree-creation-on-hosted via cli-signup-returns-
+API-key) estimated at 3-4 days end-to-end; during that window
+shipping Option B ("Sign up. Your agent handles the rest.") is
+overclaim because new customers attempting autonomous install
+hit the same block Pepe hit. Option A ships now; once aang
+verified-live, Sofia dispatches a revert to Option B; Hestia
+re-wires.
 
-**Engineering tickets that should follow** (Athena named, separate
-work, not blocking ship):
-1. Agent-runnable signup flow (close the cold-start gap so no
-   human signup is required)
+Two purposeful copy state transitions instead of one. The second
+locks the truthful claim for good once engineering reality
+catches up.
+
+**Engineering work in flight** (Juan called all four P0;
+Athena's dev team dispatching):
+
+1. Agent-runnable signup flow / cli-signup-returns-API-key
+   (aweb-aang) — closes the cold-start gap. THIS is the load-
+   bearing fix that gates the Option A → Option B copy revert.
+   3-4 day estimate.
 2. Plugin install via shell (close the Claude-Code `/plugin
    install` REPL gap)
-3. Documented path for shell-less agents (Claude Desktop / ChatGPT
-   app via custodial-agent + dashboard)
+3. Documented path for shell-less agents (Claude Desktop /
+   ChatGPT app via custodial-agent + dashboard)
+4. Pepe's fourth friction (named in his autonomous-install
+   report; specifics not surfaced to Iris yet)
 
-When those land, this section can revert to the hard claim. Until
-then, this honest framing stays.
+**Three options on this section heading** (for record):
 
-**Alternative text** (if Bertha/Eugenie wants softer-but-still-bold
-than Athena's "Sign up. Your agent handles the rest."):
-
-Option A (very honest): "Most setup your agent can handle."
-Option B (hardest defensible): "Sign up. Your agent handles the rest." (recommended)
-Option C (would be ideal but not currently true): "No developer needed. Ask your agent to set you up." (do NOT ship until engineering tickets above close)
+- Option A (ships now): "Most setup your agent can handle."
+  Honest about the engineering gap; matches what an autonomous
+  install actually delivers today.
+- Option B (post-aang revert): "Sign up. Your agent handles the
+  rest." The truth once aang verified-live; Sofia dispatches
+  the revert.
+- Option C (would-be-ideal): "No developer needed. Ask your
+  agent to set you up." End-to-end autonomous, no human signup;
+  blocked on the named engineering tickets above.
 
 ---
 
