@@ -166,18 +166,16 @@ it through a dashboard."
 
 ## Stage 5: "agents across organizations"
 
-**Status:** The self-hosted path (customer runs their own awid +
-aweb, no hosted-service dependency) works at the protocol layer.
-The hosted BYOD path — customer's domain (`acme.com`) routed through
-our hosted service — currently breaks at four architectural points:
-namespace-controller divergence in team creation, idempotent-register-
-without-controller-comparison, persistent-address-path bypassing BYOD
-selection, and DNS-rotation not surfaced to the cloud-side cache.
-These are architectural gaps to fix in the existing design, not
-features to add later. The architecture has to be right; getting
-this path correct is foundational, not deferable. Custodial agents
-and cross-org team certificates rest on the same architecture. See
-"Known architectural gaps" below.
+**Status:** The architecture supports cross-organizational agent
+coordination through the BYOT tier (Bring Your Own Trust — customer
+holds namespace controller key + team certificate key; see
+`audiences.md`). Tier 1 fully-hosted customers also reach this
+stage via cross-team coordination on aweb.ai-managed namespaces.
+The generic "create your sovereign identity and team locally, then
+import to org" primitive is the load-bearing operational piece for
+BYOT; building that primitive cleanly and removing legacy
+managed-namespace-on-customer-domain code paths is the implementation
+work named in "Implementation work to align with architecture" below.
 
 **What changes:** They want agents at their company to talk to agents
 at a partner company. Or they're building a product where agents need
@@ -207,58 +205,64 @@ using verifiable identity."
 
 ---
 
-## Known architectural gaps
+## Implementation work to align with architecture
 
-The honest gap between what each stage's architecture promises and
-what every path delivers cleanly. These are architectural correctness
-issues, not features to add later — the system has to be right end
-to end or customers hitting later stages fail in ways the architecture
-was supposed to prevent.
+The architecture is settled: one protocol, two product tiers (Fully
+hosted + BYOT, see `audiences.md`), per-layer custody per invariant
+#3, authority not blurred between layers. Code paths inherited from
+the earlier Shape B (AC operating as the namespace controller for a
+customer-owned domain) are being removed; the generic import-to-org
+primitive that serves BYOT migration and brand-new BYOT onboarding
+is being built. These are present-tense implementation gaps to close,
+not architectural questions to defer.
 
-**Stages 1-2:** No known gaps. Working end-to-end.
+**Stages 1-2:** No implementation gaps. Tier 1 fully-hosted delivers
+end-to-end.
 
-**Stage 3:** Working on managed namespaces. The persistent-identity
-+ managed-address path delivers Stage 3 cleanly.
+**Stage 3:** Tier 1 (managed namespaces) delivers cleanly. Tier 2
+(BYOT) reaches this stage through the generic import-to-org
+primitive named in the implementation list below.
 
-**Stage 4:** Working. Multi-team-agent routing — one identity,
-multiple team memberships, cross-team conversation continuity —
-resolves correctly through the did_key strict-walk that landed in
-aweb 1.20.7.
+**Stage 4:** Multi-team-agent routing — one identity, multiple team
+memberships, cross-team conversation continuity — resolves correctly
+through the did_key strict-walk that landed in aweb 1.20.7. Same
+behavior across both tiers.
 
-**Stage 5:** Four architectural correctness gaps surface in the
-hosted BYOD path:
+**Stage 5:** Five concrete code-level hot spots to close, in the order
+of customer impact:
 
-- **Bug 3 (BYOD persistent-address-path)**: address-creation always
-  selects the managed default namespace, never the customer's
-  verified BYOD namespace. Without fixing this, BYOD is broken
-  end-to-end regardless of what's underneath.
-- **Bug 1 (controller divergence)**: when a customer's org slug
-  matches an existing namespace, AC generates a fresh keypair
-  instead of reusing the existing controller. Two `controller_did`
-  values for the same domain — a violation of the
-  one-domain-one-controller invariant.
-- **Bug 2 (idempotent register without comparison)**: AC marks
-  registration successful even when AWID returns a different
-  controller than the one AC just generated. AC's local state
-  diverges from AWID truth.
-- **Bug 4 (DNS-rotation not surfaced)**: when a customer rotates
-  DNS, AC's stored state diverges silently from DNS truth.
+1. **Generic import-to-org primitive**: any customer can create
+   their sovereign identity and team locally (existing OSS aw CLI
+   primitives), then import them into an AC org. Same flow serves
+   brand-new BYOT customers and existing customers migrating away
+   from the Shape B path. AC verifies and imports AWID facts into
+   org state; AC does not take controller private keys.
+2. **`assign_permanent_team_address` restriction**: AC signs address
+   creation only for managed namespaces. BYOD addresses are signed
+   by the customer's namespace controller.
+3. **`ensure_default_team_namespace` correction**: never generate
+   namespace controller material for a customer-owned domain. The
+   customer's controller is the only valid one for their namespace.
+4. **`ensure_registered_namespace` fail-closed**: compare AWID's
+   returned `controller_did` against what AC has and fail closed on
+   mismatch. AC must not cache false authority.
+5. **`is_default` overloading**: split into per-purpose semantics.
+   It currently affects deletion protection, spawn invite namespace,
+   dashboard JWT namespace lookup, lifecycle primary-address
+   selection, and persistent address assignment — not all of which
+   should share the same flag.
 
-The self-hosted path (customer runs their own awid + aweb) sidesteps
-these — works at the protocol layer.
+In parallel: customer-facing error message rewrite for the migration
+window. A customer hitting a state mismatch should see a useful
+message and a remediation path, not a silent failure. Recovery is
+the difference between a customer who gives up and a customer who
+asks for help.
 
-Customer-impact priority for the fixes: Bug 3 first (Tier 2 customers
-blocked end-to-end), customer-facing error-message rewrite in
-parallel (recovery > silent give-up), then structural fixes (Bugs
-1+2+4) as cleanup behind those customer-visible wins. The fixes are
-in flight; the architecture has to be right because customers hit
-these gaps the moment they try to bring their own domain — that's a
-foundational promise of the product, not a forward feature.
-
-The four-tier customer mapping in `audiences.md` describes who hits
-which gap. Stage 5 promises Tier 2-4 capability; the architecture
-must support those tiers cleanly, not gate them behind a future fix
-schedule.
+The architecture does not promise these capabilities behind a future
+schedule — it promises them as part of the BYOT tier's
+correctness. Customers hit them the moment they bring their own
+trust chain. The implementation work above is the alignment of code
+with the locked architecture.
 
 ---
 

@@ -116,72 +116,108 @@ They care about:
 
 ---
 
-## Four customer tiers
+## Two product tiers + operational complexity
 
 The two-audience framing above maps to who shows up by background.
-This four-tier framing maps to customer intent — what they want, what
-they're willing to pay attention to. Use it for product decisions;
-the audience-shape is for content and outreach.
+The two-tier framing below maps to customer intent — what trust
+arrangement they want with us. There are two clean tiers and an
+operational-complexity layer that sits on top of either. The
+clean cut is deliberate: it's the simplest distinction we can
+communicate honestly without producing customer confusion about
+what kind of sovereignty they have.
 
-### Tier 1 — "Make the mess stop"
+### Tier 1 — Fully hosted
 
-"I have multiple AI coding agents on my codebase, stepping on each
-other. Make it stop." Wants coordination working in five minutes.
-Doesn't care about identity sovereignty or DNS-rooted trust at first
-contact. Architecturally: AC managed namespace + AC managed identity
-+ AC default address.
+AC manages the namespace controller key and the team certificate
+key. Customer is on a managed namespace under aweb.ai (e.g.
+`acme.aweb.ai`). AC operates as the namespace controller and the
+team controller; the customer's relationship is account-shaped, not
+key-shaped.
 
-This is the wedge. The path that delivers cleanly today, end to end.
+Per-agent custody within Tier 1 is the customer's choice:
+custodial-by-default for ease of onboarding (AC holds the agent's
+signing key); self-custody available for agents that want their
+own signing path (the CLI holds the key locally). Browser-based
+clients (Claude Desktop, ChatGPT, MCP OAuth connectors) are
+naturally custodial because they can't hold private keys
+themselves; CLI-running developer agents typically self-custody.
 
-### Tier 2 — "I want my agents on MY domain"
+This is the wedge. Customer reaches "agents stopped stepping on
+each other" inside five minutes. Doesn't have to think about
+identity sovereignty, DNS-rooted trust, or controller keys at
+first contact.
 
-"acme.com/alice." Either adopted aweb at Tier 1 and now wants their
-brand on it, or came specifically for the cross-org identity story.
-Cares about address sovereignty. Architecturally: AC managed namespace
-+ AC managed identity + BYOD-domain address.
+### Tier 2 — BYOT (Bring Your Own Trust)
 
-Today this fails. The architectural gaps are named in
-`user-journey.md` Stage 5 known-architectural-gaps section. The
-fixes are foundational, not future features — Tier 2 customers hit
-these the moment they bring their own domain.
+Customer holds the namespace controller key. Customer holds the
+team certificate key. Customer's DNS asserts customer's namespace
+controller public key (the `_awid.<domain>` TXT record). AC is
+not in the namespace or team trust path. Includes BYOD (your own
+domain) bundled in — you bring your own domain because you're
+bringing your own trust chain.
 
-### Tier 3 — "Self-sovereign agent identity"
+Per-agent custody within Tier 2 is still the customer's choice:
+some agents custodial via AC for browser-based clients (the
+authority chain runs from customer's DNS → customer's namespace
+controller → customer's team certificate → AC-held agent key);
+others self-custody for full sovereignty top-to-bottom.
 
-"I want a protocol for agent identity that doesn't depend on any
-vendor." Smaller market than Tier 1-2. Ideologically aligned with
-DNS-anchored cryptographic identity. Architecturally: pure CLI /
-self-sovereign / no AC dependency.
+The customer's relationship is key-shaped. They sign namespace and
+team operations themselves. AC operates only what the customer
+explicitly delegates (the per-agent custodial slice).
 
-Works at the protocol layer because AC isn't in the path. The
-self-hosted-only deployment model honors Tier 3 cleanly.
+### Operational complexity (layered on either tier)
 
-### Tier 4 — Operational complexity
+Multi-agent, multi-team, key rotation, DNS rotation, audit-trail
+depth, cross-team conversation continuity. Layers on top of either
+Tier 1 or Tier 2 — operational concerns scale with team size and
+deployment maturity, independent of which trust arrangement the
+customer chose.
 
-Multi-agent, multi-team, DNS rotation, custodial-vs-self-custody
-choice per layer. Emerges as adoption scales — a customer in any of
-Tier 1-3 hits Tier 4 questions when their team grows or their
-infrastructure shifts.
+Multi-team-agent routing resolves cleanly through the did_key
+strict-walk that landed in aweb 1.20.7. Cross-team conversation
+continuity works through the conversation primitive shipped in
+aweb 1.20.0–1.20.7.
 
-Architecturally layered on top of Tier 1-3 stability. Multi-team-agent
-routing now resolves cleanly through the did_key strict-walk that
-landed in aweb 1.20.7. DNS rotation is named as a gap in the Stage 5
-analysis.
+### The two tiers are a clean cut
+
+There's no in-between offering. "Custom domain with managed keys"
+is not a tier — it would conflate DNS sovereignty with key
+sovereignty, which is the architectural mistake (Shape B in earlier
+analysis) we explicitly removed. If a customer wants their domain
+in the trust path, they hold the keys; if they want managed keys,
+they're on the managed namespace.
+
+Authority must not be blurred between layers. Custody is
+independent per layer (per invariant #3); authority follows the
+trust chain (DNS → namespace controller → team controller →
+agent), not whoever happens to hold a key.
+
+If a future customer asks for "branded experience without
+operational burden" (vanity domain on AC-managed keys), that's a
+signal to consider adding a third tier with honest framing about
+what custody they have. Until that ask surfaces, two tiers is
+the clean cut.
 
 ### Audiences and tiers blend
 
 Audience 1 customers (developer teams) typically enter at Tier 1.
-They stretch into Tier 2 the moment they want their team's work to
-appear under their own domain. They stretch into Tier 4 the moment
-their team grows past two agents.
+They stretch into Tier 2 (BYOT) when they want sovereignty over
+their trust chain — usually because they're building a product
+or company brand on top of agent coordination, or because their
+ops team already manages DNS for their domain.
 
 Audience 2 customers (agent platform builders) typically enter at
-Tier 3 — they care about the protocol independent of any hosted
-service. They stretch into Tier 4 immediately because they're
-operating multiple platforms.
+Tier 2 — they care about the protocol independent of any hosted
+service. The self-hosted deployment of awid + aweb is also
+available; that path exits the AC dependency entirely.
 
-The architecture must support all four tiers correctly. Tiers
-aren't a roadmap; they're customer-intent slices of the same
-architecture.
+Operational complexity layers when teams scale, regardless of
+tier choice.
+
+The architecture must support both tiers correctly from the start.
+Tiers aren't a sequence to ship; they're customer-intent slices of
+the same architecture.
 
 ## What this means for priorities
 
@@ -189,16 +225,15 @@ Everything we build should serve Tier 1 first. The Tier 1 path
 must be the cleanest, fastest, lowest-friction path. Get a customer
 to "agents stopped stepping on each other" inside five minutes.
 
-But the architecture must support Tier 2-4 correctly, not gate them
-behind a future fix schedule. The architectural gaps in Stage 5
-(`user-journey.md`) are foundational correctness issues — Tier 2
-customers hit them on first BYOD attempt; Tier 3 customers depend
-on the protocol layer staying clean; Tier 4 customers hit derived
-versions of the same gaps as their teams scale. Get the architecture
-right; the alternative is paying down structural debt that will
-only get more expensive as customers reach later tiers.
+But the architecture must support Tier 2 correctly. BYOT customers
+hit the trust-chain primitives the moment they bring their domain;
+the system must operate on customer-held keys cleanly without AC
+ever taking authority it shouldn't. The generic "create your own
+identity and team locally, then import to org" primitive serves
+both Tier 1 onboarding and Tier 2 migration of customers who came
+in through the older Shape B path.
 
-The exception that proves the rule: the crypto identity migration
-serves Tier 1 transparently while honoring Tier 2-4 architectural
-needs. Architectural decisions that serve all tiers simultaneously
-are the right shape.
+Operational-complexity capabilities (rotation, multi-team, audit)
+must work for both tiers. Architectural decisions that serve both
+tiers simultaneously are the right shape; decisions that benefit
+one tier at the cost of the other should be reframed.

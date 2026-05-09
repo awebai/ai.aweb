@@ -85,63 +85,83 @@ fixes against the existing architecture, not features to ship later.
 
 ---
 
-## Status notes — architectural gaps to fix
+## Status notes — capability framing under the two-tier architecture
 
-Capabilities the architecture promises but where specific paths
-currently break. These are foundational correctness fixes against
-the existing design, not future features. Customers hit these the
-moment they reach the affected path; the architecture has to honor
-the promise end to end.
+The architecture has a clean cut between two product tiers (see
+`audiences.md`):
 
-### BYOD namespaces — hosted path
+- **Tier 1 — Fully hosted**: AC manages namespace controller +
+  team certificate keys. Customer on aweb.ai-managed namespace.
+- **Tier 2 — BYOT (Bring Your Own Trust)**: customer holds
+  namespace controller key + team certificate key. Customer's DNS
+  asserts customer's key. AC not in namespace or team trust path.
+  Includes BYOD (your own domain) bundled in.
 
-The self-hosted path (customer runs their own awid + aweb) honors
-BYOD cleanly at the protocol layer. The hosted-service BYOD path
-— customer's domain (`acme.com`) routed through our hosted
-service — has four architectural correctness gaps surfaced by the
-BYOD architectural analysis:
+Per-agent custody is independent within either tier per invariant
+#3. There is no "custom domain with managed keys" intermediate —
+that would conflate DNS sovereignty with key sovereignty, which is
+the architectural mistake (Shape B in earlier analysis) explicitly
+removed.
 
-- Namespace-controller divergence in team creation
-- Idempotent register without controller comparison
-- Persistent-address path bypassing the customer's verified BYOD
-  namespace
-- DNS-rotation not surfaced to the cloud-side cache
+### BYOD namespaces
 
-See `user-journey.md` Stage 5 "Known architectural gaps" for the
-detailed shape of each. Fixes in flight; customer-impact priority
-is BYOD persistent-address-path first, then customer-facing error
-message rewrite, then the structural cleanup.
+Land under the BYOT tier. Customer's DNS (`_awid.<domain>` TXT
+record) asserts customer's namespace controller public key;
+customer signs all namespace operations. The self-hosted deployment
+(customer runs their own awid + aweb) works at the protocol layer
+without any AC dependency. The hosted-service path operates BYOT
+through the generic "create your sovereign identity and team
+locally, then import to org" primitive — that primitive is the
+load-bearing operational piece for BYOT customers, currently being
+built per `user-journey.md` "Implementation work to align with
+architecture."
 
-### Custody modes — hosted-with-customer-domain mix
+### Custody modes — per-layer choice
 
-Self-custody works at the protocol layer (Tier 3 in `audiences.md`).
-AC-managed custody on a managed namespace works (Tier 1). The mix
-— AC-managed custody on a customer's BYOD domain — is gated on the
-hosted-BYOD-path fixes above. The customer-facing framing for the
-two custody modes when shipped:
+Custody is a choice at every layer independently:
 
-- **Managed BYOD**: your domain, our keys. We hold the namespace
-  controller key on your behalf. You control your domain at the
-  DNS level; we handle the cryptographic signing on your behalf.
-- **Self-sovereign BYOD**: your domain, your keys. You hold the
-  controller key. Our cloud doesn't see or hold your keys.
-  Verification flows through DNS and your own keypair.
+- **Namespace controller key**: customer-sovereign (BYOT) OR
+  AC-managed (Tier 1).
+- **Team certificate key**: customer-sovereign (BYOT) OR
+  AC-managed (Tier 1).
+- **Per-agent did:aw signing key**: self-custody (CLI holds the
+  key) OR custodial (AC holds the key, for browser clients and
+  MCP OAuth connectors).
+
+The two product tiers fix the namespace+team layer choices
+together (Tier 1 = both AC-managed; Tier 2 = both
+customer-sovereign). The per-agent custody choice is independent
+in either tier — a Tier 2 customer can have AC-managed agents
+under their sovereign trust chain (custodial-agents-under-BYOT
+is fine, because AC's authority over those agent keys is
+delegated by the customer's team controller).
+
+Customer-facing copy: "Want managed convenience? Use the
+aweb.ai-managed namespace. Want your own domain? Bring your own
+trust — your domain, your namespace controller key, your team
+certificate. There's no 'your domain, our keys' option — that
+isn't sovereignty, and we don't pretend it is."
 
 ### Cross-org team certificates
 
-The team-certificate primitive itself works (Stage 4). Cross-org
-issuance — where party A in `acme.com` issues a certificate to
-party B in `partner.com` — depends on the BYOD path being clean
-on both sides. Same architectural fixes unblock this.
+The team-certificate primitive works. Cross-org issuance —
+customer in `acme.com` issuing a certificate to a party in
+`partner.com` — works through the same primitives, with both
+sides operating their own team certificate keys per BYOT. Both
+sides hold their own keys; AC does not synthesize certs for a
+customer-held team.
 
 ### Custodial agents (cloud-held signing keys for browser-based agents)
 
-Depends on AC-managed custody on the customer's chosen namespace
-(managed or BYOD) being correct. Tier 1 path (managed namespace +
-custodial keys) works; the BYOD path is gated on the same fixes
-above.
+Per-agent custody at the agent layer — independent of which tier
+the customer is in for namespace and team. Tier 1 customers get
+custodial agents by default for ease of onboarding. Tier 2
+customers can use custodial agents under their sovereign team for
+browser-based clients that can't hold private keys themselves;
+the authority chain runs DNS → customer's namespace controller →
+customer's team controller → AC-held agent key.
 
-### MCP OAuth connectors (Claude Desktop, ChatGPT)
+### MCP OAuth connectors (Claude Desktop, ChatGPT, Cursor agents)
 
-Depends on the custodial-agents capability above. Same architectural
-gating.
+Built on the custodial-agents capability. Available in both tiers
+for browser-based or hosted clients that can't hold private keys.
