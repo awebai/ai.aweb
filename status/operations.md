@@ -1,29 +1,37 @@
 # Operations Status
 
-Last updated: 2026-05-07 15:20 BST (Hestia, post aweb 1.20.6 publish — 3rd consecutive #27a CLI-only release this week)
+Last updated: 2026-05-08 17:15 BST (Hestia, post v0.5.24 verified-live + aweb 1.20.7 server release + Bertha daily/hourly infra)
 
 ## Current focus
 
-**aweb 1.20.3 + 1.20.4 published (all CLI-only fixes); no AC cut for
-either.** Customer-side fixes land via `aw upgrade` (now auto-
-prompted on interactive commands per aamy). AC pin stays at
-`aweb>=1.20.2` matching deployed v0.5.23 (aweb 1.20.2 server). Pin
-will bump naturally with next functional AC change.
+**aweb 1.20.7 + AC v0.5.24 verified-live** (2026-05-08 17:00:43Z).
+Two same-day diagnose-to-ship cycles bundled in one release:
+multi-team-agent did_key strict-walk (Mia at 1b55e8e) + chat
+fresh-start contract end-to-end (Grace at 1054dd4). Closes the
+chat-409 surface from Sofia's reproducer this morning.
 
-CLI-only release pattern (established 2026-05-06):
-- aweb 1.20.3 (aamx + aamy): bumped server/pyproject.toml, pushed
-  both server-v1.20.3 + aw-v1.20.3 tags. Server PyPI publish
-  occurred but server pkg was functionally identical to 1.20.2.
-- aweb 1.20.4 (init UX cleanup): **did NOT bump pyproject.toml**.
-  Tagged aw-v1.20.4 directly at the fix commit (7adfea6). No main
-  commit, no server-v1.20.4 push, no PyPI server publish. Goreleaser
-  reads version from tag (\${GITHUB_REF_NAME#aw-v}); pyproject.toml
-  not load-bearing for CLI publish path.
+Three smoke probes green: mail-attach-to-existing-conv (multi-team
+did_key surface), chat baseline send, chat --start-conversation
+against active session (the actual Grace fix surface — pre-fix
+this 409'd, post-fix clean). Verified-live mails sent to athena
+(0ad656f8) + sofia (764c2843) + aida (4b6d2c3e). Sofia ack'd —
+will forward to Iris for multi-channel drafts. Aida ack'd — chat-403
+runbook entry stays closed; e15838c held pending Juan greenlight.
 
-The 1.20.4 pattern is the cleaner shape for CLI-only releases:
-honors discipline #27 fully (source-vs-deploy state coherent —
-PyPI shows 1.20.3, source shows 1.20.3). Use this pattern for
-CLI-only changes going forward.
+Bertha's daily/hourly infra (set up earlier today, separate context)
+runs independently of any AC version — direct prod-DB queries.
+
+## CLI-only release pattern (established 2026-05-06, validated through 1.20.6)
+
+For the prior CLI-only chain (1.20.4/5/6), pattern was:
+- Don't bump server/pyproject.toml. Tag aw-vX.Y.Z directly at fix
+  commit; goreleaser reads version from \${GITHUB_REF_NAME#aw-v}.
+  No main commit, no server-v tag, no PyPI server publish. Source
+  pkg state stays aligned with PyPI's server.
+
+This cycle (1.20.7) was a server release, not CLI-only — full flow
+applied (bump pyproject.toml at 106ade2, tag both server-v1.20.7 +
+aw-v1.20.7, push both individually, both publish workflows fire).
 
 Verified-live status:
 - Pagination fix (1.20.2 + v0.5.23): STANDS, three-probe attestation.
@@ -63,6 +71,25 @@ Verified-live status:
   (BYOD prompt + doctor remediation + persistent-alias) are
   interactive/specific-path, covered by unit tests + code review;
   load-bearing dogfood is Phase 21/22 init coverage in e2e.
+- Multi-team did_key + chat fresh-start (1.20.7 server release at
+  1054dd4 + AC v0.5.24 at 04c21432): full release flow — both
+  server-v1.20.7 + aw-v1.20.7 tags, AC pyproject.toml bumped to
+  0.5.24 at 106ade2, AC re-deploy required and live 17:00:43Z.
+  Three smoke probes green: (1) mail send to athena attached cleanly
+  to 96317ca9 (multi-team did_key surface, msg 007f2efd); (2) chat
+  baseline send-and-leave clean; (3) **chat --start-conversation
+  against the existing athena↔hestia session — clean send, no 409**.
+  Pre-fix this hit 'Existing active chat session found' dedup; post-
+  fix the server closes existing + creates new signed session as
+  designed. Closes the chat-409 surface from Sofia's reproducer
+  earlier 5/8.
+- **Render deploy lag noted as ops debt** — v0.5.24 GHA finished at
+  12:44Z, /health flipped at 17:00Z. Historical baseline ~3 min
+  (v0.5.23 was 21:24→21:27Z). GHA workflow only does GHCR build+push,
+  Render is auto-polling. Could be Render image-watcher slow or in
+  upgrade window — one-time blip, not yet a pattern. Re-investigate
+  if next cycle shows similar lag. Juan triggered manual deploy at
+  the end ("ok deployed. please check").
 
 ## Open issue: chat --start-conversation 409 (aweb-aamx P1)
 
