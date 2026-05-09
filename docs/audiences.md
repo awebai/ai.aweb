@@ -1,15 +1,23 @@
 # Audiences — who uses aweb and why
 
-Preliminary. Sofia, Hestia, and Athena should refine these as we
-learn from real users.
+Two complementary framings. The two-audience model (below) maps to
+who shows up by background (developer team vs agent platform builder).
+The four-tier customer mapping (further below) maps to customer
+intent (what they want, what they're willing to pay attention to).
+Both are useful for different decisions: audience-shape for content
+and outreach; tier-shape for product decisions.
 
 **Known gaps:**
-- These personas are hypothetical — no real user data yet
-- Audience 2 is particularly thin; we don't know what "agent platform
-  builder" looks like in practice
+- Personas were hypothetical until the first real BYOD customer
+  flow surfaced architectural gaps that validate the audiences
+  blend across BYOD/self-custody needs
 - Missing: what specific tools/providers Audience 1 uses most
   (Claude Code vs Codex vs Cursor split)
 - Missing: pricing sensitivity data for Audience 1
+- The Audience 1 / Audience 2 distinction is less crisp than this
+  doc originally suggested — Audience 1 customers stretch into
+  Audience 2 territory as they hit BYOD or self-custody needs.
+  See "Four customer tiers" below.
 
 ---
 
@@ -108,13 +116,89 @@ They care about:
 
 ---
 
+## Four customer tiers
+
+The two-audience framing above maps to who shows up by background.
+This four-tier framing maps to customer intent — what they want, what
+they're willing to pay attention to. Use it for product decisions;
+the audience-shape is for content and outreach.
+
+### Tier 1 — "Make the mess stop"
+
+"I have multiple AI coding agents on my codebase, stepping on each
+other. Make it stop." Wants coordination working in five minutes.
+Doesn't care about identity sovereignty or DNS-rooted trust at first
+contact. Architecturally: AC managed namespace + AC managed identity
++ AC default address.
+
+This is the wedge. The path that delivers cleanly today, end to end.
+
+### Tier 2 — "I want my agents on MY domain"
+
+"acme.com/alice." Either adopted aweb at Tier 1 and now wants their
+brand on it, or came specifically for the cross-org identity story.
+Cares about address sovereignty. Architecturally: AC managed namespace
++ AC managed identity + BYOD-domain address.
+
+Today this fails. The architectural gaps are named in
+`user-journey.md` Stage 5 known-architectural-gaps section. The
+fixes are foundational, not future features — Tier 2 customers hit
+these the moment they bring their own domain.
+
+### Tier 3 — "Self-sovereign agent identity"
+
+"I want a protocol for agent identity that doesn't depend on any
+vendor." Smaller market than Tier 1-2. Ideologically aligned with
+DNS-anchored cryptographic identity. Architecturally: pure CLI /
+self-sovereign / no AC dependency.
+
+Works at the protocol layer because AC isn't in the path. The
+self-hosted-only deployment model honors Tier 3 cleanly.
+
+### Tier 4 — Operational complexity
+
+Multi-agent, multi-team, DNS rotation, custodial-vs-self-custody
+choice per layer. Emerges as adoption scales — a customer in any of
+Tier 1-3 hits Tier 4 questions when their team grows or their
+infrastructure shifts.
+
+Architecturally layered on top of Tier 1-3 stability. Multi-team-agent
+routing now resolves cleanly through the did_key strict-walk that
+landed in aweb 1.20.7. DNS rotation is named as a gap in the Stage 5
+analysis.
+
+### Audiences and tiers blend
+
+Audience 1 customers (developer teams) typically enter at Tier 1.
+They stretch into Tier 2 the moment they want their team's work to
+appear under their own domain. They stretch into Tier 4 the moment
+their team grows past two agents.
+
+Audience 2 customers (agent platform builders) typically enter at
+Tier 3 — they care about the protocol independent of any hosted
+service. They stretch into Tier 4 immediately because they're
+operating multiple platforms.
+
+The architecture must support all four tiers correctly. Tiers
+aren't a roadmap; they're customer-intent slices of the same
+architecture.
+
 ## What this means for priorities
 
-Everything we build should serve Audience 1 first. Audience 2
-features (BYOD namespaces, cross-org certificates, the identity
-layer as standalone infrastructure) are the long-term vision but
-premature until Audience 1 is established.
+Everything we build should serve Tier 1 first. The Tier 1 path
+must be the cleanest, fastest, lowest-friction path. Get a customer
+to "agents stopped stepping on each other" inside five minutes.
 
-The exception: architectural decisions that serve both audiences
-simultaneously (like the crypto identity migration — it serves
-Audience 1 transparently while enabling Audience 2 later).
+But the architecture must support Tier 2-4 correctly, not gate them
+behind a future fix schedule. The architectural gaps in Stage 5
+(`user-journey.md`) are foundational correctness issues — Tier 2
+customers hit them on first BYOD attempt; Tier 3 customers depend
+on the protocol layer staying clean; Tier 4 customers hit derived
+versions of the same gaps as their teams scale. Get the architecture
+right; the alternative is paying down structural debt that will
+only get more expensive as customers reach later tiers.
+
+The exception that proves the rule: the crypto identity migration
+serves Tier 1 transparently while honoring Tier 2-4 architectural
+needs. Architectural decisions that serve all tiers simultaneously
+are the right shape.

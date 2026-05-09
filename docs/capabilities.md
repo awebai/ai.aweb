@@ -4,14 +4,15 @@ What the product actually does. Athena (Engineer) checks code against
 this: if we claim a capability, the code must deliver it. If the code
 does something not on this list, ask whether it should be.
 
-Preliminary. Sofia and Athena should refine as the product stabilizes.
+The architecture must support every capability listed here cleanly.
+Specific paths through some capabilities currently have correctness
+gaps named in the "Status notes" section below. Those are foundational
+fixes against the existing architecture, not features to ship later.
 
 **Known gaps:**
-- Not yet validated against the current codebase — some capabilities
-  listed here may be partially implemented or broken during the
-  migration
-- Missing: which capabilities are working TODAY vs planned
-- Missing: capacity limits per tier (messages/day, retention, etc.)
+- Capacity limits per tier (messages/day, retention, etc.) not yet
+  documented here; see `ac/backend/src/aweb_cloud/models/billing.py`
+  for canonical limits
 - The "What we do NOT provide" section needs periodic review as the
   market evolves
 
@@ -81,3 +82,66 @@ Preliminary. Sofia and Athena should refine as the product stabilizes.
 - We don't provide an IDE or editor
 - We don't do task delegation between agents (that's A2A's domain)
 - We don't connect agents to tools (that's MCP's domain)
+
+---
+
+## Status notes — architectural gaps to fix
+
+Capabilities the architecture promises but where specific paths
+currently break. These are foundational correctness fixes against
+the existing design, not future features. Customers hit these the
+moment they reach the affected path; the architecture has to honor
+the promise end to end.
+
+### BYOD namespaces — hosted path
+
+The self-hosted path (customer runs their own awid + aweb) honors
+BYOD cleanly at the protocol layer. The hosted-service BYOD path
+— customer's domain (`acme.com`) routed through our hosted
+service — has four architectural correctness gaps surfaced by the
+BYOD architectural analysis:
+
+- Namespace-controller divergence in team creation
+- Idempotent register without controller comparison
+- Persistent-address path bypassing the customer's verified BYOD
+  namespace
+- DNS-rotation not surfaced to the cloud-side cache
+
+See `user-journey.md` Stage 5 "Known architectural gaps" for the
+detailed shape of each. Fixes in flight; customer-impact priority
+is BYOD persistent-address-path first, then customer-facing error
+message rewrite, then the structural cleanup.
+
+### Custody modes — hosted-with-customer-domain mix
+
+Self-custody works at the protocol layer (Tier 3 in `audiences.md`).
+AC-managed custody on a managed namespace works (Tier 1). The mix
+— AC-managed custody on a customer's BYOD domain — is gated on the
+hosted-BYOD-path fixes above. The customer-facing framing for the
+two custody modes when shipped:
+
+- **Managed BYOD**: your domain, our keys. We hold the namespace
+  controller key on your behalf. You control your domain at the
+  DNS level; we handle the cryptographic signing on your behalf.
+- **Self-sovereign BYOD**: your domain, your keys. You hold the
+  controller key. Our cloud doesn't see or hold your keys.
+  Verification flows through DNS and your own keypair.
+
+### Cross-org team certificates
+
+The team-certificate primitive itself works (Stage 4). Cross-org
+issuance — where party A in `acme.com` issues a certificate to
+party B in `partner.com` — depends on the BYOD path being clean
+on both sides. Same architectural fixes unblock this.
+
+### Custodial agents (cloud-held signing keys for browser-based agents)
+
+Depends on AC-managed custody on the customer's chosen namespace
+(managed or BYOD) being correct. Tier 1 path (managed namespace +
+custodial keys) works; the BYOD path is gated on the same fixes
+above.
+
+### MCP OAuth connectors (Claude Desktop, ChatGPT)
+
+Depends on the custodial-agents capability above. Same architectural
+gating.

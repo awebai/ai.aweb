@@ -9,6 +9,9 @@ exist yet.
 
 ## Stage 1: First 5 minutes — "make the mess stop"
 
+**Status:** Working end-to-end. The wedge journey; the stage where we
+deliver every promised capability cleanly.
+
 **Who:** A developer running 2-3 Claude Code or Codex agents on the
 same repo. They're frustrated. Agents duplicate work, overwrite each
 other, create conflicting migrations.
@@ -57,6 +60,8 @@ coordination just works.
 
 ## Stage 2: First week — "this is actually useful"
 
+**Status:** Working. In active dogfooding by aweb's own team.
+
 **What changes:** They've been using aweb for a few days. Agents
 coordinate naturally. They start wanting more structure.
 
@@ -95,6 +100,11 @@ builds in parallel."
 
 ## Stage 3: First month — "I want this to persist"
 
+**Status:** Working on managed namespaces. Persistent identity
+(`did:aw`), addresses on `*.aweb.ai`, dashboard, and MCP integration
+all delivered cleanly. The customer flow described below works
+end-to-end on the managed-namespace path.
+
 **What changes:** They restart Claude Code sessions regularly. Each
 time, the agent gets a new ephemeral identity. They want continuity —
 the same agent recognized across sessions.
@@ -126,6 +136,11 @@ manage them from a dashboard."
 
 ## Stage 4: Months 2-3 — "my team needs this"
 
+**Status:** Working. Organizations + team certificates + API keys
+deliver cleanly. Multi-team-agent routing — one identity, multiple
+team memberships, cross-team conversation continuity — resolves
+correctly through the did_key strict-walk that landed in aweb 1.20.7.
+
 **What changes:** They want to share the setup with teammates. Multiple
 humans, each running their own agents, all coordinating on the same
 project.
@@ -149,7 +164,20 @@ it through a dashboard."
 
 ---
 
-## Stage 5: Month 6+ — "agents across organizations"
+## Stage 5: "agents across organizations"
+
+**Status:** The self-hosted path (customer runs their own awid +
+aweb, no hosted-service dependency) works at the protocol layer.
+The hosted BYOD path — customer's domain (`acme.com`) routed through
+our hosted service — currently breaks at four architectural points:
+namespace-controller divergence in team creation, idempotent-register-
+without-controller-comparison, persistent-address-path bypassing BYOD
+selection, and DNS-rotation not surfaced to the cloud-side cache.
+These are architectural gaps to fix in the existing design, not
+features to add later. The architecture has to be right; getting
+this path correct is foundational, not deferable. Custodial agents
+and cross-org team certificates rest on the same architecture. See
+"Known architectural gaps" below.
 
 **What changes:** They want agents at their company to talk to agents
 at a partner company. Or they're building a product where agents need
@@ -176,6 +204,61 @@ stable, verifiable identities.
 
 **Success metric:** "Agents from different organizations collaborate
 using verifiable identity."
+
+---
+
+## Known architectural gaps
+
+The honest gap between what each stage's architecture promises and
+what every path delivers cleanly. These are architectural correctness
+issues, not features to add later — the system has to be right end
+to end or customers hitting later stages fail in ways the architecture
+was supposed to prevent.
+
+**Stages 1-2:** No known gaps. Working end-to-end.
+
+**Stage 3:** Working on managed namespaces. The persistent-identity
++ managed-address path delivers Stage 3 cleanly.
+
+**Stage 4:** Working. Multi-team-agent routing — one identity,
+multiple team memberships, cross-team conversation continuity —
+resolves correctly through the did_key strict-walk that landed in
+aweb 1.20.7.
+
+**Stage 5:** Four architectural correctness gaps surface in the
+hosted BYOD path:
+
+- **Bug 3 (BYOD persistent-address-path)**: address-creation always
+  selects the managed default namespace, never the customer's
+  verified BYOD namespace. Without fixing this, BYOD is broken
+  end-to-end regardless of what's underneath.
+- **Bug 1 (controller divergence)**: when a customer's org slug
+  matches an existing namespace, AC generates a fresh keypair
+  instead of reusing the existing controller. Two `controller_did`
+  values for the same domain — a violation of the
+  one-domain-one-controller invariant.
+- **Bug 2 (idempotent register without comparison)**: AC marks
+  registration successful even when AWID returns a different
+  controller than the one AC just generated. AC's local state
+  diverges from AWID truth.
+- **Bug 4 (DNS-rotation not surfaced)**: when a customer rotates
+  DNS, AC's stored state diverges silently from DNS truth.
+
+The self-hosted path (customer runs their own awid + aweb) sidesteps
+these — works at the protocol layer.
+
+Customer-impact priority for the fixes: Bug 3 first (Tier 2 customers
+blocked end-to-end), customer-facing error-message rewrite in
+parallel (recovery > silent give-up), then structural fixes (Bugs
+1+2+4) as cleanup behind those customer-visible wins. The fixes are
+in flight; the architecture has to be right because customers hit
+these gaps the moment they try to bring their own domain — that's a
+foundational promise of the product, not a forward feature.
+
+The four-tier customer mapping in `audiences.md` describes who hits
+which gap. Stage 5 promises Tier 2-4 capability; the architecture
+must support those tiers cleanly, not gate them behind a future fix
+schedule.
 
 ---
 
