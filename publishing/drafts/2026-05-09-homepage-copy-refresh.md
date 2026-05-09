@@ -140,10 +140,30 @@ not replaces it.
 
 ---
 
-### Works-with strip — move up; confirm 4 items
+### Works-with strip — CREATE (not move) under the hero
 
-**Where**: currently lower on the page; move to sit immediately
-between the hero and the new onboarding section.
+**Update from Hestia's pre-flight (mail 82c9e8ab):** the strip
+does NOT currently exist on aweb.ai. Brief assumed it exists +
+moves up; reality is the strip needs to be created from scratch.
+
+**Where (new)**: insert as a new section immediately under the
+hero, above the new "Sign up. Your agent handles the rest." section.
+
+**Visual treatment options** (Eugenie's call, surfaced via
+Bertha):
+
+- (a) **Text-only pills** — ~15min CSS work; cleanest first ship;
+  Hestia's recommended default.
+- (b) **Text + brand colors** — ~30min; each pill picks up the
+  named tool's brand color as accent.
+- (c) **Logos** — ~1-2h plus asset-gathering; requires
+  brand-kit svg files + Anthropic / OpenAI brand-guideline checks.
+
+**Content-overlap concern**: the existing Hosted MCP section in
+`layouts/index.html` already mentions "Claude Desktop, ChatGPT,
+claude.ai, and other hosted runtimes" as text. New strip
+duplicates. Eugenie's call: strip REPLACES that mention, LINKS to
+it, or COEXISTS with it.
 
 **Copy**:
 
@@ -314,4 +334,39 @@ covers the three concepts, no action needed.
   queues the three tickets named in the "No developer needed"
   section.
 
-— Iris, 2026-05-09
+## Sofia framing-pass result (mail 6827f33b, 2026-05-09)
+
+Signed off on the three load-bearing calls: Athena-honest soften
+(Option B "Sign up. Your agent handles the rest." preferred; do
+NOT ship Option C until the named engineering tickets close);
+voice register declarative-without-platform-speak holds the line;
+BYOT correctly NOT surfaced at hero level.
+
+Three items raised in Sofia's pass that go to Bertha for Eugenie's
+call (mailed):
+
+- **Trust-line position clarification.** Brief said "Trust line +
+  works-with strip moved up." Bundle kept the trust line where it
+  is (already inside `.hero-note`) and moved only the works-with
+  strip. Possibly intentional (trust line is already at hero, so
+  "moved up" doesn't apply), possibly Bertha intended a real move
+  (e.g., above the CTAs). Confirm.
+
+- **Works-with strip specificity nudge 1: name Cursor / Codex /
+  OpenCode.** Brief lists Claude / ChatGPT / Claude Desktop / Any
+  MCP-compatible AI. Per audiences.md, Cursor and Codex are tools
+  the target customer actively uses. A founder on Cursor who does
+  not see Cursor in the strip may assume aweb does not work with
+  their setup and bounce — "Any MCP-compatible AI" technically
+  covers them but adds a click of cognitive load. Suggest naming
+  integrations explicitly if Athena confirms they're factually
+  supported.
+
+- **Works-with strip specificity nudge 2: tighten "Any MCP-
+  compatible AI".** Same concern, opposite framing — the phrase
+  is broad enough to be true but not specific enough to feel like
+  inclusion. Athena's tech-accuracy call on which named integrations
+  are real beyond the briefed four. Mailed Athena.
+
+Both nudges are Bertha/Eugenie's call. Sofia called them "nudges,
+not framing-blockers."
