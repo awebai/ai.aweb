@@ -147,15 +147,28 @@ metis (sent this cycle).
 
 Only after all four: Hestia runs `make deploy-site` from ac/.
 
-**Staging architecture** (in setup as of 2026-05-10):
-- `deploy-landing-staging` branch → Render staging service → preview.aweb.ai
-- Custom HTTP header `X-Robots-Tag: noindex, nofollow` (Render-level) prevents SEO duplicate-content concerns.
+**Staging architecture** (operational as of 2026-05-10):
+- `deploy-landing-staging` branch → Render staging service → preview-urw1.onrender.com (preview.aweb.ai DNS pending).
 - agent-guide sync identical to prod (true parity).
-- Iris runs `make deploy-staging` (target Athena lands; cross-repo ask sent c09216dd).
+- Iris runs `make deploy-staging` (Athena landed at 36a9e442).
+
+**Production architecture** (operational as of 2026-05-10):
+- `deploy-landing` branch → Render production service → aweb.ai.
+- Render reconfigured to watch `deploy-landing` (not main) — gate is now real.
+- `make deploy-site` from ac/ pushes current branch → deploy-landing.
+- For mid-cycle force-push case: `git push -f origin deploy-landing-staging:deploy-landing` — used in cycle 1 because Pass-3 lived on staging branch only.
 
 **Rollback authority**: only Hestia.
 
-**First deploy gate run**: Iris's bundle 58ed6c53 (homepage refresh) is the first test case. Held until staging architecture is live.
+**Branch protection** (open, Juan's lane, Task #88): PR-based with Juan + Sofia as approvers. Closes the structural gap — without protection, anyone with main push rights can update deploy-landing too. Latency cost acceptable for homepage frequency.
+
+**First deploy gate run — closed 2026-05-10 14:39Z**: Iris's bundle 58ed6c53 bypassed gate (Pass-1; Render was watching main; reverted). Sofia-authored Pass-3 (60be8f4e) ran the gate cleanly: Bertha/Eugenie validation on staging ✓, Sofia framing-pass ✓ (substantive customer-shape correction), Juan explicit per-deploy greenlight ✓, Hestia deploy + verify-live ✓. Verified-live mails dispatched: iris (f0ac616f), bertha (5379880c), sofia (ab09f148). Sofia independent live-check confirmed (mail c6b73992).
+
+**Customer-shape discipline** — adopted cross-team (Sofia mail c6b73992):
+- Doc: ai.aweb/docs/customer-onboarding-flows.md (Shape A custodial-MCP / Shape B CLI dev / Shape C self-host).
+- Site copy review starts with: 'which customer shape is this section addressing?'
+- Discipline that should have prevented Pass-2's Shape-B-flow-labeled-Shape-A miss.
+- Adopted by Iris (mail cbd2aacb) + Sofia + Hestia. Aida's adoption is the natural next ask for customer-support runbook triage.
 
 ## Operational discrepancies
 
