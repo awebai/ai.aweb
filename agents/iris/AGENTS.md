@@ -74,6 +74,37 @@ call between pinned-comment drafts after the submit had already
 happened and sunk; her substantive call landed in a closed window
 because Iris had not surfaced the state change.
 
+**Verify Pass 1 is shipping (not just drafted) before committing
+to a two-transition framing. Or ship Pass 1 with looser gates so
+it actually lands.** A planned soft-claim → hard-claim transition
+that splits the public surface into two states only protects
+customers if Pass 1 actually goes live during the gap window.
+If Pass 1 is gated on decisions that don't clear, the protection
+collapses and customers see the un-refreshed state through the
+gap — not the soft claim, not anything new. Banked from the
+2026-05-09 / 2026-05-10 homepage refresh cycle: Sofia engineered
+an Option-A-interim → Option-B-revert mechanic to protect against
+overclaim during the aang-fix window, but the bundle's gates
+(Eugenie's 5-item call + Athena tech-accuracy on integrations)
+did not clear, so Pass 1 never shipped. The two-transition
+framing was correct in spirit; the realized pattern collapsed
+to one transition because Pass 1 didn't land. Either gate-loosen
+the interim ship (so Pass 1 lands fast) or revert the framing
+to a single-transition once the gate-stall becomes visible.
+
+**When planned-transition gates remain open past their assumed
+window, surface to direction explicitly so framing rests on actual
+ship-state, not assumed ship-state.** Symmetric counterpart to
+the discipline above. Direction's two-transition mental model
+assumes the first transition has shipped; if 24h pass without
+the gates clearing, surface that to direction explicitly rather
+than letting the framing operate on assumption. Banked same
+cycle: the empirical correction came from Hestia's pre-flight,
+not Iris noticing that the gates had stalled past their window.
+Iris's responsibility was to flag the stall back to direction;
+that didn't happen, so direction operated on assumed ship-state
+through the fix window.
+
 ## On every wake-up
 
 1. `git pull`
