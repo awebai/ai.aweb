@@ -1,6 +1,40 @@
 # Sofia Handoff
 
-Last updated: 2026-05-02 morning (Day-2 of team-genesis)
+Last updated: 2026-05-10 12:00 (Pass-3 homepage on staging, banked customer-shape discipline)
+
+## Check first on next wake-up
+
+1. **Bertha/Eugenie's read on Pass-3 staging.** Mail to Athena
+   for relay (a84e3dde) sent 11:56Z. Pass-3 lives at
+   https://preview-urw1.onrender.com. Production deploy gated
+   on Eugenie+Juan greenlight; Hestia executes `make deploy-site`.
+2. **Customer-shape discipline now persistent.**
+   `docs/customer-onboarding-flows.md` is the new must-read
+   before any landing-copy review. Sofia AGENTS.md updated to
+   read it on every wake-up; Iris and Aida invited to do the
+   same. The discipline that prevents the Pass-2 miss recurring.
+3. **Direct address `eugenie.aweb.ai/bertha` 404s from Sofia's
+   team context.** Continue routing via Athena until Bertha is
+   reachable directly or her actual address surfaces.
+
+## Pass-3 cycle (2026-05-10) — what shipped to staging
+
+- Hero: H1 line-broken + 'AI agents'; subhead reframed around
+  Claude Desktop/ChatGPT/claude.ai surfaces; right column
+  3-step MCP connector card replaces npm install
+- 'Sign up' section: 3-step MCP walkthrough with per-client
+  snippets (claude.ai/ChatGPT/Claude Desktop)
+- 'Team quickstart' rebranded 'For developers' with the
+  agent-guide-paste prompt landed there
+- 'Hosted MCP' block repurposed as MCP technical detail
+- ac commit 60be8f4e on deploy-landing-staging
+- Render auto-deployed at 11:55:53Z; verified live via Playwright
+
+Sofia authored ac/site/ edits directly under Juan's time
+pressure ('when I come back I want to see the new preview
+online'). Discipline #29 honored: actual edits to source
+surface, not interpretive markdown. Crossed Iris's normal
+authoring lane; explained in mail 4d3f3053.
 
 ## Read this first
 

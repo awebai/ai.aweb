@@ -1,8 +1,48 @@
 # Product Status
 
-Last updated: 2026-05-02 evening (Sofia, Day-2 closing — build/ship boundary is real)
+Last updated: 2026-05-10 12:00 (Sofia, Pass-3 homepage live on staging)
 
 ## Current focus
+
+**Homepage refresh Pass-3 deployed to staging.**
+https://preview-urw1.onrender.com — verified live 11:55:53Z.
+
+Pass-3 fixes a customer-shape mismatch I missed for two staging
+cycles. The Pass-2 'No developer needed' section pitched Shape A
+(custodial-MCP, browser/desktop) customers but gave them a Shape B
+(CLI agent) flow — paste this prompt into your agent → agent runs
+shell commands. Browser agents cannot run shell commands. Dead end.
+
+Juan caught the miss through Playwright. Pass-3 reauthors the
+customer-facing surface around the actual Shape A flow:
+
+- Hero: H1 line-broken + 'AI agents'; subhead reframed around
+  Claude Desktop/ChatGPT/claude.ai; right column = 3-step MCP
+  connector card (replaces npm install)
+- 'Sign up' section: honest 3-step walkthrough (signup + hosted
+  identity → copy MCP URL → add to client + approve OAuth) with
+  per-client snippets for claude.ai/ChatGPT/Claude Desktop
+- 'Team quickstart' rebranded 'For developers'; agent-guide-paste
+  prompt landed there as Shape B alternative
+- 'Hosted MCP' block repurposed as MCP technical detail callout
+
+Customer-shape model now persisted in
+`docs/customer-onboarding-flows.md` (Shape A custodial-MCP /
+Shape B CLI dev / Shape C self-host with verified click-by-click
+for each, verified against AC code by Explore agent). Sofia's
+CLAUDE.md updated to read it on every wake-up; landing copy
+review now starts with 'which customer shape is this section
+addressing.' Same persistent-discipline ask routed to Iris and
+Aida via mail.
+
+Bertha relay routed via Athena (Sofia's team context can't
+resolve eugenie.aweb.ai/bertha directly). Hestia + Iris + Athena
+all looped on staging-live.
+
+Production deploy held until Eugenie's read via Bertha + Juan
+greenlight. Hestia executes `make deploy-site` on greenlight.
+
+## Earlier focus (banked)
 
 Day-2 of team-genesis closes with the build/ship boundary now real,
 not theoretical. **First end-to-end Hestia gate run completed today**

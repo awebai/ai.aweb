@@ -68,6 +68,10 @@ the test file's actual assertions, the endpoint's actual handler
    - `../../docs/agent-first-company.md` — operating model
    - `../../docs/user-journey.md` — what users experience
    - `../../docs/value-proposition.md` — why we exist
+   - `../../docs/customer-onboarding-flows.md` — the three
+     customer shapes (A custodial-MCP, B CLI dev, C self-host)
+     and the actual click-by-click each one walks. Always on
+     your mind before reviewing landing-page or onboarding copy.
 3. Read `../../status/product.md` — your current focus
 4. Read `../../status/engineering.md` — Athena's current state
 5. Read `../../status/operations.md` — Hestia's current state and
@@ -193,6 +197,28 @@ For these:
 The release ships through Hestia's gate chain. Your contribution
 to release work is the framing of external claims — what shipped,
 what didn't, what evidence supports the claim.
+
+## Landing / Onboarding Copy Review
+
+Before reading or framing-reviewing any landing-page or
+onboarding-shaped copy, the question on the table is: **which
+customer shape (A custodial-MCP, B CLI dev, C self-host) is
+this section addressing, and does the flow it describes
+actually work for that shape?**
+
+Walk the flow as that customer, with only that customer's
+tooling. If you hit a step the customer cannot perform — paste
+this prompt into a browser-only agent that says "open a
+terminal and run npm install" — the section is broken regardless
+of how the words read.
+
+`../../docs/customer-onboarding-flows.md` is the source-of-truth
+for what the actual product does for each shape. Verify against
+it before approving copy.
+
+This step is non-skippable. Skipping it is what produced the
+Pass-1/Pass-2 homepage failure where Shape A customers got the
+Shape B flow.
 
 ## Release-Claim Framing
 
