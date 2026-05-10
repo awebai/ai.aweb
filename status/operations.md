@@ -1,128 +1,117 @@
 # Operations Status
 
-Last updated: 2026-05-10 10:25 CEST (08:25 UTC) — aweb 1.20.8 verified-
-live (option 2 framing: aang/aanh/aanj closed for ALL customers,
-aani closed for OSS-direct only; aani for AC-hosted DEFERRED to AC
-v0.5.26). Verified-live mails sent to athena (02414be4) + sofia
-(7e56ec43) + aida (e817fbd5). Bertha brief (5a73c5ed) sent for
-Pepe partial-unblock.
+Last updated: 2026-05-10 12:25 CEST (10:25 UTC) — AC v0.5.26 verified-
+live. **Full P0 arc empirically closed end-to-end across two coordinated
+releases (aweb 1.20.8 + AC v0.5.26) within ~24h.** Verified-live mails
+sent to athena (5fc87592), sofia (ae05039f), aida (96f74b81).
+Aida REMOVE-trigger fired for runbook entry e6b1303.
 
 ## Current focus
 
-**aweb 1.20.8 verified-live (option 2 framing)**
+**FULL P0 ARC RECEIPT — 2026-05-09 → 2026-05-10**
 
-CLOSED for ALL customers:
-- aweb-aang (LOAD-BEARING): hosted add-worktree + cli-signup api_key
-  persistence chain. Paired with AC v0.5.25's addd3332 already
-  deployed-live. Pepe-class autonomous-install no longer hits the
-  'API key required' wall after init --hosted.
-- aweb-aanh: aw init --hosted produces fully-bound workspace.yaml in
-  single invocation (folded into aang).
-- aweb-aanj: aw roles set accepts array-shaped bundles. CLI-only,
-  hits team-roles endpoints not agent_lifecycle — no AC interception.
+Pepe Reyero surfaced four frictions on 2026-05-09. All four closed
+empirically across two coordinated releases:
+- **aweb-aang** (LOAD-BEARING autonomous-install): aweb 1.20.8 +
+  AC v0.5.25.
+- **aweb-aanh** (init --hosted single-invocation workspace.yaml):
+  aweb 1.20.8 (folded into aang).
+- **aweb-aanj** (aw roles set array bundles): aweb 1.20.8 (CLI-only).
+- **aweb-aani** (role-name set + AC route fix): aweb 1.20.8 (CLI +
+  OSS server) + AC v0.5.26 (route fix at agent_lifecycle.UpdateAgentRequest
+  accepting role/role_name aliases).
 
-CLOSED for OSS-direct customers only:
-- aweb-aani for self-hosted aweb (no AC layer). CLI sends both role +
-  role_name; OSS PatchWorkspaceRequest at server-v1.20.8 has
-  model_validator alias resolution.
+Pepe-class population fully unblocked end-to-end. Sofia dispatching
+Iris with full-arc receipt + Pass-2 wire-in trigger to revert
+homepage bundle from Option A back to Option B.
 
-DEFERRED to AC v0.5.26 (AC-hosted customers including Pepe):
-- aweb-aani end-to-end against AC. AC's agent_lifecycle.router PATCH
-  /{agent_id} (UpdateAgentRequest with access_mode required, role/
-  role_name extra_forbidden) intercepts /api/v1/agents/me before the
-  mounted OSS aweb_app at /api can handle it. Athena's confirmed v0.5.26
-  scope: lockfile bump + AC route fix (extend UpdateAgentRequest with
-  role/role_name fields, thread to OSS PatchWorkspace flow OR delegate
-  the role surface to OSS keeping access_mode locally — unified handler
-  cleanest).
+## v0.5.26 ship attestation (2026-05-10 09:30Z → 10:13Z)
 
-**Pepe Reyero's case** — partial unblock: aang/aanh closed (his
-original autonomous-install blocker, the 'add-worktree wants API key'
-wall). aani's 422 on `aw role-name set` still landing for him until
-AC v0.5.26 ships. Bertha briefed (mail 5a73c5ed) so Eugenie/Juan can
-follow up with him precisely. Per Athena's correction: Pepe IS
-AC-hosted (signed up via `aw init --hosted --username formlab --alias
-vision`); his original 422 shape matches AC UpdateAgentRequest exactly
-— my probe replicates his original failure.
+GATE CHAIN
+- Athena's release-ready at 1ce7d6a9: 164 PASSED including new
+  test_cloud_role_name_set_updates_current_workspace real-Docker e2e
+  probe (#24b shape baked into AC release-ready chain).
+- My release-ready at 1ce7d6a9: 164 PASSED (matches Athena's,
+  identical test list).
+- Tag v0.5.26 pushed individually at 1ce7d6a9 per discipline #7.
+- GHA aweb-cloud CI/CD: SUCCESS in 14m44s (run 25625745592).
+- Render → /health flip: ~1 min (Juan's manual deploy trigger
+  bypassed the 4-7h pattern from last 2 cycles).
 
-**Empirical evidence chain**:
-- make ship 637cd74: ALL PASSED 218 tests (matches Athena's run; same
-  pass count, same test list).
-- Tags pushed individually per #7: server-v1.20.8 (17s) + aw-v1.20.8
-  (11s).
-- awebai/aw mirror 'aw Release': 3m8s success (matches historical
-  baseline 3m1s-3m13s).
-- PyPI: aweb 1.20.8 latest, in releases.
-- npm: @awebai/aw 1.20.8 latest, in versions.
-- aamy auto-update banner detected v1.20.7 → v1.20.8 (5th self-
-  upgrade attestation: 1.20.3 → 4 → 5 → 6 → 7 → 8 all dogfood-clean).
-- aw upgrade v1.20.7 → v1.20.8 clean. Post-upgrade banner suppressed.
-- aw version: 1.20.8 commit=303e0e3 built=2026-05-10T07:49:18Z.
+LIVE STATE (verified 2026-05-10 10:13Z)
+- /health: release_tag=v0.5.26, git_sha=1ce7d6a97a (matches gate-input),
+  aweb_version=1.20.8, awid_service_version=0.5.4. Started 10:12:36Z.
+- /awid: 0.5.4 healthy.
 
-**Empirical probe — aani against deployed v0.5.25** (1.20.7 server):
-```
-$ aw role-name set coordinator
-setting role name: aweb: http 422: {"detail":[
-  {"type":"missing","loc":["body","access_mode"],"msg":"Field required",
-   "input":{"role_name":"coordinator","role":"coordinator"}},
-  {"type":"extra_forbidden","loc":["body","role_name"]},
-  {"type":"extra_forbidden","loc":["body","role"]}
-]}
-```
-That's AC's UpdateAgentRequest schema (`access_mode: str = Field(...,
-min_length=1, max_length=64)`, `model_config = ConfigDict(extra="forbid")`)
-at `ac/backend/src/aweb_cloud/routers/agent_lifecycle.py:84-92`. Direct
-curl against `app.aweb.ai/api/v1/agents/me` confirms — interception
-is at AC, not awid or middleware.
+LOAD-BEARING aani PROBE (single-team, default:aweb.ai)
+- Pre-fix (yesterday): HTTP 422 with AC UpdateAgentRequest schema
+  (access_mode required, role/role_name extra_forbidden).
+- Post-deploy: 'Role name set to coordinator' clean. Round-trip
+  coordinator → developer → coordinator: both transitions clean.
+  CLI workspace.yaml + DB aweb.workspaces.role both updated.
 
-## Iris Pass-2 trigger — HELD
+MULTI-TEAM-AGENT PROBE — discipline #24b empirical attestation
+(Athena ran via chat 2756e6db)
+- Active-team (juan.aweb.ai dev team): aw role-name set → 200 clean.
+- Cross-team override (--team default:aweb.ai): 200 clean.
+- DB: two distinct rows for same did_aw, different team_ids, both
+  updated within ~504ms. Multi-team workspaces handled cleanly —
+  each team's row updates independently when --team override targets.
+- Server-side role validation reachable: invalid role 'engineering'
+  returns structured 'available roles: backend, coordinator,
+  developer, frontend, reviewer'. Wire contract clean end-to-end.
+- Route-interception class fully gone — server validates, responds
+  with structured errors, CLI parses cleanly.
 
-Sofia's precise trigger (mail earlier): "1.20.8 verified-live + npm
-reachable + aw upgrade works". All three met for aang/aanh/aanj.
-Asked Sofia (mail 7e56ec43) whether the aani-AC partial coverage
-changes the trigger framing — holding Iris dispatch until she calls.
+## Discipline #24b — banked across this cycle
 
-## Live state (verified 2026-05-10 07:38:54Z)
+"Pre-empirical SHA-diff inspection covers ROUTE TOPOLOGY across
+deployment targets. When a fix touches a path that is mounted under
+both AC's direct routes AND the OSS /api mount, verify which handler
+wins on the actual deployed surface. Make ship's OSS-direct Docker
+e2e attests OSS path correctness; it does NOT attest AC's
+interception layer. Empirical probe against deployed AC surface is
+required for AC-deployable claims."
 
-- `app.aweb.ai/health`: `release_tag=v0.5.25`, `aweb_version=1.20.7`,
-  `awid_service_version=0.5.4`. Started 2026-05-10T07:07:11Z.
-- `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
+- Banked verbatim by Athena and Sofia.
+- Applied through v0.5.26 release-ready chain (real-Docker CLI-driven
+  e2e test_cloud_role_name_set_updates_current_workspace added before
+  tag-push).
+- aank ticket scope still stands for extending coverage to
+  aang/aanh/aanj surfaces; aanl established the pattern this cycle.
 
-Pre-1.20.8: AC v0.5.25, aweb 1.20.7, AWID 0.5.4. Post-1.20.8 PyPI/npm
-reachable, deployed surface (app.aweb.ai) still pinned to 1.20.7
-pending v0.5.26 lockfile bump.
+## Render deploy lag — open ops debt
 
-## Live state (verified 2026-05-10 07:38:54Z)
+Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
+3min. v0.5.26 ~1 min thanks to Juan's manual deploy trigger (bypass).
+Pattern unresolved. Hypothesis: Render image-watcher poll interval
+changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-- `app.aweb.ai/health`: `release_tag=v0.5.25`, `aweb_version=1.20.7`,
+## Live state (verified 2026-05-10 10:13Z, post v0.5.26 deploy)
+
+- `app.aweb.ai/health`: `release_tag=v0.5.26`, `aweb_version=1.20.8`,
   `awid_service_version=0.5.4`,
-  `git_sha=77e60e5bdf7566e2c712cef8cb6462341cdb6ede`. Started
-  2026-05-10T07:07:11Z (uptime ~31 min).
+  `git_sha=1ce7d6a97a92f41dfeed7163fc3d67a50f48827a`. Started
+  2026-05-10T10:12:36Z.
 - `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
 
-## Recent verified-live history (post 2026-05-08 cycle close)
+## Bertha pipeline — HANDOFF TO METIS (ANALYTICS) PER JUAN 2026-05-10
 
-- aweb 1.20.7 + AC v0.5.24 verified-live 2026-05-08 17:00:43Z.
-  Multi-team-agent did_key strict-walk + chat fresh-start contract.
-- AC v0.5.25 verified-live ~2026-05-09 (cli-signup api_key surface
-  ride-along + admin_analytics test-fix). Render deploy lag re-
-  observed: GHA→/health flip ~7h vs historical ~3min. Pattern logged.
+Juan (2026-05-10): "we are going to task metis, who is responsible for
+analytics, for the regular check of the database... she will need to
+design and write admin entrypoints to do the tasks."
 
-Render deploy lag (2 cycles in a row) is now operational debt to
-investigate. Hypothesis: Render image-watcher poll interval changed
-or upgrade-window held. Athena/Juan to investigate when bandwidth
-permits.
-
-## Bertha pipeline (operational since 2026-05-08)
-
-- **Daily sign-up export** (cron 2ddbdd18, daily 08:13 CEST): mail to
-  Bertha with prior-26h sign-up batch + multi-agent activity status.
+Until Metis ships admin entrypoints + takes over the cadence:
+- **Daily sign-up export** (cron 2ddbdd18, daily 08:13 CEST): operational.
 - **Hourly multi-agent milestone check** (cron f6adaa50, hourly):
-  state-tracked, alerts Bertha on first-cross. Last fire 2026-05-10
-  07:36:02Z, 0 candidates. State file initialized empty 2026-05-08.
+  operational, state-tracked.
+- Both crons are session-only (CronCreate `durable=true` does not take —
+  the durability gap is part of why Metis taking this is right; admin
+  entrypoints + system cron / launchd is the proper architecture).
 
-Both crons are session-only (CronCreate `durable=true` did not take —
-flagged as ops debt; system cron / launchd is the durable answer).
+Hestia briefing Metis with full context, SQL, state-file design, Bertha
+integration shape, durability constraints, and pitfalls — see mail to
+metis (sent this cycle).
 
 ## Release pipeline
 
