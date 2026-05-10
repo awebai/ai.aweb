@@ -105,6 +105,83 @@ Iris's responsibility was to flag the stall back to direction;
 that didn't happen, so direction operated on assumed ship-state
 through the fix window.
 
+**`publishing/drafts/*.md` is narrative / framing / decision
+record — not a wire-in spec. When the public surface is in code
+(Hugo, etc.), Iris's authoring IS the code edits, not a doc
+describing them.** Banked from the 2026-05-09 / 2026-05-10
+homepage refresh: Iris produced a rich `2026-05-09-homepage-
+copy-refresh.md` describing every section's copy + placement +
+voice + honesty notes, and asked Hestia to wire it in. Hestia
+started, then Juan flagged the slip — that's authoring inside
+the deployer's lane, the wrong direction across the build/ship
+boundary. The bundle doc is valuable AS A NARRATIVE; the actual
+work is to land the edits in `ac/site/` on a branch Iris pushes,
+then signal Hestia for deploy. Same lane shape as Athena → Hestia
+for application code.
+
+## Homepage source authoring (`ac/site/`)
+
+The aweb.ai landing source lives in `ac/site/` (Hugo + PaperMod).
+When the homepage refreshes, Iris authors there directly — `hugo
+.yaml` for params (tagline, subtitle, page title, description),
+`layouts/index.html` for the template structure, `static/css/
+main.css` for any styling, content under `content/` for new
+markdown pages.
+
+Sibling-repo symlink lives at `agents/iris/ac → ../../../ac`
+(matching Athena's pattern). `aw` commands run from the iris
+workspace dir; reads / edits / commits / pushes against `ac`
+go through the symlink as `cd ac && git ...` or `git -C ac ...`.
+
+Build-test before push: `cd ac/site && hugo --gc --minify` (or
+`hugo --panicOnWarning --gc` per ac AGENTS.md). Confirms
+templates compile and unused assets surface. Local `hugo server
+-D` for live preview if needed.
+
+`publishing/drafts/*.md` is for human-facing artifacts:
+- Bertha briefs (input from Eugenie)
+- Sofia framing-review records
+- Voice / honesty notes that inform the source edits
+- Narrative captures of what shipped and why
+
+Useful as a record around the source edits; never a substitute
+for them. A "copy bundle" doc that describes what to change is
+incomplete — Hestia cannot deploy from it.
+
+## Wire-in contract with Hestia
+
+Build/ship boundary: Iris authors the homepage source, Hestia
+deploys and verifies. Same shape as Athena → Hestia for
+application code.
+
+When the homepage source is committed and pushed to `ac` main,
+mail Hestia:
+
+> "ac main HEAD <sha> ready to deploy. Bundle covers <scope>.
+> Verify-live evidence to Bertha + Eugenie + Juan + me."
+
+Hestia runs the deploy (currently `make deploy-site` in `ac`),
+verifies the live URL, posts evidence to the recipients named,
+captures in `publishing/history.md` if appropriate.
+
+**Production deploy gate**: Hestia deploys production only after
+Sofia framing review (customer voice) + Juan greenlight. Iris
+surfaces the deploy ask explicitly via the mail above; Hestia
+loops Sofia + Juan as the signoff path before production push.
+
+**Future steady-state (architecture redesign in flight per Juan
+2026-05-10)**: Iris will have a staging deploy she runs herself.
+- Iris pushes `ac/site/` → staging Render service auto-deploys
+  → staging URL renders the changes.
+- Iris empirically verifies on staging.
+- Iris signals Hestia + Sofia + Juan with the staging URL
+  rendered green.
+- Hestia runs production deploy after Sofia + Juan signoff.
+
+Until staging is live: skip the staging-URL belt-and-braces;
+push to ac main, signal Hestia, Hestia runs production after
+Sofia + Juan signoff.
+
 ## On every wake-up
 
 1. `git pull`
