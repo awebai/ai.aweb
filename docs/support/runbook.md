@@ -429,63 +429,6 @@ entry mail `f393168c` (2026-05-02), Athena's review mail `df41abbc`
 finding #3. Captured 422 envelopes were verified against the
 production schema by Mia on 2026-05-02.
 
-### `aw role-name set` returns 422 on AC-hosted (until AC v0.5.26)
-
-**TIME-LIMITED ENTRY.** Active only until `AC v0.5.26` verifies-live
-in production. Closes when Hestia signals the deploy. After that,
-`aw role-name set` works end-to-end on AC-hosted and this entry is
-obsolete.
-
-**When this applies.** Customer is **AC-hosted** (signed up via
-`app.aweb.ai`), upgraded to `aw 1.20.8`, and runs:
-
-```
-$ aw role-name set <new-role>
-setting role name: aweb: http 422: {
-  "missing": "body.access_mode required",
-  "extra_forbidden": ["body.role", "body.role_name"]
-}
-```
-
-Self-hosted (OSS-direct) customers are NOT affected — `aw 1.20.8`
-works end-to-end against their own server.
-
-**Why this happens.** AC's `PATCH /api/v1/agents/{id}` route
-(`agent_lifecycle.UpdateAgentRequest`) intercepts the patch request
-before the OSS server-side fix shipped in `aweb 1.20.8` is reached.
-The route's schema (Pydantic v2, `extra="forbid"`) requires
-`access_mode` and rejects `role` / `role_name`, while the 1.20.8
-CLI sends the latter. The fix lives in `AC v0.5.26`.
-
-**Customer-facing answer.** Tell the customer:
-
-> "Known issue, AC-hosted only — the server-side fix is shipping
-> with `AC v0.5.26` (estimated 1-2 days). Until then, the
-> `aw role-name set` command isn't usable against `app.aweb.ai`.
-> The role-name on the server is whatever was set at agent
-> creation — that value stays until `v0.5.26` lands, after which
-> you can rename freely."
-
-For a more current ETA, check `status/operations.md` — Hestia
-publishes the live `v0.5.26` verified-live signal there.
-
-The workaround is *not* to retry — there's nothing the customer can
-do client-side. They wait for `v0.5.26`, then run the command and
-it works.
-
-**Why this is not a bug to escalate.** Known, ETA-bound, fix in
-flight. Do not escalate to Hestia or Athena unless the symptom
-persists *after* `AC v0.5.26` is verified-live, at which point it
-becomes a new signal worth investigating.
-
-**Source.** `aweb 1.20.8` ticket `aani`. AC's
-`PATCH /api/v1/agents/{id}` route
-(`ac/backend/src/aweb_cloud/routers/agent_lifecycle.py`,
-`UpdateAgentRequest` schema) is the load-bearing surface; `AC
-v0.5.26` route work closes the gap. Hestia's verified-live mail
-`e817fbd5` + tech-accuracy review `d3fcdfd8` (2026-05-10) captured
-the empirical 422 shape against `app.aweb.ai` post-1.20.8 publish.
-
 ## Escalation Packet
 
 When asking Engineering, include:
