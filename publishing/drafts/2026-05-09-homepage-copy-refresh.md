@@ -1,11 +1,63 @@
 ---
-title: "aweb.ai homepage copy refresh — copy bundle for Hestia wire-in"
-date: "2026-05-09"
-type: "copy-bundle"
-status: "ready for Sofia framing pass + Hestia wire-in"
-brief: "Bertha chat 53251bb9 (2026-05-08); Athena pre-flight 2f9cd979 (2026-05-09)"
-brand: "aweb (lowercase) per existing site convention; Bertha's 'aWeb' brief-shorthand normalizes to 'aweb' here"
+title: "aweb.ai homepage copy refresh — narrative record (Pass-3 live on staging)"
+date: "2026-05-09 / updated 2026-05-11"
+type: "narrative-record"
+status: "Pass-3 live on staging at preview-urw1.onrender.com (commit 60be8f4e on deploy-landing-staging) — Sofia authored Pass-3 customer-shape correction directly under time pressure; sequence Bertha-validates → Sofia-framing → Juan-greenlight → Hestia-prod still pending"
+brief: "Bertha chat 53251bb9 (2026-05-08); Athena pre-flight 2f9cd979 (2026-05-09); Sofia Pass-3 mail a84e3dde (2026-05-11)"
+brand: "aweb (lowercase) per existing site convention"
 ---
+
+## Pass-3 update (2026-05-11)
+
+This file was originally drafted as a wire-in spec for Hestia.
+Banked discipline since: `publishing/drafts/*.md` is a narrative
+record, not a wire-in spec — the actual authoring landed in
+`ac/site/` (commits 58ed6c53 by Iris, 60be8f4e by Sofia on
+deploy-landing-staging).
+
+Pass-3 customer-shape correction (Sofia mail a84e3dde): Iris's
+Pass-1 / Pass-2 work shipped a Shape-B (CLI agent) flow under
+language addressed to Shape-A (custodial-MCP browser/desktop)
+customers. The "paste this prompt into your agent → agent runs
+npm install" pattern doesn't work for claude.ai / ChatGPT /
+Claude Desktop users. Sofia caught it under Juan's "preview
+online before I'm back" deadline and authored the corrective
+edits directly. Customer-shape model now persisted in
+`docs/customer-onboarding-flows.md` (Shape A / Shape B / Shape C
+with click-by-click for each).
+
+Banked discipline (Iris AGENTS.md updated 2026-05-11):
+**Customer-shape verification before authoring landing-copy.**
+Identify which onboarding shape the section addresses, walk the
+flow as that customer with only that customer's tooling. A
+section that promises something the customer cannot do is broken.
+Source-of-truth: `docs/customer-onboarding-flows.md`.
+
+What's live on staging now (Pass-3, Sofia-authored):
+- Hero h1 line-broken + "AI agents" not "AIs"
+- Hero subhead reframed: drops "those are agents" vocabulary-
+  bridge that confused vs. served the audience; reframes around
+  Claude Desktop / ChatGPT / claude.ai as concrete customer
+  surfaces.
+- Hero right column: 3-step MCP connector card (signup →
+  copy MCP URL → add to client) replaces the npm-install card.
+- "Sign up. Add aweb to your AI client." section: honest 3-step
+  walkthrough with per-client snippets (claude.ai / ChatGPT /
+  Claude Desktop). Replaces the original "Sign up. Your agent
+  handles the rest." Shape-B-disguised-as-Shape-A flow.
+- Iris-authored content preserved: hero "Free tier · No credit
+  card required" trust line, works-with strip (text pills),
+  pillars heading "Each AI you're running is isolated. aweb
+  changes that.", new CSS for works-with + signup-onboard.
+- "Team quickstart" section relabeled "For developers" —
+  the agent-guide-paste prompt now lands there (its honest
+  home for Shape-B customers).
+- "Hosted MCP" block repurposed as MCP technical detail callout.
+
+This narrative record stays as the cycle's history; the
+canonical source is now `ac/site/` directly + the staging
+URL above + `docs/customer-onboarding-flows.md` for the
+shape model.
 
 ## Context
 

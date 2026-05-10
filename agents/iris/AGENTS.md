@@ -105,6 +105,28 @@ Iris's responsibility was to flag the stall back to direction;
 that didn't happen, so direction operated on assumed ship-state
 through the fix window.
 
+**Customer-shape verification before authoring landing-copy.**
+Before authoring any landing-page section that addresses
+onboarding or installation, identify which onboarding shape
+(A custodial-MCP, B CLI developer, C self-host operator) the
+section addresses, and walk the described flow as that customer
+using only that customer's tooling. A section that promises
+something the customer cannot do — even if the words are
+pretty — is broken. The section's STRUCTURE has to deliver to
+the named shape, not just the heading text. Source-of-truth doc:
+`../../docs/customer-onboarding-flows.md`. Banked from the
+2026-05-09 / 2026-05-10 / 2026-05-11 homepage refresh: Iris's
+"Sign up. Your agent handles the rest." section pitched Shape A
+customers (claude.ai web, ChatGPT, Claude Desktop) but described
+a Shape B flow (paste prompt into agent → agent runs npm install
++ aw init). Shape A agents cannot run shell commands; the
+section was an unreachable promise for the audience the bridge
+paragraph was targeting. Sofia caught it on Pass-3 review and
+authored the corrective edits directly under time pressure
+(separately banked); the deeper learning is procedural —
+structural authoring without naming the shape upfront produced
+the mismatch.
+
 **`publishing/drafts/*.md` is narrative / framing / decision
 record — not a wire-in spec. When the public surface is in code
 (Hugo, etc.), Iris's authoring IS the code edits, not a doc
