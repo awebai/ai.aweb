@@ -132,6 +132,31 @@ metis (sent this cycle).
 | **aweb 1.20.8** (aang/aanh/aani/aanj bundle) | **mid-flight, awaiting Athena re-make-ship at 637cd74** |
 | AC v0.5.26 (1.20.8 uptake) | pending PyPI 1.20.8 publish |
 
+## Site deploy protocol (Juan-authorized 2026-05-10)
+
+**Surface separation (build/ship boundary applied to site)**:
+- Iris owns authoring `ac/site/` source (hugo.yaml, layouts/, css/).
+- Hestia owns deploy execution + verification.
+- Same shape as Athena → Hestia for code.
+
+**Production deploy gate** — every deploy needs:
+1. Iris signal: 'staging green at <preview URL>; ready for production deploy. Bundle covers <scope>.'
+2. Bertha validation (non-technical-founder framing match — Eugenie's read).
+3. Sofia framing review.
+4. Juan explicit per-deploy greenlight.
+
+Only after all four: Hestia runs `make deploy-site` from ac/.
+
+**Staging architecture** (in setup as of 2026-05-10):
+- `deploy-landing-staging` branch → Render staging service → preview.aweb.ai
+- Custom HTTP header `X-Robots-Tag: noindex, nofollow` (Render-level) prevents SEO duplicate-content concerns.
+- agent-guide sync identical to prod (true parity).
+- Iris runs `make deploy-staging` (target Athena lands; cross-repo ask sent c09216dd).
+
+**Rollback authority**: only Hestia.
+
+**First deploy gate run**: Iris's bundle 58ed6c53 (homepage refresh) is the first test case. Held until staging architecture is live.
+
 ## Operational discrepancies
 
 - **Render deploy lag** (2 cycles): v0.5.24 GHA→live ~4h, v0.5.25
@@ -238,6 +263,16 @@ Athena is the cross-team bridge.
     as a side effect of a non-git-management command, even with
     loud warnings. Refuse + remediate, don't auto-fix the
     customer's repo for them.
+29. **Refuse interpretive-doc-only wire-ins.** A draft markdown that
+    describes what to change is incomplete. Hestia cannot deploy from
+    narrative. The author commits actual edits to the source surface;
+    markdown serves as narrative around them, not substitute. Same
+    shape as #2 (review via shared working tree, not chat-pasted
+    diffs) extended to the site-author surface. (Banked 2026-05-10
+    from homepage-refresh slip: Iris's first bundle was a copy-bundle
+    narrative in publishing/drafts/; Hestia started wiring it into
+    ac/site/. Juan caught it. Iris re-authored on ac main as 58ed6c53
+    — proper shape. Banking the rule for future bundles.)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
