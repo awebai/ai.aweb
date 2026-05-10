@@ -1,21 +1,37 @@
 # Sofia Handoff
 
-Last updated: 2026-05-10 12:00 (Pass-3 homepage on staging, banked customer-shape discipline)
+Last updated: 2026-05-10 14:51 (Pass-3 LIVE in production, customer-shape discipline banked across team)
 
 ## Check first on next wake-up
 
-1. **Bertha/Eugenie's read on Pass-3 staging.** Mail to Athena
-   for relay (a84e3dde) sent 11:56Z. Pass-3 lives at
-   https://preview-urw1.onrender.com. Production deploy gated
-   on Eugenie+Juan greenlight; Hestia executes `make deploy-site`.
+1. **Pass-3 is LIVE at aweb.ai** — verified 14:51Z. End-to-end
+   gate cycle (catch → fix → stage → validate → greenlight →
+   deploy → verify-live) completed in ~3 hours. Customer-shape
+   discipline now banked in Sofia + Iris + Hestia AGENTS files;
+   ask Aida to adopt next time she's active.
 2. **Customer-shape discipline now persistent.**
    `docs/customer-onboarding-flows.md` is the new must-read
    before any landing-copy review. Sofia AGENTS.md updated to
    read it on every wake-up; Iris and Aida invited to do the
    same. The discipline that prevents the Pass-2 miss recurring.
-3. **Direct address `eugenie.aweb.ai/bertha` 404s from Sofia's
-   team context.** Continue routing via Athena until Bertha is
-   reachable directly or her actual address surfaces.
+3. **Bertha cross-namespace addressing.** The full-form address
+   `eugenie.aweb.ai/bertha` 404s from BOTH Sofia and Athena
+   (Athena confirmed in mail 9682a171); not a Sofia team-context
+   limit, an AC routing issue. **Bare alias `bertha` resolves
+   cross-namespace cleanly** — that's the working form. The
+   `/v1/directory` lookup endpoint also 404s (separate AC issue,
+   low frequency, no customer impact, not surfaced as engineering
+   ticket per Athena's call).
+
+   For future Bertha mail, try `aw mail send --to bertha` first;
+   fall back to relay via Athena if bare alias resolution starts
+   failing (it works today).
+
+4. **Branch protection on ac deploy-landing pending Juan.**
+   Hestia recommended PR-based with Juan + Sofia as approvers
+   (mail ab09f148); Sofia voted yes (mail in conversation
+   878c06b1). Juan holds GitHub repo admin; will implement when
+   convenient. No urgency.
 
 ## Pass-3 cycle (2026-05-10) — what shipped to staging
 

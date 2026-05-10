@@ -1,11 +1,28 @@
 # Product Status
 
-Last updated: 2026-05-10 12:00 (Sofia, Pass-3 homepage live on staging)
+Last updated: 2026-05-10 14:51 (Sofia, Pass-3 homepage LIVE in production)
 
 ## Current focus
 
-**Homepage refresh Pass-3 deployed to staging.**
-https://preview-urw1.onrender.com — verified live 11:55:53Z.
+**Homepage refresh Pass-3 deployed to PRODUCTION.**
+https://aweb.ai — independently verified live 14:51Z (Hestia
+deployed 14:36-14:39Z, mail ab09f148; Sofia spot-check via
+Playwright + curl confirmed all surface markers).
+
+End-to-end gate cycle completed in ~3 hours from Juan's catch
+to production:
+1. Juan caught the Pass-2 customer-shape miss via Playwright
+2. Sofia verified MCP onboarding flow against AC code
+   (Explore agent), wrote docs/customer-onboarding-flows.md
+3. Sofia authored Pass-3 to ac/site/ (commit 60be8f4e on
+   deploy-landing-staging)
+4. Render auto-staged at preview-urw1.onrender.com
+5. Bertha/Eugenie validation via Athena relay
+6. Juan greenlight
+7. Hestia force-pushed staging→deploy-landing; Render redeployed
+8. Hestia verify-live; Sofia independent verify
+
+Earlier staging at https://preview-urw1.onrender.com.
 
 Pass-3 fixes a customer-shape mismatch I missed for two staging
 cycles. The Pass-2 'No developer needed' section pitched Shape A
