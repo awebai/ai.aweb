@@ -1,78 +1,96 @@
 # Operations Status
 
-Last updated: 2026-05-10 10:00 CEST (08:00 UTC) — aweb 1.20.8 PUBLISHED
-+ upgrade-dogfood verified, BUT role-name probe surfaced AC route-
-interception blocker. Verified-live mail HELD pending framing
-agreement with Athena (mail f159c881 sent).
+Last updated: 2026-05-10 10:25 CEST (08:25 UTC) — aweb 1.20.8 verified-
+live (option 2 framing: aang/aanh/aanj closed for ALL customers,
+aani closed for OSS-direct only; aani for AC-hosted DEFERRED to AC
+v0.5.26). Verified-live mails sent to athena (02414be4) + sofia
+(7e56ec43) + aida (e817fbd5). Bertha brief (5a73c5ed) sent for
+Pepe partial-unblock.
 
 ## Current focus
 
-**aweb 1.20.8 published**:
-- My make ship at 637cd74: ALL PASSED 218 tests (matches Athena's run).
-- Tags pushed individually per #7: server-v1.20.8 (17s), aw-v1.20.8
-  (11s). Both GHA workflows green.
-- awebai/aw mirror "aw Release" workflow: 3m8s success (matches
-  historical baseline 3m1s-3m13s).
-- PyPI: aweb 1.20.8 latest, 1.20.8 in releases.
+**aweb 1.20.8 verified-live (option 2 framing)**
+
+CLOSED for ALL customers:
+- aweb-aang (LOAD-BEARING): hosted add-worktree + cli-signup api_key
+  persistence chain. Paired with AC v0.5.25's addd3332 already
+  deployed-live. Pepe-class autonomous-install no longer hits the
+  'API key required' wall after init --hosted.
+- aweb-aanh: aw init --hosted produces fully-bound workspace.yaml in
+  single invocation (folded into aang).
+- aweb-aanj: aw roles set accepts array-shaped bundles. CLI-only,
+  hits team-roles endpoints not agent_lifecycle — no AC interception.
+
+CLOSED for OSS-direct customers only:
+- aweb-aani for self-hosted aweb (no AC layer). CLI sends both role +
+  role_name; OSS PatchWorkspaceRequest at server-v1.20.8 has
+  model_validator alias resolution.
+
+DEFERRED to AC v0.5.26 (AC-hosted customers including Pepe):
+- aweb-aani end-to-end against AC. AC's agent_lifecycle.router PATCH
+  /{agent_id} (UpdateAgentRequest with access_mode required, role/
+  role_name extra_forbidden) intercepts /api/v1/agents/me before the
+  mounted OSS aweb_app at /api can handle it. Athena's confirmed v0.5.26
+  scope: lockfile bump + AC route fix (extend UpdateAgentRequest with
+  role/role_name fields, thread to OSS PatchWorkspace flow OR delegate
+  the role surface to OSS keeping access_mode locally — unified handler
+  cleanest).
+
+**Pepe Reyero's case** — partial unblock: aang/aanh closed (his
+original autonomous-install blocker, the 'add-worktree wants API key'
+wall). aani's 422 on `aw role-name set` still landing for him until
+AC v0.5.26 ships. Bertha briefed (mail 5a73c5ed) so Eugenie/Juan can
+follow up with him precisely. Per Athena's correction: Pepe IS
+AC-hosted (signed up via `aw init --hosted --username formlab --alias
+vision`); his original 422 shape matches AC UpdateAgentRequest exactly
+— my probe replicates his original failure.
+
+**Empirical evidence chain**:
+- make ship 637cd74: ALL PASSED 218 tests (matches Athena's run; same
+  pass count, same test list).
+- Tags pushed individually per #7: server-v1.20.8 (17s) + aw-v1.20.8
+  (11s).
+- awebai/aw mirror 'aw Release': 3m8s success (matches historical
+  baseline 3m1s-3m13s).
+- PyPI: aweb 1.20.8 latest, in releases.
 - npm: @awebai/aw 1.20.8 latest, in versions.
-- aamy auto-update banner: detected v1.20.7 → v1.20.8 (5th self-
-  upgrade attestation).
-- aw upgrade: v1.20.7 → v1.20.8 worked clean. Post-upgrade banner
-  suppressed. Version: aw 1.20.8 commit=303e0e3.
+- aamy auto-update banner detected v1.20.7 → v1.20.8 (5th self-
+  upgrade attestation: 1.20.3 → 4 → 5 → 6 → 7 → 8 all dogfood-clean).
+- aw upgrade v1.20.7 → v1.20.8 clean. Post-upgrade banner suppressed.
+- aw version: 1.20.8 commit=303e0e3 built=2026-05-10T07:49:18Z.
 
-**Role-name probe BLOCKED at AC route layer (NOT OSS server)**:
-Athena's mail predicted "should SUCCEED via backward-compat" against
-deployed v0.5.25 (1.20.7 server). Empirical probe returned HTTP 422
-with `UpdateAgentRequest` schema (access_mode required, role/
-role_name extra_forbidden) — that's AC's `agent_lifecycle.router`
-schema, NOT OSS aweb's PatchWorkspaceRequest.
+**Empirical probe — aani against deployed v0.5.25** (1.20.7 server):
+```
+$ aw role-name set coordinator
+setting role name: aweb: http 422: {"detail":[
+  {"type":"missing","loc":["body","access_mode"],"msg":"Field required",
+   "input":{"role_name":"coordinator","role":"coordinator"}},
+  {"type":"extra_forbidden","loc":["body","role_name"]},
+  {"type":"extra_forbidden","loc":["body","role"]}
+]}
+```
+That's AC's UpdateAgentRequest schema (`access_mode: str = Field(...,
+min_length=1, max_length=64)`, `model_config = ConfigDict(extra="forbid")`)
+at `ac/backend/src/aweb_cloud/routers/agent_lifecycle.py:84-92`. Direct
+curl against `app.aweb.ai/api/v1/agents/me` confirms — interception
+is at AC, not awid or middleware.
 
-Root cause: AC's `agent_lifecycle_router` at prefix `/api/v1/agents`
-includes PATCH `/{agent_id}` (UpdateAgentRequest). FastAPI matches
-this direct route BEFORE the mounted OSS aweb_app at `/api`, so
-`/api/v1/agents/me` hits AC's update_agent handler with
-agent_id="me" — NEVER reaches OSS PatchWorkspaceRequest where role
-field would be accepted.
+## Iris Pass-2 trigger — HELD
 
-Implication: aani (role-name set) works END-TO-END for OSS-direct
-users (self-hosted aweb without AC layer) — Athena's Phase 0-22
-e2e against Docker OSS attests this and that test rig is correct.
-aani DOES NOT work end-to-end against deployed app.aweb.ai until
-v0.5.26 either (a) extends UpdateAgentRequest with role/role_name,
-(b) removes the catch-all PATCH /{agent_id} from agent_lifecycle,
-or (c) reorders routes so the OSS mount wins for /v1/agents/me.
+Sofia's precise trigger (mail earlier): "1.20.8 verified-live + npm
+reachable + aw upgrade works". All three met for aang/aanh/aanj.
+Asked Sofia (mail 7e56ec43) whether the aani-AC partial coverage
+changes the trigger framing — holding Iris dispatch until she calls.
 
-Pepe Reyero's autonomous-install case is OSS-direct — aani works
-for him. Other autonomous-install customers similarly unblocked.
-AC users get 422 on `aw role-name set` until v0.5.26.
+## Live state (verified 2026-05-10 07:38:54Z)
 
-Holding verified-live mail until Athena agrees on framing. Three
-options sketched in mail f159c881:
-1. Verified-live with explicit aani-against-AC scoping.
-2. Verified-live for aang/aanh/aanj only; aani DEFERRED to v0.5.26.
-3. Cut 1.20.9 with sidestep of AC intercept (heavier).
+- `app.aweb.ai/health`: `release_tag=v0.5.25`, `aweb_version=1.20.7`,
+  `awid_service_version=0.5.4`. Started 2026-05-10T07:07:11Z.
+- `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
 
-Hestia recommendation: option 2.
-
-## Banking proposal — discipline #24b (refines #24a)
-
-"Pre-empirical SHA-diff inspection covers ROUTE TOPOLOGY across
-deployment targets. When a fix touches a path that is mounted under
-both AC's direct routes AND the OSS /api mount, verify which handler
-wins on the actual deployed surface. Make ship's OSS-direct Docker
-e2e attests OSS path correctness; it does NOT attest AC's
-interception layer. Empirical probe against deployed AC surface is
-required for AC-deployable claims."
-
-(Banked 2026-05-10 from aweb 1.20.8 cycle: aani fix predicted to
-SUCCEED against deployed v0.5.25 via backward-compat; empirically
-returned 422 with AC's UpdateAgentRequest schema because AC's
-agent_lifecycle PATCH /{agent_id} intercepts before OSS /api mount.
-Pre-empirical SHA-diff (#24a) caught the OSS+CLI mismatch but did
-NOT catch the route-topology shadowing.)
-
-Pre-1.20.8 verified-live state: AC v0.5.25, aweb 1.20.7, AWID 0.5.4
-all healthy.
+Pre-1.20.8: AC v0.5.25, aweb 1.20.7, AWID 0.5.4. Post-1.20.8 PyPI/npm
+reachable, deployed surface (app.aweb.ai) still pinned to 1.20.7
+pending v0.5.26 lockfile bump.
 
 ## Live state (verified 2026-05-10 07:38:54Z)
 
