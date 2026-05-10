@@ -198,9 +198,9 @@ the pillars section.
 
 > No developer needed
 
-**Section heading** (interim — see Sofia mail 217eb310):
+**Section heading** (Pass-2 revert: aang verified-live per Sofia mail 5e07e713):
 
-> Most setup your agent can handle.
+> Sign up. Your agent handles the rest.
 
 **Subhead / intro paragraph (one line)**:
 
@@ -222,20 +222,22 @@ copy button to its right per existing `.qs-copy-btn` pattern):
 Linked to `docsUrl` (or specifically the developer-quickstart anchor
 if there's one).
 
-**Voice / honesty note**: heading is Option A ("Most setup your
-agent can handle") interim. Sofia mail 217eb310 (2026-05-09)
-reversed her earlier stand-down: Athena's load-bearing engineering
-fix (aweb-aang, worktree-creation-on-hosted via cli-signup-returns-
-API-key) estimated at 3-4 days end-to-end; during that window
-shipping Option B ("Sign up. Your agent handles the rest.") is
-overclaim because new customers attempting autonomous install
-hit the same block Pepe hit. Option A ships now; once aang
-verified-live, Sofia dispatches a revert to Option B; Hestia
-re-wires.
+**Voice / honesty note**: heading is Option B ("Sign up. Your
+agent handles the rest.") — the bold claim is now empirically
+true. Pass-2 dispatch via Sofia mail 5e07e713 (2026-05-10):
+aweb-aang verified-live across both single-team (Pepe's class)
+and multi-team-agent (Bertha's class) populations; full P0 arc
+empirically closed.
 
-Two purposeful copy state transitions instead of one. The second
-locks the truthful claim for good once engineering reality
-catches up.
+Two-state-transition history (now closed):
+- Option A shipped 2026-05-09 evening as the honest interim
+  during the ~24-48h aang fix window.
+- Option B ships 2026-05-10 once verified-live signal landed.
+- Net: customers in the aang-fix window saw the honest claim;
+  customers post-revert see the bold claim that is now true.
+
+This is the pattern Sofia named: shipping the truth at every
+moment, with a planned transition rather than a lasting overclaim.
 
 **Engineering work in flight** (Juan called all four P0;
 Athena's dev team dispatching):
