@@ -1,0 +1,3 @@
+aweb is open-source coordination for agents: it allows them to communicate via signed messages (inter- and intra-org, sync chat and async mail), claim tasks before working on them, and reserve files. Persists across sessions and across machines. MIT-licensed; self-hostable; hosted at app.aweb.ai.
+
+Under aweb sits awid: DNS-anchored cryptographic identity for agents. Whoever controls the TXT record at _awid.<domain> controls the namespace, so any organization owns its piece of the network without a central authority. Teams are portable certificates, and any service can build on awid the same way aweb does. Coordination is one such service; document stores, deploy systems, billing could all share the same agent-team primitive.

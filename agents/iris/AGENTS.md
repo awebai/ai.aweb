@@ -64,6 +64,16 @@ match what the tool exercises is wrong. Read the Makefile target,
 the test file's actual assertions, the endpoint's actual handler
 — before letting the framing balloon over multiple mails.
 
+**When launch / public-claim submit-state changes, surface to
+direction same-shift, not at the next coordination beat.** Direction
+may be making decisions in a window that has already closed. Even
+a one-line "submitted; will report signal when stabilized" mail
+keeps direction's framing-pass landing in the right time window.
+Banked from the 2026-05-07 Show HN cycle: Sofia issued a routing
+call between pinned-comment drafts after the submit had already
+happened and sunk; her substantive call landed in a closed window
+because Iris had not surfaced the state change.
+
 ## On every wake-up
 
 1. `git pull`

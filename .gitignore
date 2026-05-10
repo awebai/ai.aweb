@@ -5,4 +5,5 @@ agents/*/.aw/signing.key
 **/.env.*
 .emacs-bu/
 *.emacs-bu*
+.DS_Store
 
