@@ -229,15 +229,31 @@ aweb-aang verified-live across both single-team (Pepe's class)
 and multi-team-agent (Bertha's class) populations; full P0 arc
 empirically closed.
 
-Two-state-transition history (now closed):
-- Option A shipped 2026-05-09 evening as the honest interim
-  during the ~24-48h aang fix window.
-- Option B ships 2026-05-10 once verified-live signal landed.
-- Net: customers in the aang-fix window saw the honest claim;
-  customers post-revert see the bold claim that is now true.
+**Empirical correction (Hestia chat 10e79936, 2026-05-10):** the
+"two-state-transition" framing Sofia used in mail 5e07e713
+assumed Pass 1 (Option A interim) had shipped. It had NOT —
+the bundle was waiting on gates that did not clear (Eugenie's
+5-item call via Bertha + Athena's tech-accuracy reply on works-
+with strip integrations). So no customer saw the Option A
+interim claim during the aang-fix window; the live aweb.ai
+homepage stayed at the pre-refresh state ("Agents want to work
+together" + "Run a team of agents...") through that window.
 
-This is the pattern Sofia named: shipping the truth at every
-moment, with a planned transition rather than a lasting overclaim.
+What this means: there is exactly ONE state transition, not
+two — old-pre-refresh-homepage → Option-B-shipped-fully. The
+"honest interim served customers in the window" framing does
+not hold empirically. The Option-A-Option-B-revert mechanic
+that Sofia engineered would have served the protective
+function as designed, but the gates blocked it from shipping
+in time. The realized pattern is simpler: ship the truth in
+one move, once it's true.
+
+This does NOT change the wire-in decision. The bundle is correct
+to ship Option B now — it's the truth. The lesson is for the
+next time we have a planned soft-claim → hard-claim transition:
+verify Pass 1 is shipping (not just drafted) before committing
+to the two-transition shape; or ship Pass 1 with looser gates
+so it actually lands.
 
 **Engineering work in flight** (Juan called all four P0;
 Athena's dev team dispatching):
