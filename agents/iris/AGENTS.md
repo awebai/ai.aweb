@@ -107,24 +107,50 @@ through the fix window.
 
 **For external-vendor policy verification (tier requirements,
 feature availability, RBAC scope, etc.), the vendor's own
-help-center IS the authoritative source.** Developer-docs guides,
-third-party aggregators, blog posts, and even authoritative-shape
-news reporting can be outdated or describe a different feature.
-Convergent third-party sources can be convergently wrong on
-vendor policy because they all source from the same outdated-or-
-misinterpreted upstream. Always corroborate against the vendor's
-help-center pages directly; if a help-center fetch returns 403,
-the right move is to escalate to someone who can pull it
-authoritatively (Athena via Olivia in this case), not to fall
-back on whichever URLs the WebFetch tool will retrieve.
-Banked from the 2026-05-11 ChatGPT-MCP tier verification: Iris's
-read pulled developers.openai.com + InfoQ, converged on a
-permissive answer ('Plus + Pro eligible for full MCP'). Olivia
-pulled help.openai.com pages, got the stricter current truth
-(Plus walled; Pro read-only; Business+ for full coordination).
-The convergent-third-party agreement felt like high signal; it
-was. The signal was that those sources all sourced from each
-other, not that the answer was right.
+help-center IS the authoritative source — and cite the
+provenance accurately.** Developer-docs guides, third-party
+aggregators, blog posts, and even authoritative-shape news
+reporting can be outdated or describe a different feature.
+Convergent third-party sources can be convergently wrong because
+they all source from the same outdated-or-misinterpreted
+upstream.
+
+Workflow when verifying:
+
+1. WebFetch the vendor's help-center URL first. Live page is the
+   ground truth.
+2. If WebFetch returns 403 (some vendors block automated reads of
+   help-center articles), fall back to WebSearch with a
+   `site:help.<vendor>.com` filter. The returned snippets are
+   indexed/cached content from the help-center, not live page
+   reads. Cross-reference multiple snippet returns where possible
+   to detect staleness.
+3. Cite the actual content provenance in any downstream
+   communication. "Per help.openai.com snippets indexed
+   YYYY-MM-DD" is honest; "verified against help.openai.com" is
+   not, if the live page is unreachable. The URL being
+   authoritative does NOT imply you read the live page.
+4. When Pass-N copy goes out, attempt a fresh live read from a
+   different IP / signed-in browser / mobile session if anyone
+   has that access. If the live read disagrees with the
+   snippet-sourced matrix, the live read wins.
+
+Banked from the 2026-05-11 ChatGPT-MCP tier verification arc:
+Iris's first pass pulled developers.openai.com + InfoQ, converged
+on a permissive answer ("Plus + Pro eligible for full MCP").
+Athena routed to Olivia, who pulled the stricter matrix via
+`site:help.openai.com` WebSearch snippets — not live page fetch
+(WebFetch 403'd for her too). Iris cross-checked the same
+snippets from her own surface and converged with Olivia. The
+matrix is most likely current but snippet-sourced; live
+verification still pending.
+
+The double failure mode worth carrying forward:
+- Convergent third-party sources can be convergently wrong
+  (Iris's first pass).
+- Convergent help-center snippets can be cited as if they were
+  live-page reads when they are not (the framing trap Athena
+  caught second).
 
 **Customer-shape verification before authoring landing-copy.**
 Before authoring any landing-page section that addresses
