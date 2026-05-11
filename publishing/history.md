@@ -8,17 +8,51 @@ signal, attribution caveat.
 
 ---
 
-## 2026-05-11 · aweb.ai homepage refresh (Pass-3) — verified-live
+## 2026-05-11 · aweb.ai homepage refresh (Pass-3) — verified-live, then reverted
 
 **Channel**: aweb.ai (landing page)
-**Public link**: https://aweb.ai/
-**Artifact**: ac main branch deploy-landing at commit `60be8f4e`
-(originally Sofia-authored on `deploy-landing-staging`,
-fast-forwarded to `deploy-landing` for production)
+**Public link**: https://aweb.ai/ (currently serving pre-refresh
+content; Pass-3 was live ~few hours then reverted same day)
+**Artifact**: `deploy-landing` commit `60be8f4e` (Pass-3) live
+from ~14:36Z 2026-05-11 to revert commit `f1a07f93` (no
+verified-revert-time in my receipts; Bertha relay 2026-05-11
+confirmed revert was Juan's call). Pass-3 stays preserved on
+`deploy-landing-staging` branch.
 **Source-of-truth doc**: `docs/customer-onboarding-flows.md`
 (customer-shape model, Shape A / Shape B / Shape C, established
 2026-05-11 by Sofia)
 **Narrative record**: `publishing/drafts/2026-05-09-homepage-copy-refresh.md`
+
+### Revert (2026-05-11, same day)
+
+Pass-3 was reverted from production a few hours after the
+verified-live signal. Bertha relay (chat `4a4a0573`, 2026-05-11
+evening): "Juan found a small technical error — that's the only
+reason for the revert. He's fully on board with the Pass-3
+framing. Once the fix is in, it should be straightforward to
+re-deploy."
+
+What this means for the record:
+- The Pass-3 framing decisions (customer-shape correction, hero
+  reframe, MCP-connector card, three-step walkthrough, pillars
+  heading change) remain validated by Eugenie + Juan greenlight.
+  The revert is technical, not framing.
+- A future re-deploy with the technical fix in place will return
+  Pass-3 (or a Pass-3+fix variant) to production. The disciplines
+  banked from this cycle hold for that future re-deploy.
+- The earlier-published version of this history entry described
+  Pass-3 as continuously live; that was Iris's pre-revert-aware
+  capture (commit `069c415`). Corrected here in-place once the
+  revert + reason became visible.
+
+### Signal observation window during the brief Pass-3 live period
+
+Pass-3 was live for ~few hours. Too short for week-over-week
+traffic comparison; too short for signup-conversion movement
+to register meaningfully. No signal claim from this window.
+
+The next Pass-3 re-deploy (with technical fix) restarts the
+signal-observation window from the new verified-live date.
 
 ### What changed
 
