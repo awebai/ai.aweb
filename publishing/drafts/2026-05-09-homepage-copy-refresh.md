@@ -7,6 +7,62 @@ brief: "Bertha chat 53251bb9 (2026-05-08); Athena pre-flight 2f9cd979 (2026-05-0
 brand: "aweb (lowercase) per existing site convention"
 ---
 
+## Pass-4 constraints (carry into next-cycle edits)
+
+When the technical-fix re-deploy of Pass-3 unblocks the wire-in
+path, the following constraints apply to any Pass-4 edit:
+
+1. **ChatGPT-tier framing (from Athena mail a128cf12 + Iris/Olivia
+   snippet cross-check, 2026-05-11):** pill stays "ChatGPT" with
+   no tier annotation. Footnote or per-client snippet carries:
+   *"ChatGPT custom MCP requires Business, Enterprise, or
+   Education tier with Developer Mode enabled by a workspace
+   admin. Free, Plus, and Pro personal subscribers cannot use
+   aweb on ChatGPT today. Pro can read replies but cannot send.
+   Currently in beta, web only."* Per-client signup snippet for
+   ChatGPT names the tier constraint upfront so non-enterprise
+   readers redirect to Claude immediately. Provenance:
+   snippet-sourced from help.openai.com via WebSearch site:
+   filter, two independent pulls converged (Olivia's + Iris's),
+   not live-page-confirmed.
+
+2. **Consumer signup copy is provider-agnostic (from Athena mail
+   34a268fc, 2026-05-11):** any copy that references the signup
+   flow uses provider-agnostic framing — "Sign in or create an
+   account" or similar — NOT "Sign in with Google" or any
+   single-provider phrasing. The /register flow today offers
+   Google + GitHub + email/password; the homepage copy must not
+   imply Google-only. Material for Apple-ecosystem audience and
+   EU/privacy-conscious customers that the Google-only framing
+   would have excluded.
+
+3. **Hero CTA copy direction (from Bertha relay via Athena
+   56fc4e4a, 2026-05-11):** Eugenie's call is *"Add ChatGPT /
+   Claude / whatever AI you use"* — specific client names
+   rotating, replacing generic "Connect your AI." Inclusive +
+   concrete. Links to AC frontend picker at `app.aweb.ai/connect`
+   (Grace's aweb-aanp.8); coordinate with Grace on route target
+   once she's confirmed the surface via Playwright visual review.
+
+4. **Pepe-anonymous in any public outreach derivative (from
+   Bertha chat 4a4a0573 / Athena mail 56fc4e4a, 2026-05-11):**
+   any case-study or voice-work derivative of the autonomous-
+   install arc anonymizes Pepe. Default framing: "an early user"
+   / "a private-tester" / "an early customer attempting
+   autonomous install." Same default for future private-beta
+   customers unless explicitly cleared.
+
+5. **Source-of-truth doc paths:** Sofia named
+   `docs/customer-onboarding-flows.md` as the customer-shape
+   source-of-truth (Shape A / B / C); as of 2026-05-11 evening
+   that file is in 'deleted' state on Sofia's working tree
+   pending Juan's input on whether the deletion was intentional.
+   If the doc moves or is recreated at a different path, Pass-4
+   author re-threads the reference from the bundle + AGENTS.md
+   discipline.
+
+---
+
 ## Pass-3 update (2026-05-11)
 
 This file was originally drafted as a wire-in spec for Hestia.
