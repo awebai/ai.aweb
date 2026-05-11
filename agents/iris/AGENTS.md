@@ -105,6 +105,27 @@ Iris's responsibility was to flag the stall back to direction;
 that didn't happen, so direction operated on assumed ship-state
 through the fix window.
 
+**For external-vendor policy verification (tier requirements,
+feature availability, RBAC scope, etc.), the vendor's own
+help-center IS the authoritative source.** Developer-docs guides,
+third-party aggregators, blog posts, and even authoritative-shape
+news reporting can be outdated or describe a different feature.
+Convergent third-party sources can be convergently wrong on
+vendor policy because they all source from the same outdated-or-
+misinterpreted upstream. Always corroborate against the vendor's
+help-center pages directly; if a help-center fetch returns 403,
+the right move is to escalate to someone who can pull it
+authoritatively (Athena via Olivia in this case), not to fall
+back on whichever URLs the WebFetch tool will retrieve.
+Banked from the 2026-05-11 ChatGPT-MCP tier verification: Iris's
+read pulled developers.openai.com + InfoQ, converged on a
+permissive answer ('Plus + Pro eligible for full MCP'). Olivia
+pulled help.openai.com pages, got the stricter current truth
+(Plus walled; Pro read-only; Business+ for full coordination).
+The convergent-third-party agreement felt like high signal; it
+was. The signal was that those sources all sourced from each
+other, not that the answer was right.
+
 **Customer-shape verification before authoring landing-copy.**
 Before authoring any landing-page section that addresses
 onboarding or installation, identify which onboarding shape
