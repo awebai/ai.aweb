@@ -1,0 +1,400 @@
+#!/usr/bin/env python3
+"""
+Score the aweb UX surface inventory against persona priorities.
+
+Reads personas.yaml + surfaces.yaml from this directory. Computes
+per-surface value V(S) under both linear and exponential weighting
+schemes, categorizes each surface, identifies vocabulary-friction
+candidates, and writes ux-surface-report.md.
+
+Model:
+  V(S) = sum_P [ W(P) * I(S, P) ]
+  W(P): persona priority weight (linear or exponential)
+  I(S, P): intensity of surface S for persona P (0..3)
+
+Categorization rules (per weighting scheme):
+  DEPRECATED — explicit flag
+  REDUNDANT  — surface duplicates another (redundant_with set)
+  DEAD       — max intensity = 0 across all personas
+  REQUIRED_INFRA — V(S) below cut threshold but required_for non-empty
+  CUT_CANDIDATE  — V(S) below cut threshold and not required
+  REVIEW     — V(S) between cut and focus thresholds
+  KEEP       — V(S) in keep band with required_for set
+  FOCUS      — V(S) at or above focus threshold
+
+Thresholds are fractions of the max score in the dataset (current
+weighting), not absolute. Two surfaces that are close calls under one
+weighting may differ under the other — those are the discussion points.
+
+Run from agents/sofia/ux/:
+    uv run --with PyYAML python score.py
+"""
+from __future__ import annotations
+
+from pathlib import Path
+from collections import defaultdict
+import yaml
+
+HERE = Path(__file__).parent
+PERSONAS_FILE = HERE / "personas.yaml"
+SURFACES_FILE = HERE / "surfaces.yaml"
+REPORT_FILE = HERE / "ux-surface-report.md"
+
+FOCUS_FRACTION = 0.6   # V(S) >= max * 0.6 -> FOCUS
+CUT_FRACTION   = 0.20  # V(S) <  max * 0.20 -> CUT_CANDIDATE (or REQUIRED_INFRA)
+
+
+def load_data():
+    with PERSONAS_FILE.open() as f:
+        personas_doc = yaml.safe_load(f)
+    with SURFACES_FILE.open() as f:
+        surfaces_doc = yaml.safe_load(f)
+    return personas_doc, surfaces_doc
+
+
+def weights(personas_doc, field: str) -> dict[str, int]:
+    return {p: meta[field] for p, meta in personas_doc["personas"].items()}
+
+
+def score(surface: dict, w: dict[str, int]) -> int:
+    intensity = surface.get("intensity") or {}
+    return sum(w[p] * intensity.get(p, 0) for p in w)
+
+
+def categorize(surface: dict, v: int, max_v: int) -> str:
+    if surface.get("deprecated"):
+        return "DEPRECATED"
+    if surface.get("redundant_with"):
+        return "REDUNDANT"
+    intensity = surface.get("intensity") or {}
+    if not intensity or max(intensity.values()) == 0:
+        return "DEAD"
+    required = bool(surface.get("required_for"))
+    focus_threshold = max_v * FOCUS_FRACTION
+    cut_threshold = max_v * CUT_FRACTION
+    if v >= focus_threshold:
+        return "FOCUS"
+    if v < cut_threshold:
+        return "REQUIRED_INFRA" if required else "CUT_CANDIDATE"
+    return "KEEP" if required else "REVIEW"
+
+
+def vocabulary_friction_rows(surfaces: list[dict]) -> list[dict]:
+    rows = []
+    for s in surfaces:
+        vf = s.get("vocabulary_friction") or []
+        if vf:
+            rows.append({"id": s["id"], "name": s["name"],
+                          "location": s.get("location"), "personas": vf})
+    return rows
+
+
+def primary_persona(surface: dict) -> str:
+    intensity = surface.get("intensity") or {}
+    if not intensity:
+        return "—"
+    best_p = max(intensity, key=lambda p: intensity[p])
+    if intensity[best_p] == 0:
+        return "—"
+    # tie-break: priority order P1 > P2 > P3 > P4
+    priority = ["P1", "P2", "P3", "P4"]
+    top_value = intensity[best_p]
+    tied = [p for p in priority if intensity.get(p, 0) == top_value]
+    return tied[0]
+
+
+def category_summary(surfaces: list[dict], cat_key: str) -> dict[str, int]:
+    counts: dict[str, int] = defaultdict(int)
+    for s in surfaces:
+        counts[s[cat_key]] += 1
+    return dict(counts)
+
+
+def render_md_table(rows: list[list[str]], headers: list[str]) -> str:
+    lines = ["| " + " | ".join(headers) + " |",
+             "|" + "|".join(["---"] * len(headers)) + "|"]
+    for row in rows:
+        lines.append("| " + " | ".join(str(c) for c in row) + " |")
+    return "\n".join(lines)
+
+
+def build_report(personas_doc: dict, surfaces: list[dict]) -> str:
+    w_lin = weights(personas_doc, "weight_linear")
+    w_exp = weights(personas_doc, "weight_exponential")
+
+    for s in surfaces:
+        s["V_lin"] = score(s, w_lin)
+        s["V_exp"] = score(s, w_exp)
+
+    v_lin_values: list[int] = [s["V_lin"] for s in surfaces]
+    v_exp_values: list[int] = [s["V_exp"] for s in surfaces]
+    max_lin: int = max(v_lin_values) if v_lin_values else 1
+    max_exp: int = max(v_exp_values) if v_exp_values else 1
+
+    for s in surfaces:
+        s["cat_lin"] = categorize(s, s["V_lin"], max_lin)
+        s["cat_exp"] = categorize(s, s["V_exp"], max_exp)
+        s["primary"] = primary_persona(s)
+        s["category_changes"] = s["cat_lin"] != s["cat_exp"]
+
+    out: list[str] = []
+    out.append("# UX surface prioritization report")
+    out.append("")
+    out.append("Generated by `agents/sofia/ux/score.py` from "
+               "`personas.yaml` + `surfaces.yaml`. Re-run after editing "
+               "either file.")
+    out.append("")
+    out.append(f"- Total surfaces scored: **{len(surfaces)}**")
+    out.append(f"- Max V(S) under linear weights: **{max_lin}**")
+    out.append(f"- Max V(S) under exponential weights: **{max_exp}**")
+    out.append(f"- Focus threshold: V(S) >= max × {FOCUS_FRACTION}")
+    out.append(f"- Cut threshold:   V(S) <  max × {CUT_FRACTION}")
+    out.append("")
+
+    # Persona weights table
+    out.append("## Persona weights in use")
+    out.append("")
+    rows = []
+    for p, meta in personas_doc["personas"].items():
+        rows.append([p, meta["name"], meta["priority"],
+                      meta["weight_linear"], meta["weight_exponential"]])
+    out.append(render_md_table(rows,
+        ["Persona", "Name", "Priority", "W_linear", "W_exponential"]))
+    out.append("")
+
+    # Category counts
+    out.append("## Category counts")
+    out.append("")
+    counts_lin = category_summary(surfaces, "cat_lin")
+    counts_exp = category_summary(surfaces, "cat_exp")
+    all_cats = sorted(set(counts_lin) | set(counts_exp))
+    rows = [[c, counts_lin.get(c, 0), counts_exp.get(c, 0)] for c in all_cats]
+    out.append(render_md_table(rows, ["Category", "Linear", "Exponential"]))
+    out.append("")
+    out.append("Categories: FOCUS = keep, polish, promote. KEEP = required & "
+               "valued. REVIEW = mid-range, judgment call. REQUIRED_INFRA = "
+               "low V(S) but required for a journey (e.g., /login). "
+               "CUT_CANDIDATE = low V(S), not required, real cut target. "
+               "REDUNDANT = duplicates another surface. DEPRECATED = "
+               "explicit flag. DEAD = no persona uses it.")
+    out.append("")
+
+    # Surfaces that change category under different weighting — close calls
+    flipped = [s for s in surfaces if s["category_changes"]]
+    out.append("## Close calls — category changes between weighting schemes")
+    out.append("")
+    if flipped:
+        out.append(f"{len(flipped)} surface(s) land in different categories "
+                   "under linear vs. exponential weights. These are the "
+                   "surfaces whose cut/keep call depends on how hard we "
+                   "favor P1. Discuss before acting.")
+        out.append("")
+        rows = [[s["id"], s["name"], s["V_lin"], s["cat_lin"],
+                 s["V_exp"], s["cat_exp"]] for s in flipped]
+        out.append(render_md_table(rows,
+            ["id", "name", "V_lin", "linear", "V_exp", "exponential"]))
+    else:
+        out.append("None — all surfaces land in the same category under "
+                   "both weighting schemes.")
+    out.append("")
+
+    # Actionable cuts vs. low-leverage-but-not-abandoned
+    cut_lin = [s for s in surfaces if s["cat_lin"] == "CUT_CANDIDATE"]
+    cut_exp = [s for s in surfaces if s["cat_exp"] == "CUT_CANDIDATE"]
+    cut_union = sorted({s["id"]: s for s in cut_lin + cut_exp}.values(),
+                        key=lambda s: s["V_lin"])
+
+    # Primary-persona split: actionable cuts are surfaces whose primary
+    # persona is P1 or P2 (the personas being optimized for). If those
+    # land in CUT_CANDIDATE we've built something the priority personas
+    # don't need. CUT_CANDIDATE with P3/P4 primary means "low aggregate
+    # leverage" — which is what the math says given the weights — but is
+    # NOT actionable as a cut, because P3 stays load-bearing per the
+    # 2026-05-12 decision and P4 still anchors the protocol layer.
+    actionable_cuts = [s for s in cut_union
+                       if s["primary"] in ("P1", "P2")]
+    low_leverage_kept = [s for s in cut_union
+                          if s["primary"] in ("P3", "P4")]
+
+    out.append("## Actionable cuts")
+    out.append("")
+    out.append("Surfaces whose primary persona is P1 or P2 AND that land "
+               "in CUT_CANDIDATE under either weighting. These are real "
+               "cut candidates — we built something the priority personas "
+               "don't need.")
+    out.append("")
+    if actionable_cuts:
+        rows = [[s["id"], s["name"], s.get("location", ""),
+                 s["primary"], s["V_lin"], s["V_exp"]]
+                for s in actionable_cuts]
+        out.append(render_md_table(rows,
+            ["id", "name", "location", "primary persona",
+             "V_lin", "V_exp"]))
+    else:
+        out.append("**None.** No surfaces in CUT_CANDIDATE have P1 or P2 "
+                   "as primary persona. That's a positive signal: we "
+                   "haven't built focus-tier things that the priority "
+                   "personas don't actually use.")
+    out.append("")
+
+    out.append("## Low-leverage surfaces (not actionable cuts)")
+    out.append("")
+    out.append(f"{len(low_leverage_kept)} surface(s) score as "
+               "CUT_CANDIDATE on the math but primarily serve P3 or P4. "
+               "Per the 2026-05-12 decision, P3 stays load-bearing as "
+               "the architectural anchor (44 internal users today) and "
+               "P4 anchors the protocol layer. These are NOT cuts — they "
+               "exist because they serve their persona, and the math is "
+               "correctly reporting that they don't contribute much to "
+               "the P1/P2 funnel. Useful as the inventory of \"surfaces "
+               "we won't promote on the landing page or in P1/P2 "
+               "onboarding\" — i.e., things that stay buried in CLI / "
+               "developer docs / advanced settings.")
+    out.append("")
+    if low_leverage_kept:
+        rows = [[s["id"], s["name"], s.get("location", ""),
+                 s["primary"], s["V_lin"], s["V_exp"]]
+                for s in low_leverage_kept]
+        out.append(render_md_table(rows,
+            ["id", "name", "location", "primary persona",
+             "V_lin", "V_exp"]))
+    out.append("")
+
+    # Redundant / deprecated surfaces — explicit cut list
+    redundant = [s for s in surfaces if s["cat_lin"] == "REDUNDANT"]
+    deprecated = [s for s in surfaces if s["cat_lin"] == "DEPRECATED"]
+    out.append("## Redundant + deprecated surfaces")
+    out.append("")
+    out.append("Explicit cuts independent of scoring — flagged in YAML.")
+    out.append("")
+    if redundant:
+        out.append("### Redundant (duplicates of another surface)")
+        rows = [[s["id"], s["name"], s.get("redundant_with", ""),
+                 s.get("notes", "")] for s in redundant]
+        out.append(render_md_table(rows,
+            ["id", "name", "duplicates", "notes"]))
+        out.append("")
+    if deprecated:
+        out.append("### Deprecated (explicit flag)")
+        rows = [[s["id"], s["name"], s.get("notes", "")]
+                for s in deprecated]
+        out.append(render_md_table(rows, ["id", "name", "notes"]))
+        out.append("")
+
+    # Focus surfaces — what to polish
+    focus = [s for s in surfaces if s["cat_lin"] == "FOCUS"]
+    focus.sort(key=lambda s: -s["V_lin"])
+    out.append("## Focus surfaces (top value under linear weighting)")
+    out.append("")
+    out.append(f"{len(focus)} surface(s) at FOCUS category under linear "
+               "weighting. These are the surfaces where polish, promotion, "
+               "and vocabulary alignment with the priority personas "
+               "matter most.")
+    out.append("")
+    rows = [[s["id"], s["name"], s.get("location", ""),
+             s["primary"], s["V_lin"], s["V_exp"]] for s in focus]
+    out.append(render_md_table(rows,
+        ["id", "name", "location", "primary persona",
+         "V_lin", "V_exp"]))
+    out.append("")
+
+    # Vocabulary friction
+    vf = vocabulary_friction_rows(surfaces)
+    out.append("## Vocabulary friction surfaces")
+    out.append("")
+    out.append("Surfaces whose words violate a persona's "
+               "`vocabulary_do_not_introduce` list. NOT a cut signal — a "
+               "reframing signal. Friction in a FOCUS surface for P1 is "
+               "a real problem; friction in a CUT_CANDIDATE is moot.")
+    out.append("")
+    if vf:
+        rows = []
+        # join surface metadata for V values
+        idx = {s["id"]: s for s in surfaces}
+        for entry in vf:
+            s = idx[entry["id"]]
+            rows.append([s["id"], s["name"], s.get("location", ""),
+                         ", ".join(entry["personas"]),
+                         s["cat_lin"], s["V_lin"]])
+        rows.sort(key=lambda r: (-r[5]))  # highest-value friction first
+        out.append(render_md_table(rows,
+            ["id", "name", "location", "friction for",
+             "category", "V_lin"]))
+    else:
+        out.append("None.")
+    out.append("")
+
+    # Persona coverage — for each persona, what's their score distribution
+    out.append("## Per-persona coverage")
+    out.append("")
+    out.append("Sum of intensity scores per persona, plus count of surfaces "
+               "that primarily serve them. Low per-persona coverage on a "
+               "high-priority persona is a gap signal.")
+    out.append("")
+    persona_intensity_sum = defaultdict(int)
+    persona_primary_count = defaultdict(int)
+    for s in surfaces:
+        if s.get("deprecated") or s.get("redundant_with"):
+            continue
+        intensity = s.get("intensity") or {}
+        for p, v in intensity.items():
+            persona_intensity_sum[p] += v
+        primary = s["primary"]
+        if primary != "—":
+            persona_primary_count[primary] += 1
+    rows = []
+    for p, meta in personas_doc["personas"].items():
+        rows.append([p, meta["name"], meta["priority"],
+                      persona_intensity_sum.get(p, 0),
+                      persona_primary_count.get(p, 0)])
+    out.append(render_md_table(rows,
+        ["Persona", "Name", "Priority",
+         "Total intensity (sum over surfaces)",
+         "Surfaces where this persona is primary"]))
+    out.append("")
+
+    # Full table — all surfaces with their scores and categories
+    out.append("## Full scored inventory")
+    out.append("")
+    out.append("All surfaces with V(S) and category under both weighting "
+               "schemes. Sorted by V_lin descending.")
+    out.append("")
+    surfaces_sorted = sorted(surfaces, key=lambda s: -s["V_lin"])
+    rows = []
+    for s in surfaces_sorted:
+        intensity = s.get("intensity") or {}
+        intensity_str = "/".join(str(intensity.get(p, 0))
+                                  for p in ["P1", "P2", "P3", "P4"])
+        rows.append([s["id"], s["name"], s.get("location", ""),
+                      intensity_str, s["V_lin"], s["cat_lin"],
+                      s["V_exp"], s["cat_exp"]])
+    out.append(render_md_table(rows,
+        ["id", "name", "location",
+         "I (P1/P2/P3/P4)", "V_lin", "linear cat",
+         "V_exp", "exp cat"]))
+    out.append("")
+
+    out.append("---")
+    out.append("")
+    out.append("**Methodology limits**: intensity values are judgments from "
+               "the inventory + persona reasoning, not telemetry. The math "
+               "is precise; the inputs are not. Treat as a structured "
+               "prioritization aid, not a measurement. Two reasonable "
+               "people will disagree on whether a tab is intensity-2 or "
+               "intensity-3 for a persona — when that disagreement matters "
+               "for the cut/keep call, surface it and pick deliberately.")
+
+    return "\n".join(out) + "\n"
+
+
+def main():
+    personas_doc, surfaces_doc = load_data()
+    surfaces = list(surfaces_doc["surfaces"])
+    report = build_report(personas_doc, surfaces)
+    REPORT_FILE.write_text(report)
+    print(f"Wrote {REPORT_FILE}")
+    print(f"Scored {len(surfaces)} surfaces.")
+
+
+if __name__ == "__main__":
+    main()

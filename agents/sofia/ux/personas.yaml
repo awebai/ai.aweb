@@ -1,0 +1,59 @@
+# Persona definitions for UX surface scoring.
+# Canonical persona definitions live in docs/audiences.md.
+# Priority ordering set in docs/decisions.md 2026-05-12.
+#
+# weight_linear: equal-increment weights (conservative read of priority)
+# weight_exponential: each priority step doubles weight (favors P1 hard)
+# Surface scores computed under both schemes; surfaces that change
+# category between them are the close calls worth discussing.
+
+personas:
+  P1:
+    name: "Personal-AI consumer"
+    priority: 1
+    weight_linear: 4
+    weight_exponential: 8
+    short: "consumer"
+    vocabulary_do_not_introduce:
+      - team
+      - role
+      - namespace
+      - controller
+      - certificate
+      - "team cert"
+      - "did:aw"
+      - DNS
+      - "agent identity"
+      - workspace
+      - cli
+
+  P2:
+    name: "Company with AI-using employees"
+    priority: 2
+    weight_linear: 3
+    weight_exponential: 4
+    short: "company"
+    vocabulary_do_not_introduce:
+      - controller
+      - "did:aw"
+
+  P3:
+    name: "Developer team"
+    priority: 3
+    weight_linear: 2
+    weight_exponential: 2
+    short: "dev"
+    vocabulary_do_not_introduce: []
+
+  P4:
+    name: "Platform builder / self-host"
+    priority: 4
+    weight_linear: 1
+    weight_exponential: 1
+    short: "platform"
+    vocabulary_do_not_introduce: []
+
+# Reference docs for what these personas mean and why they're ordered this way.
+reference:
+  persona_definitions: docs/audiences.md
+  priority_decision: "docs/decisions.md (2026-05-12)"
