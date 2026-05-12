@@ -6,6 +6,20 @@
 # weight_exponential: each priority step doubles weight (favors P1 hard)
 # Surface scores computed under both schemes; surfaces that change
 # category between them are the close calls worth discussing.
+#
+# role_for_weights: maps the qualitative role taxonomy (used in
+# surfaces.yaml) to numeric weights for V(S) computation. Note that
+# `friction` and `harmful` contribute 0 to V(S) — those signals flow
+# through the per-persona action lists (HIDE_FOR / REFRAME_FOR), NOT
+# through the aggregate value score. Two distinct dimensions.
+
+role_for_weights:
+  essential: 4    # persona cannot function without this surface
+  heavy: 3        # used often, core to the persona's workflow
+  useful: 2       # used occasionally, valued when needed
+  irrelevant: 0   # not used; not in the way (invisible / hidden)
+  friction: 0     # visible but unused; cognitive load -> HIDE_FOR
+  harmful: 0      # breaks mental model (vocab leak / wrong frame) -> REFRAME_FOR
 
 personas:
   P1:
