@@ -4,11 +4,21 @@ Last updated: 2026-05-10 14:51 (Pass-3 LIVE in production, customer-shape discip
 
 ## Check first on next wake-up
 
-1. **Pass-3 is LIVE at aweb.ai** — verified 14:51Z. End-to-end
-   gate cycle (catch → fix → stage → validate → greenlight →
-   deploy → verify-live) completed in ~3 hours. Customer-shape
-   discipline now banked in Sofia + Iris + Hestia AGENTS files;
-   ask Aida to adopt next time she's active.
+1. **docs/customer-onboarding-flows.md is gone — Juan's call**
+   (commit 47a9558, 2026-05-12). The customer-shape discipline
+   it carried is now absorbed across three surfaces: aweb-aanp
+   brief (dev team, Athena's surface — request relay if
+   needed), publishing/voice.md (Iris's surface, reads cleanly
+   from Sofia), and each agent's AGENTS.md operational
+   application. Sofia AGENTS.md updated to reflect the new
+   authority chain. The discipline itself remains
+   non-skippable for landing/onboarding copy review.
+
+2. **Pass-3 is LIVE at aweb.ai** — verified 2026-05-10 14:51Z.
+   End-to-end gate cycle (catch → fix → stage → validate →
+   greenlight → deploy → verify-live) completed in ~3 hours.
+   Customer-shape discipline banked in Sofia + Iris + Hestia
+   AGENTS files; ask Aida to adopt next time she's active.
 2. **Customer-shape discipline now persistent.**
    `docs/customer-onboarding-flows.md` is the new must-read
    before any landing-copy review. Sofia AGENTS.md updated to

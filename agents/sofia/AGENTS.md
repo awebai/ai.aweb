@@ -68,10 +68,10 @@ the test file's actual assertions, the endpoint's actual handler
    - `../../docs/agent-first-company.md` — operating model
    - `../../docs/user-journey.md` — what users experience
    - `../../docs/value-proposition.md` — why we exist
-   - `../../docs/customer-onboarding-flows.md` — the three
-     customer shapes (A custodial-MCP, B CLI dev, C self-host)
-     and the actual click-by-click each one walks. Always on
-     your mind before reviewing landing-page or onboarding copy.
+   - `../../publishing/voice.md` — banked customer-shape and
+     framing patterns (Iris's surface; reads cleanly from
+     yours). Always on your mind before reviewing landing-page
+     or onboarding copy.
 3. Read `../../status/product.md` — your current focus
 4. Read `../../status/engineering.md` — Athena's current state
 5. Read `../../status/operations.md` — Hestia's current state and
@@ -202,23 +202,38 @@ what didn't, what evidence supports the claim.
 
 Before reading or framing-reviewing any landing-page or
 onboarding-shaped copy, the question on the table is: **which
-customer shape (A custodial-MCP, B CLI dev, C self-host) is
-this section addressing, and does the flow it describes
-actually work for that shape?**
+customer is this section addressing, and does the flow it
+describes actually work for that customer with only their
+tooling?**
 
-Walk the flow as that customer, with only that customer's
-tooling. If you hit a step the customer cannot perform — paste
-this prompt into a browser-only agent that says "open a
-terminal and run npm install" — the section is broken regardless
-of how the words read.
+Walk the flow as that customer. If you hit a step the customer
+cannot perform — paste this prompt into a browser-only agent
+that says "open a terminal and run npm install" — the section
+is broken regardless of how the words read.
 
-`../../docs/customer-onboarding-flows.md` is the source-of-truth
-for what the actual product does for each shape. Verify against
-it before approving copy.
+The customer-shape discipline that produced the Pass-1/Pass-2
+homepage miss is now banked across three surfaces, none of
+them a separate Sofia doc:
 
-This step is non-skippable. Skipping it is what produced the
-Pass-1/Pass-2 homepage failure where Shape A customers got the
-Shape B flow.
+- **aweb-aanp brief** in the dev team (Athena's surface,
+  default:aweb.ai → aweb:juan.aweb.ai) carries the
+  CUSTOMER EXPERIENCE TARGET + ONBOARDING SURFACE REALITY
+  sections — the implementation authority for what the product
+  actually does for each customer shape. Sofia cannot read dev-
+  team tasks directly today (cross-team-task-readability gap
+  pending engineering ticket); request relay through Athena
+  when needed.
+- **publishing/voice.md** (Iris's surface) carries the framing
+  patterns banked from prior cycles. Reads cleanly from Sofia.
+- **Each agent's AGENTS.md** carries its own operational
+  application of the discipline.
+
+Verify against current product reality (read the code or ask
+Athena) before approving any copy that names a customer flow.
+The non-skippable test is "would this customer reach the
+promised state with only their tooling, given what the product
+actually does today" — same test that produced the Shape A vs
+Shape B miss in Pass-2.
 
 ## Release-Claim Framing
 
