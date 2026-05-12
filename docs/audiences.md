@@ -39,6 +39,17 @@ entry for 2026-05-12.
 - Missing: what specific MCP-capable clients each consumer-shaped
   persona uses most (ChatGPT vs claude.ai vs Claude Desktop vs
   Gemini split).
+- Missing: conversation-breakdown behind the 2026-05-12 reorder
+  — how many of the conversations that drove the call were
+  P1-shaped vs P2-shaped. Iris flagged in mail
+  (conv 345f95bb): P2 may be leaning on a small anchor set.
+- Persona 2 blockers we have not yet probed: many companies
+  today block AI tools (data-leakage policy), sanction one
+  specific tool (enterprise ChatGPT), or have employees using
+  AI off-the-books. In none of those is the company actively
+  seeking inter-AI messaging. Whether a meaningful subset of
+  companies is asking for what P2 describes is currently an
+  open question.
 
 ---
 
@@ -55,16 +66,26 @@ daily for life logistics, research, writing, planning.
 
 ### What she wants
 
-Her AI to be a personal assistant **connected to her friends'
+Her AI to be a personal assistant **connected to other people's
 AIs**. The mental model is:
 
 - *My AI has a name.*
 - *My AI has an address.*
-- *My AI can talk to my friends' AIs.*
+- *My AI can talk to other people's AIs.*
 - *Only the AIs of people I define as contacts can reach me.*
 
 Those are the four concepts she understands. Everything else is
 product noise.
+
+**Note on framing**: the *friends* register ("my AI can talk to
+my friends' AIs") tested well in the Bertha gift-language
+context but is not the canonical framing. Some P1 segments will
+read better in different registers — *hand-off* ("my AI can hand
+off to another AI"), *third-person* ("my AI shows up in someone
+else's AI"), or *task-shaped* ("my AI can ask another AI
+something on my behalf"). The mental model above stays neutral;
+derivative copy picks a register and tests it before being
+committed across all P1 surfaces.
 
 ### What she does NOT want to know
 
@@ -84,14 +105,30 @@ address. The work to make this one-click is in the aweb-aanp epic
 + the OpenAI App Directory / Anthropic Connectors Directory
 packaging work (FUT-1, FUT-2).
 
-### Where she hangs out
+### Where she hangs out — by funnel distance
 
-- Twitter/X (consumer side, not devtool)
-- TikTok / Instagram / Threads (LLM-curious general public)
-- Reddit `r/ChatGPT`, `r/ClaudeAI`, `r/singularity` (consumer side)
+The persona is broadly present across consumer-AI channels, but
+conversion distance from "saw a post" to "wired up an MCP
+connector" varies a lot by channel. Lead with cheaper-funnel
+channels; treat broader-reach channels as awareness tier only
+after earlier funnels show signal.
+
+**Cheaper funnel (lead here)**:
+- Twitter/X consumer side (not devtool side)
+- AI-newsletter audiences (general-audience, not technical)
+- Reddit `r/ChatGPT`, `r/ClaudeAI`, `r/singularity` (consumer
+  side) — high content-quality bar; needs substantive posts
 - Discord servers for the AI tools she uses
-- AI-newsletter audiences (general-audience newsletters, not
-  technical ones)
+
+**Awareness tier (after earlier funnels prove signal)**:
+- TikTok / Instagram / Threads — large LLM-curious audience but
+  far from "install MCP connector" intent. Multiple conversion
+  steps from short-form-social to product. Real reach but
+  expensive per conversion. Hold until cheaper funnels validate.
+
+The principle: spend the first content cycles where the
+audience is closer to the product mental model. Broaden once
+we know what story actually converts.
 
 ### What aweb must do for her, minimum viable
 
@@ -106,9 +143,18 @@ packaging work (FUT-1, FUT-2).
 
 ## Persona 2: Company with AI-using employees
 
-**Second priority.** Many people in a company, each with a
-personal browser/desktop AI, wanting those AIs to help with
-internal communication.
+**Second priority — hypothesis-level.** Many people in a company,
+each with a personal browser/desktop AI, wanting those AIs to
+help with internal communication.
+
+**Status of this persona**: hypothesis based on a small number of
+conversations; no observed customer evidence yet. Companies today
+commonly (a) block AI tools entirely, (b) sanction one specific
+tool (enterprise ChatGPT), or (c) have employees using AI
+off-the-books. In none of those is the company actively seeking
+inter-AI messaging. Whether a meaningful subset of companies is
+asking for what this persona describes is an open question.
+Worth probing before significant product work optimizes for P2.
 
 ### Who they are
 
