@@ -6,6 +6,102 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-12 — Persona priority reorder: consumer first, dev team third, platform builder last
+
+**Commit:** (this commit — adds personas 1+2 to `docs/audiences.md`
+and reframes the doc to "persona" terminology)
+
+**Decision maker:** Juan (founder call), with Sofia capturing.
+
+**What changed.** The persona ordering for likely-first-customer
+shifted. Old order (still implicit in much of the product, landing
+copy, and content):
+
+1. Developer teams coordinating agents
+2. Agent platform builders
+
+New order (effective 2026-05-12):
+
+1. **Personal-AI consumer** — individual ChatGPT / claude.ai /
+   Gemini user who wants her AI connected to her friends' AIs via
+   MCP. Doesn't want to know about teams, roles, or any identity
+   vocabulary. Mental model is {my AI, my address, my contacts,
+   who can reach me}.
+2. **Company with AI-using employees** — many employees each
+   running their own browser/desktop AI; company wants those AIs
+   to help the humans communicate. Custodial across the board.
+3. **Developer teams coordinating agents** — was #1; demoted to
+   #3. Still the persona with the most direct product-fit
+   evidence (44 internal users); still the architectural anchor;
+   no longer the lead persona for landing-copy / onboarding /
+   content priorities.
+4. **Agent platform builders** — was #2; demoted to last. Long-
+   term defensibility; no near-term product prioritization for
+   this persona.
+
+**Why.** Conversations over the past weeks (Juan + outreach
+contacts) indicate the consumer and company-fleet shapes are
+more likely first customers than developer teams. The two new
+personas share a UX shape: browser-based custodial MCP, no
+terminal, vocabulary limited to {address, contacts,
+reachability}. Both are already plausible without us building
+anything new on the protocol layer — the work is onboarding,
+packaging, and submission to the MCP-client directories.
+
+The dev-team persona stays load-bearing as the architectural
+anchor and the only persona with real product-fit evidence
+today. The reorder is about who we *reach first*, not who we
+*build for* — the architecture must continue to serve all four.
+
+**What it affects.**
+
+- **Product / engineering**: aweb-aanp epic + FUT-1 (Anthropic
+  Connectors Directory submission) + FUT-2 (OpenAI App
+  Directory submission) become higher priority. Dashboard
+  reframe — the 9 team-tabs assume a developer-team mental
+  model that's hostile to Persona 1; UX simplification pass
+  pending (Sofia + Athena).
+- **Landing copy**: the homepage Pass-3 framing was already in
+  the right direction (custodial-MCP first); next pass should
+  push further toward Persona 1 vocabulary and remove dev-team-
+  first signals from the hero / above-the-fold.
+- **Content / outreach (Iris)**: target audiences shift toward
+  consumer + company-fleet hangouts (consumer Reddit, AI
+  newsletters, LinkedIn for company-fleet decision-makers).
+  Voice guide carries the principles but the channel mix
+  changes.
+- **Support (Aida)**: runbook framing must expand beyond "what
+  CLI users hit"; consumer + company-fleet customers will not
+  have terminal-shaped questions.
+- **Analytics (Metis, when online)**: signal definitions for
+  persona-fit will include consumer + company-fleet shapes.
+- **Pricing / business model**: not changed by this reorder. To
+  be revisited as customer-fit evidence accumulates for the new
+  personas.
+
+**What is NOT changed.**
+
+- The architecture (four primitives, two product tiers, identity
+  trust chain).
+- The dogfooding work on Persona 3 (44 internal users on this
+  team's own workflow). That continues; it's what proves the
+  product works.
+- The voice guide principles (`publishing/voice.md`). Channel mix
+  shifts, voice doesn't.
+- Decision records and invariants for prior cycles.
+
+**Next motions queued.**
+
+1. Sofia + Athena converge on UX simplification implications
+   (the 9-tab dashboard, 25-command CLI, 45 MCP tools as seen
+   through the new persona lens). Working artifact:
+   `agents/sofia/ux-surface.md` + `agents/sofia/ux-surface.html`.
+2. Iris reorients content / outreach targeting once she's online.
+3. Aida absorbs Persona 1 + Persona 2 into runbook framing.
+4. Metis defines persona-fit signals once online.
+
+---
+
 ## 2026-05-06 — Messaging-architecture cycle close: aame epic + pagination fix verified end-to-end
 
 **Commit:** `3e9a378` Messaging-architecture cycle close: v0.5.23 verified-live + framing ready for distribution

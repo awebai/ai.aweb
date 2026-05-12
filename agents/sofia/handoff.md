@@ -1,10 +1,33 @@
 # Sofia Handoff
 
-Last updated: 2026-05-10 14:51 (Pass-3 LIVE in production, customer-shape discipline banked across team)
+Last updated: 2026-05-12 (persona priority reorder + UX simplification pass beginning)
 
 ## Check first on next wake-up
 
-1. **docs/customer-onboarding-flows.md is gone — Juan's call**
+1. **Persona priority reordered (2026-05-12, Juan's call).**
+   New ordering: Personal-AI consumer (P1) → Company with
+   AI-using employees (P2) → Developer team (P3, was #1) →
+   Platform builder (P4, was #2). Decision record at
+   `docs/decisions.md` 2026-05-12. `docs/audiences.md`
+   rewritten to add Personas 1+2 and reframe to "persona"
+   terminology. Architecture unchanged; what shifts is what
+   we reach first, what onboarding optimizes for, what
+   landing copy targets, what channels content goes through.
+
+2. **UX simplification pass in flight.** Working artifacts:
+   `agents/sofia/ux-surface.md` (inventory snapshot) +
+   `agents/sofia/ux-surface.html` (persona-colored surface
+   map). Athena mailed (conv 70f1c868) to converge on a
+   cut list before either of us proposes externally.
+   Specific simplification candidates listed in the mail:
+   the "Two Paths" duplication, /connect-in-two-places,
+   Identities-vs-Contacts overlap, auth-page near-dupes,
+   MCP duplicate verbs (contacts_list vs list_contacts,
+   wrap-tools), 3 first-time-user surfaces. Awaiting
+   Athena's read. Juan's next ask after that converges:
+   actually do the simplification cut.
+
+3. **docs/customer-onboarding-flows.md is gone — Juan's call**
    (commit 47a9558, 2026-05-12). The customer-shape discipline
    it carried is now absorbed across three surfaces: aweb-aanp
    brief (dev team, Athena's surface — request relay if

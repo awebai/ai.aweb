@@ -1,63 +1,51 @@
 # Product Status
 
-Last updated: 2026-05-10 14:51 (Sofia, Pass-3 homepage LIVE in production)
+Last updated: 2026-05-12 (Sofia, persona priority reorder + UX simplification pass beginning)
 
 ## Current focus
 
-**Homepage refresh Pass-3 deployed to PRODUCTION.**
-https://aweb.ai — independently verified live 14:51Z (Hestia
-deployed 14:36-14:39Z, mail ab09f148; Sofia spot-check via
-Playwright + curl confirmed all surface markers).
+**Persona priority reordered (decision record 2026-05-12).** New
+likely-first-customer ranking:
 
-End-to-end gate cycle completed in ~3 hours from Juan's catch
-to production:
-1. Juan caught the Pass-2 customer-shape miss via Playwright
-2. Sofia verified MCP onboarding flow against AC code
-   (Explore agent), wrote docs/customer-onboarding-flows.md
-3. Sofia authored Pass-3 to ac/site/ (commit 60be8f4e on
-   deploy-landing-staging)
-4. Render auto-staged at preview-urw1.onrender.com
-5. Bertha/Eugenie validation via Athena relay
-6. Juan greenlight
-7. Hestia force-pushed staging→deploy-landing; Render redeployed
-8. Hestia verify-live; Sofia independent verify
+1. Personal-AI consumer (was not previously named)
+2. Company with AI-using employees (was not previously named)
+3. Developer teams coordinating agents (was #1)
+4. Agent platform builders (was #2, now last)
 
-Earlier staging at https://preview-urw1.onrender.com.
+Conversations over the past weeks shifted Juan's read of who shows
+up first. The two new personas share a UX shape: browser-based
+custodial MCP, no terminal, vocabulary limited to {*my AI*,
+*my address*, *my contacts*, *who can reach me*}. Dev-team
+persona stays load-bearing as the architectural anchor and the
+only persona with real product-fit evidence (44 internal users),
+but is no longer the lead persona for landing-copy / onboarding /
+content priorities.
 
-Pass-3 fixes a customer-shape mismatch I missed for two staging
-cycles. The Pass-2 'No developer needed' section pitched Shape A
-(custodial-MCP, browser/desktop) customers but gave them a Shape B
-(CLI agent) flow — paste this prompt into your agent → agent runs
-shell commands. Browser agents cannot run shell commands. Dead end.
+`docs/audiences.md` rewritten to add Personas 1 and 2 and reframe
+to "persona" terminology. Decision record at `docs/decisions.md`
+2026-05-12.
 
-Juan caught the miss through Playwright. Pass-3 reauthors the
-customer-facing surface around the actual Shape A flow:
+**UX simplification pass beginning.** Working artifact:
+`agents/sofia/ux-surface.md` (inventory snapshot of all five
+user-facing surfaces: landing, auth, dashboard, CLI, MCP).
+HTML diagram with persona-colored surface map renders to
+`agents/sofia/ux-surface.html`. Next motion (after Athena reads
+the persona reorder): converge on which surfaces / sections /
+commands / tools to cut or demote to sharpen the experience for
+Personas 1 and 2 without breaking Personas 3 and 4.
 
-- Hero: H1 line-broken + 'AI agents'; subhead reframed around
-  Claude Desktop/ChatGPT/claude.ai; right column = 3-step MCP
-  connector card (replaces npm install)
-- 'Sign up' section: honest 3-step walkthrough (signup + hosted
-  identity → copy MCP URL → add to client + approve OAuth) with
-  per-client snippets for claude.ai/ChatGPT/Claude Desktop
-- 'Team quickstart' rebranded 'For developers'; agent-guide-paste
-  prompt landed there as Shape B alternative
-- 'Hosted MCP' block repurposed as MCP technical detail callout
+Surfaces that look most mismatched to the new top persona:
+- Dashboard's 9 team-tabs assume a developer-team mental model
+  hostile to Persona 1.
+- CLI's 25 top-level commands are invisible to Personas 1 and 2.
+- MCP's 45 tools (no `readOnlyHint`) are agent-facing and shape
+  Persona 1's first impression of "what my AI can do."
+- Landing homepage's 8 sections include redundant "Two Paths"
+  framings and competing CTAs that don't sharpen for Persona 1.
 
-Customer-shape model now persisted in
-`docs/customer-onboarding-flows.md` (Shape A custodial-MCP /
-Shape B CLI dev / Shape C self-host with verified click-by-click
-for each, verified against AC code by Explore agent). Sofia's
-CLAUDE.md updated to read it on every wake-up; landing copy
-review now starts with 'which customer shape is this section
-addressing.' Same persistent-discipline ask routed to Iris and
-Aida via mail.
-
-Bertha relay routed via Athena (Sofia's team context can't
-resolve eugenie.aweb.ai/bertha directly). Hestia + Iris + Athena
-all looped on staging-live.
-
-Production deploy held until Eugenie's read via Bertha + Juan
-greenlight. Hestia executes `make deploy-site` on greenlight.
+Peer notifications going out now: Athena (engineering implications),
+Iris (content / outreach target shift), Aida (support framing
+broadens beyond CLI users), Hestia (FYI).
 
 ## Earlier focus (banked)
 
