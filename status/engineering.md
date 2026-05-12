@@ -1,142 +1,108 @@
 # Engineering Status
-Last updated: 2026-05-01 23:15 CEST
+Last updated: 2026-05-07 ~14:30 CEST
 
 ## Current focus
 
-1. **Cloud deployed v0.5.16, v0.5.17 in flight.** `app.aweb.ai/health`
-   reports `release_tag=v0.5.16`, `aweb_version=1.18.6`,
-   `git_sha=842e0b5b`, started 2026-05-01 20:45:10 UTC.
-   v0.5.17 (commit `9c1038ad`, tag pushed) is building/deploying;
-   Render lag has run 20-90min in past releases per Mia.
-2. **Five-release iteration on Add-Existing today.** Mia shipped
-   v0.5.13 → v0.5.14 → v0.5.15 → v0.5.16 → v0.5.17 chasing the
-   hosted Add Existing Identity flow: redesign (aaly.6, commit
-   `20419936`) → cloud team route fix (`b549a18e`) → certificate
-   handoff clarification (`d22e453d`) → command handoff
-   replacement (the bare `aw init` instead of `--aweb-url`
-   hardcoding) → layout containment so the long `aw id team
-   fetch-cert` command scrolls horizontally inside the modal
-   (`937f37b0` for v0.5.17). Iteration cost driven by absence of
-   local Playwright reproducer for the dialog.
-3. **Routing decision: dev team stops tagging from here on.**
-   Hestia owns gates+tags+deploys+verify-live per docs/team.md;
-   v0.5.13-17 were Mia filling that lane because Hestia wasn't
-   online. Going-forward flow: dev signals "branch ready" → I run
-   code-reviewer → I draft release notes + bless-and-run mail to
-   Hestia → Hestia tags + deploys + verifies. Mia briefed (mail
-   c6e57938); Sofia aligned (her message fee4e4ad); Hestia
-   running v0.5.17 retroactively as runbook-seed exercise tonight
-   (her message ce95ad8a).
-4. **Two-team setup confirmed.** Athena now has membership in
-   `default:aweb.ai` (private company team — Sofia, Hestia, Aida,
-   Iris, Metis) AND `aweb:juan.aweb.ai` (public dev team — mia,
-   noah, grace, kate). Engineering is the only role bridging both,
-   by design. AGENTS.md rewritten to lead with the team-bridge
-   (commit `937e248`). Default active team is the dev team;
-   coordinator chats use `--team default:aweb.ai`.
-5. **Engineering posture continues release-discipline + invariant
-   correctness.** Distribution remains the bottleneck; engineering
-   side green for first conversations.
+1. **Messaging-architecture epic VERIFIED-LIVE.** aweb 1.20.0 → 1.20.6
+   + AC v0.5.22 → v0.5.23 deployed and verified end-to-end. Original
+   launch-day customer-blocking shape closed empirically.
+2. **aweb 1.20.6 (CLI-only) shipped at SHA 360bfe2**, npm @awebai/aw
+   1.20.6 latest, 2026-05-07 14:14Z. Closes Grace's four review
+   findings on the 1.20.4 init UX cleanup: BYOD jargon → "The other
+   option"; doctor missing-workspace remediation drops `aw run`;
+   persistent-alias regression test
+   (TestExecuteHostedPathPersistentDoesNotSuggestUserAsAlias);
+   Windows symlink-skip helper. CLI-only #27a (no pyproject bump,
+   no AC re-deploy). Pin in AC main stays at >=1.20.2.
+3. **aweb 1.20.5 (CLI-only) shipped at SHA 394adae**, 2026-05-07
+   ~10:00Z. Refuses `aw workspace add-worktree` when `.aw/` runtime
+   files are tracked in git, with explicit remediation
+   (`printf '\n.aw/\n' >> .gitignore` + `git rm --cached -r .aw` +
+   commit + retry). `aw init` writes `.git/info/exclude` entry for
+   `.aw/` on the non-refusal path. Closes a regression from b2070a5
+   (Apr 16). Grace dogfooded against the exact customer-blocking
+   case in /Users/juanre/prj/boscosis before tagging.
+4. **aweb 1.20.4 (CLI-only) shipped at 7adfea6**, 2026-05-06.
+   Cleans up `aw init` next-steps output: full channel install
+   instructions, agent guide URL, removed duplicate hook setup,
+   suppressed claim-human suggestion when APIKeyAuth=true.
+5. **aamy now has THREE production self-upgrade attestations** —
+   the auto-update-check feature shipped in 1.20.3 caught its own
+   upgrade across 1.20.3 → 1.20.4 → 1.20.5 → 1.20.6 in Hestia's
+   workspace. Distribution-cadence loop closed; receipt strengthened
+   each ship.
+6. **Companion AC frontend fix at 2d7150a3** (already on AC main):
+   autoComplete attributes on RegisterPage + LoginPage to fix the
+   browser-prefilled-username-with-email bug. Rides next functional
+   AC release.
 
 ## Dev team work in flight
 
-- **aweb-aalr.2** (mia, ac): AWID ensure-team endpoint + ac
-  persist refactor. P1. Starts tomorrow morning. Plan: read team
-  row + load/generate keypair OUTSIDE any AWID I/O; separate
-  small txn for keypair persistence; AWID calls strictly outside
-  open transactions; multi-schema final txn with zero AWID I/O.
-  John drives the AWID endpoint after. Mia signals me when ready
-  for review. Cross-system deadlock framing is the architectural
-  reason this refactor is non-optional.
-- **aweb-aalz** (mia, ac): "no mocks of internal implementations"
-  P1. The Add-Existing Playwright reproducer (Athena's
-  non-feature code authoring) lands inside this scope as the
-  concrete first deliverable; broader policy pass (remove
-  existing api-client mocks) follows.
+Quiet post-cycle. Grace shipped 5 CLI fixes in 24h: aamx (809056e),
+aamy (448a9f5), 7adfea6 (init UX), 394adae (add-worktree tracked-.aw
+refusal). P3 follow-ups on her queue: aamz (wait-semantics
+carry-over), aana (atomic temp+rename for update-check cache), aanb
+(full-path output test for init post-setup dedup), aane (best-effort
+error handling for ensureAwebRuntimeGitIgnored).
 
 ## Non-feature work in flight
 
-- **Playwright-MCP reproducer for Add-Existing dialog**
-  (Athena, ac). Targets: render dialog, assert command-list
-  contains `fetch-cert`/`switch`/`init` exactly once each in
-  order; assert bare `aw init` (no `--aweb-url`); assert dialog
-  `max-w-2xl` doesn't widen past viewport with long commands;
-  assert caption reflects conditional `switch`/`init` steps.
-  Lands as `ac/frontend/e2e/add-existing.spec.ts`, wired into
-  `make test-cloud-user-journeys`. Reproducer-as-gate (banked
-  policy 12) applied to the UI surface that just generated five
-  iterations. Authoring tomorrow morning fresh-headed (avoid
-  near-midnight UI-test-code risk).
+- **Multi-team agent_id-vs-did comparison grep** (task #20, my plate,
+  bandwidth-allowing). cp.agent_id is team-scoped — multi-team agents
+  hit asymmetry when code compares on cp.agent_id instead of
+  cp.did/cp.did_aw. The 1.20.2 fix bypassed this for the pagination
+  case but other code paths in aweb may still have direct cp.agent_id
+  comparisons.
 
 ## Release-ready state (handoff to Hestia)
 
-- **v0.5.17 retroactive runbook-seed exercise** in flight by
-  Hestia tonight. Tag already pushed by Mia (commit `9c1038ad`,
-  tag `b6c6e088`); image building. Hestia runs `make
-  release-ready` against `9c1038ad` locally to validate the chain
-  end-to-end and seed the runbook. Code-reviewer subagent ran on
-  `937f37b0` (the v0.5.17 substance) — small frontend layout
-  containment, low risk; two findings (test assertion at
-  AgentsPage.test.tsx:181 fragile under `--aweb-url` regression;
-  `whitespace-pre` on `<pre>` is dead weight) forwarded to Mia
-  via mail 4dfa7f75. The fragile-test gap is closed at the e2e
-  level by the Playwright reproducer; cosmetic noise stays for
-  next-touch cleanup.
-- **No new candidate** flagged by dev team yet; aalr.2 is
-  tomorrow.
+Nothing in the release pipeline. Last ships:
+- aw-v1.20.6: npm latest, 2026-05-07 14:14Z (CLI-only, init UX
+  cleanup follow-up addressing Grace's 4 review findings on 3a251a5).
+- aw-v1.20.5: npm, 2026-05-07 ~10:00Z (CLI-only, add-worktree
+  refuses tracked .aw/ + init writes .git/info/exclude).
+- aw-v1.20.4: npm, 2026-05-06 ~10:00Z (CLI-only, init UX cleanup).
+- aweb-server-v1.20.3 + aw-v1.20.3: PyPI + npm, 2026-05-06 ~09:00Z
+  (aamx + aamy bundled).
+- aweb-cloud v0.5.23: app.aweb.ai released, 2026-05-06 06:14:33Z.
+- AC pin stays at aweb 1.20.2 in main; bumps only when functional
+  AC change ships.
+- AC main has b7e86745 (admin_analytics date-fragility test fix) +
+  2d7150a3 (autoComplete on Login/Register) awaiting next AC release.
 
 ## Pending engineering artifacts owed
 
-- **KI#1 closure decision record technical content.** Sofia
-  drafts framing; Athena supplies cert-presentation auth
-  correction + aalk continuity arc + 1.18.6 trust-model arc +
-  Aida 4/4 attestation. Source: `agents/athena/aale-trust-
-  contract.md` + aweb commit `7759abc`. Pending Sofia framing
-  draft.
-- **Aida runbook PR tech-accuracy review.** Mentioned in
-  earlier handoff but no inbox traffic; verify state with Aida
-  when she comes online. v0.5.13-17 may add customer-visible
-  deltas worth folding (Add-Existing dialog UX).
-- **YC-publish prep**: when YC's draft answer reaches code-
-  touching state, time `aw init` on a fresh container before
-  the five-minute claim publishes externally (yc message
-  3c183e9a, my reply via mail 2c6db8cf).
-
-## Production scale (queried 2026-05-01 morning)
-
-- AWID: 91 did_aw_mappings, 57 dns_namespaces, 45 teams,
-  33 public_addresses, 3 team_certificates.
-- Cloud: 44 active users (46 inc soft-deleted), 53 organizations,
-  46 managed_namespaces, 8 active sessions, 155 cloud_agent_
-  certificates, 178 cloud_workspace_metadata.
-- Honest framing: dogfooding scale; distribution begins this
-  week.
+- **KI#1 closure decision record technical content** (still owed
+  to Sofia from before this cycle started). cert-presentation auth
+  correction + aalk continuity arc + 1.18.6 trust-model arc + Aida
+  4/4 attestation. Source: `agents/athena/aale-trust-contract.md`
+  + aweb commit `7759abc`. Pending Sofia framing draft.
+- **Playwright-MCP reproducer for Add-Existing dialog** (still
+  open from 2026-05-01, deferred during the cutover/messaging arcs).
+  Lands as `ac/frontend/e2e/add-existing.spec.ts`.
 
 ## Risks
 
-- **Add-Existing surface ships unprotected** until Playwright
-  reproducer lands. Hestia agreed to flag any subsequent
-  Add-Existing-touching candidate for manual extra-eyes pass
-  until then.
-- **Aida / Iris / Metis directories don't exist on disk** despite
-  the rename commit `810d472`; `agents/aida/`, `agents/iris/`,
-  `agents/metis/` are not yet created. No engineering blocker
-  but role separation stays partly theater until the agents are
-  set up.
+- **Multi-team-agent class** unaudited across the codebase
+  (task #20). Potential silent misbehavior on code paths comparing
+  cp.agent_id directly. No reported customer hits yet but the
+  class is real.
+- **chat-403 entry pulled from runbook by Aida (e15838c)** after
+  Hestia's empirical zero-customer-reports check. The W3-binding
+  surface we worried about may not actually hit customers under
+  realistic conditions. If a customer reports the shape, file fresh
+  with empirical evidence — don't reopen on theoretical grounds.
 
 ## Next checks
 
-- Confirm Render rolls forward to v0.5.17 within ~90min of tag
-  push.
-- Hestia's runbook-seed exercise output: did `make release-ready`
-  succeed end-to-end on `9c1038ad`? Any gate-failure shapes to
-  fold into runbook prior-knowledge?
-- Mia's aalr.2 branch-ready signal tomorrow.
-- Sofia's KI#1 framing draft when ready.
-- My own: author the Add-Existing Playwright reproducer
-  tomorrow morning.
+- Sofia's KI#1 framing draft already received (mail 07d78ce8); fold
+  technical content into bracketed placeholders and send back.
+- Multi-team agent_id grep at next bandwidth window (task #20).
+- P3 follow-ups on Grace's queue: aamz / aana / aanb.
+- Any customer-side reports of pagination edge cases or
+  --start-conversation 409s post-1.20.4 customer upgrades.
 
-## Standing release-discipline (banked through 2026-04-26, going-forward enforced by Hestia)
+## Banked release-discipline (through 2026-05-06)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree (not chat-pasted diffs)
@@ -149,7 +115,57 @@ Last updated: 2026-05-01 23:15 CEST
 9. Published artifact ≠ deployed service
 10. Browser-verify UI-surface releases
 11. Closure framing rests on empirical attestation
-12. Reproducer-as-gate (the Add-Existing Playwright spec is the
-    next instance)
-13. Code-reviewer subagent for gate-input commits before signaling
-    Hestia (now part of the canonical handoff flow)
+12. Reproducer-as-gate
+13. Code-reviewer subagent for gate-input commits BEFORE
+    bless-and-run mail to Hestia
+14. Migration files are immutable post-deploy. Recovery is additive.
+15. Equivalence-test policy: non-trivial diff = reject the
+    consolidation, even if functionally invisible.
+16. Cross-schema FK audit before any DROP SCHEMA cutover.
+17. Pre-deploy gates that depend on env-specific prerequisites
+    must fail-closed with explicit bypass signal, not skip-on-missing.
+18. Verified-live evidence cites actually-committed SHA.
+19. Don't bless-and-run with a work-in-flight branch.
+20. Code-correctness review before re-running e2e.
+21. Bless-and-run validation MUST run the FULL release-ready chain
+    end-to-end at the gate-input SHA (on the same machine as the
+    deploy will run from), not a curated subset.
+22. Code-reviewer subagent flagging silent-fall-through gap +
+    relevant-scale realistic for production trajectory ⇒ blocker,
+    not follow-up. (>100 conversations is realistic almost
+    immediately for active agent teams.)
+23. Test failures recurring at specific clock windows + reruns
+    clean later are date/timezone-math signals, NOT transient-flake
+    signals. "It passed on rerun" is not a diagnosis. Check whether
+    the rerun delay corresponds to a UTC-vs-local-midnight crossing
+    or other clock-based window before declaring transient.
+24. Documented workarounds must be empirically attested against
+    the actual customer surface AND the predecessor states they
+    apply on top of, not just the surface they claim to work
+    around. Same family as #11 applied at the workaround-doc step.
+25. When the empirical surface contradicts a hypothesis, that's a
+    refutation, not a "transient." Don't double down on the
+    hypothesis. Test against a known-OK case before narrowing scope.
+26. "Affects only one customer in current base" is not a scope
+    claim about the bug class — it's an observation about THIS
+    customer base AT THIS MOMENT. Reproduce against an internal
+    pair you control to distinguish customer-data class from
+    product class.
+27. Cut-the-deploy-only-if-functional-change. Don't cut a deploy
+    release purely to keep a pin-in-tagged-release synced. Pin
+    bump on main is valid state; tags should track functional
+    changes. Same family as 'released artifact ≠ deployed service' —
+    this is 'pinned-in-main ≠ deploy-needed'.
+27a. For CLI-only releases, don't bump server/pyproject.toml. The
+    tag carries the CLI version (goreleaser uses GITHUB_REF_NAME).
+    Source pkg state stays aligned with what's on PyPI for the
+    server. Avoids 'pyproject says X but PyPI server is X-1' drift.
+    (Sharpening of #27 from Hestia's 1.20.4 release prep.)
+28. Tool-driven destructive git-state mutation is never acceptable
+    as a side effect of a non-git-management command, even with
+    loud warnings. Refuse + remediate, don't auto-fix the customer's
+    repo for them. The tool gives the customer the exact commands
+    to run; the customer makes the git/index decision. (Banked
+    2026-05-07 from add-worktree fix: initial 'overwrite .aw/ with
+    warning' instinct was wrong; Juan's correction stood; preflight+
+    refuse shape shipped in 1.20.5.)

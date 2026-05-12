@@ -9,6 +9,9 @@ exist yet.
 
 ## Stage 1: First 5 minutes — "make the mess stop"
 
+**Status:** Working end-to-end. The wedge journey; the stage where we
+deliver every promised capability cleanly.
+
 **Who:** A developer running 2-3 Claude Code or Codex agents on the
 same repo. They're frustrated. Agents duplicate work, overwrite each
 other, create conflicting migrations.
@@ -57,6 +60,8 @@ coordination just works.
 
 ## Stage 2: First week — "this is actually useful"
 
+**Status:** Working. In active dogfooding by aweb's own team.
+
 **What changes:** They've been using aweb for a few days. Agents
 coordinate naturally. They start wanting more structure.
 
@@ -95,6 +100,11 @@ builds in parallel."
 
 ## Stage 3: First month — "I want this to persist"
 
+**Status:** Working on managed namespaces. Persistent identity
+(`did:aw`), addresses on `*.aweb.ai`, dashboard, and MCP integration
+all delivered cleanly. The customer flow described below works
+end-to-end on the managed-namespace path.
+
 **What changes:** They restart Claude Code sessions regularly. Each
 time, the agent gets a new ephemeral identity. They want continuity —
 the same agent recognized across sessions.
@@ -126,6 +136,11 @@ manage them from a dashboard."
 
 ## Stage 4: Months 2-3 — "my team needs this"
 
+**Status:** Working. Organizations + team certificates + API keys
+deliver cleanly. Multi-team-agent routing — one identity, multiple
+team memberships, cross-team conversation continuity — resolves
+correctly through the did_key strict-walk that landed in aweb 1.20.7.
+
 **What changes:** They want to share the setup with teammates. Multiple
 humans, each running their own agents, all coordinating on the same
 project.
@@ -149,7 +164,18 @@ it through a dashboard."
 
 ---
 
-## Stage 5: Month 6+ — "agents across organizations"
+## Stage 5: "agents across organizations"
+
+**Status:** The architecture supports cross-organizational agent
+coordination through the BYOT tier (Bring Your Own Trust — customer
+holds namespace controller key + team certificate key; see
+`audiences.md`). Tier 1 fully-hosted customers also reach this
+stage via cross-team coordination on aweb.ai-managed namespaces.
+The generic "create your sovereign identity and team locally, then
+import to org" primitive is the load-bearing operational piece for
+BYOT; building that primitive cleanly and removing legacy
+managed-namespace-on-customer-domain code paths is the implementation
+work named in "Implementation work to align with architecture" below.
 
 **What changes:** They want agents at their company to talk to agents
 at a partner company. Or they're building a product where agents need
@@ -176,6 +202,67 @@ stable, verifiable identities.
 
 **Success metric:** "Agents from different organizations collaborate
 using verifiable identity."
+
+---
+
+## Implementation work to align with architecture
+
+The architecture is settled: one protocol, two product tiers (Fully
+hosted + BYOT, see `audiences.md`), per-layer custody per invariant
+#3, authority not blurred between layers. Code paths inherited from
+the earlier Shape B (AC operating as the namespace controller for a
+customer-owned domain) are being removed; the generic import-to-org
+primitive that serves BYOT migration and brand-new BYOT onboarding
+is being built. These are present-tense implementation gaps to close,
+not architectural questions to defer.
+
+**Stages 1-2:** No implementation gaps. Tier 1 fully-hosted delivers
+end-to-end.
+
+**Stage 3:** Tier 1 (managed namespaces) delivers cleanly. Tier 2
+(BYOT) reaches this stage through the generic import-to-org
+primitive named in the implementation list below.
+
+**Stage 4:** Multi-team-agent routing — one identity, multiple team
+memberships, cross-team conversation continuity — resolves correctly
+through the did_key strict-walk that landed in aweb 1.20.7. Same
+behavior across both tiers.
+
+**Stage 5:** Five concrete code-level hot spots to close, in the order
+of customer impact:
+
+1. **Generic import-to-org primitive**: any customer can create
+   their sovereign identity and team locally (existing OSS aw CLI
+   primitives), then import them into an AC org. Same flow serves
+   brand-new BYOT customers and existing customers migrating away
+   from the Shape B path. AC verifies and imports AWID facts into
+   org state; AC does not take controller private keys.
+2. **`assign_permanent_team_address` restriction**: AC signs address
+   creation only for managed namespaces. BYOD addresses are signed
+   by the customer's namespace controller.
+3. **`ensure_default_team_namespace` correction**: never generate
+   namespace controller material for a customer-owned domain. The
+   customer's controller is the only valid one for their namespace.
+4. **`ensure_registered_namespace` fail-closed**: compare AWID's
+   returned `controller_did` against what AC has and fail closed on
+   mismatch. AC must not cache false authority.
+5. **`is_default` overloading**: split into per-purpose semantics.
+   It currently affects deletion protection, spawn invite namespace,
+   dashboard JWT namespace lookup, lifecycle primary-address
+   selection, and persistent address assignment — not all of which
+   should share the same flag.
+
+In parallel: customer-facing error message rewrite for the migration
+window. A customer hitting a state mismatch should see a useful
+message and a remediation path, not a silent failure. Recovery is
+the difference between a customer who gives up and a customer who
+asks for help.
+
+The architecture does not promise these capabilities behind a future
+schedule — it promises them as part of the BYOT tier's
+correctness. Customers hit them the moment they bring their own
+trust chain. The implementation work above is the alignment of code
+with the locked architecture.
 
 ---
 

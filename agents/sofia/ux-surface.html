@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>aweb UX surface — by persona (2026-05-12)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    margin: 0; padding: 24px;
+    background: #f8fafc; color: #0f172a;
+    font-size: 13px; line-height: 1.4;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px 0; }
+  .subtitle { color: #64748b; margin: 0 0 20px 0; font-size: 12px; }
+
+  /* Legend */
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    margin: 16px 0 24px 0;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .swatch {
+    width: 18px; height: 18px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .priority {
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* Persona colors. Order = priority. */
+  .p1 { background: #c084fc; }              /* Persona 1: consumer — purple */
+  .p2 { background: #60a5fa; }              /* Persona 2: company  — blue   */
+  .p3 { background: #fb923c; }              /* Persona 3: dev team — orange */
+  .p4 { background: #4ade80; }              /* Persona 4: platform — green  */
+  .visitor { background: #cbd5e1; }         /* Visitor — gray */
+  .multi {
+    background: repeating-linear-gradient(
+      45deg,
+      #c084fc, #c084fc 6px,
+      #60a5fa 6px, #60a5fa 12px,
+      #fb923c 12px, #fb923c 18px,
+      #4ade80 18px, #4ade80 24px
+    );
+  }
+  .p1p2 {
+    background: repeating-linear-gradient(45deg,
+      #c084fc, #c084fc 8px, #60a5fa 8px, #60a5fa 16px);
+  }
+  .p2p3 {
+    background: repeating-linear-gradient(45deg,
+      #60a5fa, #60a5fa 8px, #fb923c 8px, #fb923c 16px);
+  }
+  .p3p4 {
+    background: repeating-linear-gradient(45deg,
+      #fb923c, #fb923c 8px, #4ade80 8px, #4ade80 16px);
+  }
+  .p1p2p3 {
+    background: repeating-linear-gradient(45deg,
+      #c084fc, #c084fc 6px,
+      #60a5fa 6px, #60a5fa 12px,
+      #fb923c 12px, #fb923c 18px);
+  }
+
+  /* Overlay badges */
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .badge-admin {
+    background: #1e293b; color: #fef9c3;
+    border: 1px solid #1e293b;
+  }
+  .badge-agent {
+    background: #fef3c7; color: #78350f;
+    border: 1px dashed #f59e0b;
+  }
+  .badge-deprecated {
+    background: #fee2e2; color: #991b1b;
+    border: 1px solid #fca5a5;
+    text-decoration: line-through;
+  }
+  .badge-duplicate {
+    background: #fef9c3; color: #713f12;
+    border: 1px solid #fbbf24;
+  }
+
+  /* Grid of surfaces */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    align-items: start;
+  }
+  @media (max-width: 1400px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 900px)  { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px)  { .grid { grid-template-columns: 1fr; } }
+
+  .surface {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .surface-header {
+    background: #1e293b;
+    color: #fff;
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .surface-header .url {
+    display: block;
+    font-weight: 400;
+    color: #94a3b8;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .group {
+    border-top: 1px solid #e2e8f0;
+    padding: 8px 12px 6px 12px;
+  }
+  .group:first-of-type { border-top: none; }
+  .group-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    padding: 4px 0 4px 10px;
+    border-left: 6px solid transparent;
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .item-label { flex: 1; }
+
+  .footer {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #475569;
+  }
+  .footer p { margin: 0 0 6px 0; }
+  .footer strong { color: #0f172a; }
+</style>
+</head>
+<body>
+
+<h1>aweb UX surface — by persona</h1>
+<p class="subtitle">
+  Inventory snapshot 2026-05-12. Each block is colored by the
+  persona(s) it primarily serves. Priority ordering reflects
+  decision record 2026-05-12 (consumer first, dev team third,
+  platform builder last). Source: <code>agents/sofia/ux-surface.md</code>,
+  personas defined in <code>docs/audiences.md</code>.
+</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="swatch p1"></div>
+    <span><span class="priority">P1</span>Personal-AI consumer (highest priority)</span></div>
+  <div class="legend-item"><div class="swatch p2"></div>
+    <span><span class="priority">P2</span>Company with AI-using employees</span></div>
+  <div class="legend-item"><div class="swatch p3"></div>
+    <span><span class="priority">P3</span>Developer team (CLI)</span></div>
+  <div class="legend-item"><div class="swatch p4"></div>
+    <span><span class="priority">P4</span>Platform builder / self-host</span></div>
+  <div class="legend-item"><div class="swatch visitor"></div>
+    <span>Visitor (anonymous, evaluating)</span></div>
+  <div class="legend-item"><div class="swatch multi"></div>
+    <span>All / many personas (multi)</span></div>
+  <div class="legend-item"><span class="badge badge-admin">admin</span>
+    <span>Team-admin role overlay</span></div>
+  <div class="legend-item"><span class="badge badge-agent">agent</span>
+    <span>Agent-as-user (the AI itself consumes this)</span></div>
+  <div class="legend-item"><span class="badge badge-duplicate">dup</span>
+    <span>Duplicate verb / redundant surface</span></div>
+  <div class="legend-item"><span class="badge badge-deprecated">hidden</span>
+    <span>Hidden or deprecated</span></div>
+</div>
+
+<div class="grid">
+
+  <!-- ============ LANDING SITE ============ -->
+  <div class="surface">
+    <div class="surface-header">
+      Landing site
+      <span class="url">aweb.ai</span>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Homepage — 8 sections</div>
+      <div class="item"><div class="swatch multi" style="margin-right:8px;width:6px;height:24px;border-radius:0"></div><span class="item-label">Hero + install commands</span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">"Two Paths" (features, not paths)</span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">Team Quickstart (CLI)</span></div>
+      <div class="item p1p2" style="border-left-color:#c084fc"><span class="item-label">Hosted MCP block</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">Under the Hood (cards)</span></div>
+      <div class="item p2" style="border-left-color:#60a5fa"><span class="item-label">"Two Paths to Production" (managed vs DNS)</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">Pricing</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">CTA footer</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Docs — 11 pages</div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">Getting Started</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">Identity</span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">Communication</span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">Coordination</span></div>
+      <div class="item p1p2" style="border-left-color:#c084fc"><span class="item-label">MCP Integration</span></div>
+      <div class="item p2" style="border-left-color:#60a5fa"><span class="item-label">Namespaces</span></div>
+      <div class="item p4" style="border-left-color:#4ade80"><span class="item-label">API Reference</span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">Channel</span></div>
+      <div class="item p4" style="border-left-color:#4ade80"><span class="item-label">Events &amp; Control</span></div>
+      <div class="item p4" style="border-left-color:#4ade80"><span class="item-label">Self-Hosting</span></div>
+      <div class="item visitor" style="border-left-color:#cbd5e1"><span class="item-label">Privacy / Terms</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Nav</div>
+      <div class="item visitor" style="border-left-color:#cbd5e1"><span class="item-label">Get started · Dashboard · Pricing · Docs · GitHub</span></div>
+    </div>
+  </div>
+
+  <!-- ============ AUTH GATE ============ -->
+  <div class="surface">
+    <div class="surface-header">
+      Auth gate
+      <span class="url">app.aweb.ai</span>
+    </div>
+
+    <div class="group">
+      <div class="group-label">9 pages</div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/login</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/register</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/forgot-password</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/reset-password/:id</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/verify-email/:id <span class="badge badge-duplicate">dup with next</span></span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/email-verified <span class="badge badge-duplicate">dup</span></span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/oauth/callback</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/choose-username <span class="badge badge-duplicate">dup with next</span></span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/complete-profile <span class="badge badge-duplicate">dup</span></span></div>
+    </div>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div class="surface">
+    <div class="surface-header">
+      Signed-in dashboard
+      <span class="url">app.aweb.ai</span>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Team tabs — 9</div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Monitor</span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">Tasks</span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">Mail</span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">Chat</span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Identities <span class="badge badge-admin">admin</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">Contacts</span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Roles <span class="badge badge-admin">admin</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">Connect <span class="badge badge-admin">admin</span> <span class="badge badge-duplicate">overlaps public /connect</span></span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Settings <span class="badge badge-admin">admin</span></span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Onboarding — 3 first-time surfaces</div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">/onboarding wizard <span class="badge badge-duplicate">3 surfaces</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">Getting-started checklist</span></div>
+      <div class="item p1p2" style="border-left-color:#c084fc"><span class="item-label">Welcome banner (invite)</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Public routes</div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">/:username (public profile)</span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">/organizations/:slug</span></div>
+      <div class="item p1p2" style="border-left-color:#c084fc"><span class="item-label">/invite/:code</span></div>
+      <div class="item p1p2" style="border-left-color:#c084fc"><span class="item-label">/i/:code (short invite)</span></div>
+      <div class="item p1p2" style="border-left-color:#c084fc"><span class="item-label">/connect (consumer client picker)</span></div>
+      <div class="item p1p2" style="border-left-color:#c084fc"><span class="item-label">/oauth/consent</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Dialogs — 8</div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Create Team <span class="badge badge-admin">admin</span></span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Create Org <span class="badge badge-admin">admin</span></span></div>
+      <div class="item p4" style="border-left-color:#4ade80"><span class="item-label">BYOT Identity Setup</span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">CLI Identity Setup</span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Team Agent Setup</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">Send Message</span></div>
+      <div class="item multi" style="border-left-color:#cbd5e1"><span class="item-label">Start Chat</span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">Settings Help <span class="badge badge-admin">admin</span></span></div>
+    </div>
+  </div>
+
+  <!-- ============ aw CLI ============ -->
+  <div class="surface">
+    <div class="surface-header">
+      aw CLI
+      <span class="url">terminal</span>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Top-level — 25 commands</div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">init</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">whoami <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">id (13 subs; id team has 12) <span class="badge badge-admin">admin</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">chat (8 subs) <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">mail (4 subs) <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">contacts <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">directory</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">heartbeat <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">events</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">control</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">log</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">work (3 subs) <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">task (10 subs) <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">roles <span class="badge badge-admin">admin</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">instructions <span class="badge badge-admin">admin</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">workspace</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">lock</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">notify</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">run</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">reset</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">connect <span class="badge badge-deprecated">hidden</span></span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">claim-human</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">upgrade</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">version</span></div>
+      <div class="item p3p4" style="border-left-color:#fb923c"><span class="item-label">doctor</span></div>
+    </div>
+  </div>
+
+  <!-- ============ MCP TOOLS ============ -->
+  <div class="surface">
+    <div class="surface-header">
+      MCP tools
+      <span class="url">claude.ai · ChatGPT · Claude Desktop · Gemini</span>
+    </div>
+
+    <div class="group">
+      <div class="group-label">45 tools, no readOnlyHint annotations</div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">whoami <span class="badge badge-agent">agent</span></span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Mail + chat — 8 tools (P1's primary surface)</div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">send_mail <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">check_inbox <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">chat_send <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">chat_pending <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">chat_history <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">chat_read <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">send_message_to_contact <span class="badge badge-duplicate">wraps mail+chat</span> <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">read_messages_from_contact <span class="badge badge-duplicate">wraps</span> <span class="badge badge-agent">agent</span></span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Agents + presence — 2</div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">list_agents <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">heartbeat <span class="badge badge-agent">agent</span></span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Tasks — 10 (dev-team-shaped concept)</div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_create <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_list <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_ready <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_get <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_close <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_update <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_reopen <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_claim <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_comment_add <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">task_comment_list <span class="badge badge-agent">agent</span></span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Work + status — 4</div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">work_ready <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">work_active <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">work_blocked <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p3" style="border-left-color:#fb923c"><span class="item-label">workspace_status <span class="badge badge-agent">agent</span></span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Roles + instructions — 4</div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">roles_show <span class="badge badge-admin">admin</span> <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">roles_list <span class="badge badge-admin">admin</span> <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">instructions_show <span class="badge badge-admin">admin</span> <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p2p3" style="border-left-color:#60a5fa"><span class="item-label">instructions_history <span class="badge badge-admin">admin</span> <span class="badge badge-agent">agent</span></span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Contacts — 6 (P1's mental model)</div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">contacts_list <span class="badge badge-duplicate">dup with list_contacts</span> <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">contacts_add <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">contacts_remove <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">list_contacts <span class="badge badge-duplicate">dup</span> <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">add_contact_by_handle <span class="badge badge-agent">agent</span></span></div>
+      <div class="item p1p2p3" style="border-left-color:#c084fc"><span class="item-label">add_contact_by_email <span class="badge badge-deprecated">stub, drop for v1</span> <span class="badge badge-agent">agent</span></span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p><strong>What the colors say:</strong> Persona 1 (Personal-AI consumer) is the highest-priority customer and the persona whose surface coverage looks thinnest right now. Most of the dashboard's team-tabs are <em>P2/P3</em> shaped, the CLI is <em>P3/P4</em> entirely, and the docs lean <em>P3/P4</em>. P1's natural path through MCP tools (mail+chat + contacts) is well-covered as <em>tools</em>, but the surrounding mental model (teams, roles, identities) is wrong-shaped for her.</p>
+  <p><strong>What the badges say:</strong> Yellow <code>dup</code> badges flag the candidates for the simplification pass — paired auth pages, the two <code>contacts_list</code> / <code>list_contacts</code> verbs, the wrap-tool pair that duplicates mail+chat, the <code>/connect</code> route that exists in two places, and the three first-time-user surfaces.</p>
+  <p><strong>Methodology note:</strong> "P1+P2+P3" coloring on Mail/Chat/Contacts dashboard tabs reflects that all three personas use those, even though the surrounding vocabulary today is team-shaped. The coloring is "does this persona need this capability," not "does this surface speak their language today."</p>
+</div>
+
+</body>
+</html>

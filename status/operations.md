@@ -1,157 +1,217 @@
 # Operations Status
 
-Last updated: 2026-05-01 23:55 CEST (Hestia, first wake-up under live identity; v0.5.17 retroactive exercise called off)
+Last updated: 2026-05-10 12:25 CEST (10:25 UTC) — AC v0.5.26 verified-
+live. **Full P0 arc empirically closed end-to-end across two coordinated
+releases (aweb 1.20.8 + AC v0.5.26) within ~24h.** Verified-live mails
+sent to athena (5fc87592), sofia (ae05039f), aida (96f74b81).
+Aida REMOVE-trigger fired for runbook entry e6b1303.
 
 ## Current focus
 
-Hestia identity went live tonight (2026-05-01 21:05 UTC); inbox and
-workspace are now real. Today is **team-genesis day** — Sofia,
-Athena, YC agent online on the company team; Mia online in the dev
-team and shipped five ac releases (v0.5.13–v0.5.17) chasing the
-hosted Add-Existing-Identity flow. Those five shipped without me
-because the runtime layer for me was not yet up. Accept retroactively
-per Sofia + Juan; the build/ship boundary becomes real on the **next**
-ac release.
+**FULL P0 ARC RECEIPT — 2026-05-09 → 2026-05-10**
 
-**Tonight's substantive actions, after Juan's late call:**
+Pepe Reyero surfaced four frictions on 2026-05-09. All four closed
+empirically across two coordinated releases:
+- **aweb-aang** (LOAD-BEARING autonomous-install): aweb 1.20.8 +
+  AC v0.5.25.
+- **aweb-aanh** (init --hosted single-invocation workspace.yaml):
+  aweb 1.20.8 (folded into aang).
+- **aweb-aanj** (aw roles set array bundles): aweb 1.20.8 (CLI-only).
+- **aweb-aani** (role-name set + AC route fix): aweb 1.20.8 (CLI +
+  OSS server) + AC v0.5.26 (route fix at agent_lifecycle.UpdateAgentRequest
+  accepting role/role_name aliases).
 
-1. Seeded `runbook.md` with prior-knowledge encoding. Marked
-   explicitly as not-yet-validated by Hestia running the chain solo;
-   validation comes from the first end-to-end exercise on the next
-   real candidate.
-2. Status + handoff refresh.
-3. v0.5.17 retroactive exercise was kicked off (Athena's
-   bless-and-run, ~21:15Z), then **called off by Juan** at ~22:00Z
-   — v0.5.17 is shipping without my retroactive verification.
-   Background `make release-ready` terminated. The first real
-   exercise comes on the next bless-and-run mail from Athena.
+Pepe-class population fully unblocked end-to-end. Sofia dispatching
+Iris with full-arc receipt + Pass-2 wire-in trigger to revert
+homepage bundle from Option A back to Option B.
 
-## Live state (verified 2026-05-01 23:00 CEST)
+## v0.5.26 ship attestation (2026-05-10 09:30Z → 10:13Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.16`,
-  `aweb_version=1.18.6`, `git_sha=842e0b5b`,
-  `awid_service_version=0.5.3`. db / redis / awid /
-  coordination_api healthy. Started 2026-05-01 20:45 UTC.
-- `api.awid.ai/health`: `version=0.5.2`, redis / db / schema
-  healthy. Unchanged from prior wake-up.
-- aweb OSS published tags: `server-v1.18.6`, `aw-v1.18.6`,
-  `awid-v0.5.2`, `awid-service-v0.5.2`. Unchanged.
-- channel: 1.3.3 published. Unchanged.
-- awid library inside cloud bumped 0.5.1 → 0.5.3 across today's
-  cluster.
+GATE CHAIN
+- Athena's release-ready at 1ce7d6a9: 164 PASSED including new
+  test_cloud_role_name_set_updates_current_workspace real-Docker e2e
+  probe (#24b shape baked into AC release-ready chain).
+- My release-ready at 1ce7d6a9: 164 PASSED (matches Athena's,
+  identical test list).
+- Tag v0.5.26 pushed individually at 1ce7d6a9 per discipline #7.
+- GHA aweb-cloud CI/CD: SUCCESS in 14m44s (run 25625745592).
+- Render → /health flip: ~1 min (Juan's manual deploy trigger
+  bypassed the 4-7h pattern from last 2 cycles).
+
+LIVE STATE (verified 2026-05-10 10:13Z)
+- /health: release_tag=v0.5.26, git_sha=1ce7d6a97a (matches gate-input),
+  aweb_version=1.20.8, awid_service_version=0.5.4. Started 10:12:36Z.
+- /awid: 0.5.4 healthy.
+
+LOAD-BEARING aani PROBE (single-team, default:aweb.ai)
+- Pre-fix (yesterday): HTTP 422 with AC UpdateAgentRequest schema
+  (access_mode required, role/role_name extra_forbidden).
+- Post-deploy: 'Role name set to coordinator' clean. Round-trip
+  coordinator → developer → coordinator: both transitions clean.
+  CLI workspace.yaml + DB aweb.workspaces.role both updated.
+
+MULTI-TEAM-AGENT PROBE — discipline #24b empirical attestation
+(Athena ran via chat 2756e6db)
+- Active-team (juan.aweb.ai dev team): aw role-name set → 200 clean.
+- Cross-team override (--team default:aweb.ai): 200 clean.
+- DB: two distinct rows for same did_aw, different team_ids, both
+  updated within ~504ms. Multi-team workspaces handled cleanly —
+  each team's row updates independently when --team override targets.
+- Server-side role validation reachable: invalid role 'engineering'
+  returns structured 'available roles: backend, coordinator,
+  developer, frontend, reviewer'. Wire contract clean end-to-end.
+- Route-interception class fully gone — server validates, responds
+  with structured errors, CLI parses cleanly.
+
+## Discipline #24b — banked across this cycle
+
+"Pre-empirical SHA-diff inspection covers ROUTE TOPOLOGY across
+deployment targets. When a fix touches a path that is mounted under
+both AC's direct routes AND the OSS /api mount, verify which handler
+wins on the actual deployed surface. Make ship's OSS-direct Docker
+e2e attests OSS path correctness; it does NOT attest AC's
+interception layer. Empirical probe against deployed AC surface is
+required for AC-deployable claims."
+
+- Banked verbatim by Athena and Sofia.
+- Applied through v0.5.26 release-ready chain (real-Docker CLI-driven
+  e2e test_cloud_role_name_set_updates_current_workspace added before
+  tag-push).
+- aank ticket scope still stands for extending coverage to
+  aang/aanh/aanj surfaces; aanl established the pattern this cycle.
+
+## Render deploy lag — open ops debt
+
+Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
+3min. v0.5.26 ~1 min thanks to Juan's manual deploy trigger (bypass).
+Pattern unresolved. Hypothesis: Render image-watcher poll interval
+changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
+
+## Live state (verified 2026-05-10 10:13Z, post v0.5.26 deploy)
+
+- `app.aweb.ai/health`: `release_tag=v0.5.26`, `aweb_version=1.20.8`,
+  `awid_service_version=0.5.4`,
+  `git_sha=1ce7d6a97a92f41dfeed7163fc3d67a50f48827a`. Started
+  2026-05-10T10:12:36Z.
+- `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
+
+## Bertha pipeline — HANDOFF TO METIS (ANALYTICS) PER JUAN 2026-05-10
+
+Juan (2026-05-10): "we are going to task metis, who is responsible for
+analytics, for the regular check of the database... she will need to
+design and write admin entrypoints to do the tasks."
+
+Until Metis ships admin entrypoints + takes over the cadence:
+- **Daily sign-up export** (cron 2ddbdd18, daily 08:13 CEST): operational.
+- **Hourly multi-agent milestone check** (cron f6adaa50, hourly):
+  operational, state-tracked.
+- Both crons are session-only (CronCreate `durable=true` does not take —
+  the durability gap is part of why Metis taking this is right; admin
+  entrypoints + system cron / launchd is the proper architecture).
+
+Hestia briefing Metis with full context, SQL, state-file design, Bertha
+integration shape, durability constraints, and pitfalls — see mail to
+metis (sent this cycle).
 
 ## Release pipeline
 
-- **v0.5.17**: tagged on origin (`b6c6e088` annotated → commit
-  `9c1038ad`, authored by Mia 2026-05-01 22:55 CEST). Layout-
-  containment fix in `AgentsPage.tsx` (modal contains the long
-  fetch-cert command list). At 23:55 CEST `app.aweb.ai/health` still
-  reports v0.5.16; GHA "Build Release Image" was running 27+ min
-  vs v0.5.16's 13 min when last checked. Per Juan, v0.5.17 ships
-  on its own — no Hestia retroactive gate-run, no verified-live
-  mail from me on this one.
-- **Going-forward routing decision (Athena, 2026-05-01).** Dev team
-  stops at "branch ready / clean main." They do NOT tag. Tags +
-  gates + deploys + verify-live all in Hestia's lane from the next
-  candidate forward. Athena will brief Mia on the new flow
-  separately.
-- **Athena's flow going forward:**
-  1. Dev team lands work on main + signals Athena.
-  2. Athena runs code-reviewer subagent on gate-input commit
-     (banked policy 13).
-  3. Athena drafts release notes + mails Hestia bless-and-run.
-  4. Hestia runs `make release-ready` → tag → push → wait for
-     image → verify live.
-  5. Hestia posts verified-live mail with evidence.
-- **Genesis-day pattern (accepted retroactively):** v0.5.13–v0.5.17
-  all shipped through Mia's iteration loop on the same feature. No
-  Hestia gate, no verified-live mail. /health was used as the
-  authoritative deployment check by Sofia and Athena.
+| Cycle | Status |
+|-------|--------|
+| aweb 1.20.0 (aame epic) | shipped + verified-live |
+| aweb 1.20.1 (Phase 12 hotfix) | shipped + verified-live |
+| AC v0.5.22 (aame uptake + 1to1 cleanup) | shipped + verified-live |
+| aweb 1.20.2 (pagination fix) | shipped + verified-live |
+| AC v0.5.23 (1.20.2 uptake) | shipped + verified-live |
+| aweb 1.20.3 (aamx + aamy auto-update) | shipped + verified-live (CLI-only #27a) |
+| aweb 1.20.4 (init UX) | shipped + verified-live (CLI-only #27a) |
+| aweb 1.20.5 (add-worktree refuse) | shipped + verified-live (CLI-only #27a) |
+| aweb 1.20.6 (Grace review cleanup) | shipped + verified-live (CLI-only #27a) |
+| aweb 1.20.7 (multi-team did_key + chat 409) | shipped + verified-live (server release) |
+| AC v0.5.24 (1.20.7 uptake + chat 409 close) | shipped + verified-live |
+| AC v0.5.25 (cli-signup api_key + admin_analytics fix) | shipped + verified-live |
+| **aweb 1.20.8** (aang/aanh/aani/aanj bundle) | **mid-flight, awaiting Athena re-make-ship at 637cd74** |
+| AC v0.5.26 (1.20.8 uptake) | pending PyPI 1.20.8 publish |
 
-## Iteration-loop cost flag (Sofia mail, 2026-05-01)
+## Site deploy protocol (Juan-authorized 2026-05-10)
 
-Today's 4 ac releases on one feature cost ~2 hours of pure
-publish-loop wait (30+ min publishing × 4 cycles), driven by the
-absence of a local end-to-end reproducer for the
-Add-Existing-Identity surface. Production became the test bench.
-The framing is operations-shaped (iteration cost) but the fix is
-engineering-shaped (build the local reproducer / Playwright-MCP
-harness). Lane: I advocate the cost; Athena decides whether and
-how to invest. Concrete next-cycle items I own:
+**Surface separation (build/ship boundary applied to site)**:
+- Iris owns authoring `ac/site/` source (hugo.yaml, layouts/, css/).
+- Hestia owns deploy execution + verification.
+- Same shape as Athena → Hestia for code.
 
-- Time the publishing path (GHA workflow log breakdown — 30+ min
-  composed of what?).
-- Test-suite triage in `ac/Makefile` — which targets compose to
-  the 20-min run, which are critical-path for UI-only changes.
-  Bring data; engineering decides what to keep / split / make
-  optional.
+**Production deploy gate** — every deploy needs:
+1. Iris signal: 'staging green at <preview URL>; ready for production deploy. Bundle covers <scope>.'
+2. Bertha validation (non-technical-founder framing match — Eugenie's read).
+3. Sofia framing review.
+4. Juan explicit per-deploy greenlight.
 
-Banked Sofia routing rule: bug-fix releases tag through my gate
-chain by default. Mail Sofia before tag only if the release carries
-external-claim weight (new public capability, customer-visible
-behavior change, anything affecting value-prop framing). Otherwise
-she reads /health when I post verified-live.
+Only after all four: Hestia runs `make deploy-site` from ac/.
+
+**Staging architecture** (operational as of 2026-05-10):
+- `deploy-landing-staging` branch → Render staging service → preview-urw1.onrender.com (preview.aweb.ai DNS pending).
+- agent-guide sync identical to prod (true parity).
+- Iris runs `make deploy-staging` (Athena landed at 36a9e442).
+
+**Production architecture** (operational as of 2026-05-10):
+- `deploy-landing` branch → Render production service → aweb.ai.
+- Render reconfigured to watch `deploy-landing` (not main) — gate is now real.
+- `make deploy-site` from ac/ pushes current branch → deploy-landing.
+- For mid-cycle force-push case: `git push -f origin deploy-landing-staging:deploy-landing` — used in cycle 1 because Pass-3 lived on staging branch only.
+
+**Rollback authority**: only Hestia.
+
+**Branch protection** (open, Juan's lane, Task #88): PR-based with Juan + Sofia as approvers. Closes the structural gap — without protection, anyone with main push rights can update deploy-landing too. Latency cost acceptable for homepage frequency.
+
+**First deploy gate run — closed 2026-05-10 14:39Z**: Iris's bundle 58ed6c53 bypassed gate (Pass-1; Render was watching main; reverted). Sofia-authored Pass-3 (60be8f4e) ran the gate cleanly: Bertha/Eugenie validation on staging ✓, Sofia framing-pass ✓ (substantive customer-shape correction), Juan explicit per-deploy greenlight ✓, Hestia deploy + verify-live ✓. Verified-live mails dispatched: iris (f0ac616f), bertha (5379880c), sofia (ab09f148). Sofia independent live-check confirmed (mail c6b73992).
+
+**Customer-shape discipline** — adopted cross-team (Sofia mail c6b73992):
+- Doc: ai.aweb/docs/customer-onboarding-flows.md (Shape A custodial-MCP / Shape B CLI dev / Shape C self-host).
+- Site copy review starts with: 'which customer shape is this section addressing?'
+- Discipline that should have prevented Pass-2's Shape-B-flow-labeled-Shape-A miss.
+- Adopted by Iris (mail cbd2aacb) + Sofia + Hestia. Aida's adoption is the natural next ask for customer-support runbook triage.
 
 ## Operational discrepancies
 
-- **Ops runbook missing.** Seeding tonight with prior-knowledge
-  encoding from decisions.md + Makefile survey; flagged as
-  not-yet-validated.
-- **Local reproducer for Add-Existing-Identity.** Per Sofia, the
-  surface has no local end-to-end test. Awaiting Athena's read on
-  what exists (full / partial / nothing) and what scoping the work
-  needs.
-- **GitHub author attribution quirk.** Commits authored by dev-team
-  members (Mia et al.) show "Juan Reyero" in `git log`. The actual
-  agent identity is carried via the aweb cert, not git config.
-  Bear this in mind when reading commit history; cross-check with
-  Athena who can route to the actual author.
-- **Stale repo-manager dirs on disk**: `agents/coord-cloud/` and
-  `agents/repo-aweb/` remain untracked from the pre-narrowed model.
-  Tracked by `aweb-aals.5`. Low-priority hygiene.
-- **Dashboard implementation**: signal inventory exists in
-  `docs/company-dashboard.md`; no concrete dashboard or report yet.
-  Next step pending.
-- **`aw` task metadata native fields**: builder/reviewer/feedback
-  fields still parsed from prose `Work contract:` block. Tracked
-  by `aweb-aals.7`.
+- **Render deploy lag** (2 cycles): v0.5.24 GHA→live ~4h, v0.5.25
+  ~7h vs historical ~3min. Now a pattern, not a one-time blip.
+  Re-flag at next cycle.
+- **CronCreate `durable=true` not taking**: scheduled_tasks.json
+  not written; crons survive only inside this Claude session.
+  System cron / launchd is the durable answer. Banked as ops debt.
+- **Aida's runbook push (e15838c)** held pending Juan greenlight.
+  BYOD-422 + framing-invariant only; fada3dd dropped after aani
+  window eliminated by Grace's coordination-side fix.
+- **Multi-team-agent agent_id-vs-did comparison**: Athena's lane,
+  open follow-up, non-blocking.
+- **Iris agent not registered**: Hetzner identity bootstrap pending.
 
 ## Active claims
 
-`aw work active`: zero rows. `aw work blocked`: zero rows. Clean
-slate.
+`aw work active`: zero rows. `aw work blocked`: zero rows.
 
-## Workspace status (company team, default:aweb.ai)
+## Workspace status (default:aweb.ai team)
 
-- hestia (me): online, just came up, no claims/locks.
-- athena: online (seen 4s ago at survey time), no claims/locks.
-- sofia: online (seen 5s ago), no claims/locks.
-- yc: online in co.aweb (separate repo).
-- cowork-z3dflikwduph, juan-reyero: offline.
+- hestia (me): online, 1.20.8 standby + cron-driven hygiene.
+- athena: cross-team bridge to dev team (juan.aweb.ai).
+- iris/metis/sofia/aida: see workspace status.
 
-Dev team (`aweb:juan.aweb.ai`) members not visible from my
-workspace — Athena is the cross-team bridge.
+Dev team (`aweb:juan.aweb.ai`) members not visible from my workspace —
+Athena is the cross-team bridge.
 
 ## Next checks
 
-1. Wait for the next bless-and-run mail from Athena. That's the
-   first real end-to-end exercise — gate chain, tag, push, watch
-   CI/CD, verify live, post evidence.
-2. Daily `/health` check on `app.aweb.ai` and `api.awid.ai`.
-   Compare to `status/product.md` claims; flag drift.
-3. Stale-claim sweep on `aw work active` next wake-up (currently
-   clean, so just cadence).
-4. Time the publishing path on the next ac release (GHA log
-   breakdown). Bring numbers, not hand-waving. Pre-seed the data
-   from v0.5.16 (~13m GHA build; the 7m gap to /health-shows-new-tag
-   was Juan's manual deploy window, not auto-rollout — Render is
-   manual). v0.5.17 GHA ran 27+ min so far — slower than v0.5.16,
-   worth investigating the GHA-build side; deploy timing depends
-   on when Juan triggers it.
-5. Test-suite triage in ac/Makefile — which targets compose to the
-   ~20-min cost.
+1. Athena's re-make-ship green at 637cd74 → tag both server-v1.20.8 +
+   aw-v1.20.8 individually + push, watch GHA, verify-live.
+2. Daily `/health` on app.aweb.ai + api.awid.ai. Render deploy-lag
+   pattern if v0.5.26 ships next.
+3. Hourly milestone-check cron firings; act only if non-empty.
+4. Daily 08:13 CEST sign-up export to Bertha.
+5. Brief Bertha (when 1.20.8 verified-live): Pepe Reyero's
+   autonomous-install case unblocked.
+6. Pass-2 trigger to Iris when 1.20.8 verified-live + npm reachable
+   + aw upgrade works (Sofia's precise trigger).
 
-## Standing release-discipline (banked through 2026-04-26, Hestia enforces)
+## Standing release-discipline (banked through 2026-05-10)
 
 1. Release gate = full e2e + SOT + peer-review approval (mailed)
 2. Review via shared working tree
@@ -164,11 +224,68 @@ workspace — Athena is the cross-team bridge.
 9. Published artifact ≠ deployed service
 10. Browser-verify UI-surface releases
 11. Closure framing rests on empirical attestation
-12. Reproducer-as-gate (surface-agnostic; today's Add-Existing
-    iteration cost was missing local-loop infrastructure, not
-    policy silence)
-13. Code-reviewer subagent for gate-input commits (Athena runs
-    before signaling Hestia)
+12. Reproducer-as-gate
+13. Code-reviewer subagent for gate-input commits (Athena pre-flight)
+14. Migration-checksum chase covers BOTH OSS wheel and AC embedded copy
+15. Run new-client smoke probes against rolled prod before patch tags
+16. Destructive cutover with cross-schema FKs requires constraint-diff
+    audit (prod vs clean baseline) as explicit verification step
+17. Pre-deploy gates with environment-specific prerequisites must
+    fail-closed with explicit bypass, not skip-on-missing
+18. Verified-live evidence cites the actually-committed SHA, not a
+    bumped-but-unreverified SHA
+19. Work in flight (uncommitted bumps, in-progress procedures) does not
+    count as released until tag is pushed and live-verified
+20. Reproducer must match the empirical surface (CLI 409 reproducer
+    must surface 409 from production CLI binary against production
+    server, not just unit-test logic)
+21. Bless-and-run from peer = run the FULL release-ready chain
+    end-to-end, don't shortcut to bump+tag
+22. Code-reviewer subagent flagged silent-fall-through + the relevant
+    scale is realistic for the production trajectory ⇒ blocker, not
+    follow-up.
+23. Test failures recurring at specific clock windows + reruns clean
+    later are date/timezone-math signals, NOT transient-flake signals.
+24. Documented workarounds must be empirically attested against the
+    actual customer surface AND the predecessor states they apply on
+    top of, not just the surface they claim to work around.
+24a. **Pre-empirical SHA-diff inspection of release framing.** Before
+    accepting a release classification (CLI-only, server-only, full),
+    diff the actual SHAs against the predecessor and confirm the
+    classification matches the change shape. The framing in the
+    handoff mail is the author's intent; the diff is the truth.
+    Catches mis-classifications where wire-protocol changes are
+    framed as CLI-only. (Banked 2026-05-10 from aweb 1.20.8 cycle:
+    Athena framed as CLI-only #27a; SHA-diff against 1.20.7 found
+    d3dfb4b modifies server/src/aweb/routes/agents.py with new
+    `role_name` field that older servers silently drop. Hestia
+    pushed back with two-path mail; Athena layered (A) server bump
+    + (B) backward-compat fix.)
+25. When the empirical surface contradicts a hypothesis, that's a
+    refutation, not a "transient." Don't double down on the
+    hypothesis.
+26. "Affects only one customer in current base" is not a scope claim
+    about the bug class — it's an observation about THIS customer
+    base AT THIS MOMENT.
+27. Cut-the-deploy-only-if-functional-change. Don't cut a deploy
+    release purely to keep a pin-in-tagged-release synced.
+27a. CLI-only release pattern: don't bump server/pyproject.toml.
+    Tag aw-vX.Y.Z directly at the fix commit; goreleaser reads
+    version from `${GITHUB_REF_NAME#aw-v}` per workflow config.
+28. Tool-driven destructive git-state mutation is never acceptable
+    as a side effect of a non-git-management command, even with
+    loud warnings. Refuse + remediate, don't auto-fix the
+    customer's repo for them.
+29. **Refuse interpretive-doc-only wire-ins.** A draft markdown that
+    describes what to change is incomplete. Hestia cannot deploy from
+    narrative. The author commits actual edits to the source surface;
+    markdown serves as narrative around them, not substitute. Same
+    shape as #2 (review via shared working tree, not chat-pasted
+    diffs) extended to the site-author surface. (Banked 2026-05-10
+    from homepage-refresh slip: Iris's first bundle was a copy-bundle
+    narrative in publishing/drafts/; Hestia started wiring it into
+    ac/site/. Juan caught it. Iris re-authored on ac main as 58ed6c53
+    — proper shape. Banking the rule for future bundles.)
 
-`status/weekly.md` continues as a roll-up until replaced by a
-proper dashboard.
+`status/weekly.md` continues as a roll-up until replaced by a proper
+dashboard.

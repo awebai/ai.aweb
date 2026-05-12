@@ -1,6 +1,89 @@
 # Sofia Handoff
 
-Last updated: 2026-05-02 morning (Day-2 of team-genesis)
+Last updated: 2026-05-12 (persona priority reorder + UX simplification pass beginning)
+
+## Check first on next wake-up
+
+1. **Persona priority reordered (2026-05-12, Juan's call).**
+   New ordering: Personal-AI consumer (P1) → Company with
+   AI-using employees (P2) → Developer team (P3, was #1) →
+   Platform builder (P4, was #2). Decision record at
+   `docs/decisions.md` 2026-05-12. `docs/audiences.md`
+   rewritten to add Personas 1+2 and reframe to "persona"
+   terminology. Architecture unchanged; what shifts is what
+   we reach first, what onboarding optimizes for, what
+   landing copy targets, what channels content goes through.
+
+2. **UX simplification pass in flight.** Working artifacts:
+   `agents/sofia/ux-surface.md` (inventory snapshot) +
+   `agents/sofia/ux-surface.html` (persona-colored surface
+   map). Athena mailed (conv 70f1c868) to converge on a
+   cut list before either of us proposes externally.
+   Specific simplification candidates listed in the mail:
+   the "Two Paths" duplication, /connect-in-two-places,
+   Identities-vs-Contacts overlap, auth-page near-dupes,
+   MCP duplicate verbs (contacts_list vs list_contacts,
+   wrap-tools), 3 first-time-user surfaces. Awaiting
+   Athena's read. Juan's next ask after that converges:
+   actually do the simplification cut.
+
+3. **docs/customer-onboarding-flows.md is gone — Juan's call**
+   (commit 47a9558, 2026-05-12). The customer-shape discipline
+   it carried is now absorbed across three surfaces: aweb-aanp
+   brief (dev team, Athena's surface — request relay if
+   needed), publishing/voice.md (Iris's surface, reads cleanly
+   from Sofia), and each agent's AGENTS.md operational
+   application. Sofia AGENTS.md updated to reflect the new
+   authority chain. The discipline itself remains
+   non-skippable for landing/onboarding copy review.
+
+2. **Pass-3 is LIVE at aweb.ai** — verified 2026-05-10 14:51Z.
+   End-to-end gate cycle (catch → fix → stage → validate →
+   greenlight → deploy → verify-live) completed in ~3 hours.
+   Customer-shape discipline banked in Sofia + Iris + Hestia
+   AGENTS files; ask Aida to adopt next time she's active.
+2. **Customer-shape discipline now persistent.**
+   `docs/customer-onboarding-flows.md` is the new must-read
+   before any landing-copy review. Sofia AGENTS.md updated to
+   read it on every wake-up; Iris and Aida invited to do the
+   same. The discipline that prevents the Pass-2 miss recurring.
+3. **Bertha cross-namespace addressing.** The full-form address
+   `eugenie.aweb.ai/bertha` 404s from BOTH Sofia and Athena
+   (Athena confirmed in mail 9682a171); not a Sofia team-context
+   limit, an AC routing issue. **Bare alias `bertha` resolves
+   cross-namespace cleanly** — that's the working form. The
+   `/v1/directory` lookup endpoint also 404s (separate AC issue,
+   low frequency, no customer impact, not surfaced as engineering
+   ticket per Athena's call).
+
+   For future Bertha mail, try `aw mail send --to bertha` first;
+   fall back to relay via Athena if bare alias resolution starts
+   failing (it works today).
+
+4. **Branch protection on ac deploy-landing pending Juan.**
+   Hestia recommended PR-based with Juan + Sofia as approvers
+   (mail ab09f148); Sofia voted yes (mail in conversation
+   878c06b1). Juan holds GitHub repo admin; will implement when
+   convenient. No urgency.
+
+## Pass-3 cycle (2026-05-10) — what shipped to staging
+
+- Hero: H1 line-broken + 'AI agents'; subhead reframed around
+  Claude Desktop/ChatGPT/claude.ai surfaces; right column
+  3-step MCP connector card replaces npm install
+- 'Sign up' section: 3-step MCP walkthrough with per-client
+  snippets (claude.ai/ChatGPT/Claude Desktop)
+- 'Team quickstart' rebranded 'For developers' with the
+  agent-guide-paste prompt landed there
+- 'Hosted MCP' block repurposed as MCP technical detail
+- ac commit 60be8f4e on deploy-landing-staging
+- Render auto-deployed at 11:55:53Z; verified live via Playwright
+
+Sofia authored ac/site/ edits directly under Juan's time
+pressure ('when I come back I want to see the new preview
+online'). Discipline #29 honored: actual edits to source
+surface, not interpretive markdown. Crossed Iris's normal
+authoring lane; explained in mail 4d3f3053.
 
 ## Read this first
 

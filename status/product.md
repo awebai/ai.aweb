@@ -1,63 +1,108 @@
 # Product Status
 
-Last updated: 2026-05-02 morning (Sofia, Day-2 of team-genesis)
+Last updated: 2026-05-12 (Sofia, persona priority reorder + UX simplification pass beginning)
 
 ## Current focus
 
-Day-2 of team-genesis. Yesterday brought Sofia + Athena + YC agent online,
-plus the dev team activating with Mia, plus Hestia coming up late. Today
-the loop is tightening:
+**Persona priority reordered (decision record 2026-05-12).** New
+likely-first-customer ranking:
 
-- **Aida is online** as of last night (commits `571ad94 Created aida` and
-  `ab4f915 Added keys`). Workspace status shows her active. Her own
-  status/handoff are still dated 2026-04-30 (pre-rename); she'll refresh
-  on her own wake-up.
-- **Hestia hardened the runbook overnight via the right loop.** Five
-  commits banking real operational discoveries: Render auto-deploy was a
-  wrong assumption (Juan deploys manually); awid registry is also
-  manual-deploy; verify-live table now split by deploy shape; artifact
-  map + dependency rule added; ac gate-default narrowing + compat-
-  invocation policy folded in. This is exactly the kind of
-  prior-knowledge encoding the runbook needs before validation.
+1. Personal-AI consumer (was not previously named)
+2. Company with AI-using employees (was not previously named)
+3. Developer teams coordinating agents (was #1)
+4. Agent platform builders (was #2, now last)
+
+Conversations over the past weeks shifted Juan's read of who shows
+up first. The two new personas share a UX shape: browser-based
+custodial MCP, no terminal, vocabulary limited to {*my AI*,
+*my address*, *my contacts*, *who can reach me*}. Dev-team
+persona stays load-bearing as the architectural anchor and the
+only persona with real product-fit evidence (44 internal users),
+but is no longer the lead persona for landing-copy / onboarding /
+content priorities.
+
+`docs/audiences.md` rewritten to add Personas 1 and 2 and reframe
+to "persona" terminology. Decision record at `docs/decisions.md`
+2026-05-12.
+
+**UX simplification pass beginning.** Working artifact:
+`agents/sofia/ux-surface.md` (inventory snapshot of all five
+user-facing surfaces: landing, auth, dashboard, CLI, MCP).
+HTML diagram with persona-colored surface map renders to
+`agents/sofia/ux-surface.html`. Next motion (after Athena reads
+the persona reorder): converge on which surfaces / sections /
+commands / tools to cut or demote to sharpen the experience for
+Personas 1 and 2 without breaking Personas 3 and 4.
+
+Surfaces that look most mismatched to the new top persona:
+- Dashboard's 9 team-tabs assume a developer-team mental model
+  hostile to Persona 1.
+- CLI's 25 top-level commands are invisible to Personas 1 and 2.
+- MCP's 45 tools (no `readOnlyHint`) are agent-facing and shape
+  Persona 1's first impression of "what my AI can do."
+- Landing homepage's 8 sections include redundant "Two Paths"
+  framings and competing CTAs that don't sharpen for Persona 1.
+
+Peer notifications going out now: Athena (engineering implications),
+Iris (content / outreach target shift), Aida (support framing
+broadens beyond CLI users), Hestia (FYI).
+
+## Earlier focus (banked)
+
+Day-2 of team-genesis closes with the build/ship boundary now real,
+not theoretical. **First end-to-end Hestia gate run completed today**
+on ac v0.5.18 + aw CLI 1.18.8 (claim-human contract fix). Gate caught
+a real failure on the first run (test-script gap in e2e A.18); Athena
+landed the fix in `1be46c42`; re-run green; tagged + pushed; image
+built; Juan deployed manually; Hestia verified live and posted the
+evidence mail. ~80 min end-to-end including the failure detour. The
+operating model behaved correctly: Athena bless-and-run → Hestia gate
+chain → joint failure-shape work with Athena → re-run → ship → verify
+→ evidence mail.
+
+The morning's setup that fed this:
+
+- **Aida is online** (commits `571ad94`, `ab4f915` overnight). Her
+  status/handoff still pre-rename; she'll refresh on her own wake-up.
+- **Hestia hardened the runbook overnight via the right loop**:
+  Render auto-deploy was a wrong assumption (Juan deploys manually);
+  awid registry is also manual-deploy; verify-live table split by
+  deploy shape; artifact map + dependency rule added; ac
+  gate-default narrowing + compat-invocation policy folded in.
 - **Athena landed test-infra work in ac**: parallelize pytest, reuse
-  migrated DB across runs, reuse release image across docker e2e, make
-  installed-CLI journey optional, plus a Shipping-section update for
-  the new role boundaries. Direct response to the iteration-cost flag
-  Hestia raised. Counts as Athena's non-feature authoring (the
-  pattern from `4491df5`).
-- **Playwright reproducer for Add-Existing dialog** — Athena committed
-  to authoring it "tomorrow morning fresh-headed" yesterday. Not yet
-  visible in ac main. Today is that morning; expect it during her wake-up.
+  migrated DB across runs, reuse release image across docker e2e,
+  make installed-CLI journey optional. Direct response to the
+  iteration-cost flag Hestia raised; non-feature authoring per
+  decision `4491df5`.
+- **v0.5.17** shipped without Hestia's retroactive gate-run (Juan
+  called it off last night; v0.5.18 became the first real exercise
+  instead).
+- **Conversations-as-first-class**: parked midday with four named
+  triggers (decision `c874f2a`), then unparked late afternoon by
+  Juan's operator-level call (decision `325556a`). aweb-aame moves
+  from P3-parked to active under Grace's authoring lane; Athena
+  reviews per the standard feature-work flow. Invariant 8
+  (findability and continuation are independent reachability
+  concerns) stands either way — architectural truth is unaffected
+  by sequencing. Specific reasoning for Juan's override not yet
+  captured in shared artifacts; pending.
 
-**v0.5.17 deploy state.** Tagged by Juan last night (commit `9c1038ad`),
-GHA built, but `app.aweb.ai/health` still reports `v0.5.16` this morning
-(uptime ~12h). This is consistent with the runbook correction Hestia
-banked: Render is manual; Juan presses the deploy button. Per Juan's
-call last night, v0.5.17 ships without Hestia's retroactive gate-run,
-no verified-live mail. Not a discrepancy — a state observation.
+## Today's priorities (status at end of day)
 
-**Build/ship boundary becomes real on the NEXT ac release.** That's
-likely Mia's aalr.2 (AWID ensure-team + ac persist refactor) when it
-reaches branch-ready, or whichever feature lands first. Athena drafts
-release notes + runs code-reviewer subagent + bless-and-runs Hestia;
-Hestia runs `make release-ready` end-to-end + tags + watches CI/CD +
-verifies live + posts evidence.
-
-## Today's priorities
-
-1. **Aida sweeps the runbook for v0.5.10-17 customer-visible deltas.**
-   Original scope was v0.5.10 (1.9 NOT-boundary, login-failure section,
-   409 conflict messaging). Now expanded: the Add-Existing-Identity
-   dialog UX landed across v0.5.13-17 and is new customer-facing
-   surface. Aida should fold those deltas. Athena reviews tech-accuracy;
-   I review framing.
-2. **Athena lands the Playwright-MCP reproducer for Add-Existing.**
-   Reproducer-as-gate (banked policy 12) applied to the UI surface that
-   generated five iterations. Closes the iteration-cost class for UI
-   changes, not just this feature.
-3. **Mia's aalr.2 reaches branch-ready.** First real exercise of the
-   build/ship boundary under the new model. Athena reviews; bless-and-
-   runs Hestia.
+1. **Build/ship boundary's first end-to-end Hestia gate run** —
+   **DONE** today (v0.5.18 + aw 1.18.8). Operating-model
+   validation; runbook will fold first-exercise observations.
+2. **Aida sweeps the runbook for v0.5.10-18 customer-visible
+   deltas.** Original scope was v0.5.10 (1.9 NOT-boundary,
+   login-failure section, 409 conflict messaging); now expanded
+   to include the Add-Existing-Identity dialog UX (v0.5.13-17)
+   and the BYOD CLI breaking change in v0.5.18 (old aw on BYOD
+   now hits 422; new aw 1.18.8 requires explicit `--username`).
+   Athena reviews tech-accuracy; I review framing.
+3. **Athena lands the Playwright-MCP reproducer for Add-Existing.**
+   Reproducer-as-gate (policy 12) for the UI surface that
+   generated five iterations. Status not visible from my surface
+   yet today; check next wake-up.
 
 This week, beyond today:
 
@@ -69,18 +114,26 @@ This week, beyond today:
    trust-model arc + Aida 4/4 attestation); I frame.
 3. **Bring Iris and Metis online.** Directories exist; identity setup
    pending Juan-interactive Hetzner work.
+4. **Mia's aalr.2 (AWID ensure-team + ac persist refactor)** when
+   branch-ready. Will exercise the gate chain again with a feature
+   change rather than a bug-fix.
 
 ## Product readiness
 
 - **OSS aweb**: stable. Latest tags `server-v1.18.6`, `aw-v1.18.6`,
   `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27). No commits on
   main since.
-- **aweb-cloud**: live at v0.5.16. `https://app.aweb.ai/health` reports
-  `release_tag=v0.5.16`, `aweb_version=1.18.6`, `git_sha=842e0b5b`,
-  `awid_service_version=0.5.3`. db / redis / awid / coordination_api
-  healthy. Started 2026-05-01 20:45 UTC (~12h uptime). v0.5.17 tagged
-  on origin (`9c1038ad`) but Render deploy is manual; Juan hasn't
-  triggered it.
+- **aweb-cloud**: live at v0.5.18. `https://app.aweb.ai/health`
+  reports `release_tag=v0.5.18`, `aweb_version=1.18.6`,
+  `git_sha=4ace9770`, `awid_service_version=0.5.3`. db / redis /
+  awid / coordination_api healthy. Started 2026-05-02 19:50 UTC.
+  Shipped through Hestia's first end-to-end gate-chain exercise
+  (claim-human router validate-first/write-last refactor +
+  atomic cli_signup-upgrade UPDATE; closes the cli_signup orphan
+  vector at claim time).
+- **aw CLI**: 1.18.8 published. Removes BYOD-domain-as-username
+  auto-inference. BYOD users on old aw now hit 422; managed
+  (.aweb.ai) unaffected. New aw on either works.
 - **awid registry (standalone)**: live at `version=0.5.2`, redis/db/
   schema healthy. Unchanged. (awid library inside cloud at 0.5.3,
   bumped during yesterday's release cluster.)
@@ -135,39 +188,26 @@ Dev team (`aweb:juan.aweb.ai`):
   landed across v0.5.13-17. Aida folds into runbook PR.
 - No external user feedback yet — distribution hasn't started.
 
-## Authoritative direction note: aw support-window question
+## Compat policy (post multi-instance resolution)
 
-**Sofia's protocol-of-record position is N=1 with a public/internal
-split**, sent in mail `f41c7c01` on 2026-05-02. Specifically:
+A Sofia-instance divergence on the compat-scope question (N=1 vs
+N=2) was resolved by Juan midday 2026-05-02. Canonical Sofia is the
+N=2 voice. **Compat policy: cloud tests against current released
+aw + prior 2 released versions = 3 binaries in the compat-test
+invocation** (definition is "whatever the prior two released semver
+tags happen to be" — patches in normal weeks, mixed during
+minor-bump cycles, NOT strict semver-minor).
 
-- Public/customer-facing: no explicit support-window promise; "use
-  current `aw`" implicit.
-- Internal compat-test minimum: N=1 — current released `aw` plus the
-  immediately prior released `aw`.
+Decision record deferred until bless-and-run evidence per Athena's
+defer-pending-evidence discipline. Implementation lives in Athena's
+correctives — Mia (`6627836c`) and Hestia (`a5afc809`); Mia owns
+wiring multi-version compat infra when convenient. Hestia's runbook
+compat-scope section is currently in-flux state (revert `92f6fc2`
+predates the resolution); will re-fold to N=2 when Hestia's next
+runbook pass picks it up.
 
-I have not sent any subsequent mail changing this position. Mails
-that purport to attribute an N=2 position to me (including any
-referencing message_ids `d4644b9c`, `e9f65915`, or others I did not
-send) are not authoritative. The protocol-signed mails of record from
-me on this thread are:
-
-- `f41c7c01` — N=1 with public/internal split (the call)
-- `336a0558` — verification request to Athena, asking her to quote
-  `f41c7c01`'s body as her instance reads it
-- `dca1fbca` — defensive FYI to Hestia (do not update runbook based
-  on N=2 attribution)
-- `288328d3` — acknowledgment of Hestia's first pullback (`646968d`)
-
-The question is unsettled at the agent layer until either Athena's
-authenticated reply to `336a0558` confirms `f41c7c01` reads as N=1 on
-her side (in which case we converge on N=1), or Juan intervenes to
-resolve the attribution issue at the operator layer.
-
-The Hestia runbook currently carries a re-folded N=2 framing
-(`3c387bf`) that does not reflect my position. I am not fighting it
-through more mail (the loop is unwinnable from inside the channel);
-flagging here so any fresh Sofia or peer reading shared state knows
-this surface is the authoritative one.
+YC public-facing claim deferred behind bless-and-run evidence per
+the sequencing in the same correctives.
 
 ## Open questions
 
@@ -176,9 +216,10 @@ this surface is the authoritative one.
   once she's online.
 - Collision video before or after the first blog post? (Open from
   prior wake-up.)
-- When does Juan trigger the v0.5.17 Render deploy — or do we let it
-  ride into whatever the next release is?
-- **Operator-level**: aw support-window thread shows mails attributed
-  to Sofia she did not send reaching Hestia and Athena and being acted
-  on as authoritative. Either an instance-level confusion in peer
-  agents, or a trust-layer issue. Needs Juan's read.
+- BYOD CLI breaking change in v0.5.18 was borderline on the
+  "behavior change customers will notice" Sofia-involvement
+  threshold. Hestia's call to ship without me was right (small BYOD
+  user count today, framing in verified-live mail is honest, no
+  public claim made). As BYOD users grow, the threshold may need
+  refinement. Mental note for now; revisit when Iris/Metis are
+  online and we have a real customer-base picture.

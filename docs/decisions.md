@@ -6,6 +6,525 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-12 — Persona priority reorder: consumer first, dev team third, platform builder last
+
+**Commit:** (this commit — adds personas 1+2 to `docs/audiences.md`
+and reframes the doc to "persona" terminology)
+
+**Decision maker:** Juan (founder call), with Sofia capturing.
+
+**What changed.** The persona ordering for likely-first-customer
+shifted. Old order (still implicit in much of the product, landing
+copy, and content):
+
+1. Developer teams coordinating agents
+2. Agent platform builders
+
+New order (effective 2026-05-12):
+
+1. **Personal-AI consumer** — individual ChatGPT / claude.ai /
+   Gemini user who wants her AI connected to her friends' AIs via
+   MCP. Doesn't want to know about teams, roles, or any identity
+   vocabulary. Mental model is {my AI, my address, my contacts,
+   who can reach me}.
+2. **Company with AI-using employees** — many employees each
+   running their own browser/desktop AI; company wants those AIs
+   to help the humans communicate. Custodial across the board.
+3. **Developer teams coordinating agents** — was #1; demoted to
+   #3. Still the persona with the most direct product-fit
+   evidence (44 internal users); still the architectural anchor;
+   no longer the lead persona for landing-copy / onboarding /
+   content priorities.
+4. **Agent platform builders** — was #2; demoted to last. Long-
+   term defensibility; no near-term product prioritization for
+   this persona.
+
+**Why.** Conversations over the past weeks (Juan + outreach
+contacts) indicate the consumer and company-fleet shapes are
+more likely first customers than developer teams. The two new
+personas share a UX shape: browser-based custodial MCP, no
+terminal, vocabulary limited to {address, contacts,
+reachability}. Both are already plausible without us building
+anything new on the protocol layer — the work is onboarding,
+packaging, and submission to the MCP-client directories.
+
+The dev-team persona stays load-bearing as the architectural
+anchor and the only persona with real product-fit evidence
+today. The reorder is about who we *reach first*, not who we
+*build for* — the architecture must continue to serve all four.
+
+**What it affects.**
+
+- **Product / engineering**: aweb-aanp epic + FUT-1 (Anthropic
+  Connectors Directory submission) + FUT-2 (OpenAI App
+  Directory submission) become higher priority. Dashboard
+  reframe — the 9 team-tabs assume a developer-team mental
+  model that's hostile to Persona 1; UX simplification pass
+  pending (Sofia + Athena).
+- **Landing copy**: the homepage Pass-3 framing was already in
+  the right direction (custodial-MCP first); next pass should
+  push further toward Persona 1 vocabulary and remove dev-team-
+  first signals from the hero / above-the-fold.
+- **Content / outreach (Iris)**: target audiences shift toward
+  consumer + company-fleet hangouts (consumer Reddit, AI
+  newsletters, LinkedIn for company-fleet decision-makers).
+  Voice guide carries the principles but the channel mix
+  changes.
+- **Support (Aida)**: runbook framing must expand beyond "what
+  CLI users hit"; consumer + company-fleet customers will not
+  have terminal-shaped questions.
+- **Analytics (Metis, when online)**: signal definitions for
+  persona-fit will include consumer + company-fleet shapes.
+- **Pricing / business model**: not changed by this reorder. To
+  be revisited as customer-fit evidence accumulates for the new
+  personas.
+
+**What is NOT changed.**
+
+- The architecture (four primitives, two product tiers, identity
+  trust chain).
+- The dogfooding work on Persona 3 (44 internal users on this
+  team's own workflow). That continues; it's what proves the
+  product works.
+- The voice guide principles (`publishing/voice.md`). Channel mix
+  shifts, voice doesn't.
+- Decision records and invariants for prior cycles.
+
+**Next motions queued.**
+
+1. Sofia + Athena converge on UX simplification implications
+   (the 9-tab dashboard, 25-command CLI, 45 MCP tools as seen
+   through the new persona lens). Working artifact:
+   `agents/sofia/ux-surface.md` + `agents/sofia/ux-surface.html`.
+2. Iris reorients content / outreach targeting once she's online.
+3. Aida absorbs Persona 1 + Persona 2 into runbook framing.
+4. Metis defines persona-fit signals once online.
+
+---
+
+## 2026-05-06 — Messaging-architecture cycle close: aame epic + pagination fix verified end-to-end
+
+**Commit:** `3e9a378` Messaging-architecture cycle close: v0.5.23 verified-live + framing ready for distribution
+
+**Decision maker:** Sofia (cycle framing) + Athena (technical content) + Hestia (verified-live + disciplines).
+
+**What this captures.** The messaging-architecture cycle
+(2026-05-03 → 2026-05-06) is closed and verified end-to-end. aweb
+1.20.2 + ac v0.5.23 are live as of 2026-05-06 06:14:33Z. The arc:
+
+- aweb 1.20.0 (2026-05-03): aame epic — first-class conversation
+  primitive, W3 cross-conversation replay protection,
+  conversation-aware CLI flags, 218 e2e tests.
+- aweb 1.20.1 (2026-05-04): chat-reply hotfix.
+- ac v0.5.22 (2026-05-05): cloud uptake of aweb 1.20.1; aame
+  architectural completion verified-live (decision `96134d6`);
+  pre-deploy duplicate-1to1 cleanup (195 conversations across 16
+  pairs).
+- aweb 1.20.2 (2026-05-06): mail-409 pagination fix
+  (`/v1/conversations` gains optional `participant_did`,
+  `participant_address`, `conversation_type` filters; CLI uses
+  focused query instead of first-page-of-100 sort).
+- ac v0.5.23 (2026-05-06): cloud uptake of aweb 1.20.2;
+  pagination fix verified-live.
+
+**Empirical attestation: three smoke probes against deployed v0.5.23
++ aweb 1.20.2.**
+
+1. Baseline auto-thread (page-1) — conversation `96317ca9`
+   (Athena↔Hestia, post-deploy). Clean.
+2. Stale-by-recency from default-team — conversation `878c06b1`
+   (Sofia↔Hestia, originated 2026-05-05 from yesterday's v0.5.22
+   framing reply). Pushed off first-100-most-recent by intervening
+   chat activity. Auto-thread worked.
+3. Stale-by-recency from cross-team-agent (load-bearing case) —
+   conversation `70f1c868` (Sofia↔Athena via Athena's default-team
+   agent_id). The exact 409 case that drove 1.20.2. CLI hit the new
+   server filter, server returned focused response containing
+   `70f1c868`, dedup matched, delivery succeeded.
+
+Pagination fix verified-live on every shape hypothesized.
+
+**Disciplines banked in Hestia's runbook (#18-#23).** Six
+operational disciplines from this cycle. Per banked-learnings
+routing, engineering-discipline lives in `agents/hestia/runbook.md`;
+brief list as cross-reference: verified-live cites actually-committed
+SHA (#18); work-in-flight ≠ released until tag pushed +
+live-verified (#19); reproducer must match empirical surface (#20);
+bless-and-run from peer = run FULL release-ready chain (#21);
+code-reviewer subagent flagging silent-fall-through + scale realistic
+for production trajectory ⇒ blocker, not follow-up (#22); date-
+fragility ≠ transient-flake — recurring failures at specific clock
+windows + reruns clean later are timezone-math signals (#23, caught
+by Juan's pushback). Canonical home in Hestia's runbook.
+
+**What this cycle did NOT close.**
+
+- **chat-403 on pre-aame chat sessions**: customer-side workaround
+  documented in Aida's runbook PR (`3279c973`). Signal threshold for
+  code fix: 2nd case in rolling 7d.
+- **Multi-team-agent agent_id-vs-did comparison**: cp.agent_id is
+  team-scoped; same did_key/did_aw across team memberships maps to
+  different agent_ids. Athena's lane (grep aweb codebase). Open ops
+  follow-up; non-blocking.
+- **Pytest-randomly seed-driven test contamination**: closed without
+  fix; root cause was date-fragility on UTC-vs-local-midnight,
+  banked as discipline #23 + fix at `b7e86745` lives on main, ships
+  next AC release.
+
+**Framing ready for distribution.** The cycle narrative is
+positioning-grade for outreach and YC: bug-class flagged →
+diagnosed → shipped → verified-live in ~24h with multi-agent
+coordination across the build/ship boundary; six disciplines banked
+from one cycle; date-fragility caught by Juan's pushback. The
+cycle-narrative is durable here; the customer-facing and protocol-
+positioning framings live in decisions `7d915e8` (protocol-primitive
+ship) and `96134d6` (architectural completion). Iris is not yet
+online (Hetzner identity setup pending); canonical framing is in
+those records for her wake-up. Routing to Eugenie via Juan is
+available now if external posting timing wants the narrative ahead
+of Iris's activation.
+
+**Cross-references.**
+
+- Architectural-completion decision (`96134d6`, 2026-05-05 evening).
+- Protocol-primitive decision (`7d915e8`, 2026-05-05 morning).
+- Migration-immutability gate (`3d7f878b`, 2026-05-05): structural
+  prevention; proved its keep on v0.5.22 deploy and again on v0.5.23.
+- Hestia's runbook for the six banked disciplines (canonical home).
+- 1.18.6 trust-model pivot (commit `7759abc`).
+- Invariant 8 (`docs/invariants.md`: findability and continuation
+  are independent reachability concerns).
+- KI#1 closure decision record: still pending; Athena's tech content
+  owed when she's ready.
+
+**Affects.** No code changes in this commit; durable artifact
+banking the cycle close. Future cycles inherit the disciplines via
+Hestia's runbook. Distribution work (Iris when online, or Juan +
+Eugenie now) has the source narrative ready.
+
+---
+
+## 2026-05-05 — aame architectural completion verified-live: writing creates a reply channel (aweb 1.20.1, ac v0.5.22)
+
+**Commit:** `96134d6` aame architectural completion verified-live: writing creates a reply channel
+
+**Decision maker:** Sofia (framing) + Athena (technical content + bless-and-run) + Hestia (gate chain + verified-live + misclaim flag).
+
+**What shipped (architectural completion of aame).** The protocol
+primitive that shipped this morning (aweb 1.19.1 / ac v0.5.21 — see
+the decision entry below) was incomplete for AC managed identity:
+cloud customers' did:keys without team-cert mode could not reliably
+continue conversations across team boundaries via address routing.
+Aida's onboarding flow surfaced the gap as customer-blocking shape
+A.6a during the day. Today's ship closes it.
+
+The customer-facing claim that becomes accurate at v0.5.22:
+
+- Writing to someone creates a reply channel they can use back,
+  end-to-end across team boundaries
+- AC managed identity (cloud customers without team-cert mode) can
+  continue conversations via address routing
+- Cross-team chat reply with private team-members-only target lands
+  in the same conversation
+- Mail auto-thread to an existing 1:1 works for both alias-routing
+  and address-routing
+
+**Empirical attestation.**
+
+- Morning ship (decision `7d915e8`): aweb 1.19.1 / ac v0.5.21 —
+  protocol primitive verified-live 2026-05-05 07:11Z.
+- Aida's onboarding A.6a surfaced the AC managed identity gap during
+  the day.
+- aweb 1.20.0 + aweb 1.20.1 shipped through Athena's iteration.
+- **aweb 1.20.1 was a misclaim release**: its release notes claimed
+  a fix that was empirically null on A.6a; the actual A.6a fix
+  landed in AC commit `f6c27c61`. **If external posting cites aweb
+  1.20.1 as the fix release, that's wrong — cite AC `f6c27c61`.**
+  Caveat banked here so future agents reading commit history don't
+  get confused.
+- ac v0.5.22 deployed 2026-05-05 21:27Z. `app.aweb.ai/health`:
+  `release_tag=v0.5.22`, `git_sha=f6c27c61`, `aweb_version=1.20.1`,
+  `awid_service_version=0.5.4`. Healthy.
+- Two Hestia smoke probes post-deploy (after duplicate-1:1 cleanup):
+  `aw mail send --to athena` → conversation `96317ca9`;
+  `aw mail send --to-address aweb.ai/athena` → SAME conversation
+  `96317ca9`. Athena's reply confirmed
+  `verification_status=verified`. The exact dual of A.6a — the
+  failure shape that drove three rounds of iteration — now passes in
+  production.
+- Migration-immutability gate (commit `3d7f878b`, banked this
+  morning) proved its keep on this deploy: no migration drift
+  through gate-time → deploy.
+
+**External framing (for outreach + future verified-live mails + YC
+posting moments).**
+
+Customer-facing version (use in verified-live mail body and outreach
+drafts):
+
+> When you write to someone in aweb, they can now reply back to you
+> in the same conversation — across team boundaries, across hosted
+> and self-hosted identities, regardless of whether you addressed
+> them by alias or address. Writing creates a reply channel; that
+> channel works end-to-end.
+
+Protocol-positioning version (for YC-grade language at external
+posting moments — coordinate with Iris and the YC agent on timing):
+
+> aweb's conversation primitive is now a fully reciprocal
+> addressable unit. Cross-team agent coordination works without
+> either side requiring the other to be publicly findable to receive
+> a reply. The cert-presentation auth model (1.18.6) extends to
+> conversation-scope (1.19.1) and now operates symmetrically across
+> all identity-routing paths (1.20.1 + ac v0.5.22).
+
+**What this is not.**
+
+- Not always-encrypted payloads (separate concern).
+- Not a new auth model (extends the 1.18.6 cert-presentation
+  predicate).
+- Not the first messaging in aweb (mail/chat shipped in 1.16.x; the
+  conversation primitive is the binding/lifecycle layer).
+- **aweb 1.20.1 release notes are misclaim-grade**: the actual A.6a
+  fix landed in AC `f6c27c61`. External posting must cite the AC
+  commit, not the aweb tag.
+
+**Cross-references.**
+
+- Morning ship decision (`7d915e8`): protocol primitive verified-live
+  (aweb 1.19.1 / ac v0.5.21). This entry is the architectural
+  completion that makes the customer-facing claim accurate.
+- 1.18.6 trust-model pivot (commit `7759abc`): cert-presentation
+  auth predicate, foundation that aame extends to conversation-scope
+  and now operates symmetrically across identity-routing paths.
+- Migration-immutability gate (commit `3d7f878b`): structural
+  prevention from this morning's banked discipline; proved its keep
+  on tonight's deploy.
+- Invariant 8 (`docs/invariants.md`: findability and continuation
+  are independent reachability concerns) — aame's symmetric
+  reciprocal routing is the operational realization.
+- KI#1 closure decision record: still pending; Athena's tech content
+  is owed.
+
+**Affects.** Cloud at v0.5.22 carries the rollup. Customer-facing
+flow (Aida's onboarding A.6a) is unblocked. External framing ready
+for outreach (Iris when online) and YC posting work; voice-shape per
+`publishing/voice.md`. Migration-immutability gate now mechanically
+enforced at AC release-ready.
+
+---
+
+## 2026-05-05 — aame verified-live: conversations as first-class primitive (aweb 1.19.1, ac v0.5.21)
+
+**Commit:** `7d915e8` aame verified-live: decision record for conversations as first-class primitive
+
+**Decision maker:** Sofia (framing) + Athena (technical content + bless-and-run) + Hestia (gate chain + verified-live).
+
+**What shipped.** Conversations are now a first-class object in the
+aweb protocol. Signed message canonical payloads bind
+`conversation_id`, so the same payload cannot be replayed across
+conversations. The cert-presentation auth predicate from 1.18.6
+(commit `7759abc`) extends to conversation-scope without introducing
+new trust primitives. Conversations bind at the persistent did:aw
+layer, so rotated did:keys continue conversations.
+
+Specific shape:
+
+- `conversations` table records `conversation_id`, type
+  (`mail`|`chat`), TTL, participant set
+- W3 enforcement: every signed message canonical payload binds
+  `conversation_id`
+- Legacy pre-aame messages flagged `verified_legacy`; continuation
+  paths reject `verified_legacy`
+- Lazy 30-day sliding TTL; check-on-read (no background sweeper)
+
+**Live state (verified 2026-05-05 07:11Z).** `app.aweb.ai/health`:
+`release_tag=v0.5.21`, `aweb_version=1.19.1`, `git_sha=8d6b37a2`,
+`awid_service_version=0.5.4`. aweb OSS 1.19.1; aw CLI 1.19.x; awid
+0.5.4; channel 1.4.0.
+
+**Empirical attestation.**
+
+- 2026-05-03: aweb 1.19.0 / aw 1.19.0 / awid 0.5.4 / channel 1.4.0
+  shipped (OSS layer).
+- 2026-05-04: v0.5.19 cloud deploy attempted; FAILED on two
+  regressions (migration checksum drift; routing guard breaking
+  same-team mail/chat). Rolled back to v0.5.18.
+- 2026-05-04 evening: aweb 1.19.1 shipped with routing fix (extracted
+  `address_auth.py`: same-team team_id-equality + cryptographic
+  signature verification before signed_payload binding). 9
+  reproducer-as-gate tests across HTTP and MCP surfaces.
+- v0.5.20: aweb-schema cutover #1 (consolidated 001 from `49b1525c`;
+  schema-equivalence proven IDENTICAL).
+- v0.5.21: aweb_cloud-schema cutover #2 (Grace's `8fa36cd0`
+  disciplined recovery via file-revert + forward-additive 002;
+  schema-equivalence IDENTICAL; closed schema drift, 226 baseline
+  restored, 6 cross-schema FKs restored).
+- Both cutovers + 1.19.1 routing fix verified-live via
+  channel-routed mail/chat smoke probes.
+
+**What this is not.**
+
+- Not the first messaging in aweb — mail and chat shipped in 1.16.x.
+- Not a new auth model — extends 1.18.6 cert-presentation predicate
+  to conversation-scope.
+- Not always-encrypted-payloads — conversations are routing/replay-
+  protection infrastructure; payload encryption is separate work.
+
+**Why this matters.** Any agent-to-agent flow that coordinates over
+multiple turns needs replay protection at conversation scope.
+Without it, an adversary capturing one turn's signed message could
+replay it into a different conversation under the same recipient.
+Conversations as first-class objects make that impossible by
+construction. Load-bearing for cross-organizational agent
+coordination — once two organizations' agents have repeated business
+with each other, conversation-scope is what makes the trust model
+durable across the boundary.
+
+**Cross-references.**
+
+- 1.18.6 trust-model pivot (commit `7759abc`): cert-presentation
+  auth predicate, the architectural foundation aame extends.
+- KI#1 closure decision record: still pending; Athena has tech
+  content ready (cert-presentation auth correction + aalk continuity
+  arc + 1.18.6 trust-model arc + Aida 4/4 attestation). aame and
+  KI#1 sit in the same arc — KI#1 is the trust-model pivot
+  (April 2026); aame is the protocol primitive that exercises that
+  pivot at conversation scope (May 2026).
+- aame park decision (commit `c874f2a`, 2026-05-02): superseded by
+  Juan's unpark (commit `325556a`, 2026-05-02); now ratified by
+  ship.
+- Invariant 8 (`docs/invariants.md`: findability and continuation
+  are independent reachability concerns) — aame is the
+  implementation that operationalizes invariant 8 in the protocol.
+
+**External framing routing.** Sofia mails Hestia (the language to
+use in the verified-live external-facing mail body) and Iris (the
+framing for outreach drafts) separately. Both source content is
+the "What shipped" + "What this is not" + "Why this matters"
+sections above, voice-shaped per `publishing/voice.md`. YC public-
+facing claim language held until external posting moment per the
+sequencing established 2026-05-02.
+
+**Affects.** Protocol surface area. New `conversations` table + 002
+migration in aweb-server. aw CLI 1.19.x supports the conversation
+primitive. awid 0.5.4 + channel 1.4.0 align. Cloud at v0.5.21
+carries the rollup. Working doc
+`aweb/docs/conversations-as-first-class.md` to be deleted per
+Juan's brief now that implementation has landed.
+
+---
+
+## 2026-05-02 — Unpark "conversations as first-class": Juan-directed, Grace authors
+
+**Commit:** `325556a` Unpark conversations-as-first-class: Juan-directed, Grace authors
+
+**Decision maker:** Juan (operator-level override of the peer-converged park entry below).
+
+**Decision.** `aweb-aame` is unparked and active immediately. Grace
+authors: decompose into sub-tasks → implement → mail Athena for review
+when done → delete the working doc at
+`aweb/docs/conversations-as-first-class.md` when tasks are complete.
+Athena reviews per the feature-work flow in her `AGENTS.md`. The four
+named triggers from the prior entry (cross-team conv volume, customer
+pull, Athena-relay saturation, distribution evidence) are no longer
+operational gates; they remain in the entry below as historical
+context for the original parking reasoning.
+
+**Why.** Juan made an operator-level call to unpark; specific
+reasoning not yet captured in shared artifacts as of this entry.
+Possible context Athena and Sofia considered (without committing to
+any of them): relay-pattern saturation Juan is seeing operationally,
+wanting the conversation primitive in place before distribution
+lands and surfaces cross-org cases, or strategic order-of-investment
+factors. Neither peer is on the founder-side of that view; the
+entry stands on operator authority and will be amended if Juan
+surfaces the reasoning.
+
+**What this overrides.** The "Park 'conversations as first-class'
+with named triggers" entry below (commit `c874f2a`). That entry's
+analysis of engineering cost (~weeks of cross-repo work;
+mail-threading-first prerequisite; 1.18.6 trust-model arc recently
+stable) is unchanged factually — Juan accepted those costs in the
+unpark decision.
+
+**What this does not change.** Invariant 8 in `docs/invariants.md`
+(findability and continuation are independent reachability
+concerns). The architectural truth is unaffected by sequencing.
+
+**Affects.** `aweb-aame` epic moves from P3-parked to active under
+Grace's authoring lane. The working doc at
+`aweb/docs/conversations-as-first-class.md` becomes the
+implementation-target/spec rather than a parked artifact; deleted on
+task completion per Juan's brief to Athena. No invariant changes,
+no other doc changes in this commit.
+
+---
+
+## 2026-05-02 — Park "conversations as first-class" with named triggers
+
+**Commit:** `c874f2a` Bank invariant 8 + park conversations-as-first-class with named triggers
+
+**Decision maker:** Sofia + Athena (peer-converged via direction-thread mail, 2026-05-02).
+
+**Decision.** Park investment in making conversations a first-class
+object in the protocol. Bank the architectural framing in two
+artifacts: a working doc at `aweb/docs/conversations-as-first-class.md`
+(Athena, banked separately, not promoted) and a new invariant in
+`docs/invariants.md` (added in this commit). Athena files a
+tracked-but-unscoped epic in aw tasks. No engineering scope begins
+until a named trigger fires.
+
+**Why.** Distribution is the current bottleneck, not protocol features
+(invariant 6). The reachability asymmetry — address-based routing
+404s for restricted-reachability recipients (e.g.
+`aweb.ai/aida → juan.aweb.ai/mia`) — bites rarely at 44-user
+dogfooding scale; Athena-relay handles it operationally. Mail-
+threading-first is itself non-trivial engineering work; opening a
+multi-week cross-repo protocol change while distribution hasn't
+started would burn cycles on a problem that isn't yet load-bearing.
+The 1.18.6 trust-model arc is recent and stable; re-opening protocol
+shape so soon is real cost. The trigger system below addresses the
+"deferring forever" risk: park with named triggers means we revisit
+on signal, not vibes.
+
+**Triggers (any one fires the revisit):**
+
+1. **A**: 8+ cross-team coordination moments per week (volume signal
+   — raw agent count conflates with team growth for unrelated
+   reasons, so volume is the right axis).
+2. **B**: customer use case actually pulls for cross-org agent
+   coordination.
+3. **C**: Athena-relay saturation — 5+ relays in any 24h window where
+   Athena is the bridge. Self-reported by Athena (operational mail to
+   Sofia) until Metis comes online and instruments it.
+4. **D**: distribution evidence of pull — real users surfacing the
+   cross-org need.
+
+**The fix when we go.** Conversations as first-class objects in the
+protocol, with explicit lifecycle and participant set. Mail threading
+as prerequisite (mail today has only `reply_to UUID` chains; chat
+already has `session_id`). Cert-presentation auth (already in 1.18.6,
+commit `7759abc`) as the verification anchor. AWID stays a pure
+findability registry. The verification gap originally hypothesized in
+Athena's brief was a false alarm — Mia confirmed both directions
+verified via `aw mail inbox --show-all --json`; the `verified=false`
+was a renderer artifact (separate P1/P2 fix, not architectural).
+
+**Customer-facing claim deferred behind evidence.** When the
+engineering work ships, "first-class conversations across
+organizational boundaries" is positioning gold for YC and outreach.
+Until then, no public claim — banked-too-early protocol promises
+become stale.
+
+**Affects.** `docs/invariants.md` (new invariant 8: findability and
+continuation are independent reachability concerns),
+`aweb/docs/conversations-as-first-class.md` (working doc, Athena
+banks separately), aw epic (Athena to file). No code changes in this
+commit.
+
+---
+
 ## 2026-05-01 — Athena owns code; ephemeral pairs author feature changes
 
 **Commit:** `4491df5` Athena owns code; ephemeral pairs author feature changes

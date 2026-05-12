@@ -1,191 +1,176 @@
 # Hestia Handoff
 
-Last updated: 2026-05-01 23:55 CEST (post-Juan-call; v0.5.17
-retroactive exercise called off; waiting on next bless-and-run)
+Last updated: 2026-05-10 10:50 CEST (08:50 UTC) — aweb 1.20.8 verified-
+live (option 2 framing: aang/aanh/aanj closed for ALL customers; aani
+closed for OSS-direct only; aani for AC-hosted DEFERRED to AC v0.5.26).
+Standing by for v0.5.26 cycle.
 
 ## Read this first
 
 You are Hestia. You carry every release across the build/ship boundary
-and keep the company machinery healthy in between. Tonight (2026-05-01)
-was the first wake-up under live identity — the runtime layer for the
-role separation became real. Identity, mailing, gating, and a runbook
-all came online today.
+and keep the company machinery healthy in between.
 
-The team you work with:
+## Active cycle: aweb 1.20.8 verified-live + AC v0.5.26 ahead
 
-- **Sofia**: direction — priorities, decisions, technical direction,
-  release-claim framing for external-claim-weighted releases.
-- **Athena**: code in aweb and ac. Briefs you with bless-and-run mail
-  after running code-reviewer subagent on gate-input commits.
-- **Mia / Noah / Grace / Kate**: dev team (`aweb:juan.aweb.ai`,
-  separate cryptographic team). Author feature work, Athena reviews.
-- **Aida / Iris / Metis**: pending Hetzner deploy. Not yet online.
+**1.20.8 ship complete**:
+- Tags `server-v1.20.8` + `aw-v1.20.8` pushed individually at 637cd74
+  (Grace's backward-compat fix on top of Athena's server bump 78b364e).
+- PyPI: aweb 1.20.8 latest.
+- npm: @awebai/aw 1.20.8 latest.
+- aw upgrade 1.20.7 → 1.20.8 dogfood-clean (5th self-upgrade
+  attestation: 1.20.3 → 4 → 5 → 6 → 7 → 8 all clean).
+- aw version: 1.20.8 commit=303e0e3 built=2026-05-10T07:49:18Z.
+- make ship at 637cd74 (mine): ALL PASSED 218 tests (matches Athena's).
 
-Within your role, you decide. Across roles, collaborate. Tonight's
-working agreements got banked from real exchange — see "banked
-working agreements" below.
+**Verified-live framing — option 2 (Sofia + Athena confirmed)**:
 
-## Identity (live as of 2026-05-01 21:05 UTC)
+CLOSED for ALL customers:
+- aweb-aang (LOAD-BEARING): hosted add-worktree + cli-signup api_key.
+  Pepe-class autonomous-install no longer hits 'API key required' wall.
+- aweb-aanh: aw init --hosted produces fully-bound workspace.yaml.
+- aweb-aanj: aw roles set accepts array-shaped bundles (CLI-only, no AC
+  interception).
+
+CLOSED for OSS-direct customers (self-hosted aweb without AC):
+- aweb-aani: aw role-name set works end-to-end via OSS PatchWorkspace
+  alias resolution.
+
+DEFERRED to AC v0.5.26:
+- aweb-aani for AC-hosted customers (including Pepe). AC's
+  agent_lifecycle.UpdateAgentRequest at agent_lifecycle.py:84 intercepts
+  /api/v1/agents/me PATCH before the OSS /api mount handles it. The
+  empirical 422 returns AC's schema error (access_mode required, role/
+  role_name extra_forbidden), NOT OSS's PatchWorkspaceRequest.
+
+**Pepe Reyero correction (per Athena 5/10)**: Pepe IS AC-hosted (signed
+up via `aw init --hosted --username formlab --alias vision`). His
+original aw role-name set 422 matches AC UpdateAgentRequest exactly —
+the empirical probe today replicates his original failure. aang/aanh
+unblock his autonomous-install NOW; aani waits for v0.5.26.
+
+**Mails sent this cycle**:
+- Verified-live to athena (02414be4), sofia (7e56ec43), aida (e817fbd5).
+- Pepe partial-unblock brief to bertha (5a73c5ed) for Eugenie/Juan relay.
+- Re-confirmation to sofia (a597cd86) on HOLD direction.
+- Aida tech-accuracy review (d3fcdfd8) for runbook aani entry.
+- Initial finding mail to athena (f159c881) which surfaced the AC
+  intercept — kicked off the option 2 framing alignment.
+
+## Active holds (HESTIA's lane to break)
+
+- **Iris dispatch**: HELD until v0.5.26 verified-live. NOTE: Sofia
+  takes the actual dispatch (her lane), with the full customer-evidence
+  arc receipt: "real customer hit four frictions on 2026-05-09; all
+  four shipped end-to-end within 48hrs across two coordinated
+  releases." I do NOT auto-dispatch on the Pass-2 trigger.
+
+- **Aida runbook aani entry**: stack-on-e15838c on her sign-off, will
+  be removed with TIME-LIMITED close-trigger when v0.5.26 verifies.
+  When v0.5.26 lands verified-live, send a short close mail to Aida
+  explicitly tagging the entry for removal.
+
+## AC v0.5.26 — what's coming
+
+Athena's confirmed scope:
+1. aweb pin lockfile bump (>=1.20.2 → 1.20.8 floor pulled).
+2. AC route fix for aani: extend UpdateAgentRequest with role/role_name
+   fields, thread to OSS PatchWorkspace flow (Athena's lane, possibly
+   coordinating with Mia or Grace).
+3. Backend regression tests covering all body shapes (role-only,
+   role_name-only, both, access_mode-only, mixed).
+4. Real-Docker AC + e2e CLI to confirm Pepe's flow works end-to-end.
+
+When Athena signals release-ready: pull, run `make release-ready`
+end-to-end (discipline #21), tag, push, watch deploy, verify aani
+post-deploy probe. Then signal Sofia for the full-arc Iris dispatch.
+
+ETA estimate (told to Aida): 1-2 days from now (2026-05-10 08:25 UTC),
+so landing Mon 5/11 or Tue 5/12 if nothing surprises. Render deploy
+lag pattern (last 2 cycles 4-7h GHA→/health flip) adds a few hours
+buffer.
+
+## Identity (live since 2026-05-01 21:05 UTC)
 
 - did: `did:key:z6MkebRpF7qEFNt5vAYa5BWjegFk1igt6mRESqWb5r3kp9AK`
 - stable: `did:aw:3fC4cfvFuVAxZCWyJNRCoUxHVAim`
-- address: `aweb.ai/hestia`
-- active team: `default:aweb.ai` (company team)
-- workspace_id: `8ae26888-ee11-4e1f-beff-aaab79b44b58`
-- registry: registered at `https://api.awid.ai`
+- address: `aweb.ai/hestia` (reachability=nobody)
+- active team: `default:aweb.ai`
 
-## What's in flight tonight
+## What's live (verified 2026-05-10 07:38:54Z)
 
-**Nothing.** The v0.5.17 retroactive exercise was kicked off
-(Athena's bless-and-run, ~21:15Z) and called off by Juan ~22:00Z —
-v0.5.17 ships without my retroactive verification. Local
-`make release-ready` was terminated; the log at
-`/tmp/hestia-release-ready-v0.5.17.log` is partial and not worth
-reading. No verified-live mail to post.
+- **ac**: v0.5.25 at app.aweb.ai,
+  git_sha=`77e60e5bdf7566e2c712cef8cb6462341cdb6ede`,
+  aweb_version=1.20.7, awid_service_version=0.5.4. Started
+  2026-05-10T07:07:11Z.
+- **aw CLI**: 1.20.8 published on npm (`@awebai/aw`).
+- **aweb server**: 1.20.8 on PyPI.
+- **awid registry**: 0.5.4 at api.awid.ai. Healthy.
+- **channel**: 1.4.0 on npm.
 
-The first real exercise comes on the **next** bless-and-run mail
-from Athena — that is what wakes me into a release.
+App.aweb.ai still pinned to aweb 1.20.7 — v0.5.26 lockfile bump pulls
+1.20.8 + ships AC route fix.
 
-**What's true about v0.5.17 for the record:**
+## Bertha pipeline (operational since 2026-05-08)
 
-- Tag `v0.5.17` (annotated, `b6c6e088`) is on origin pointing at
-  `9c1038ad` (ac main). Authored by Mia at 22:55 CEST 2026-05-01.
-- Fix: layout containment in `AgentsPage.tsx` so the long
-  fetch-cert command list scrolls horizontally inside the
-  Add-Existing dialog instead of widening the modal.
-- GHA "Build Release Image" run id `25233272933` started 21:09:18Z;
-  was 27+ min in when last checked (vs ~13 min for v0.5.16).
-- /health was still v0.5.16 at hand-off time. Juan's manual deploy
-  state is no longer my concern for this release.
+- **Daily sign-up export** (cron 2ddbdd18, daily 08:13 CEST).
+- **Hourly multi-agent milestone check** (cron f6adaa50, hourly).
+  Last fire 2026-05-10 07:36:02Z, 0 candidates.
 
-**Next instance reads first:**
+Both crons are session-only (CronCreate `durable=true` doesn't take —
+ops debt; system cron / launchd is durable answer).
 
-1. `aw mail inbox` and `aw chat pending`. The release-handoff
-   mail from Athena is what kicks the next exercise.
-2. `/health` on `app.aweb.ai` and `api.awid.ai`. Compare to
-   `status/product.md` claims; flag drift to Sofia if any.
-3. `aw work active` and `aw work blocked`. Sweep stale claims.
-4. If a release-handoff mail arrived, run the runbook end-to-end.
-   That's the first real validation of the seeded runbook.
-5. If no handoff but a clean-main commit appeared on ac/aweb that
-   looks candidate-shaped (version bump in pyproject + uv.lock),
-   mail Athena: "is X queued for my chain?"
+## Banked this cycle
 
-## Banked working agreements (from tonight's exchanges)
+**Discipline #24b** (refines #24a) — adopted verbatim by Athena and
+Sofia; lives in operations.md standing release-discipline list:
 
-**Sofia (mail thread 2026-05-01):**
+> "Pre-empirical SHA-diff inspection covers ROUTE TOPOLOGY across
+> deployment targets. When a fix touches a path that is mounted under
+> both AC's direct routes AND the OSS /api mount, verify which handler
+> wins on the actual deployed surface. Make ship's OSS-direct Docker
+> e2e attests OSS path correctness; it does NOT attest AC's
+> interception layer. Empirical probe against deployed AC surface is
+> required for AC-deployable claims."
 
-- Bug-fix / no-external-claim-weight releases tag through Hestia's
-  gate chain by default. Sofia is OUT of routing.
-- Mail Sofia BEFORE tag only when the release carries external-
-  claim weight: new public capability, customer-visible behavior
-  change, anything affecting value-prop framing.
-- Otherwise Sofia reads `/health` when verified-live mail posts.
+The v0.5.26 cycle being load-bearing for AC-hosted aani is itself the
+discipline working — pre-empirical route-topology check this cycle
+correctly identified v0.5.26 as required follow-up, not optional.
 
-**Athena (mail 2026-05-01):**
+## Open follow-ups (Hestia's lane)
 
-- **Going-forward routing.** Dev team stops at "branch ready /
-  clean main." They do NOT tag. Tags + gates + deploys + verify-
-  live all in Hestia's lane.
-- Flow: dev team lands work + signals Athena → Athena runs code-
-  reviewer subagent on gate-input commit (policy 13) → Athena
-  drafts release notes + mails Hestia bless-and-run → Hestia runs
-  `make release-ready` → tag → push → wait for image → verify
-  live → post verified-live with evidence.
-- For v0.5.13–v0.5.16 (already shipped without me, retroactively
-  accepted) and v0.5.17 (already tagged by Mia before the routing
-  decision was banked): no rework. Going forward Athena will brief
-  Mia on the new flow.
-- Code-reviewer subagent runs BEFORE the bless-and-run mail, not
-  after.
-
-## State of the runbook (`runbook.md`)
-
-Exists as of 2026-05-01. Seeded from `../../docs/decisions.md` +
-Makefile survey. Marked **[unvalidated]** wherever the shape comes
-from prior decisions but I haven't yet executed it solo. Tonight's
-v0.5.17 exercise is the first validation pass — when it completes,
-update the unvalidated markers with real observations:
-
-- Per-gate timing under the new `test-cloud-user-journeys` shape.
-- Whether `make release-ready` requires anything I didn't anticipate
-  (env files, Docker stack pre-warming, controller key paths).
-- The shape of failure-mode output if any gate goes red.
-
-If the chain completed clean, fold the timing data into the runbook
-"step 4 (Gates)" section and remove the unvalidated marker on it.
-
-If the chain failed, mail Athena with the failure shape immediately
-(not next wake-up). Failure shape ≠ commit message grep — paste the
-actual error output.
-
-## Open follow-ups (Hestia-owned)
-
-1. **Time the publishing path.** Sofia flagged ~30+ min per cycle.
-   Compose the breakdown from GHA workflow logs: image build, GHCR
-   publish, Render deploy rollout, health-check wait. Bring numbers
-   to Athena/Sofia, not hand-waving.
-2. **Test-suite triage in `ac/Makefile`.** Identify which targets
-   compose to the ~20-min run, which are critical-path for changes
-   of various shapes. Bring data; engineering decides what to keep
-   / split / make optional.
-3. **Stale repo-manager dirs on disk** (`agents/coord-cloud/`,
-   `agents/repo-aweb/`). Untracked, low-priority, tracked under
-   `aweb-aals.5`.
-4. **Dashboard implementation** — signal inventory exists; concrete
-   dashboard / report TBD per `docs/company-dashboard.md`.
-
-## Open follow-ups (Athena-owned, on her surface)
-
-- **`ac/frontend/e2e/add-existing.spec.ts`** — Playwright-MCP
-  reproducer for the Add-Existing dialog. Athena committing
-  tonight or tomorrow morning. Wired into `make
-  test-cloud-user-journeys` as reproducer-as-gate (policy 12) for
-  the surface. Until it lands: mail Athena before signaling on any
-  Add-Existing-touching candidate so we add a manual eyes-on pass.
-- **Code-reviewer subagent pass on `937f37b0`** — Athena running
-  retroactively tonight while I do the gate-chain exercise. Result
-  expected in inbox.
-
-## Operational hygiene at this snapshot
-
-- `aw workspace status`: hestia / athena / sofia online on
-  default:aweb.ai. yc online in co.aweb. Dev team members
-  (`aweb:juan.aweb.ai`) not visible from my workspace — Athena is
-  the cross-team bridge.
-- `aw work active`: 0 rows. `aw work blocked`: 0 rows. Clean.
-- `mail inbox` after replies received: empty (Sofia + Athena
-  threads handled; expect Athena's code-reviewer-pass result to
-  arrive).
+1. **AC v0.5.26 ship** when Athena signals release-ready.
+2. **Render deploy lag pattern** (2 cycles in a row): re-flag if
+   v0.5.26 also shows it. Pattern, not blip — needs investigation.
+3. **CronCreate `durable=true`**: not taking; system cron / launchd
+   needed for true durability beyond session.
+4. **Aida's e15838c push** pending Juan greenlight (BYOD-422 +
+   framing-invariant only; aani entry stacks on top after v0.5.26).
+5. **Multi-team agent_id-vs-did follow-up**: Athena's lane.
+6. **Iris agent registration**: Hetzner identity bootstrap pending.
 
 ## What to check FIRST on next wake-up
 
-1. `aw mail inbox` and `aw chat pending` — release-handoff or peer
-   signal.
-2. `curl https://app.aweb.ai/health` and `curl https://api.awid.ai/health`
-   — current live state. Note whatever release_tag and git_sha are
-   showing in operations.md for the wake-up.
-3. `aw work active` and `aw work blocked` — sweep stale claims.
-4. If a release-handoff mail arrived, work the runbook end-to-end
-   on the new candidate.
-5. The publishing-path timing breakdown is owed to Sofia (Sofia's
-   first question of four). v0.5.16 baseline: 13m GHA + 7m Render =
-   20m tag-to-live. v0.5.17 GHA was 27+ min (slower; investigate
-   why). Pre-seed numbers when picking this up.
+1. `aw mail inbox` and `aw chat pending` — sweep messages.
+2. `curl https://app.aweb.ai/health` — confirm v0.5.25 still live OR
+   v0.5.26 if it shipped. If v0.5.26 live, run aani probe:
+   `aw role-name set coordinator` should now succeed (HTTP 200).
+3. `curl https://api.awid.ai/health` — confirm AWID healthy.
+4. `aw work active` and `aw work blocked` — sweep stale claims.
+5. Re-read `docs/decisions.md` for entries newer than last handoff.
+6. Hourly milestone-check cron firings — note any non-empty results.
+7. Athena's release-ready mail for v0.5.26 if landing.
 
 ## Sibling repo symlinks under this dir
 
 - `aweb` → `../../../aweb` (run gates here for aweb releases)
 - `ac` → `../../../ac` (run gates here for ac releases)
 
-Prefer `git -C aweb log` over `cd aweb && git log` — keeps CWD
-anchored. Do NOT run `aw` from sibling repos (different workspace
-identity). Read sibling repos to run gates and verify what shipped;
-do NOT edit code there (Athena's surface).
+Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
+`aw` from sibling repos. Read sibling repos to run gates and
+verify what shipped; do NOT edit code there (Athena's surface).
 
 ## Note on git author attribution
 
-Commits authored by dev-team members (Mia et al.) appear as
-"Juan Reyero" in `git log`. The actual agent identity is carried via
-the aweb cert. Cross-check author with Athena when attribution
-matters; she routes to the actual author.
+Commits authored by dev-team members (Mia / Grace et al.) appear
+as "Juan Reyero" in `git log`. The actual agent identity is
+carried via the aweb cert. Grace's 637cd74 = dev-team agent.

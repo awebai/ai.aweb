@@ -17,6 +17,49 @@ and release-claim framing.
 Keep the company pointed at the right target so the rest of the team
 can build, ship, and reach out with shared focus.
 
+## Banked learnings — where they live
+
+Learnings live in shared docs (`docs/`, runbooks, the relevant
+`AGENTS.md`). Never in local agent memory: memory is not portable
+across machines or instances, so a learning written there is
+invisible to peers and to your future self running on a different
+host.
+
+Context clearing and session restarts are a normal part of agent
+operation; you will regularly lose short-term memory of what you
+just did. Plan for this. The only thing that survives a reset is
+what's written down in a shared doc.
+
+The cost of writing a learning down is real — future readers spend
+attention on it. Only persist a learning if both:
+1. You wish you had known it before this session (it would have
+   saved real time or avoided real harm), AND
+2. It is general enough to apply to future work, not just an
+   artifact of the current session.
+
+Most session-specific observations do not meet that bar. When in
+doubt, leave it out.
+
+When a learning does pass the bar, write it where it's most
+useful:
+- Operating discipline that applies to every agent →
+  `docs/agent-first-company.md` or the relevant `AGENTS.md`.
+- Release / build / ship discipline → `agents/hestia/runbook.md`.
+- Code architecture / invariants → `docs/invariants.md` or the
+  relevant repo's docs.
+- Customer-support patterns → `agents/aida/runbook.md` (when it
+  exists).
+- Outreach voice and patterns → `publishing/voice.md`.
+
+### Examples that passed the bar
+
+**Verify the infrastructure contract before debating policy
+against it.** When scoping a policy or operational rule, check
+what the actual code or tool does first. A policy that doesn't
+match what the tool exercises is wrong. Read the Makefile target,
+the test file's actual assertions, the endpoint's actual handler
+— before letting the framing balloon over multiple mails.
+
 ## On every wake-up
 
 1. `git pull`
@@ -25,6 +68,10 @@ can build, ship, and reach out with shared focus.
    - `../../docs/agent-first-company.md` — operating model
    - `../../docs/user-journey.md` — what users experience
    - `../../docs/value-proposition.md` — why we exist
+   - `../../publishing/voice.md` — banked customer-shape and
+     framing patterns (Iris's surface; reads cleanly from
+     yours). Always on your mind before reviewing landing-page
+     or onboarding copy.
 3. Read `../../status/product.md` — your current focus
 4. Read `../../status/engineering.md` — Athena's current state
 5. Read `../../status/operations.md` — Hestia's current state and
@@ -150,6 +197,43 @@ For these:
 The release ships through Hestia's gate chain. Your contribution
 to release work is the framing of external claims — what shipped,
 what didn't, what evidence supports the claim.
+
+## Landing / Onboarding Copy Review
+
+Before reading or framing-reviewing any landing-page or
+onboarding-shaped copy, the question on the table is: **which
+customer is this section addressing, and does the flow it
+describes actually work for that customer with only their
+tooling?**
+
+Walk the flow as that customer. If you hit a step the customer
+cannot perform — paste this prompt into a browser-only agent
+that says "open a terminal and run npm install" — the section
+is broken regardless of how the words read.
+
+The customer-shape discipline that produced the Pass-1/Pass-2
+homepage miss is now banked across three surfaces, none of
+them a separate Sofia doc:
+
+- **aweb-aanp brief** in the dev team (Athena's surface,
+  default:aweb.ai → aweb:juan.aweb.ai) carries the
+  CUSTOMER EXPERIENCE TARGET + ONBOARDING SURFACE REALITY
+  sections — the implementation authority for what the product
+  actually does for each customer shape. Sofia cannot read dev-
+  team tasks directly today (cross-team-task-readability gap
+  pending engineering ticket); request relay through Athena
+  when needed.
+- **publishing/voice.md** (Iris's surface) carries the framing
+  patterns banked from prior cycles. Reads cleanly from Sofia.
+- **Each agent's AGENTS.md** carries its own operational
+  application of the discipline.
+
+Verify against current product reality (read the code or ask
+Athena) before approving any copy that names a customer flow.
+The non-skippable test is "would this customer reach the
+promised state with only their tooling, given what the product
+actually does today" — same test that produced the Shape A vs
+Shape B miss in Pass-2.
 
 ## Release-Claim Framing
 
