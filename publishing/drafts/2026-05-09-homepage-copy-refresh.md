@@ -61,6 +61,28 @@ path, the following constraints apply to any Pass-4 edit:
    author re-threads the reference from the bundle + AGENTS.md
    discipline.
 
+6. **Add-a-friend is handle-only during FUT-2 / .6.1 gap (from
+   Athena mail cda42ba0, 2026-05-12):** any copy describing the
+   add-a-friend mechanic (consumer-social surfaces, per-client
+   install snippets that mention inviting friends, future App
+   Directory listing copy) leads with the `@handle` path
+   (e.g., "share your @handle with a friend"). Email-invite
+   framed as "coming soon"; not as the primary path.
+
+   Mechanism: `add_contact_by_email` MCP tool is a stub returning
+   "unavailable" and is being dropped from the registry for the
+   v1 OpenAI App Directory submission to avoid rejection risk.
+   Grace's aweb-aanp.6.1 lands the email-typed contacts +
+   invite-code flow during the submission tail; tool gets re-
+   added then. Copy can revise to "share by handle or send an
+   invite email" once Sofia + Athena surface the .6.1 landed
+   signal.
+
+   Eugenie's gift-framing language still works ("share your AI's
+   address with a friend" / "send your @handle to a friend") —
+   just the underlying mechanism shifts from email-invite to
+   handle-share during the gap period.
+
 ---
 
 ## Pass-3 update (2026-05-11)
