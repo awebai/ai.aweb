@@ -1,65 +1,116 @@
 # Support Status
-Last updated: 2026-04-30 (post v0.5.10 deploy)
+Last updated: 2026-05-13 22:35 UTC (post aweb.ai consumer-entry ship)
 
 ## Current focus
 
-Support owns customer success first and learning second. The immediate
-operating standard is: get the customer to a safe next step, ask
-engineering before guessing on code-dependent answers, then record the
-feedback signal or task that came out of the support case. Tracking
-task: `aweb-aals.8`.
+Watching for the first **P1 (Personal-AI consumer)** and **P2 (Company
+with AI-using employees)** customer questions after the aweb.ai
+consumer-entry path shipped 2026-05-13 22:28Z (Sofia mail
+`aa9d70de`). Persona priority reordered 2026-05-12 (decision record
+2026-05-12): P1 consumer → P2 company → P3 developer team (was #1)
+→ P4 platform builder (was #2).
 
-Cloud rolled forward to **v0.5.10 / aweb 1.18.6** on 2026-04-30 05:54 UTC
-(release_tag=v0.5.10, git_sha=bce92c29). Per Athena's commit-traced
-engineering review (mail 320be732, sent before the role rename so it
-reads as "from randy" in the inbox), v0.5.10 layered auth-gate +
-personal-org invariants + admin write tools. Three customer-visible
-runbook deltas
-to land in the next runbook PR:
+The runbook is currently shape-complete for **P3 (CLI developer
+customers)**. P1+P2 support flows are not yet authored; standing
+posture per Sofia is **collect 2-3 real seed examples first, then
+author** — same TIME-LIMITED / reversible-evidence discipline that
+paid off on the chat-403 and aani cycles.
 
-1. **1.9 NOT-boundary**: pre-v0.5.10 personal teams may need
-   operator-run AWID backfill. If a customer hits cross-team-cert
-   weirdness on a pre-v0.5.10 account, route to engineering — do NOT
-   tell them to retry from the dashboard.
-2. **New login-failure section** (1.6 or 1.12): cover the new
-   `email_unverified` and `account_inactive` error codes users now see
-   distinctly at login (substance commit 20872ccf).
-3. **Namespace-claim collision messaging**: AWID controller conflicts
-   are now HTTP 409 + structured body (commits 3f9938d0 + 668a9dbd),
-   surfaced in CreateOrganizationDialog.tsx and OwnerSelector.tsx. If
-   1.9 covers org/namespace creation, cite the 409 shape.
+### Watch list — six expected P1+P2 question shapes (Sofia `aa9d70de`)
 
-Sections 1.7 (conversation policy) and 1.9 (create-new-agent) happy
-paths fill from the existing plan unchanged per the engineering
-verdict.
+1. **"I don't know my friend's @handle"** — discovery friction; email-invite path is followup work (aweb-aanp.6.1, Grace P2).
+2. **"My AI says it can't connect"** — OAuth-consent flow confusion across providers.
+3. **"I added Sarah but she didn't get my message"** — pending vs active contact state.
+4. **"What's the difference between my AI and my agent?"** — vocabulary; per aanw.7: `agent` = on-aweb actor, `AI`/client name = user's tool, `handle` = consumer identifier.
+5. **"Where do I see what my AI did?"** — observability of custodial AI actions.
+6. **"How do I block someone?"** — privacy default question; contacts-only-reachability may not be obvious from UI.
+
+Saved as seeds, not authored. Once 2-3 of these arrive empirically,
+runbook section follows.
 
 ## Open customer blockers
 
-- No new external user issues are recorded in this public status.
-- Existing support-runbook work remains in the support handoff and
-  `docs/support/`.
+None active. Customer activity over recent period closed cleanly
+(see Closed customer loops below).
 
 ## Waiting on engineering
 
-- Hosted custodial cases that require cloud state are Engineering
-  escalations until Engineering provides a support-facing procedure.
+Nothing customer-blocking. Customer-shape discipline lives in each
+agent's own AGENTS.md operational section + the `aweb-aanp` brief
+in the dev team (per Sofia mail `7b3fd3a5`). The
+`customer-onboarding-flows.md` doc was deleted 2026-05-12 (commit
+`47a9558`) and absorbed accordingly; `publishing/voice.md` will
+catch up the discipline pointer once Iris's update lands.
 
 ## Closed customer loops
 
-- KI#1 was marked closed in recent support/cloud handoffs after
-  empirical attestation. Engineering should keep release evidence
-  current in `status/engineering.md`.
+**Recent cycles, summarized**:
 
-## Learnings and patterns
+- **chat-403 surface (2026-05-06)**: closed without runbook
+  documentation. Empirically-zero customer reports + spec-lock on
+  `--start-conversation` made the would-be workaround actively
+  harmful (Hestia mails `1626ce35` + `b09ca4c4`). Case 6 absorbs
+  any rare future report.
+- **aani 422-on-AC-hosted (2026-05-08 → 2026-05-10)**: TIME-LIMITED
+  entry added at `e6b1303` against the actual shipped surface, then
+  REMOVED at `8179a3e` when AC `v0.5.26` verified-live closed the
+  surface in code. Hestia mail `96f74b81` triggered the close.
+  Discipline #24a's "two reversal-safe checkpoints" framing paid
+  off across the full cycle.
+- **BYOD-422 (`aw claim-human` 422 on BYOD without `--username`)**:
+  runbook entry landed via Mia's structured contribution (mail
+  `f393168c`, 2026-05-02). Committed at `e15838c` with framing
+  invariant. Still local-unpushed pending Juan's greenlight.
+- **Zeus (`gsk.aweb.ai/zeus`) onboarding**: walkthrough delivered
+  (mail `1e47e6f7`). Customer end-to-end unblocked on `aw 1.20.3` +
+  channel plugin; team-setup question answered with dashboard
+  API-key bootstrap as recommended path.
+- **DAgR positioning (Bertha → Eugenie)**: three-voice convergence
+  delivered (Aida first-look → Athena technical validation → Sofia
+  positioning lock). Frame #2 (identity-layer durability) locked;
+  post can ship.
 
-- Support should route every repeated user pain into a task with an
-  owner, reviewer, and feedback signal, but only after the customer has
-  a path forward or is explicitly waiting on a named task.
-- If the safe customer-facing answer depends on current code behavior,
-  release state, live data, identity/trust semantics, or a destructive
-  operation, Support asks Engineering before replying.
-- Ask self-custodial/BYOD customers to run `aw` themselves because
-  they hold the keys for keyed/local operations. Support can run
-  non-keyed public `aw` reads on the customer's behalf when the
-  customer provides the target DID or address. Do not ask hosted
-  custodial customers to run `aw`; they usually do not have it.
+## Learnings and patterns (banked for the AGENTS.md cleanup pass)
+
+- **Discipline #24** — documented workarounds must be empirically
+  attested against the customer surface, not just the surface they
+  claim to work around.
+- **Discipline #24a** — pre-empirical OK if provable from code-diff;
+  TIME-LIMITED marker + commit-stack shape make the discipline
+  self-reversible by construction ("two reversal-safe
+  checkpoints"). Applied across chat-403 (close before push) and
+  aani (add → REMOVE on close-trigger).
+- **Discipline #24b** — empirical probe against deployed AC surface
+  required for AC-deployable claims; OSS-direct Docker e2e necessary
+  but not sufficient. Sofia + Athena banking; lives in ops.md
+  standing list.
+- **Discipline #25** — `aw mail send --body "..."` triggers shell
+  substitution on markdown backticks (and silently corrupts the body).
+  Always use `--body-file` for any mail containing technical terms
+  in backticks. The `aw mail send --help` text already warns about
+  this.
+- **Incoming-report-triage shape** — when a customer reports a
+  surface that should be fixed in the current `aw` version, confirm
+  their `aw version` first; route unknowns to Case 6 ("Bug,
+  Regression, Or Outage").
+- **Mail-conversation continuation** — replying into an active
+  mail conversation requires `--conversation-id <id>` alone
+  (extracted from JSON inbox), without `--to-*` flags. Post-1.20.2
+  the CLI auto-resolves in many cases; explicit `--conversation-id`
+  is the unambiguous form.
+- **Cross-team routing** — `--to-did did:key:...` is the bidirectional
+  fallback; `--to-address` works when the recipient address is
+  AWID-publicly-indexed; chat is alias-only (no `--to-did`); when in
+  doubt and the work is engineering-coordination, route through
+  Athena per the discipline in AGENTS.md.
+
+## Standing held items (separate from this status update)
+
+- 4-commit runbook stack (`e15838c` + `e6b1303` + `8179a3e` + merge
+  `2b3e392`) local-unpushed pending Juan's greenlight. Net runbook
+  content after push = `e15838c`-equivalent.
+- AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing
+  sections) uncommitted, awaiting same greenlight.
+- AGENTS.md cleanup pass pending the right convergence point (the
+  architecture-plan-with-Grace and the simplification-pass-with-Athena
+  both inputs).
