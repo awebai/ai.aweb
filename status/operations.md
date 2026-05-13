@@ -1,17 +1,30 @@
 # Operations Status
 
-Last updated: 2026-05-13 21:18 CEST (19:18 UTC) — **AC v0.5.28 backend
-verified-live** + aweb 1.21.0 published end-to-end (PyPI ✓ npm ✓).
-**Site staging deploy 3** at main HEAD `0a9b1654` (pain-narrative
-iteration) just pushed to `deploy-landing-staging` per Athena mail
-b55e72a7. Production site deploy of Peter's pain-narrative held
-pending Bertha/Eugenie sign-off pass + Sofia framing-pass + Juan
-per-deploy greenlight.
+Last updated: 2026-05-13 21:55 CEST (19:55 UTC) — **AC v0.5.29 backend
+verified-live** (session-recognition fast-follow at e7dec3d8) +
+production schema brought current via `make prod-migrate-direct`
+(applied aweb 002 + aweb_cloud 003/004/005 — 4 migrations that had
+silently accumulated unrun since v0.5.25). **Site staging deploy 3**
+at main HEAD `0a9b1654` (pain-narrative iter) on
+`deploy-landing-staging` still held pending Bertha/Eugenie sign-off
++ Sofia framing-pass + Juan per-deploy greenlight.
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
 NOT yet on production aweb.ai. Three options for Juan to call: push
 site / reframe notes / split verified-live framing.
+
+**Schema-migration silent-gap discovery (2026-05-13)**: v0.5.25 → v0.5.29
+all shipped without startup migrations firing on Render. 4 pending
+migrations (aweb 002_contacts_handle_state +
+aweb_cloud 003_byot_custodial_pending_identities,
+004_mcp_oauth_connection_metadata, 005_consumer_contact_invites)
+silently accumulated unrun. Caught by Juan asking "have all the
+migrations run?" — empirical query of `schema_migrations` across
+three schemas found the drift. Resolved via
+`PROD_ENV_FILE=.env.production make prod-migrate-direct` at 19:49Z.
+Banking discipline #30 (next section). Render startup-migration
+mechanism root-cause investigation: Task #109.
 
 ## Current focus
 
@@ -131,16 +144,21 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-13 19:18Z)
+## Live state (verified 2026-05-13 19:55Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.28`, `aweb_version=1.21.0`,
-  `awid_service_version=0.5.4`, `git_sha=00064992262b95bb0fea75006d2d0fc87cec8e3d`.
-  Started 2026-05-13T18:55:32Z (Juan manual Render trigger).
+- `app.aweb.ai/health`: `release_tag=v0.5.29`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=e7dec3d899c48bd450040ce8a9e8f73ea9c5bab1`.
+  Started 2026-05-13T19:44:21Z (Juan manual Render trigger after GHA SUCCESS).
+- Schema-migration state empirically current across all 3 schemas:
+  - `server.schema_migrations`: 001 (1 row)
+  - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
+  - `aweb_cloud.schema_migrations`: 001 + 002 + 003_byot_custodial_pending_identities
+    + 004_mcp_oauth_connection_metadata + 005_consumer_contact_invites (5 rows)
 - `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
 - Site production (aweb.ai): pre-pain-narrative (Sofia-authored
   Pass-3 60be8f4e at deploy-landing tip).
 - Site staging (preview-urw1.onrender.com): pain-narrative iteration
-  at 0a9b1654 on `deploy-landing-staging` (just pushed).
+  at 0a9b1654 on `deploy-landing-staging`.
 
 ## Bertha pipeline — HANDOFF TO METIS (ANALYTICS) PER JUAN 2026-05-10
 
@@ -180,7 +198,8 @@ metis (sent this cycle).
 | AC v0.5.26 (1.20.8 uptake) | shipped + verified-live |
 | AC v0.5.27 | paused at tag — Render not triggered (Task #91) |
 | **aweb 1.21.0** (aanv pain-narrative + protocol refresh) | shipped + verified-live (PyPI ✓ npm ✓) |
-| **AC v0.5.28** (1.21.0 uptake + ContactView schema fix) | shipped + backend verified-live; site iteration staging-only |
+| AC v0.5.28 (1.21.0 uptake + ContactView schema fix) | shipped + backend verified-live; site iteration staging-only |
+| **AC v0.5.29** (session-recognition fast-follow: /connect + /login + Google OAuth verified_email) | shipped + backend verified-live; schema brought current via prod-migrate-direct (4 pending migrations applied) |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
@@ -339,6 +358,20 @@ Athena is the cross-team bridge.
     narrative in publishing/drafts/; Hestia started wiring it into
     ac/site/. Juan caught it. Iris re-authored on ac main as 58ed6c53
     — proper shape. Banking the rule for future bundles.)
+30. **Schema-migration verification is part of verify-live, not /health.**
+    `/health` only probes connectivity. A service can be green on /health
+    while running against a stale schema — features keyed to missing
+    tables/columns will 500 in handlers, not at startup. Verify-live
+    must include `SELECT filename FROM <schema>.schema_migrations` across
+    all schemas (server, aweb, aweb_cloud) compared against the migration
+    files in the deployed image. (Banked 2026-05-13 from v0.5.29 cycle:
+    4 pending migrations from v0.5.25→v0.5.29 accumulated unrun across
+    4 release cycles; only caught by Juan's "have all the migrations
+    run?" question. Root-cause investigation of why Render
+    startup-migration default failed is Task #109. Discipline shape:
+    even if startup migration runs reliably, verify-live still queries
+    `schema_migrations` empirically — same shape as #18, verified-live
+    cites empirical state, not assumed defaults.)
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
