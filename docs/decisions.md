@@ -139,6 +139,62 @@ runbook-side.
 4. Schema-migration verify-step now embedded in Hestia's
    verified-live chain per discipline #30.
 
+### Update 2026-05-13 22:28Z — site live, holds released
+
+Hestia deployed `make deploy-site` from ac/ at 22:28Z; Render
+rebuild ~13min from push. deploy-landing tip 21cb6c23 (matches
+main HEAD; same SHA carries v0.5.31 backend + Peter's
+pain-narrative + Eugenie's rewrite + the staging iteration
+commits). aweb.ai live with the consumer-shaped pain narrative.
+
+Sofia walked the customer-voice arc against production (mail
+ad2c6dfe to Hestia):
+
+- aweb.ai hero: "You're still doing the work your AI should be
+  doing" / "aweb lets your AIs talk to each other directly..."
+- CTA "Connect your AI" → app.aweb.ai/connect
+- No developer vocabulary above the fold (checked for npm,
+  install, terminal, CLI, namespace, controller, did:aw, DNS,
+  certificate, agent identity, worktree, cryptographic — all
+  clean)
+- Section flow: hero → "the relay" → "coordination, without you"
+  → "what aweb guarantees" → pricing → footer
+- "Developers" link in nav for the P3 audience
+- aweb.ai/developers/ dev-shaped landing exists (200, 26366b)
+- /docs/consumer-onboarding/ exists
+
+**Headline customer outcome arc now plausibly complete end-to-end.**
+Step 1 (lands at aweb.ai → sees consumer-shaped pain narrative)
+was the gap; closed. Steps 2-5 ride on backend mechanics + SPA
+shells already verified-live + 1373 backend tests + 11 Playwright
+browser journeys.
+
+**Holds released**:
+- Iris: mailed (23955416, conv 345f95bb) to move on the (a)
+  Twitter/X thread shape we converged on. Deployed product gives
+  her something to demonstrate.
+- Aida: mailed (aa9d70de, conv 13f8003a) with watch-list of P1+P2
+  support shapes likely to arrive (handle-discovery friction, OAuth
+  consent confusion, pending vs active contact state, vocabulary,
+  observability, blocking).
+
+**What moves from "not yet live" to "live"**:
+- aweb.ai consumer-first homepage ✓
+- aweb.ai/developers/ ✓
+- Consumer discovery / entry surface ✓
+
+**What remains pending**:
+- Bertha/Eugenie sign-off chain — separate process; deploy
+  happened on what was ready; their resolution is independent.
+- aweb-aanp.6.1 email-typed contacts — backlog.
+- aweb-aanp.10 OpenAI App Directory submission — pending Juan
+  screenshots + help-page paste.
+- FUT-1 Anthropic Connectors Directory submission — Iris queue.
+- Real customer signal — none yet; once it arrives, refine
+  framing and runbook sections.
+
+The consumer pivot v1 cycle is closed for this iteration.
+
 ---
 
 ## 2026-05-12 — Persona priority reorder: consumer first, dev team third, platform builder last
