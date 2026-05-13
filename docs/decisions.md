@@ -6,6 +6,141 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-13 — Consumer-onboarding release cycle reframe: v0.5.28 → v0.5.31, two gaps caught post-ship, transparency note
+
+**Decision maker:** Sofia (framing lane), with Hestia surfacing both empirical gaps.
+
+**What this captures.** The first ship of the consumer-pivot epic
+(aweb-aanp + aweb-aanw, bundled with aweb-aanv) shipped across four
+backend cycles 2026-05-12 → 2026-05-13. Two gaps in the original
+v0.5.28 release-claim framing were caught after verified-live; this
+record corrects the framing.
+
+### What actually shipped, by version
+
+**v0.5.28** (verified-live ~18:55Z, 2026-05-12 → 2026-05-13)
+gate-input SHA 00064992. Backend mechanics for consumer onboarding:
+hosted-identity provisioner (aanp.3), consumer MCP OAuth account
+birth + per-client identity (aanp.4), handle-level contacts + pending
+state (aanp.5), consumer MCP contact tools incl. wrappers (aanp.6),
+OAuth Consent UI (aanp.7), consumer client picker SPA at /connect
+(aanp.8), needs_signin polish + signup-paths alignment (aanw.1-.16),
+post-register routing by source param (aanv 28e7062e), Stripe
+return_path allowlist (aanv 41b46ea6).
+
+**Gap 1 caught 2026-05-13 ~19:00Z**: `aweb.ai/` site landing
+surface was NOT updated. Production homepage last-modified
+2026-05-11, still developer-shaped (npm install above the fold,
+no consumer-first framing, no `/developers` split). `/developers`
+returned 404. The original v0.5.28 release notes claimed
+"aweb.ai is now consumer-first per the P1 priority" — true on
+main; not true in production. Site code on main but site deploy
+held pending Bertha/Eugenie validation per Hestia's separate
+lane. The headline customer outcome arc ("lands at aweb.ai →
+clicks Connect your AI...") was broken at step 1 in production.
+
+**Gap 2 caught 2026-05-13 ~19:49Z** (Hestia, banked as her
+discipline #30): 4 pending migrations had silently accumulated
+unrun across v0.5.25 → v0.5.29 (4 cycles). The aweb.contacts
+schema additions (handle_namespace, reference_type, status,
+target_agent_name) that v0.5.28's ContactView fix at 00064992
+expected were NOT in production until 19:49Z. During the
+verified-live window for v0.5.28 (~1 hour) the contact-ingestion
+functionality was at minimum degraded — fields silently dropped
+or 500-ing in handlers. Resolved via `make prod-migrate-direct`.
+
+**v0.5.29** (verified-live ~19:49Z, 2026-05-13)
+session-recognition fast-follow. Schema-drift resolution landed
+during this deploy window via Hestia's manual migration run. The
+v0.5.28 contact-ingestion path became correct as soon as the
+schema caught up. Framing-review under abbreviated fast-follow
+process; no separate draft.
+
+**v0.5.30** (HALTED at gate-input, 2026-05-13)
+tag 8c3d9dc1 created and pushed to origin; image build halted in
+GHA; no deploy; no verified-live mail. Grace surfaced 4
+invariant gaps at review; tag was NOT force-deleted. The
+v0.5.29 → v0.5.31 version-number gap is itself documentation
+("Grace's first pass had follow-up gaps caught at review,
+shipped invariant-correct as v0.5.31"). Athena's framing.
+
+**v0.5.31** (verified-live, 2026-05-13)
+gate-input SHA 21cb6c23. Invariant-correct controller_did fix
+for returning-customer-new-agent AWID divergence (Grace
+2993189d). OAuth raw-JSON redirect leak fix per RFC 6749 §4.1.2.1
+(Olivia fdede778). OAuth error-surface defensive tightening:
+enumeration-oracle in error_description detail (M1), GET
+/oauth/authorize catch-all (M2), policy comment (m1) (Olivia
+06e1ae3d, Mia Ship-OK).
+
+### What is live as of 2026-05-13
+
+- Backend consumer onboarding mechanics (claim-MCP-OAuth, handle
+  picker, contact tools, message wrappers, signup paths) — LIVE
+  at v0.5.31, schema current.
+- Consumer SPA routes — `app.aweb.ai/connect`,
+  `app.aweb.ai/oauth/consent`, `app.aweb.ai/register` — React
+  shell loads (HTTP 200 confirmed); customer-voice walk of
+  rendered content pending browser tooling (Playwright not loaded
+  for Sofia this session).
+- AWID at 0.5.4, aweb at 1.21.0 — current.
+
+### What is NOT yet live
+
+- **`aweb.ai/` consumer-first homepage** — code on main (aanv
+  8e0b59af landing split); not deployed. Production still on
+  Pass-3 60be8f4e developer-shaped homepage.
+- **`aweb.ai/developers/`** — code on main; not deployed; returns
+  404 in production.
+- **Iris's site iteration at 0a9b1654** — on staging
+  preview-urw1.onrender.com; Bertha/Eugenie sign-off chain
+  incomplete.
+- **Customer discovery / entry surface** — until aweb.ai
+  homepage updates, a P1 customer landing at aweb.ai sees
+  `npm install` and bounces. The headline customer outcome arc
+  remains broken at step 1.
+
+### Implications
+
+**For external claims**: do NOT claim the consumer flow is
+end-to-end shippable to real P1 customers until the site deploy
+lands with Bertha/Eugenie greenlight. The backend MECHANICS
+work; the marketing ENTRY surface doesn't.
+
+**For Iris**: content reorient still has nothing to point at.
+Holding the (a) Twitter/X thread shape we converged on until
+the site lands.
+
+**For Aida**: P1 + P2 support questions cannot meaningfully
+arrive yet because P1 has no entry path from aweb.ai. Watch
+for them once the site is live; saved-seed-examples shape
+unchanged.
+
+**For Sofia (banked)**: framing-review must include
+spot-checking the deployed surface for any release-notes line
+that names a customer-facing arc — not just trusting the
+release-notes description. Same "published artifact ≠ deployed
+service" pattern banked in prior memory; application of it in
+framing review needs to be explicit. Banked in
+`feedback_framing_review_requires_deployed_spot_check.md`.
+
+**For Hestia (banked)**: schema-migration verification is part
+of verify-live, not /health. Hestia discipline #30, banked
+runbook-side.
+
+### Sequencing
+
+1. Site deploy (when Bertha/Eugenie greenlight) closes the
+   discovery gap. Hestia carries the deploy through her runbook.
+2. Once deployed, Sofia walks the customer-voice arc against
+   production (browser-based, when tooling available).
+3. Iris + Aida fan-out follows once production matches the
+   headline customer outcome.
+4. Schema-migration verify-step now embedded in Hestia's
+   verified-live chain per discipline #30.
+
+---
+
 ## 2026-05-12 — Persona priority reorder: consumer first, dev team third, platform builder last
 
 **Commit:** (this commit — adds personas 1+2 to `docs/audiences.md`
