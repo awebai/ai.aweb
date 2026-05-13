@@ -1,13 +1,17 @@
 # Operations Status
 
-Last updated: 2026-05-14 00:00 CEST (22:00 UTC 2026-05-13) — **AC v0.5.31
-backend verified-live** at 21cb6c23 (invariant-correct controller_did
-reuse + Olivia M1/M2/m1 OAuth defensive tightening). #30 schema check
-green: 8 migration files match 8 applied rows across all 3 schemas.
-**v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR image, no
-deploy) — version-number gap documents the halt+re-gate cycle.
-**Site staging deploy 3** at 0a9b1654 still held pending Bertha/Eugenie
-sign-off + Sofia framing-pass + Juan per-deploy greenlight.
+Last updated: 2026-05-14 00:25 CEST (22:25 UTC 2026-05-13) — **AC v0.5.31
+backend verified-live + P0 PROD DATA BACKFILL COMPLETE**. Juan hit
+ChatGPT-connect OAuth error post-verified-live; DB triangulation found
+5 LIVE personal-team `managed_namespaces` rows with controller_did
+diverged from org AWID-registered source-of-truth (pre-existing
+corruption v0.5.31 invariant check exposed). Backfill script at SHA
+37a3f406 applied 5/5 cleanly inside a single transaction. Three-way
+alignment (local DB ↔ org row ↔ AWID registry) confirmed for tsm
+spot-check. **v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR
+image, no deploy). **Site staging deploy 3** at 0a9b1654 still held
+pending Bertha/Eugenie sign-off + Sofia framing-pass + Juan
+per-deploy greenlight.
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
@@ -144,11 +148,15 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-13 22:00Z)
+## Live state (verified 2026-05-13 22:25Z)
 
 - `app.aweb.ai/health`: `release_tag=v0.5.31`, `aweb_version=1.21.0`,
   `awid_service_version=0.5.4`, `git_sha=21cb6c23d97a4020548369a1ef3419d223940491`.
   Fresh deploy ~21:51Z (Juan manual Render trigger after GHA 25828109184 SUCCESS).
+- Prod data: `aweb_cloud.managed_namespaces` controller alignment
+  backfill applied 22:18Z. 5/5 rows updated (jos/jro/seamnniel/test/tsm).
+  Predicate re-run = 0 rows. AWID registry unchanged (we touched
+  local, not registry).
 - Schema-migration state empirically current across all 3 schemas:
   - `server.schema_migrations`: 001 (1 row)
   - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
@@ -377,6 +385,22 @@ Athena is the cross-team bridge.
     even if startup migration runs reliably, verify-live still queries
     `schema_migrations` empirically — same shape as #18, verified-live
     cites empirical state, not assumed defaults.)
+31. **Pre-existing prod-data state can fail an invariant introduced by
+    a fresh release even when gate tests pass.** Release-ready exercises
+    fresh provisioning against a clean DB; it does not see corruption
+    that accumulated under earlier code paths. When a release adds an
+    invariant check over existing data (Grace's controller_did equality
+    on existing managed_namespaces rows is the canonical example), the
+    gate has a structural blind spot. Mitigation: empirical prod-data
+    scan against the invariant predicate is a release-ready input,
+    same shape as #18/#30 — empirical state, not assumed defaults.
+    Banked 2026-05-13 from v0.5.31 cycle: Juan hit ChatGPT-connect
+    OAuth error within minutes of verified-live; DB triangulation
+    found 5 LIVE personal-team rows with controller_did diverged from
+    org AWID-registered source-of-truth. v0.5.31 invariant correctly
+    refused the diverged state; the data was already wrong. Backfill
+    script (SHA 37a3f406) closed the gap, but the discovery path was
+    customer-hits-error, not pre-release-empirical-check.
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.
