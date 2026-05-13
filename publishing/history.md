@@ -8,6 +8,128 @@ signal, attribution caveat.
 
 ---
 
+## 2026-05-13 · aweb.ai homepage — pain-narrative rewrite verified-live
+
+**Channel**: aweb.ai (landing page)
+**Public link**: https://aweb.ai/
+**Artifact**: `deploy-landing` commit `21cb6c23` (also `main` HEAD —
+same SHA carries v0.5.31 backend + Peter's pain-narrative + Eugenie's
+rewrite + the staging-iteration commits).
+**Verified-live**: 2026-05-13 22:28:03Z (Hestia mail `01e7154d`).
+**Source-of-truth doc**: `docs/audiences.md` (persona model, P1
+priority per decisions.md 2026-05-12)
+**Voice principles**: `publishing/voice.md` (persona-aware update
+2026-05-12)
+
+### Live copy as shipped
+
+- **`<title>`**: "aweb — AI coordination, without you"
+- **Hero kicker**: "For the AIs you already use"
+- **Hero h1**: "You're still doing the work / your AI should be doing"
+- **Hero subhead**: "You copy. You paste. You relay. You chase.
+  Every time your AI needs something from someone else's AI, you
+  step in the middle — as the most expensive messenger in the
+  room. aweb lets your AIs talk to each other directly. You give
+  the direction. They do the coordination."
+- **Primary CTA**: "Connect your AI" → `app.aweb.ai/connect`
+- **Secondary CTA**: "Get started" → `app.aweb.ai/register?source=consumer`
+- **Hero note (trust + works-with merged)**: "Works with ChatGPT,
+  Claude, and other AIs · Free to start · No credit card required."
+
+### Cycle arc to current ship
+
+- **2026-05-08**: Bertha brief from Eugenie's non-technical-founder
+  observation (chat `53251bb9`).
+- **2026-05-09 → 2026-05-11**: Iris-authored Pass-1 (commit
+  `58ed6c53`) deployed-and-reverted; Sofia-authored Pass-3
+  customer-shape correction (`60be8f4e`) on `deploy-landing-staging`;
+  Pass-3 verified-live briefly on 2026-05-11 then reverted same day
+  per Juan's small-technical-error call (Bertha chat `4a4a0573`).
+- **2026-05-12**: Juan resets persona priorities to P1 (personal-AI
+  consumer) first, P3 (developer team) third. `docs/audiences.md`
+  rewritten; `publishing/voice.md` updated to persona-aware framing
+  with customer-shape verification + four persona-ordered pitches.
+- **2026-05-13**: Peter-authored pain-narrative rewrite + Eugenie
+  iteration ships via staging gate. Different shape from Pass-3 —
+  pain-recognition opener now leads with "you're still doing the
+  work" (the human-as-messenger framing) rather than "you're already
+  running a team of AIs." Same persona target (P1), different
+  framing register.
+
+### What carried from earlier cycles vs what changed
+
+**Carried**:
+- The customer-shape verification discipline (P1 = browser-custodial-
+  MCP audience that cannot run shell commands) — banked
+  2026-05-11, refined into voice.md 2026-05-12, applied in this
+  rewrite's structure.
+- Honest framing of what works today (no "your agent handles the
+  rest" overclaim that survived through Pass-3).
+- "Connect your AI" CTA → `/connect` (the AC frontend picker route
+  Athena flagged on 2026-05-11; Grace's aweb-aanp.8).
+
+**Changed**:
+- Hero hook: "You're already running a team of AIs" (Pass-3) →
+  "You're still doing the work your AI should be doing" (live).
+  Both target P1; latter foregrounds the human-as-messenger pain
+  more concretely.
+- "Sign up. Your agent handles the rest." onboarding section: gone
+  from the live shape. The pain-narrative carries the messaging-
+  layer rather than a separate signup walkthrough.
+- Works-with strip (4 text pills) dropped. Replaced by inline
+  "Works with ChatGPT, Claude, and other AIs" in the hero-note.
+- Pillars section heading change preserved-in-spirit but the
+  specific "Each AI you're running is isolated. aweb changes
+  that." phrasing not on the live page per current curl.
+
+### Humans who acted
+
+- Bertha relayed Eugenie's brief + customer-voice direction
+- Peter authored the pain-narrative rewrite
+- Eugenie iterated on Peter's draft
+- Juan reset persona priorities + greenlighted the technical fix
+  + greenlighted the production deploy
+- Sofia framing review across cycles + the persona reorder doc
+- Athena (+ Olivia) consumer-flow corrections (ChatGPT-tier matrix,
+  Pepe-anonymous, provider-agnostic signup, handle-only add-a-friend)
+- Iris early-cycle authoring + Pass-1 ship-and-revert + voice.md
+  persona-aware update
+- Hestia deployed via the staging gate (eat-our-own-dog-food shape;
+  first cycle's gate failure → fix → second cycle's clean gate run)
+
+### Observed signal
+
+Signal-observation window opens at 2026-05-13 22:28:03Z verified-live.
+Signal categories to watch over the coming days/weeks:
+
+- Direct traffic to aweb.ai (week-over-week from the Hestia-deploy
+  moment)
+- Signup conversion at `app.aweb.ai/register?source=consumer`
+  (source query param enables attribution if Metis instruments it)
+- `/connect` route entry rate (CTA "Connect your AI" engagement)
+- Inbound conversations from P1-shape customers (personal-AI users
+  asking how to connect their AI to a friend's AI)
+- Repo stars / inbound on github.com/awebai/aweb
+- Direct-outreach response signal (5 drafts queued in
+  `co.aweb/outreach/daily/2026-05-07-direct-outreach-post-show-hn.md`;
+  none sent yet)
+
+Metis is the signal-strength reviewer when she's online;
+attribution claims gate through her.
+
+### Attribution caveat
+
+This live ship is one event in a longer arc — Pass-1 ship-and-
+revert + Pass-3 brief-live + persona reorder + pain-narrative
+rewrite together inform any signal observed in the days following.
+Concurrent factors include the (still pending) "Two Agents Not One"
+juanreyero.com article + 5 queued direct-outreach drafts + any
+organic discovery + the Show HN sink on 2026-05-07 still
+contaminating any HN re-discovery. Capture correlation; don't
+claim causation.
+
+---
+
 ## 2026-05-11 · aweb.ai homepage refresh (Pass-3) — verified-live, then reverted
 
 **Channel**: aweb.ai (landing page)
