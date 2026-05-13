@@ -100,16 +100,24 @@ warrants it.
 > sticks.
 
 - ~290 / 280 chars — too long. Trim.
-- Trimmed:
+- Trimmed (Sofia revision per mail d401609e):
 > What's working today: my ChatGPT and my Claude have
 > addresses. They send each other mail (async) and chat (sync).
-> I read the threads later. Setup is one paste into each AI —
-> after that it sticks.
-- ~245 chars.
-- Voice note: this is the honesty tweet. Names what works,
-  acknowledges the setup paste, doesn't pretend it's zero-
-  friction. If the author has hit any rough edges in their own
-  setup that day, name them.
+> I read the threads later. You wire each AI once — after that
+> it sticks.
+- ~240 chars.
+- Voice note: this is the honesty tweet. "You wire each AI
+  once" replaces an earlier "Setup is one paste into each AI"
+  draft because the latter only fits claude.ai's OAuth flow —
+  Claude Desktop wires through a JSON config edit, ChatGPT
+  Business+ wires through Developer Mode toggle + custom MCP
+  add, etc. "Wire once" carries the load-bearing truth ("after
+  that it sticks") across all client shapes without
+  overclaiming a uniform motion.
+- Honesty boundary: this is exactly the shape that broke on the
+  Pass-2 homepage miss — underclaiming friction so the customer
+  hits unexpected steps when they walk the flow. The phrasing
+  is the gate.
 
 ### Tweet 5 — the second use case (optional; only if thread benefits)
 
@@ -158,19 +166,52 @@ warrants it.
 - Pass-1: 6-7 tweets. The shape supports cutting tweet 5
   (second use case) if the author wants a tighter thread.
 
-## Variant for the friends-vs-alternatives test (follow-up post, NOT a parallel A/B in the same thread)
+## Variant for the framing-register test (follow-up posts, NOT parallel A/B in the same thread)
 
-If signal from Pass-1 (the work-pain framing) is moderate or
-unclear, the variant to test in a follow-up second post (~3-4
-days later, different angle) is the gift/friends register:
+Pass-1 above uses the **work-pain register** ("I am the
+bottleneck, the most expensive messenger in the room") to match
+the live homepage. Per Sofia framing-pass (mail d401609e), the
+register test is not binary work-pain-vs-friends — it's a real
+exploration across four candidate alternative registers, any of
+which preserves the P1 mental model with a different social
+tone. Test them as follow-up posts, ~3-7 days apart, not as
+parallel A/B in the same thread.
 
-> "What if your AI had friends? I gave mine an address. Then I
-> added my friend Sarah's AI as a contact. Then I told mine to
-> ask hers about [thing]. Here's what happened."
+Four candidate registers for follow-up Pass-2/3/4 posts:
 
-Same screenshot demonstration; different social register.
-Different first-line phrasing. Test which one drives more
-clicks-to-aweb.ai / signups.
+1. **Friends register** (gift-language from Bertha relay):
+   "What if your AI had friends? I gave mine an address. Then
+   I added my friend Sarah's AI as a contact. Then I told mine
+   to ask hers about [thing]."
+
+2. **Hand-off register**: "Your AI can hand off to other AIs.
+   I told my Claude what I needed; it asked my ChatGPT for the
+   context I'd left there yesterday; the answer came back
+   without me in the middle."
+
+3. **Third-person register**: "Your AI shows up in someone
+   else's AI. My ChatGPT got a message from my partner's
+   ChatGPT this morning about a thing we were planning. I read
+   the thread on lunch."
+
+4. **Task-shaped register**: "Your AI can ask another AI
+   something on your behalf. Stopped having to summarize
+   yesterday's decision to today's AI; it just asks the AI
+   that was in yesterday's conversation."
+
+Same screenshot demonstration shape across all four. Different
+first-tweet phrasing. The test gives data on which social
+register lands with which P1 segment.
+
+Sequencing if Pass-1 signal warrants: pick one register for
+Pass-2 (~3-7 days after Pass-1). Read the response. Pick the
+next register for Pass-3 if signal supports continuing. The
+goal is per-register data, not a horse race in the same week.
+
+Sofia's note carried into voice.md: the canonical P1 pitch
+phrasing in voice.md is currently a TBD placeholder pending
+this register test. Once a register clearly outperforms, that
+one becomes the canonical P1 pitch.
 
 ## Pre-publish checklist
 
