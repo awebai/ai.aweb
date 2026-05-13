@@ -1,14 +1,58 @@
 # Operations Status
 
-Last updated: 2026-05-10 12:25 CEST (10:25 UTC) — AC v0.5.26 verified-
-live. **Full P0 arc empirically closed end-to-end across two coordinated
-releases (aweb 1.20.8 + AC v0.5.26) within ~24h.** Verified-live mails
-sent to athena (5fc87592), sofia (ae05039f), aida (96f74b81).
-Aida REMOVE-trigger fired for runbook entry e6b1303.
+Last updated: 2026-05-13 21:18 CEST (19:18 UTC) — **AC v0.5.28 backend
+verified-live** + aweb 1.21.0 published end-to-end (PyPI ✓ npm ✓).
+**Site staging deploy 3** at main HEAD `0a9b1654` (pain-narrative
+iteration) just pushed to `deploy-landing-staging` per Athena mail
+b55e72a7. Production site deploy of Peter's pain-narrative held
+pending Bertha/Eugenie sign-off pass + Sofia framing-pass + Juan
+per-deploy greenlight.
+
+**Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
+overclaim — the site portion of the aanv-pain-narrative iteration is
+NOT yet on production aweb.ai. Three options for Juan to call: push
+site / reframe notes / split verified-live framing.
 
 ## Current focus
 
-**FULL P0 ARC RECEIPT — 2026-05-09 → 2026-05-10**
+**AC v0.5.28 + aweb 1.21.0 — verified-live (backend) 2026-05-13**
+
+aweb 1.21.0 end-to-end:
+- PyPI publish: ✓ (server, ManyLinux+macOS wheels)
+- npm publish: ✓ via fresh GAT (banked 90-day expiration foot-gun:
+  Feb 12 + 90 = May 13; old token hit exact-day cap, 404-on-anonymous-PUT
+  is npm's misleading shape — diagnosed via Athena + research agent
+  after Juan's pushback "you are assuming they have changed something.
+  why?")
+- `aw upgrade` clean against released artifact.
+
+AC v0.5.28 end-to-end:
+- aweb >= 1.21.0 pin in pyproject.toml at d64ce84c.
+- First release-ready: 2 fails — `ContactView` `extra='forbid'`
+  rejected new aweb 1.21.0 fields (reference_type, status,
+  handle_namespace, target_agent_name). Athena landed fix at 00064992
+  using Path A (Literal types for enums).
+- Tag v0.5.28 pushed individually at 00064992.
+- GHA + Render: Juan manual trigger to bypass image-watcher lag.
+- /health: release_tag=v0.5.28, git_sha=00064992,
+  aweb_version=1.21.0, awid_service_version=0.5.4.
+
+Sofia's catch (mail 574185f5): release notes claim aanv full receipt
+but the site iteration portion is staging-only as of this writing.
+Three Juan-call options open: push site / reframe notes / split
+verified-live framing into backend-now + site-pending.
+
+## Site staging — deploy 3 (2026-05-13)
+
+Just pushed: `make deploy-staging` from main HEAD `0a9b1654`
+(9093a225..0a9b1654 → `deploy-landing-staging`). Site diff vs prior
+staging tip (ce2bf922): 4 files in `site/` only — `hugo.yaml`,
+`layouts/index.html`, `layouts/index.llms.txt`, `static/css/main.css`.
+Hugo build local: 33 pages, 13 static, clean. Render rebuild of
+preview-urw1.onrender.com triggered. Athena signaled (mail a0bf1a1d)
+for fresh walk; Bertha/Eugenie sign-off pass to follow.
+
+## Prior arc — full P0 close 2026-05-09 → 2026-05-10
 
 Pepe Reyero surfaced four frictions on 2026-05-09. All four closed
 empirically across two coordinated releases:
@@ -87,13 +131,16 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-10 10:13Z, post v0.5.26 deploy)
+## Live state (verified 2026-05-13 19:18Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.26`, `aweb_version=1.20.8`,
-  `awid_service_version=0.5.4`,
-  `git_sha=1ce7d6a97a92f41dfeed7163fc3d67a50f48827a`. Started
-  2026-05-10T10:12:36Z.
+- `app.aweb.ai/health`: `release_tag=v0.5.28`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=00064992262b95bb0fea75006d2d0fc87cec8e3d`.
+  Started 2026-05-13T18:55:32Z (Juan manual Render trigger).
 - `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
+- Site production (aweb.ai): pre-pain-narrative (Sofia-authored
+  Pass-3 60be8f4e at deploy-landing tip).
+- Site staging (preview-urw1.onrender.com): pain-narrative iteration
+  at 0a9b1654 on `deploy-landing-staging` (just pushed).
 
 ## Bertha pipeline — HANDOFF TO METIS (ANALYTICS) PER JUAN 2026-05-10
 
@@ -129,8 +176,11 @@ metis (sent this cycle).
 | aweb 1.20.7 (multi-team did_key + chat 409) | shipped + verified-live (server release) |
 | AC v0.5.24 (1.20.7 uptake + chat 409 close) | shipped + verified-live |
 | AC v0.5.25 (cli-signup api_key + admin_analytics fix) | shipped + verified-live |
-| **aweb 1.20.8** (aang/aanh/aani/aanj bundle) | **mid-flight, awaiting Athena re-make-ship at 637cd74** |
-| AC v0.5.26 (1.20.8 uptake) | pending PyPI 1.20.8 publish |
+| aweb 1.20.8 (aang/aanh/aani/aanj bundle) | shipped + verified-live |
+| AC v0.5.26 (1.20.8 uptake) | shipped + verified-live |
+| AC v0.5.27 | paused at tag — Render not triggered (Task #91) |
+| **aweb 1.21.0** (aanv pain-narrative + protocol refresh) | shipped + verified-live (PyPI ✓ npm ✓) |
+| **AC v0.5.28** (1.21.0 uptake + ContactView schema fix) | shipped + backend verified-live; site iteration staging-only |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
@@ -200,16 +250,19 @@ Athena is the cross-team bridge.
 
 ## Next checks
 
-1. Athena's re-make-ship green at 637cd74 → tag both server-v1.20.8 +
-   aw-v1.20.8 individually + push, watch GHA, verify-live.
-2. Daily `/health` on app.aweb.ai + api.awid.ai. Render deploy-lag
-   pattern if v0.5.26 ships next.
-3. Hourly milestone-check cron firings; act only if non-empty.
-4. Daily 08:13 CEST sign-up export to Bertha.
-5. Brief Bertha (when 1.20.8 verified-live): Pepe Reyero's
-   autonomous-install case unblocked.
-6. Pass-2 trigger to Iris when 1.20.8 verified-live + npm reachable
-   + aw upgrade works (Sofia's precise trigger).
+1. Athena fresh-walk preview-urw1.onrender.com post-Render-rebuild,
+   then Bertha/Eugenie sign-off pass on iterated pain-narrative.
+2. Sofia's open release-notes-reframing question (mail 574185f5):
+   Juan must call — push site / reframe notes / split verified-live.
+3. After Sofia/Juan call: production site deploy (`make deploy-site`)
+   if push-site path; otherwise update release notes.
+4. Daily `/health` on app.aweb.ai + api.awid.ai.
+5. Hourly milestone-check cron firings; act only if non-empty.
+6. Daily 08:13 CEST sign-up export to Bertha.
+7. Branch protection on deploy-landing (Task #88, Juan's lane).
+8. OIDC trusted publisher migration for npm (eliminate GAT 90-day
+   treadmill — currently May 13 → next forced rotation Aug 11).
+9. Monitor Neon DB connection-timeout transients (Task #89).
 
 ## Standing release-discipline (banked through 2026-05-10)
 
