@@ -1,17 +1,15 @@
 # Operations Status
 
-Last updated: 2026-05-14 00:25 CEST (22:25 UTC 2026-05-13) — **AC v0.5.31
-backend verified-live + P0 PROD DATA BACKFILL COMPLETE**. Juan hit
-ChatGPT-connect OAuth error post-verified-live; DB triangulation found
-5 LIVE personal-team `managed_namespaces` rows with controller_did
-diverged from org AWID-registered source-of-truth (pre-existing
-corruption v0.5.31 invariant check exposed). Backfill script at SHA
-37a3f406 applied 5/5 cleanly inside a single transaction. Three-way
-alignment (local DB ↔ org row ↔ AWID registry) confirmed for tsm
-spot-check. **v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR
-image, no deploy). **Site staging deploy 3** at 0a9b1654 still held
-pending Bertha/Eugenie sign-off + Sofia framing-pass + Juan
-per-deploy greenlight.
+Last updated: 2026-05-14 00:35 CEST (22:35 UTC 2026-05-13) — **AC v0.5.31
+backend verified-live + P0 prod-data backfill complete + Pain-narrative
+site live on aweb.ai**. Juan retested ChatGPT-connect on tsm post-backfill
+and reports "this has worked." Site production deploy
+(`make deploy-site` 46a0e526..21cb6c23) landed at 22:28Z carrying
+Peter's pain-narrative rewrite + Eugenie's iteration. Hero copy
+"You're still doing the work your AI should be doing" + all assets
+200. **v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR image,
+no deploy). Sofia's release-notes-reframing decision closed (decisions
+6eb1571, Option 3 transparency).
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
@@ -163,10 +161,11 @@ changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
   - `aweb_cloud.schema_migrations`: 001 + 002 + 003_byot_custodial_pending_identities
     + 004_mcp_oauth_connection_metadata + 005_consumer_contact_invites (5 rows)
 - `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
-- Site production (aweb.ai): pre-pain-narrative (Sofia-authored
-  Pass-3 60be8f4e at deploy-landing tip).
-- Site staging (preview-urw1.onrender.com): pain-narrative iteration
-  at 0a9b1654 on `deploy-landing-staging`.
+- Site production (aweb.ai): pain-narrative live at 22:28Z
+  (deploy-landing tip = 21cb6c23). Hero: "You're still doing the
+  work / your AI should be doing". CTA: "Connect your AI" →
+  app.aweb.ai/connect. 17 "relay" mentions in rendered HTML.
+- Site staging (preview-urw1.onrender.com): same content as prod now.
 
 ## Bertha pipeline — HANDOFF TO METIS (ANALYTICS) PER JUAN 2026-05-10
 
