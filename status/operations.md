@@ -236,9 +236,12 @@ Only after all four: Hestia runs `make deploy-site` from ac/.
 **First deploy gate run — closed 2026-05-10 14:39Z**: Iris's bundle 58ed6c53 bypassed gate (Pass-1; Render was watching main; reverted). Sofia-authored Pass-3 (60be8f4e) ran the gate cleanly: Bertha/Eugenie validation on staging ✓, Sofia framing-pass ✓ (substantive customer-shape correction), Juan explicit per-deploy greenlight ✓, Hestia deploy + verify-live ✓. Verified-live mails dispatched: iris (f0ac616f), bertha (5379880c), sofia (ab09f148). Sofia independent live-check confirmed (mail c6b73992).
 
 **Customer-shape discipline** — adopted cross-team (Sofia mail c6b73992):
-- Doc: ai.aweb/docs/customer-onboarding-flows.md (Shape A custodial-MCP / Shape B CLI dev / Shape C self-host).
-- Site copy review starts with: 'which customer shape is this section addressing?'
-- Discipline that should have prevented Pass-2's Shape-B-flow-labeled-Shape-A miss.
+- Doc: `docs/audiences.md` (Personas 1-4 + Tier 1/2). The earlier
+  `customer-onboarding-flows.md` (Shape A/B/C) was deleted 2026-05-12
+  at commit 47a9558 — persona model is now the single source. Sofia
+  flagged my stale reference 2026-05-13 (mail 985be5c2).
+- Site copy review starts with: 'which persona is this section addressing?'
+- Discipline that should have prevented Pass-2's wrong-persona-labeling miss.
 - Adopted by Iris (mail cbd2aacb) + Sofia + Hestia. Aida's adoption is the natural next ask for customer-support runbook triage.
 
 ## Operational discrepancies
