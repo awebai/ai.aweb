@@ -1,13 +1,13 @@
 # Operations Status
 
-Last updated: 2026-05-13 21:55 CEST (19:55 UTC) — **AC v0.5.29 backend
-verified-live** (session-recognition fast-follow at e7dec3d8) +
-production schema brought current via `make prod-migrate-direct`
-(applied aweb 002 + aweb_cloud 003/004/005 — 4 migrations that had
-silently accumulated unrun since v0.5.25). **Site staging deploy 3**
-at main HEAD `0a9b1654` (pain-narrative iter) on
-`deploy-landing-staging` still held pending Bertha/Eugenie sign-off
-+ Sofia framing-pass + Juan per-deploy greenlight.
+Last updated: 2026-05-14 00:00 CEST (22:00 UTC 2026-05-13) — **AC v0.5.31
+backend verified-live** at 21cb6c23 (invariant-correct controller_did
+reuse + Olivia M1/M2/m1 OAuth defensive tightening). #30 schema check
+green: 8 migration files match 8 applied rows across all 3 schemas.
+**v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR image, no
+deploy) — version-number gap documents the halt+re-gate cycle.
+**Site staging deploy 3** at 0a9b1654 still held pending Bertha/Eugenie
+sign-off + Sofia framing-pass + Juan per-deploy greenlight.
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
@@ -144,11 +144,11 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-13 19:55Z)
+## Live state (verified 2026-05-13 22:00Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.29`, `aweb_version=1.21.0`,
-  `awid_service_version=0.5.4`, `git_sha=e7dec3d899c48bd450040ce8a9e8f73ea9c5bab1`.
-  Started 2026-05-13T19:44:21Z (Juan manual Render trigger after GHA SUCCESS).
+- `app.aweb.ai/health`: `release_tag=v0.5.31`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=21cb6c23d97a4020548369a1ef3419d223940491`.
+  Fresh deploy ~21:51Z (Juan manual Render trigger after GHA 25828109184 SUCCESS).
 - Schema-migration state empirically current across all 3 schemas:
   - `server.schema_migrations`: 001 (1 row)
   - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
@@ -199,7 +199,9 @@ metis (sent this cycle).
 | AC v0.5.27 | paused at tag — Render not triggered (Task #91) |
 | **aweb 1.21.0** (aanv pain-narrative + protocol refresh) | shipped + verified-live (PyPI ✓ npm ✓) |
 | AC v0.5.28 (1.21.0 uptake + ContactView schema fix) | shipped + backend verified-live; site iteration staging-only |
-| **AC v0.5.29** (session-recognition fast-follow: /connect + /login + Google OAuth verified_email) | shipped + backend verified-live; schema brought current via prod-migrate-direct (4 pending migrations applied) |
+| AC v0.5.29 (session-recognition fast-follow: /connect + /login + Google OAuth verified_email) | shipped + backend verified-live; schema brought current via prod-migrate-direct (4 pending migrations applied) |
+| AC v0.5.30 (controller_did reuse first-pass + OAuth raw-JSON wrap) | **HALTED** at tag-push — Grace surfaced 4 invariant gaps post-tag; GHA cancelled, no image, no deploy. Tag at 8c3d9dc1 stays as halted entry. |
+| **AC v0.5.31** (invariant-correct controller_did reuse + OAuth defensive tightening M1/M2/m1) | shipped + verified-live at 21cb6c23; #30 schema check green |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
