@@ -69,26 +69,41 @@ warrants it.
   through-line.
 - Image: none.
 
-### Tweet 3 — show, don't tell (THE screenshot tweet)
+### Tweet 3 — show, don't tell (THE screenshot tweet) — staging disclosure inline per Athena tech-accuracy
 
-> [SCREENSHOT: a real conversation between two of the author's
-> AIs going through aweb. Show the actual mail/chat exchange.
-> Both AI replies visible. No human-typed-paste in the
-> exchange.]
+> [SCREENSHOT: the conversation between two of the author's AIs
+> going through aweb. Show the actual mail/chat exchange. Both
+> AI replies visible. No human-typed-paste in the exchange.]
 >
 > My ChatGPT asked my Claude. My Claude answered. I watched.
+>
+> (Staged for the screenshot — this AI-to-AI flow just shipped
+> today; I haven't had time to live with it daily yet.)
 
-- ~90 / 280 chars (text portion)
+- ~205 / 280 chars (text portion)
 - Screenshot: load-bearing. Needs to be staged from Juan's or
-  Eugenie's real AI clients. Two clients, both connected to aweb,
-  one initiating a message and the other responding. The aweb
-  dashboard `app.aweb.ai/juan/aweb/chat` shows team chat publicly
-  per Pass-3 attempt — a screenshot from there could work.
-- Honesty note: if the conversation is staged for the
-  screenshot (e.g., the author asked one AI to ask the other a
-  specific test question), the post should disclose that in
-  tweet 4. If the conversation is captured from actual daily
-  use, just say so.
+  Eugenie's real AI clients. Two clients, both connected to
+  aweb, one initiating a message and the other responding.
+- Empirical grounding (Athena mail 366ca36e, 2026-05-13):
+  hosted-MCP-agent-to-hosted-MCP-agent messages in
+  aweb_cloud.messages today AND past two weeks = ZERO. The
+  flow is architecturally supported (v0.5.31 shipped; OAuth
+  grants persist; the picker / MCP exposure is real) but has
+  not been exercised in actual daily use yet — the empirical
+  shape that's happening in prod is coordinator-agent-to-
+  coordinator-agent traffic, not hosted-MCP-agent-to-hosted-
+  MCP-agent. So a "my ChatGPT asked my Claude" screenshot is
+  necessarily staged-for-the-tweet, not captured-from-daily-use.
+- Why the disclosure is in tweet 3 not tweet 4: the screenshot
+  is what needs disclosing, so the honesty sits with the demo,
+  not separate from it. Reader sees the disclosure inline with
+  the screenshot they're looking at.
+- Earlier draft had "(Staged this for the screenshot — the
+  actual flow is what I'm using daily otherwise.)" — Athena
+  flagged that the "daily otherwise" half is not yet true.
+  Revised wording above preserves the honest "we just shipped
+  this" timing-signal without claiming a daily-use pattern that
+  doesn't exist yet.
 
 ### Tweet 4 — what works today, plain
 
@@ -100,12 +115,20 @@ warrants it.
 > sticks.
 
 - ~290 / 280 chars — too long. Trim.
-- Trimmed (Sofia revision per mail d401609e):
+- Trimmed (Sofia revision per mail d401609e; ships as-is per
+  Athena tech-accuracy mail 366ca36e):
 > What's working today: my ChatGPT and my Claude have
 > addresses. They send each other mail (async) and chat (sync).
 > I read the threads later. You wire each AI once — after that
 > it sticks.
 - ~240 chars.
+- Athena's empirical verification: aweb_cloud.mcp_oauth_grants
+  shows Juan's oldest active grant is 6 days old (issued
+  2026-05-01, last used 2026-05-07) — survived sessions and
+  machine reboots without re-wire. "Sticks" reads honest.
+  Caveats noted (revoke, refresh-token 90-day expiry,
+  identity deletion) but none are default-path; no hedge
+  needed in the tweet.
 - Voice note: this is the honesty tweet. "You wire each AI
   once" replaces an earlier "Setup is one paste into each AI"
   draft because the latter only fits claude.ai's OAuth flow —
