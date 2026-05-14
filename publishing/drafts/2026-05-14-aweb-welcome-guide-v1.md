@@ -1,10 +1,10 @@
 ---
-title: "aweb welcome guide — v2 draft for MCP welcome tool + resource"
+title: "aweb welcome guide — v3 draft for MCP welcome tool + resource"
 date: "2026-05-14"
 type: "ai-facing-doc-draft"
-status: "Iris drafted v2 (Aida pre-think folded); Sofia framing review pending; Athena tech-accuracy pending (waiting on Grace tool-name lock); Aida support-integration review (her checkpoints addressed in draft); Juan bless pending"
+status: "Iris drafted v3 (Sofia framing pass approved with cross-surface alignment ask; Athena tool-name lock applied: create_invite_link); Athena formal tech-accuracy pending; Aida support-integration review (her checkpoints addressed in draft); Juan bless pending"
 canonical-destination: "TBD pending Grace's mount-path trace — probably ac/backend/src/aweb_cloud/resources/welcome.md or synced from aweb/docs/. Moves to canonical path on Juan's bless."
-brief: "Athena mail 44c8c92a (spec lock 2026-05-14); Aida pre-think relayed via Athena mail 204e971e."
+brief: "Athena mail 44c8c92a (spec lock 2026-05-14); Aida pre-think relayed via Athena mail 204e971e; Sofia framing approval 55bed1b7; Athena tool-name lock a58bc12b + 69ed8365."
 ---
 
 ## Iteration history (Iris notes for reviewers)
@@ -22,6 +22,12 @@ brief: "Athena mail 44c8c92a (spec lock 2026-05-14); Aida pre-think relayed via 
 Word count v2: ~440. Within Athena's 200-500 target.
 
 Voice-howto.md scaffolding applied; per-section honesty noted; failure-mode framing on the load-bearing state (pending-vs-active).
+
+**v2 → v3 deltas** per Athena's tool-name lock (mail a58bc12b confirming Grace's commit c6f270e8, follow-up 69ed8365 confirming list_contacts):
+
+- `create_contact_invite` → `create_invite_link` (Grace's actually-shipping name, verified in ac/backend/src/aweb_cloud/hosted_mcp.py:91). Four mentions updated: SMALLEST FIRST ACTION call-out, TOOLS YOU HAVE entry, COMMON ASKS handle-discovery handling, Routing-notes-to-Athena list.
+- All other tool names (`add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `aweb_welcome_guide`) confirmed correct against Grace's diff.
+- Sofia framing pass (mail 55bed1b7) approved v2 content; her cross-surface alignment ask applies to serverInfo (give-user-literal-prompt → AI-offers-to-do-it shape) — welcome guide v2 already had the AI-offers-it shape, so no content change here. serverInfo revised separately to align.
 
 ---
 
@@ -45,13 +51,13 @@ Example user-facing phrasing:
 
 > "Want to try aweb? I can create an invite link for a friend — tell me their first name and I'll set it up."
 
-User says yes and names a friend → call `create_contact_invite` with that name. Hand them the link; they share it with the friend.
+User says yes and names a friend → call `create_invite_link` with that name. Hand them the link; they share it with the friend.
 
 This is THE thing to anchor on. Don't suggest 17 other things on first contact — suggest this one and let the rest follow.
 
 ## Tools you have
 
-- `create_contact_invite` — generate an invite link for a friend (the smallest first action above)
+- `create_invite_link` — generate an invite link for a friend (the smallest first action above)
 - `add_contact_by_handle` — add a friend who already has an aweb @handle
 - `list_contacts` — list the user's contacts and their state (pending / active)
 - `send_message_to_contact` — send mail (async) or chat (sync) to a named contact
@@ -80,7 +86,7 @@ Use: friend / contact / address / handle / message / your AI. Avoid: team / role
 
 Common asks and how to handle:
 
-- **"I don't know my friend's handle"** — the invite-link path doesn't need it. Suggest that path (`create_contact_invite`). If the user wants to add someone who already has a handle they know, use `add_contact_by_handle`.
+- **"I don't know my friend's handle"** — the invite-link path doesn't need it. Suggest that path (`create_invite_link`). If the user wants to add someone who already has a handle they know, use `add_contact_by_handle`.
 - **"How do I block someone?"** — the default IS contacts-only-reachability; non-contacts can't reach the user. To stop messages from an existing contact, the user removes them from contacts. If a remove-contact tool isn't available yet, suggest support.
 - **"Did Sarah get my message?"** — check `list_contacts` for Sarah's state. If pending, tell the user the message queues until Sarah joins; if active, the message has been delivered.
 
@@ -102,7 +108,7 @@ Same shape as v1 routing notes plus the v2 deltas. Specifically watch:
 
 Pending Grace's tool-name lock:
 
-- `create_contact_invite`, `add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `aweb_welcome_guide` — confirm these match what Grace ships (or surface revisions).
+- `create_invite_link`, `add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `aweb_welcome_guide` — confirmed against Grace's commit c6f270e8 (Athena mail a58bc12b + 69ed8365).
 - Does the invite-link flow produce a "pending → active" lifecycle in the v1 contact model (verbatim with what I wrote), or is there nuance (e.g., separate accept step, or active-on-both-sides-after-mutual-add)?
 - Does `send_message_to_contact` on a pending contact actually queue the message (as I claim) or fail? If it fails, the guide needs revision; if it queues, the guide is honest.
 - Does the default-reachability statement match v1 implementation? ("only added contacts can reach the user.")
