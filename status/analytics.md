@@ -54,6 +54,21 @@ should land. Acked: 579c20ec.
   vs historical ~3min) is operational signal Hestia flagged in
   status/operations.md. Not my surface but worth tracking.
 
+**Stop-gap empirical state 2026-05-14** (Hestia f822ad07):
+- Daily sign-up export firing on schedule (today 08:09Z, msg
+  99c39c12 in conv a31c58e9; 0-row day).
+- Hourly milestone-check intermittent. Last clean cluster:
+  19:36/20:35/22:36 (2026-05-13) and 01:02/01:42/03:22 (2026-05-14).
+  Then 8h gap 03:22Z → 11:30Z (~8 missed firings). Root cause:
+  Hestia's "cron" only fires while her Claude session processes
+  messages; not a real system cron.
+- Net signal impact during the gap: zero. External multi-agent
+  user population is at 0; no alert would have fired anyway.
+- **Framing held in mail to Bertha (b7dd0b5f)**: absence of
+  milestone-alert mail does NOT mean zero candidates over the
+  window; daily batch is the durable signal; hourly is
+  opportunistic until the durable replacement lands.
+
 ## Instrumentation gaps
 
 - No durable scheduling for the Bertha pipeline. CronCreate
