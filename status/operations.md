@@ -1,15 +1,14 @@
 # Operations Status
 
-Last updated: 2026-05-14 00:35 CEST (22:35 UTC 2026-05-13) — **AC v0.5.31
-backend verified-live + P0 prod-data backfill complete + Pain-narrative
-site live on aweb.ai**. Juan retested ChatGPT-connect on tsm post-backfill
-and reports "this has worked." Site production deploy
-(`make deploy-site` 46a0e526..21cb6c23) landed at 22:28Z carrying
-Peter's pain-narrative rewrite + Eugenie's iteration. Hero copy
-"You're still doing the work your AI should be doing" + all assets
-200. **v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR image,
-no deploy). Sofia's release-notes-reframing decision closed (decisions
-6eb1571, Option 3 transparency).
+Last updated: 2026-05-14 15:40 CEST (13:40 UTC) — **AC v0.5.33
+backend verified-live** at 59ac4c81 (post-OAuth onboarding bundle:
+MCP create_invite_link + aweb_welcome_guide + aweb://welcome
+resource + consent-page banner + welcome guide v5 content +
+serverInfo.instructions). Juan triggered Render at 13:36Z; image
+landed at 13:37:17Z. #30 schema check green (8 files = 8 applied).
+**v0.5.32** (Grace email hotfix at 34650a93) was tagged + GHA
+SUCCESS but never deployed — superseded by v0.5.33 (forward-progress
+ancestor confirmed). Image stays in GHCR as a halted-deploy entry.
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
@@ -146,15 +145,15 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-13 22:25Z)
+## Live state (verified 2026-05-14 13:37Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.31`, `aweb_version=1.21.0`,
-  `awid_service_version=0.5.4`, `git_sha=21cb6c23d97a4020548369a1ef3419d223940491`.
-  Fresh deploy ~21:51Z (Juan manual Render trigger after GHA 25828109184 SUCCESS).
+- `app.aweb.ai/health`: `release_tag=v0.5.33`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=59ac4c81f25f6bd05e2b145d7d44021d23c834ad`.
+  Fresh deploy 13:36:46Z (Juan manual Render trigger).
 - Prod data: `aweb_cloud.managed_namespaces` controller alignment
-  backfill applied 22:18Z. 5/5 rows updated (jos/jro/seamnniel/test/tsm).
-  Predicate re-run = 0 rows. AWID registry unchanged (we touched
-  local, not registry).
+  backfill (2026-05-13 22:18Z) holds. Predicate re-run = 0 rows.
+- Schema: 8 migration files = 8 applied rows across server (1),
+  aweb (2), aweb_cloud (5). No drift.
 - Schema-migration state empirically current across all 3 schemas:
   - `server.schema_migrations`: 001 (1 row)
   - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
@@ -208,7 +207,9 @@ metis (sent this cycle).
 | AC v0.5.28 (1.21.0 uptake + ContactView schema fix) | shipped + backend verified-live; site iteration staging-only |
 | AC v0.5.29 (session-recognition fast-follow: /connect + /login + Google OAuth verified_email) | shipped + backend verified-live; schema brought current via prod-migrate-direct (4 pending migrations applied) |
 | AC v0.5.30 (controller_did reuse first-pass + OAuth raw-JSON wrap) | **HALTED** at tag-push — Grace surfaced 4 invariant gaps post-tag; GHA cancelled, no image, no deploy. Tag at 8c3d9dc1 stays as halted entry. |
-| **AC v0.5.31** (invariant-correct controller_did reuse + OAuth defensive tightening M1/M2/m1) | shipped + verified-live at 21cb6c23; #30 schema check green |
+| AC v0.5.31 (invariant-correct controller_did reuse + OAuth defensive tightening M1/M2/m1) | shipped + verified-live at 21cb6c23 + P0 prod-data backfill (5 rows aligned) |
+| AC v0.5.32 (Grace returning-consumer email hotfix at 34650a93) | tagged + GHA SUCCESS; never deployed (superseded by v0.5.33 forward-progress) |
+| **AC v0.5.33** (post-OAuth onboarding bundle: MCP invite tool + welcome resource + consent banner + welcome guide v5 + serverInfo) | shipped + verified-live at 59ac4c81 + #30 schema check green |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
