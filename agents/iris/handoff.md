@@ -1,6 +1,6 @@
 # Iris Handoff
 
-Last updated: 2026-05-14 (welcome-guide v5 routed to Aida; Athena cleared)
+Last updated: 2026-05-14 (welcome-guide v5 SHIPPED to AC-canonical; review chain complete)
 
 ## Operating focus
 
@@ -20,30 +20,33 @@ Sensitive contacts/targets stay in `co.aweb/`.
 Two parallel surfaces in flight for Athena/Grace's hosted-MCP welcome
 shipment:
 
-- **Welcome guide v5** — `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
-  (committed 80cb00d; trail: 007f33b → a649218 → 41c84b1 → 80cb00d).
-  Returns from the MCP `aweb_welcome_guide` tool. Athena cleared v4
-  (mail 6b88d7bb) with one nit: `contacts_remove` IS registered;
-  v5 adds it to TOOLS list + revises "How do I block someone?"
-  handler to call it directly. Routed to Aida for support-integration
-  (mail 6860570a).
+- **Welcome guide v5 SHIPPED** — review chain complete (Sofia framing
+  ✓ Athena tech-accuracy ✓ Aida support-integration ✓ Juan bless ✓).
+  Source draft: `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
+  (ai.aweb commit `80cb00d`). Content committed to AC-canonical at
+  `ac/backend/src/aweb_cloud/resources/welcome.md` (ac commit
+  `95481339`, on main). Grace's `load_welcome_guide()` reads from
+  there via importlib.resources — picks up automatically on next
+  version bump. Signaled Athena (mail `6adf43ef`); she runs the
+  version bump + gate with Hestia. Captured in
+  `publishing/history.md`.
 
-- **serverInfo.instructions v5** (495 chars, under 500 cap) —
-  `contacts_remove` added to tools list. Sofia + Athena both cleared
-  serverInfo; treating it as ready-to-wire on Juan's bless.
+- **serverInfo.instructions v5** (495 chars) — same bless; ready to
+  wire. Text in mail `c7073487` to Athena; Grace's FastMCP
+  constructor wiring is happening in parallel with the welcome-guide
+  ship.
 
 Tool names locked (per Athena's verification of Grace's commit
-c6f270e8 + server.py registration): `create_invite_link`,
+`c6f270e8` + server.py registration): `create_invite_link`,
 `add_contact_by_handle`, `contacts_remove`, `list_contacts`,
 `send_message_to_contact`, `read_messages_from_contact`,
 `aweb_welcome_guide`.
 
-Source-of-truth path: `ac/backend/src/aweb_cloud/resources/welcome.md`
-(AC-canonical per Athena's read).
-
-Next: Aida support-integration pass on welcome guide → Juan bless →
-commit content at canonical path → flag back to Athena for Grace's
-stub-replacement.
+Next: Grace + Hestia run version bump + gate. Iris signal collection
+once mcp_oauth_grants start firing post-deploy (Metis when she's
+active; signal-shape: invite-link creates within N min of OAuth
+grants on hosted custodial consumer agents; mutual-active contact
+pairs created).
 
 ### 2. Twitter thread P1 launch
 
