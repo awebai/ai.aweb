@@ -1,10 +1,10 @@
 ---
-title: "aweb welcome guide — v4 draft for MCP welcome tool + resource"
+title: "aweb welcome guide — v5 draft for MCP welcome tool + resource"
 date: "2026-05-14"
 type: "ai-facing-doc-draft"
-status: "Iris drafted v4 (Athena tech-accuracy revisions applied: lifecycle two-paths, send-on-pending errors-not-queues, read_messages_from_contact added); Athena v4 re-read pending; Aida support-integration review next; Juan bless pending"
+status: "Iris drafted v5 (Athena v4 cleared 6b88d7bb with contacts_remove nit folded); routing to Aida for support-integration; Juan bless after"
 canonical-destination: "ac/backend/src/aweb_cloud/resources/welcome.md (AC-canonical per Athena tech-accuracy read; Grace's load_welcome_guide() reads from that path via importlib.resources). Moves on Juan's bless."
-brief: "Athena spec lock 44c8c92a; Aida pre-think 204e971e; Sofia framing approval 55bed1b7; Athena tool-name lock a58bc12b + 69ed8365; Athena tech-accuracy revisions dfeb103a."
+brief: "Athena spec lock 44c8c92a; Aida pre-think 204e971e; Sofia framing approval 55bed1b7; Athena tool-name lock a58bc12b + 69ed8365; Athena tech-accuracy revisions dfeb103a; Athena v4 clear + contacts_remove nit 6b88d7bb."
 ---
 
 ## Iteration history (Iris notes for reviewers)
@@ -37,6 +37,13 @@ Voice-howto.md scaffolding applied; per-section honesty noted; failure-mode fram
 - **Source-of-truth location locked**: ac/backend/src/aweb_cloud/resources/welcome.md (AC-canonical per Athena's read — consumer-cloud-product content lives in cloud-product code; the aweb/docs/welcome-guide.md option lean was wrong). Grace's load_welcome_guide() in hosted_mcp.py reads from that path via importlib.resources.
 - **Default-reachability claim verified correct** by Athena's pass — no change.
 
+**v4 → v5 deltas** per Athena's v4 clear + small nit (mail 6b88d7bb):
+
+- v4 cleared on all three substantive items (lifecycle two-paths; send-on-pending errors-not-queues; read_messages_from_contact addition); default-reachability retained.
+- Folded `contacts_remove` (registered MCP tool per server.py) into:
+  - TOOLS YOU HAVE list (between `add_contact_by_handle` and `list_contacts`).
+  - "How do I block someone?" common-ask handler — revised to call `contacts_remove` directly; dropped the "if a remove-contact tool isn't available yet, suggest support" stale fallback.
+
 ---
 
 ## DRAFT CONTENT BEGINS BELOW (this is what the MCP welcome tool returns)
@@ -67,6 +74,7 @@ This is THE thing to anchor on. Don't suggest 17 other things on first contact �
 
 - `create_invite_link` — generate an invite link for a friend (the smallest first action above)
 - `add_contact_by_handle` — add a friend who already has an aweb @handle
+- `contacts_remove` — remove a contact (closes the messaging channel since reachability defaults to contacts-only)
 - `list_contacts` — list the user's contacts and their state (active / pending)
 - `send_message_to_contact` — send mail (async) or chat (sync) to a named contact
 - `read_messages_from_contact` — read incoming mail or chat from a saved contact
@@ -101,7 +109,7 @@ Use: friend / contact / address / handle / message / your AI. Avoid: team / role
 Common asks and how to handle:
 
 - **"I don't know my friend's handle"** — the invite-link path doesn't need it. Suggest that path (`create_invite_link`). If the user wants to add someone who already has a handle they know, use `add_contact_by_handle`.
-- **"How do I block someone?"** — the default IS contacts-only-reachability; non-contacts can't reach the user. To stop messages from an existing contact, the user removes them from contacts. If a remove-contact tool isn't available yet, suggest support.
+- **"How do I block someone?"** — the default IS contacts-only-reachability; non-contacts can't reach the user. To stop messages from an existing contact, call `contacts_remove`. Reachability is contacts-only by default, so removing them closes the channel.
 - **"Did Sarah get my message?"** — check `list_contacts` for Sarah's state. If active, the message has been delivered (and the user can call `read_messages_from_contact` to see any reply). If pending, sending fails — Sarah isn't on aweb yet. Tell the user honestly: the friend needs to join aweb before messages can reach them. If the user hasn't already invited Sarah, suggest `create_invite_link`; otherwise wait for her to accept the existing invite.
 
 ## DRAFT CONTENT ENDS
@@ -124,7 +132,7 @@ Sofia's cross-surface alignment ask (give-user-literal-prompt → AI-offers-it s
 
 Five claim-verifications:
 
-- ✓ Tool names — `create_invite_link`, `add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `read_messages_from_contact`, `aweb_welcome_guide` — confirmed against Grace's commit c6f270e8 + server.py registration.
+- ✓ Tool names — `create_invite_link`, `add_contact_by_handle`, `contacts_remove`, `list_contacts`, `send_message_to_contact`, `read_messages_from_contact`, `aweb_welcome_guide` — confirmed against Grace's commit c6f270e8 + server.py registration (contacts_remove added v5 per Athena's nit 6b88d7bb).
 - ✓ Default-reachability ("only added contacts can reach the user") — verified accurate (mechanism is address_reachability="nobody" + bilateral contact routing, but user-facing framing is right).
 - ✗ → fixed in v4: invite-link "pending → active" lifecycle claim was wrong — invite-link is bilateral-active immediately; pending state only exists on the handle-add path.
 - ✗ → fixed in v4: send_message_to_contact on pending "queues" claim was wrong — it errors with "No active agent found for handle contact" (verified at aweb/server/src/aweb/mcp/tools/contacts.py:101+). LOAD-BEARING for trust per Aida — revised to honest "sending fails; suggest invite link or wait for accept" handling.
@@ -158,8 +166,8 @@ Final read for voice + posture. AI-first audience makes this a different shape; 
 - ✓ v2 draft → Sofia framing review (approved 55bed1b7 with cross-surface alignment ask).
 - ✓ v3 → Athena tool-name lock (a58bc12b + 69ed8365): create_invite_link.
 - ✓ v4 → Athena tech-accuracy revisions applied (dfeb103a): lifecycle two-paths, send-on-pending errors, read_messages_from_contact added, source-of-truth locked AC-canonical.
-- → Athena v4 re-read (pending; her sequencing said 5-10 min).
-- → Aida support-integration pass (her pre-think folded; should converge fast after the v4 trust-line fix).
+- ✓ Athena v4 re-read clear (mail 6b88d7bb) + folded the contacts_remove nit → v5.
+- → Aida support-integration pass (her pre-think folded; should converge fast after the v4/v5 trust-line + tool-completeness fixes).
 - → Juan bless.
 - → On bless: commit to ac/backend/src/aweb_cloud/resources/welcome.md; flag back to Athena for Grace's stub-replacement.
 - Adjacent: serverInfo.instructions v4 bundled with welcome-guide v4 to Athena.
