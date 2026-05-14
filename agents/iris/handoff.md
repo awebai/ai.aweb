@@ -1,6 +1,6 @@
 # Iris Handoff
 
-Last updated: 2026-05-14 (welcome-guide v2 + serverInfo v2 in review)
+Last updated: 2026-05-14 (welcome-guide v3 + serverInfo v3 bundled to Athena for tech-accuracy)
 
 ## Operating focus
 
@@ -20,26 +20,28 @@ Sensitive contacts/targets stay in `co.aweb/`.
 Two parallel surfaces in flight for Athena/Grace's hosted-MCP welcome
 shipment:
 
-- **Welcome guide v2** — `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
-  (committed 007f33b). ~440 words, within Athena's 200-500 target.
-  Returns from the MCP `aweb_welcome_guide` tool; mirrored to docs.
-  Folds Aida's pre-think (vocabulary, pending-vs-active lifecycle as
-  load-bearing for trust, default-reachability, re-fetch tool entry).
-  Review chain: Sofia framing → Athena tech-accuracy (pending Grace's
-  tool-name lock) → Aida support-integration → Juan bless → commit
-  at canonical path (TBD pending Grace's mount-path trace).
+- **Welcome guide v3** — `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
+  (committed a649218; v2 was 007f33b). ~440 words, within Athena's
+  200-500 target. Returns from the MCP `aweb_welcome_guide` tool;
+  mirrored to docs. Folds Aida's pre-think (vocabulary, pending-vs-
+  active lifecycle as load-bearing for trust, default-reachability,
+  re-fetch tool entry). Sofia framing approved (mail 55bed1b7).
+  v3 delta: tool-name fix `create_contact_invite` →
+  `create_invite_link` per Athena's lock confirming Grace's c6f270e8.
 
-- **serverInfo.instructions v2** — proposed in mail to Sofia
-  (00f88031, in conversation 345f95bb). 447 chars, under 500 cap.
-  AI-facing, semi-spec; (a) aweb framing, (b) smallest-first-action
-  prompt, (c) tools list + vocabulary guard. Awaiting Sofia's
-  converge-or-revise. Once converged → Athena tech-accuracy → Grace
-  wires into FastMCP constructor.
+- **serverInfo.instructions v3** (456 chars, under 500 cap) — bundled
+  to Athena with welcome-guide v3 (mail c7073487). Sofia approved
+  shape + content in 9595f878, then asked for cross-surface alignment
+  (give-user-literal-prompt → AI-offers-to-do-it) in 55bed1b7; I
+  concurred (mail 7acfb31e). v3 applies that alignment AND
+  `create_invite_link` rename. Awaiting Athena's formal tech-accuracy
+  on both surfaces; on her clear → Aida → Juan bless → Grace wires
+  serverInfo into FastMCP constructor + welcome guide moves to
+  canonical path.
 
-Tool names used in both (per Sofia's framing flag, aanp.10 alias drop):
-`create_contact_invite`, `add_contact_by_handle`, `list_contacts` (not
-`contacts_list`), `send_message_to_contact`, `aweb_welcome_guide`. If
-Grace ships different names, revise both surfaces together.
+Tool names locked (per Athena's verification of Grace's commit
+c6f270e8): `create_invite_link`, `add_contact_by_handle`,
+`list_contacts`, `send_message_to_contact`, `aweb_welcome_guide`.
 
 ### 2. Twitter thread P1 launch
 
