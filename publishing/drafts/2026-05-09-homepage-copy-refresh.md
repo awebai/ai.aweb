@@ -52,14 +52,26 @@ path, the following constraints apply to any Pass-4 edit:
    autonomous install." Same default for future private-beta
    customers unless explicitly cleared.
 
-5. **Source-of-truth doc paths:** Sofia named
-   `docs/customer-onboarding-flows.md` as the customer-shape
-   source-of-truth (Shape A / B / C); as of 2026-05-11 evening
-   that file is in 'deleted' state on Sofia's working tree
-   pending Juan's input on whether the deletion was intentional.
-   If the doc moves or is recreated at a different path, Pass-4
-   author re-threads the reference from the bundle + AGENTS.md
-   discipline.
+5. **Source-of-truth doc resolved (2026-05-12):** Juan's persona
+   reorder absorbed the customer-onboarding-flows.md Shape A/B/C
+   content into `docs/audiences.md` under the persona-and-tier
+   framing. customer-onboarding-flows.md is deleted; the source-
+   of-truth for customer-shape verification is now
+   `docs/audiences.md` (Personas 1-4 + Tiers 1-2). AGENTS.md
+   banked discipline updated to reference audiences.md.
+
+   Additional persona-priority context for the eventual Pass-4
+   wire-in (Sofia mail 1a65d7eb, 2026-05-12): the homepage now
+   leads with P1 (personal-AI consumer) priority, not P3
+   (developer team) as the earlier framing implied. Pass-3's
+   reframe toward custodial-MCP / browser-desktop audience was
+   already in the P1 direction, so the customer-shape direction
+   of Pass-3 holds; what shifts is the broader-content strategy
+   around the page (channel mix, surrounding copy, content
+   priorities outside the homepage). Pass-4 ChatGPT-tier framing
+   constraint (#1) still applies as-is — P1 personas use
+   ChatGPT/claude.ai/Gemini browser clients, and the tier
+   limits hit P1 directly.
 
 6. **Add-a-friend is handle-only during FUT-2 / .6.1 gap (from
    Athena mail cda42ba0, 2026-05-12):** any copy describing the

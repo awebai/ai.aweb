@@ -1,51 +1,58 @@
 # Product Status
 
-Last updated: 2026-05-12 (Sofia, persona priority reorder + UX simplification pass beginning)
+Last updated: 2026-05-13 22:30Z (Sofia, consumer-onboarding v1 cycle closed: site live + holds released)
 
 ## Current focus
 
-**Persona priority reordered (decision record 2026-05-12).** New
-likely-first-customer ranking:
+**Consumer-onboarding v1 cycle closed (2026-05-13 22:28Z).**
+ac v0.5.31 backend + aweb.ai pain-narrative homepage + /developers
+landing all live in production. Headline customer outcome arc
+(P1 lands at aweb.ai → clicks "Connect your AI" → picks client
+→ paste instructions → OAuth consent → handle pick → adds
+contact by @handle → messages friend's AI) plausibly complete
+end-to-end. Walked the deployed surface; vocabulary is
+consumer-shaped above the fold; no developer-vocabulary leaks.
 
-1. Personal-AI consumer (was not previously named)
-2. Company with AI-using employees (was not previously named)
-3. Developer teams coordinating agents (was #1)
-4. Agent platform builders (was #2, now last)
+The cycle had two gaps caught post-ship and reframed: (1) site
+landing deployed late behind the backend, (2) schema-migration
+drift across v0.5.25 → v0.5.29 ran v0.5.28's contact ingestion
+against an old schema for ~1 hour. Both resolved; transparency
+reframe captured in `docs/decisions.md` 2026-05-13 entry.
 
-Conversations over the past weeks shifted Juan's read of who shows
-up first. The two new personas share a UX shape: browser-based
-custodial MCP, no terminal, vocabulary limited to {*my AI*,
-*my address*, *my contacts*, *who can reach me*}. Dev-team
-persona stays load-bearing as the architectural anchor and the
-only persona with real product-fit evidence (44 internal users),
-but is no longer the lead persona for landing-copy / onboarding /
-content priorities.
+Sofia banked framing-review discipline (`feedback_framing_review_requires_deployed_spot_check.md`):
+release-claim framing must spot-check the deployed surface, not
+trust the release-notes description. Hestia banked her side as
+runbook discipline #30 (schema-migration verification in
+verify-live, not /health).
 
-`docs/audiences.md` rewritten to add Personas 1 and 2 and reframe
-to "persona" terminology. Decision record at `docs/decisions.md`
-2026-05-12.
+**Holds released**:
+- Iris: moved to (a) Twitter/X thread shape we converged on. Deployed
+  product gives her something to demonstrate. No deadline.
+- Aida: P1+P2 watch list of expected support shapes (handle-discovery,
+  OAuth confusion, pending vs active contacts, vocabulary, observability,
+  block-someone privacy default). Standing posture: collect 2-3 real
+  seed examples before runbook section authoring.
 
-**UX simplification pass beginning.** Working artifact:
-`agents/sofia/ux-surface.md` (inventory snapshot of all five
-user-facing surfaces: landing, auth, dashboard, CLI, MCP).
-HTML diagram with persona-colored surface map renders to
-`agents/sofia/ux-surface.html`. Next motion (after Athena reads
-the persona reorder): converge on which surfaces / sections /
-commands / tools to cut or demote to sharpen the experience for
-Personas 1 and 2 without breaking Personas 3 and 4.
+**What remains pending after the close**:
+- Bertha/Eugenie sign-off chain — separate process; deploy happened on
+  what was ready; their resolution is independent of this cycle.
+- aweb-aanp.6.1 email-typed contacts — backlog (Grace, P2).
+- aweb-aanp.10 OpenAI App Directory submission — pending Juan
+  screenshots + help-center paste.
+- FUT-1 Anthropic Connectors Directory submission — Iris queue.
+- UX simplification follow-ups (next priority): the REFRAME_FOR P1
+  list from the scoring model (Tasks/Identities/Roles tabs +
+  Create Team/Org dialogs) sits in the next consumer-v1-dashboard
+  reframe scope Athena is sequencing.
 
-Surfaces that look most mismatched to the new top persona:
-- Dashboard's 9 team-tabs assume a developer-team mental model
-  hostile to Persona 1.
-- CLI's 25 top-level commands are invisible to Personas 1 and 2.
-- MCP's 45 tools (no `readOnlyHint`) are agent-facing and shape
-  Persona 1's first impression of "what my AI can do."
-- Landing homepage's 8 sections include redundant "Two Paths"
-  framings and competing CTAs that don't sharpen for Persona 1.
-
-Peer notifications going out now: Athena (engineering implications),
-Iris (content / outreach target shift), Aida (support framing
-broadens beyond CLI users), Hestia (FYI).
+**Persona model and UX scoring** (ongoing reference work):
+`docs/audiences.md` carries the four personas + tier model
+(rewritten 2026-05-12 with Personas 1+2 added per the priority
+reorder). `agents/sofia/ux/` carries the role_for-based UX scoring
+system: personas.yaml + surfaces.yaml + score.py generate
+ux-surface-report.md. The persona-aware visibility patterns
+(HIDE_FOR / REFRAME_FOR / NEVER_CUT) are now the model the
+simplification work runs through.
 
 ## Earlier focus (banked)
 

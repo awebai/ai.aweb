@@ -154,14 +154,18 @@ The double failure mode worth carrying forward:
 
 **Customer-shape verification before authoring landing-copy.**
 Before authoring any landing-page section that addresses
-onboarding or installation, identify which onboarding shape
-(A custodial-MCP, B CLI developer, C self-host operator) the
-section addresses, and walk the described flow as that customer
-using only that customer's tooling. A section that promises
-something the customer cannot do — even if the words are
-pretty — is broken. The section's STRUCTURE has to deliver to
-the named shape, not just the heading text. Source-of-truth doc:
-`../../docs/customer-onboarding-flows.md`. Banked from the
+onboarding or installation, identify which persona the section
+addresses (P1 personal-AI consumer, P2 company with AI-using
+employees, P3 developer team, P4 platform builder — see
+`../../docs/audiences.md`), and walk the described flow as that
+persona using only that persona's tooling. A section that
+promises something the persona cannot do — even if the words
+are pretty — is broken. The section's STRUCTURE has to deliver
+to the named persona, not just the heading text. Source-of-
+truth doc: `../../docs/audiences.md` (the earlier Shape A/B/C
+model in `customer-onboarding-flows.md` was absorbed into the
+persona-and-tier framing in audiences.md; the deleted doc no
+longer exists). Banked from the
 2026-05-09 / 2026-05-10 / 2026-05-11 homepage refresh: Iris's
 "Sign up. Your agent handles the rest." section pitched Shape A
 customers (claude.ai web, ChatGPT, Claude Desktop) but described

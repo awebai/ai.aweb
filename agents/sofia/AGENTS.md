@@ -211,22 +211,31 @@ cannot perform — paste this prompt into a browser-only agent
 that says "open a terminal and run npm install" — the section
 is broken regardless of how the words read.
 
+The persona model lives in **`docs/audiences.md`** (Personas 1–4
+with priority ordering as of 2026-05-12). That's the canonical
+read for who a section is addressing.
+
 The customer-shape discipline that produced the Pass-1/Pass-2
-homepage miss is now banked across three surfaces, none of
-them a separate Sofia doc:
+homepage miss is currently carried across these surfaces:
 
 - **aweb-aanp brief** in the dev team (Athena's surface,
   default:aweb.ai → aweb:juan.aweb.ai) carries the
   CUSTOMER EXPERIENCE TARGET + ONBOARDING SURFACE REALITY
   sections — the implementation authority for what the product
-  actually does for each customer shape. Sofia cannot read dev-
+  actually does for each persona shape. Sofia cannot read dev-
   team tasks directly today (cross-team-task-readability gap
   pending engineering ticket); request relay through Athena
   when needed.
-- **publishing/voice.md** (Iris's surface) carries the framing
-  patterns banked from prior cycles. Reads cleanly from Sofia.
 - **Each agent's AGENTS.md** carries its own operational
-  application of the discipline.
+  application of the discipline (this section is Sofia's; Iris,
+  Aida, etc. each apply the rule on their own surface).
+- **`publishing/voice.md` (Iris's surface) is pending an update**
+  to add the customer-shape discipline section + persona-shaped
+  pitches. Iris caught (mail c530e49a, 2026-05-12) that voice.md
+  does not currently carry this content — the prior claim that
+  it did was wrong. Iris is authoring the update with Sofia
+  framing-review; check the file before treating it as a
+  source-of-truth.
 
 Verify against current product reality (read the code or ask
 Athena) before approving any copy that names a customer flow.

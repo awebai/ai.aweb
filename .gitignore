@@ -7,3 +7,8 @@ agents/*/.aw/signing.key
 *.emacs-bu*
 .DS_Store
 
+# Emacs autosave + lockfiles
+\#*\#
+.\#*
+*~
+

@@ -1,14 +1,73 @@
 # Operations Status
 
-Last updated: 2026-05-10 12:25 CEST (10:25 UTC) — AC v0.5.26 verified-
-live. **Full P0 arc empirically closed end-to-end across two coordinated
-releases (aweb 1.20.8 + AC v0.5.26) within ~24h.** Verified-live mails
-sent to athena (5fc87592), sofia (ae05039f), aida (96f74b81).
-Aida REMOVE-trigger fired for runbook entry e6b1303.
+Last updated: 2026-05-14 00:35 CEST (22:35 UTC 2026-05-13) — **AC v0.5.31
+backend verified-live + P0 prod-data backfill complete + Pain-narrative
+site live on aweb.ai**. Juan retested ChatGPT-connect on tsm post-backfill
+and reports "this has worked." Site production deploy
+(`make deploy-site` 46a0e526..21cb6c23) landed at 22:28Z carrying
+Peter's pain-narrative rewrite + Eugenie's iteration. Hero copy
+"You're still doing the work your AI should be doing" + all assets
+200. **v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR image,
+no deploy). Sofia's release-notes-reframing decision closed (decisions
+6eb1571, Option 3 transparency).
+
+**Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
+overclaim — the site portion of the aanv-pain-narrative iteration is
+NOT yet on production aweb.ai. Three options for Juan to call: push
+site / reframe notes / split verified-live framing.
+
+**Schema-migration silent-gap discovery (2026-05-13)**: v0.5.25 → v0.5.29
+all shipped without startup migrations firing on Render. 4 pending
+migrations (aweb 002_contacts_handle_state +
+aweb_cloud 003_byot_custodial_pending_identities,
+004_mcp_oauth_connection_metadata, 005_consumer_contact_invites)
+silently accumulated unrun. Caught by Juan asking "have all the
+migrations run?" — empirical query of `schema_migrations` across
+three schemas found the drift. Resolved via
+`PROD_ENV_FILE=.env.production make prod-migrate-direct` at 19:49Z.
+Banking discipline #30 (next section). Render startup-migration
+mechanism root-cause investigation: Task #109.
 
 ## Current focus
 
-**FULL P0 ARC RECEIPT — 2026-05-09 → 2026-05-10**
+**AC v0.5.28 + aweb 1.21.0 — verified-live (backend) 2026-05-13**
+
+aweb 1.21.0 end-to-end:
+- PyPI publish: ✓ (server, ManyLinux+macOS wheels)
+- npm publish: ✓ via fresh GAT (banked 90-day expiration foot-gun:
+  Feb 12 + 90 = May 13; old token hit exact-day cap, 404-on-anonymous-PUT
+  is npm's misleading shape — diagnosed via Athena + research agent
+  after Juan's pushback "you are assuming they have changed something.
+  why?")
+- `aw upgrade` clean against released artifact.
+
+AC v0.5.28 end-to-end:
+- aweb >= 1.21.0 pin in pyproject.toml at d64ce84c.
+- First release-ready: 2 fails — `ContactView` `extra='forbid'`
+  rejected new aweb 1.21.0 fields (reference_type, status,
+  handle_namespace, target_agent_name). Athena landed fix at 00064992
+  using Path A (Literal types for enums).
+- Tag v0.5.28 pushed individually at 00064992.
+- GHA + Render: Juan manual trigger to bypass image-watcher lag.
+- /health: release_tag=v0.5.28, git_sha=00064992,
+  aweb_version=1.21.0, awid_service_version=0.5.4.
+
+Sofia's catch (mail 574185f5): release notes claim aanv full receipt
+but the site iteration portion is staging-only as of this writing.
+Three Juan-call options open: push site / reframe notes / split
+verified-live framing into backend-now + site-pending.
+
+## Site staging — deploy 3 (2026-05-13)
+
+Just pushed: `make deploy-staging` from main HEAD `0a9b1654`
+(9093a225..0a9b1654 → `deploy-landing-staging`). Site diff vs prior
+staging tip (ce2bf922): 4 files in `site/` only — `hugo.yaml`,
+`layouts/index.html`, `layouts/index.llms.txt`, `static/css/main.css`.
+Hugo build local: 33 pages, 13 static, clean. Render rebuild of
+preview-urw1.onrender.com triggered. Athena signaled (mail a0bf1a1d)
+for fresh walk; Bertha/Eugenie sign-off pass to follow.
+
+## Prior arc — full P0 close 2026-05-09 → 2026-05-10
 
 Pepe Reyero surfaced four frictions on 2026-05-09. All four closed
 empirically across two coordinated releases:
@@ -87,13 +146,26 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-10 10:13Z, post v0.5.26 deploy)
+## Live state (verified 2026-05-13 22:25Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.26`, `aweb_version=1.20.8`,
-  `awid_service_version=0.5.4`,
-  `git_sha=1ce7d6a97a92f41dfeed7163fc3d67a50f48827a`. Started
-  2026-05-10T10:12:36Z.
+- `app.aweb.ai/health`: `release_tag=v0.5.31`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=21cb6c23d97a4020548369a1ef3419d223940491`.
+  Fresh deploy ~21:51Z (Juan manual Render trigger after GHA 25828109184 SUCCESS).
+- Prod data: `aweb_cloud.managed_namespaces` controller alignment
+  backfill applied 22:18Z. 5/5 rows updated (jos/jro/seamnniel/test/tsm).
+  Predicate re-run = 0 rows. AWID registry unchanged (we touched
+  local, not registry).
+- Schema-migration state empirically current across all 3 schemas:
+  - `server.schema_migrations`: 001 (1 row)
+  - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
+  - `aweb_cloud.schema_migrations`: 001 + 002 + 003_byot_custodial_pending_identities
+    + 004_mcp_oauth_connection_metadata + 005_consumer_contact_invites (5 rows)
 - `api.awid.ai/health`: `version=0.5.4`, redis/db/schema healthy.
+- Site production (aweb.ai): pain-narrative live at 22:28Z
+  (deploy-landing tip = 21cb6c23). Hero: "You're still doing the
+  work / your AI should be doing". CTA: "Connect your AI" →
+  app.aweb.ai/connect. 17 "relay" mentions in rendered HTML.
+- Site staging (preview-urw1.onrender.com): same content as prod now.
 
 ## Bertha pipeline — HANDOFF TO METIS (ANALYTICS) PER JUAN 2026-05-10
 
@@ -129,8 +201,14 @@ metis (sent this cycle).
 | aweb 1.20.7 (multi-team did_key + chat 409) | shipped + verified-live (server release) |
 | AC v0.5.24 (1.20.7 uptake + chat 409 close) | shipped + verified-live |
 | AC v0.5.25 (cli-signup api_key + admin_analytics fix) | shipped + verified-live |
-| **aweb 1.20.8** (aang/aanh/aani/aanj bundle) | **mid-flight, awaiting Athena re-make-ship at 637cd74** |
-| AC v0.5.26 (1.20.8 uptake) | pending PyPI 1.20.8 publish |
+| aweb 1.20.8 (aang/aanh/aani/aanj bundle) | shipped + verified-live |
+| AC v0.5.26 (1.20.8 uptake) | shipped + verified-live |
+| AC v0.5.27 | paused at tag — Render not triggered (Task #91) |
+| **aweb 1.21.0** (aanv pain-narrative + protocol refresh) | shipped + verified-live (PyPI ✓ npm ✓) |
+| AC v0.5.28 (1.21.0 uptake + ContactView schema fix) | shipped + backend verified-live; site iteration staging-only |
+| AC v0.5.29 (session-recognition fast-follow: /connect + /login + Google OAuth verified_email) | shipped + backend verified-live; schema brought current via prod-migrate-direct (4 pending migrations applied) |
+| AC v0.5.30 (controller_did reuse first-pass + OAuth raw-JSON wrap) | **HALTED** at tag-push — Grace surfaced 4 invariant gaps post-tag; GHA cancelled, no image, no deploy. Tag at 8c3d9dc1 stays as halted entry. |
+| **AC v0.5.31** (invariant-correct controller_did reuse + OAuth defensive tightening M1/M2/m1) | shipped + verified-live at 21cb6c23; #30 schema check green |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
@@ -165,9 +243,12 @@ Only after all four: Hestia runs `make deploy-site` from ac/.
 **First deploy gate run — closed 2026-05-10 14:39Z**: Iris's bundle 58ed6c53 bypassed gate (Pass-1; Render was watching main; reverted). Sofia-authored Pass-3 (60be8f4e) ran the gate cleanly: Bertha/Eugenie validation on staging ✓, Sofia framing-pass ✓ (substantive customer-shape correction), Juan explicit per-deploy greenlight ✓, Hestia deploy + verify-live ✓. Verified-live mails dispatched: iris (f0ac616f), bertha (5379880c), sofia (ab09f148). Sofia independent live-check confirmed (mail c6b73992).
 
 **Customer-shape discipline** — adopted cross-team (Sofia mail c6b73992):
-- Doc: ai.aweb/docs/customer-onboarding-flows.md (Shape A custodial-MCP / Shape B CLI dev / Shape C self-host).
-- Site copy review starts with: 'which customer shape is this section addressing?'
-- Discipline that should have prevented Pass-2's Shape-B-flow-labeled-Shape-A miss.
+- Doc: `docs/audiences.md` (Personas 1-4 + Tier 1/2). The earlier
+  `customer-onboarding-flows.md` (Shape A/B/C) was deleted 2026-05-12
+  at commit 47a9558 — persona model is now the single source. Sofia
+  flagged my stale reference 2026-05-13 (mail 985be5c2).
+- Site copy review starts with: 'which persona is this section addressing?'
+- Discipline that should have prevented Pass-2's wrong-persona-labeling miss.
 - Adopted by Iris (mail cbd2aacb) + Sofia + Hestia. Aida's adoption is the natural next ask for customer-support runbook triage.
 
 ## Operational discrepancies
@@ -200,16 +281,19 @@ Athena is the cross-team bridge.
 
 ## Next checks
 
-1. Athena's re-make-ship green at 637cd74 → tag both server-v1.20.8 +
-   aw-v1.20.8 individually + push, watch GHA, verify-live.
-2. Daily `/health` on app.aweb.ai + api.awid.ai. Render deploy-lag
-   pattern if v0.5.26 ships next.
-3. Hourly milestone-check cron firings; act only if non-empty.
-4. Daily 08:13 CEST sign-up export to Bertha.
-5. Brief Bertha (when 1.20.8 verified-live): Pepe Reyero's
-   autonomous-install case unblocked.
-6. Pass-2 trigger to Iris when 1.20.8 verified-live + npm reachable
-   + aw upgrade works (Sofia's precise trigger).
+1. Athena fresh-walk preview-urw1.onrender.com post-Render-rebuild,
+   then Bertha/Eugenie sign-off pass on iterated pain-narrative.
+2. Sofia's open release-notes-reframing question (mail 574185f5):
+   Juan must call — push site / reframe notes / split verified-live.
+3. After Sofia/Juan call: production site deploy (`make deploy-site`)
+   if push-site path; otherwise update release notes.
+4. Daily `/health` on app.aweb.ai + api.awid.ai.
+5. Hourly milestone-check cron firings; act only if non-empty.
+6. Daily 08:13 CEST sign-up export to Bertha.
+7. Branch protection on deploy-landing (Task #88, Juan's lane).
+8. OIDC trusted publisher migration for npm (eliminate GAT 90-day
+   treadmill — currently May 13 → next forced rotation Aug 11).
+9. Monitor Neon DB connection-timeout transients (Task #89).
 
 ## Standing release-discipline (banked through 2026-05-10)
 
@@ -286,6 +370,36 @@ Athena is the cross-team bridge.
     narrative in publishing/drafts/; Hestia started wiring it into
     ac/site/. Juan caught it. Iris re-authored on ac main as 58ed6c53
     — proper shape. Banking the rule for future bundles.)
+30. **Schema-migration verification is part of verify-live, not /health.**
+    `/health` only probes connectivity. A service can be green on /health
+    while running against a stale schema — features keyed to missing
+    tables/columns will 500 in handlers, not at startup. Verify-live
+    must include `SELECT filename FROM <schema>.schema_migrations` across
+    all schemas (server, aweb, aweb_cloud) compared against the migration
+    files in the deployed image. (Banked 2026-05-13 from v0.5.29 cycle:
+    4 pending migrations from v0.5.25→v0.5.29 accumulated unrun across
+    4 release cycles; only caught by Juan's "have all the migrations
+    run?" question. Root-cause investigation of why Render
+    startup-migration default failed is Task #109. Discipline shape:
+    even if startup migration runs reliably, verify-live still queries
+    `schema_migrations` empirically — same shape as #18, verified-live
+    cites empirical state, not assumed defaults.)
+31. **Pre-existing prod-data state can fail an invariant introduced by
+    a fresh release even when gate tests pass.** Release-ready exercises
+    fresh provisioning against a clean DB; it does not see corruption
+    that accumulated under earlier code paths. When a release adds an
+    invariant check over existing data (Grace's controller_did equality
+    on existing managed_namespaces rows is the canonical example), the
+    gate has a structural blind spot. Mitigation: empirical prod-data
+    scan against the invariant predicate is a release-ready input,
+    same shape as #18/#30 — empirical state, not assumed defaults.
+    Banked 2026-05-13 from v0.5.31 cycle: Juan hit ChatGPT-connect
+    OAuth error within minutes of verified-live; DB triangulation
+    found 5 LIVE personal-team rows with controller_did diverged from
+    org AWID-registered source-of-truth. v0.5.31 invariant correctly
+    refused the diverged state; the data was already wrong. Backfill
+    script (SHA 37a3f406) closed the gap, but the discovery path was
+    customer-hits-error, not pre-release-empirical-check.
 
 `status/weekly.md` continues as a roll-up until replaced by a proper
 dashboard.

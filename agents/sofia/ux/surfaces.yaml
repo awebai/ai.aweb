@@ -1,0 +1,754 @@
+# UX surface inventory with per-persona role_for assignments.
+# Inventory source: agents/sofia/ux-surface.md (2026-05-12 snapshot).
+#
+# role_for taxonomy (see personas.yaml for value-to-weight mapping):
+#   essential  — persona cannot function without this surface
+#   heavy      — used often, core to the persona's daily workflow
+#   useful     — used occasionally, valued when needed
+#   irrelevant — not used; not in the way (invisible / hidden)
+#   friction   — visible to persona but unused; cognitive load -> HIDE_FOR
+#   harmful    — breaks mental model (vocabulary leak / wrong frame) -> REFRAME_FOR
+#
+# For P3 and P4 (the CLI-running personas), role_for = max over
+# {human-developer, agent-the-developer-runs}. Many CLI verbs are
+# heavy for the AGENT (mail/chat/task/workspace status) even though
+# the human-developer rarely types them.
+# For P1 and P2, the human never uses CLI; their AGENTS use MCP tools.
+#
+# required_for: list of personas for whom this surface is REQUIRED
+#   infrastructure (e.g., /login). Combined with role_for=essential,
+#   it pins the surface as never-cuttable.
+# redundant_with: id of another surface this one duplicates
+# deprecated: explicit flag
+# admin: surface only visible to team admins
+# agent_facing: the AI agent uses this surface (not only the human)
+#
+# role_for assignments grounded in:
+# - Sofia's own usage (P3-agent surfaces — verifiable from
+#   agents/sofia/.aw/interaction-log.jsonl)
+# - Juan's stated reads (P3-human: aw init essential, aw workspace
+#   add-worktree heavy, aw roles friction)
+# - Persona-journey reasoning for P1/P2/P4 (hypothesis-shaped per
+#   audiences.md; mark uncertain)
+
+surfaces:
+
+  # =====================================================================
+  # LANDING SITE — homepage sections (8)
+  # Evaluation context: does this section help convert this persona?
+  # =====================================================================
+
+  - id: lp-hero
+    name: "Hero + install commands"
+    location: landing/homepage
+    role_for: {P1: friction, P2: friction, P3: useful, P4: useful}
+    required_for: [P1, P2, P3, P4]
+    notes: "CLI install commands are vocabulary friction for P1+P2"
+
+  - id: lp-two-paths-features
+    name: "Two Paths (features, not paths)"
+    location: landing/homepage
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+    redundant_with: lp-two-paths-production
+    notes: "Misnamed 'paths' — describes two features. Cut candidate."
+
+  - id: lp-team-quickstart
+    name: "Team Quickstart (CLI)"
+    location: landing/homepage
+    role_for: {P1: friction, P2: friction, P3: useful, P4: irrelevant}
+    notes: "Front-and-center CLI block on a homepage that should lead with P1"
+
+  - id: lp-hosted-mcp
+    name: "Hosted MCP block"
+    location: landing/homepage
+    role_for: {P1: useful, P2: useful, P3: irrelevant, P4: irrelevant}
+
+  - id: lp-under-the-hood
+    name: "Under the Hood cards"
+    location: landing/homepage
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: lp-two-paths-production
+    name: "Two Paths to Production (managed vs DNS)"
+    location: landing/homepage
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+
+  - id: lp-pricing
+    name: "Pricing"
+    location: landing/homepage
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+
+  - id: lp-cta
+    name: "CTA footer"
+    location: landing/homepage
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+
+  # =====================================================================
+  # LANDING SITE — docs (11)
+  # =====================================================================
+
+  - id: docs-getting-started
+    name: "Getting Started"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: docs-identity
+    name: "Identity"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: docs-communication
+    name: "Communication"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: docs-coordination
+    name: "Coordination"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: docs-mcp-integration
+    name: "MCP Integration"
+    location: landing/docs
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+
+  - id: docs-namespaces
+    name: "Namespaces"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+
+  - id: docs-api-reference
+    name: "API Reference"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: heavy}
+
+  - id: docs-channel
+    name: "Channel"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: docs-events-control
+    name: "Events & Control"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: docs-self-hosting
+    name: "Self-Hosting"
+    location: landing/docs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: essential}
+
+  - id: docs-legal
+    name: "Privacy / Terms"
+    location: landing/docs
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    required_for: [P1, P2, P3, P4]
+    notes: "Legal requirement"
+
+  - id: lp-nav
+    name: "Header nav (Get started / Dashboard / Pricing / Docs / GitHub)"
+    location: landing/nav
+    role_for: {P1: essential, P2: essential, P3: essential, P4: essential}
+    required_for: [P1, P2, P3, P4]
+
+  # =====================================================================
+  # AUTH GATE (9)
+  # =====================================================================
+
+  - id: auth-login
+    name: "/login"
+    location: auth
+    role_for: {P1: essential, P2: essential, P3: essential, P4: essential}
+    required_for: [P1, P2, P3, P4]
+
+  - id: auth-register
+    name: "/register"
+    location: auth
+    role_for: {P1: essential, P2: essential, P3: essential, P4: essential}
+    required_for: [P1, P2, P3, P4]
+
+  - id: auth-forgot-password
+    name: "/forgot-password"
+    location: auth
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    required_for: [P1, P2, P3, P4]
+
+  - id: auth-reset-password
+    name: "/reset-password/:linkId"
+    location: auth
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    required_for: [P1, P2, P3, P4]
+
+  - id: auth-verify-email
+    name: "/verify-email/:linkId"
+    location: auth
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    required_for: [P1, P2, P3, P4]
+
+  - id: auth-email-verified
+    name: "/email-verified"
+    location: auth
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    redundant_with: auth-verify-email
+    notes: "Near-duplicate of /verify-email — collapsible per Athena 2026-05-12"
+
+  - id: auth-oauth-callback
+    name: "/oauth/callback"
+    location: auth
+    role_for: {P1: essential, P2: essential, P3: useful, P4: useful}
+    required_for: [P1, P2]
+
+  - id: auth-choose-username
+    name: "/choose-username"
+    location: auth
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+
+  - id: auth-complete-profile
+    name: "/complete-profile"
+    location: auth
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    notes: "Maybe redundant with /choose-username — Athena reading both before deciding (item 4b)"
+
+  # =====================================================================
+  # DASHBOARD — team tabs (9)
+  # =====================================================================
+
+  - id: dash-monitor
+    name: "Monitor tab"
+    location: dashboard/team-tabs
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+
+  - id: dash-tasks
+    name: "Tasks tab"
+    location: dashboard/team-tabs
+    role_for: {P1: harmful, P2: useful, P3: heavy, P4: useful}
+    notes: "Tasks vocabulary breaks P1's mental model — harmful, not just friction"
+
+  - id: dash-mail
+    name: "Mail tab"
+    location: dashboard/team-tabs
+    role_for: {P1: heavy, P2: heavy, P3: heavy, P4: useful}
+
+  - id: dash-chat
+    name: "Chat tab"
+    location: dashboard/team-tabs
+    role_for: {P1: heavy, P2: heavy, P3: heavy, P4: useful}
+
+  - id: dash-identities
+    name: "Identities tab (routes /agents)"
+    location: dashboard/team-tabs
+    role_for: {P1: harmful, P2: useful, P3: heavy, P4: useful}
+    admin: true
+    notes: "Athena: orthogonal to Contacts (inward vs outward). Harmful for P1 — vocabulary + concept. Hide for P1 single-team mode."
+
+  - id: dash-contacts
+    name: "Contacts tab"
+    location: dashboard/team-tabs
+    role_for: {P1: essential, P2: heavy, P3: useful, P4: useful}
+    notes: "Core P1 mental model — her contacts list is the product"
+
+  - id: dash-roles
+    name: "Roles tab"
+    location: dashboard/team-tabs
+    role_for: {P1: harmful, P2: useful, P3: friction, P4: irrelevant}
+    admin: true
+    notes: "Juan: P3 never modifies roles — friction. P1: vocabulary harmful."
+
+  - id: dash-connect-tab
+    name: "Connect tab (admin)"
+    location: dashboard/team-tabs
+    role_for: {P1: harmful, P2: useful, P3: useful, P4: useful}
+    admin: true
+    redundant_with: dash-public-connect
+    notes: "Vocabulary collision with public /connect; rename per Athena (Setup / API keys / Identity)"
+
+  - id: dash-settings
+    name: "Settings tab"
+    location: dashboard/team-tabs
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    admin: true
+
+  # =====================================================================
+  # DASHBOARD — onboarding (3 first-time surfaces)
+  # =====================================================================
+
+  - id: dash-onboarding-wizard
+    name: "/onboarding wizard"
+    location: dashboard/onboarding
+    role_for: {P1: essential, P2: essential, P3: essential, P4: essential}
+
+  - id: dash-getting-started-checklist
+    name: "Getting-started checklist"
+    location: dashboard/onboarding
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    redundant_with: dash-onboarding-wizard
+
+  - id: dash-welcome-banner
+    name: "Welcome banner (invite)"
+    location: dashboard/onboarding
+    role_for: {P1: useful, P2: useful, P3: useful, P4: irrelevant}
+    redundant_with: dash-onboarding-wizard
+
+  # =====================================================================
+  # DASHBOARD — public routes (6)
+  # =====================================================================
+
+  - id: pub-profile
+    name: "/:username (public profile)"
+    location: dashboard/public
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+
+  - id: pub-organizations
+    name: "/organizations/:slug"
+    location: dashboard/public
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+
+  - id: pub-invite
+    name: "/invite/:code"
+    location: dashboard/public
+    role_for: {P1: essential, P2: heavy, P3: useful, P4: irrelevant}
+    notes: "Inviting friends is core P1 mechanic"
+
+  - id: pub-invite-short
+    name: "/i/:code (short invite)"
+    location: dashboard/public
+    role_for: {P1: essential, P2: heavy, P3: useful, P4: irrelevant}
+    redundant_with: pub-invite
+
+  - id: dash-public-connect
+    name: "/connect (consumer client picker)"
+    location: dashboard/public
+    role_for: {P1: essential, P2: heavy, P3: useful, P4: irrelevant}
+    notes: "P1's primary wiring path — pick your browser AI and connect"
+
+  - id: pub-oauth-consent
+    name: "/oauth/consent"
+    location: dashboard/public
+    role_for: {P1: essential, P2: essential, P3: useful, P4: irrelevant}
+    required_for: [P1, P2]
+
+  # =====================================================================
+  # DASHBOARD — dialogs (8)
+  # =====================================================================
+
+  - id: dlg-create-team
+    name: "Create Team dialog"
+    location: dashboard/dialogs
+    role_for: {P1: harmful, P2: useful, P3: useful, P4: useful}
+    admin: true
+    notes: "Team vocabulary harmful for P1 — she does not create teams"
+
+  - id: dlg-create-org
+    name: "Create Org dialog"
+    location: dashboard/dialogs
+    role_for: {P1: harmful, P2: useful, P3: useful, P4: useful}
+    admin: true
+
+  - id: dlg-byot-identity
+    name: "BYOT Identity Setup"
+    location: dashboard/dialogs
+    role_for: {P1: irrelevant, P2: useful, P3: irrelevant, P4: heavy}
+
+  - id: dlg-cli-identity
+    name: "CLI Identity Setup"
+    location: dashboard/dialogs
+    role_for: {P1: irrelevant, P2: irrelevant, P3: heavy, P4: useful}
+
+  - id: dlg-team-agent-setup
+    name: "Team Agent Setup"
+    location: dashboard/dialogs
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+
+  - id: dlg-send-message
+    name: "Send Message dialog"
+    location: dashboard/dialogs
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+
+  - id: dlg-start-chat
+    name: "Start Chat dialog"
+    location: dashboard/dialogs
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+
+  - id: dlg-settings-help
+    name: "Settings Help dialog"
+    location: dashboard/dialogs
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    admin: true
+
+  # =====================================================================
+  # aw CLI (25) — P1 + P2 never see the CLI (irrelevant for both)
+  # For P3 + P4: max over {human-developer, agent-the-dev-runs}
+  # Sofia's agent reads grounded in own usage; Juan's human reads
+  # grounded in his stated examples (init essential, add-worktree
+  # heavy, roles friction) + extrapolation.
+  # =====================================================================
+
+  - id: cli-init
+    name: "aw init"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: essential, P4: essential}
+    required_for: [P3, P4]
+    notes: "Juan: P3-human cannot function without"
+
+  - id: cli-whoami
+    name: "aw whoami"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+    agent_facing: true
+
+  - id: cli-id
+    name: "aw id (13 subcommands)"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: essential}
+    admin: true
+    notes: "Essential for P4 (BYOT identity setup, rotations); useful-occasional for P3"
+
+  - id: cli-chat
+    name: "aw chat (8 subcommands)"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: essential, P4: useful}
+    agent_facing: true
+    notes: "P3-agent's primary sync coordination — essential"
+
+  - id: cli-mail
+    name: "aw mail (4 subcommands)"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: essential, P4: useful}
+    agent_facing: true
+    notes: "P3-agent's primary async coordination — essential"
+
+  - id: cli-contacts
+    name: "aw contacts"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+    agent_facing: true
+
+  - id: cli-directory
+    name: "aw directory"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: cli-heartbeat
+    name: "aw heartbeat"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+    agent_facing: true
+
+  - id: cli-events
+    name: "aw events"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: useful}
+
+  - id: cli-control
+    name: "aw control"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+
+  - id: cli-log
+    name: "aw log"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+
+  - id: cli-work
+    name: "aw work (3 subs)"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: irrelevant}
+    agent_facing: true
+
+  - id: cli-task
+    name: "aw task (10 subs)"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: heavy, P4: useful}
+    agent_facing: true
+    notes: "P3-agent tracks work via aw task regularly"
+
+  - id: cli-roles
+    name: "aw roles"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: friction, P4: useful}
+    admin: true
+    notes: "Juan: P3 never modifies roles, just sees them as cognitive load — friction"
+
+  - id: cli-instructions
+    name: "aw instructions"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+    admin: true
+
+  - id: cli-workspace
+    name: "aw workspace (status / add-worktree / migrate-multi-team)"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: heavy, P4: useful}
+    notes: "Juan: P3-human adds worktrees heavily. Sofia (agent): aw workspace status heavy. Max over both = heavy."
+
+  - id: cli-lock
+    name: "aw lock"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+
+  - id: cli-notify
+    name: "aw notify"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+
+  - id: cli-run
+    name: "aw run"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+
+  - id: cli-reset
+    name: "aw reset"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+
+  - id: cli-connect
+    name: "aw connect"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+    deprecated: true
+    notes: "Hidden in CLI"
+
+  - id: cli-claim-human
+    name: "aw claim-human"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+
+  - id: cli-upgrade
+    name: "aw upgrade"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: cli-version
+    name: "aw version"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  - id: cli-doctor
+    name: "aw doctor"
+    location: cli
+    role_for: {P1: irrelevant, P2: irrelevant, P3: useful, P4: useful}
+
+  # =====================================================================
+  # MCP tools (35) — agent-facing. Persona's agent is the user.
+  # P1's agent = custodial AI in browser (claude.ai/ChatGPT/Desktop/Gemini)
+  # P2's agent = custodial AI per employee (same shape)
+  # P3's agent = CLI-running agent (Claude Code etc) via channel/MCP
+  # P4's agent = whatever the platform builder wires up
+  # =====================================================================
+
+  - id: mcp-whoami
+    name: "mcp.whoami"
+    location: mcp
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+
+  # mail + chat (8)
+  - id: mcp-send-mail
+    name: "mcp.send_mail"
+    location: mcp/mail-chat
+    role_for: {P1: useful, P2: useful, P3: essential, P4: useful}
+    agent_facing: true
+    notes: "P3-agent: essential (primary surface). P1/P2-agent: useful as low-level; primary surface is the wrappers."
+
+  - id: mcp-check-inbox
+    name: "mcp.check_inbox"
+    location: mcp/mail-chat
+    role_for: {P1: useful, P2: useful, P3: essential, P4: useful}
+    agent_facing: true
+
+  - id: mcp-chat-send
+    name: "mcp.chat_send"
+    location: mcp/mail-chat
+    role_for: {P1: useful, P2: useful, P3: essential, P4: useful}
+    agent_facing: true
+
+  - id: mcp-chat-pending
+    name: "mcp.chat_pending"
+    location: mcp/mail-chat
+    role_for: {P1: useful, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+
+  - id: mcp-chat-history
+    name: "mcp.chat_history"
+    location: mcp/mail-chat
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+
+  - id: mcp-chat-read
+    name: "mcp.chat_read"
+    location: mcp/mail-chat
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+
+  - id: mcp-send-message-to-contact
+    name: "mcp.send_message_to_contact (consumer-shaped wrapper)"
+    location: mcp/mail-chat
+    role_for: {P1: essential, P2: essential, P3: irrelevant, P4: irrelevant}
+    agent_facing: true
+    notes: "Intentional wrapper per aweb-aanp D11 — hides conversation IDs from consumer agents. KEEP per Athena."
+
+  - id: mcp-read-messages-from-contact
+    name: "mcp.read_messages_from_contact (consumer-shaped wrapper)"
+    location: mcp/mail-chat
+    role_for: {P1: essential, P2: essential, P3: irrelevant, P4: irrelevant}
+    agent_facing: true
+    notes: "Intentional wrapper per aweb-aanp D11. KEEP per Athena."
+
+  # agents + presence (2)
+  - id: mcp-list-agents
+    name: "mcp.list_agents"
+    location: mcp/agents
+    role_for: {P1: useful, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+
+  - id: mcp-heartbeat
+    name: "mcp.heartbeat"
+    location: mcp/agents
+    role_for: {P1: useful, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+
+  # tasks (10)
+  - id: mcp-task-create
+    name: "mcp.task_create"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-task-list
+    name: "mcp.task_list"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-task-ready
+    name: "mcp.task_ready"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-task-get
+    name: "mcp.task_get"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-task-close
+    name: "mcp.task_close"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-task-update
+    name: "mcp.task_update"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-task-reopen
+    name: "mcp.task_reopen"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+  - id: mcp-task-claim
+    name: "mcp.task_claim"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-task-comment-add
+    name: "mcp.task_comment_add"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+  - id: mcp-task-comment-list
+    name: "mcp.task_comment_list"
+    location: mcp/tasks
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+
+  # work + status (4)
+  - id: mcp-work-ready
+    name: "mcp.work_ready"
+    location: mcp/work
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-work-active
+    name: "mcp.work_active"
+    location: mcp/work
+    role_for: {P1: irrelevant, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+  - id: mcp-work-blocked
+    name: "mcp.work_blocked"
+    location: mcp/work
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+  - id: mcp-workspace-status
+    name: "mcp.workspace_status"
+    location: mcp/work
+    role_for: {P1: useful, P2: useful, P3: heavy, P4: useful}
+    agent_facing: true
+
+  # roles + instructions (4) — admin contexts
+  - id: mcp-roles-show
+    name: "mcp.roles_show"
+    location: mcp/roles
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+    admin: true
+  - id: mcp-roles-list
+    name: "mcp.roles_list"
+    location: mcp/roles
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+    admin: true
+  - id: mcp-instructions-show
+    name: "mcp.instructions_show"
+    location: mcp/roles
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+    admin: true
+  - id: mcp-instructions-history
+    name: "mcp.instructions_history"
+    location: mcp/roles
+    role_for: {P1: irrelevant, P2: useful, P3: useful, P4: useful}
+    agent_facing: true
+    admin: true
+
+  # contacts (6) — duplicates flagged
+  - id: mcp-contacts-list-legacy
+    name: "mcp.contacts_list (legacy)"
+    location: mcp/contacts
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+    agent_facing: true
+    deprecated: true
+    redundant_with: mcp-list-contacts
+    notes: "Drop in aweb-aanp.10 packaging cleanup per Athena."
+
+  - id: mcp-contacts-add-legacy
+    name: "mcp.contacts_add (legacy)"
+    location: mcp/contacts
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+    agent_facing: true
+    deprecated: true
+    redundant_with: mcp-add-contact-by-handle
+    notes: "Drop in aweb-aanp.10."
+
+  - id: mcp-contacts-remove-legacy
+    name: "mcp.contacts_remove (legacy)"
+    location: mcp/contacts
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+    agent_facing: true
+    deprecated: true
+    notes: "Drop in aweb-aanp.10."
+
+  - id: mcp-list-contacts
+    name: "mcp.list_contacts"
+    location: mcp/contacts
+    role_for: {P1: essential, P2: essential, P3: useful, P4: useful}
+    agent_facing: true
+
+  - id: mcp-add-contact-by-handle
+    name: "mcp.add_contact_by_handle"
+    location: mcp/contacts
+    role_for: {P1: essential, P2: heavy, P3: useful, P4: useful}
+    agent_facing: true
+
+  - id: mcp-add-contact-by-email
+    name: "mcp.add_contact_by_email"
+    location: mcp/contacts
+    role_for: {P1: irrelevant, P2: irrelevant, P3: irrelevant, P4: irrelevant}
+    agent_facing: true
+    deprecated: true
+    notes: "Stub. Drop before FUT-2 submission per aweb-aanp.10."

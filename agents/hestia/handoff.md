@@ -1,176 +1,155 @@
 # Hestia Handoff
 
-Last updated: 2026-05-10 10:50 CEST (08:50 UTC) — aweb 1.20.8 verified-
-live (option 2 framing: aang/aanh/aanj closed for ALL customers; aani
-closed for OSS-direct only; aani for AC-hosted DEFERRED to AC v0.5.26).
-Standing by for v0.5.26 cycle.
+Last updated: 2026-05-13 21:20 CEST (19:20 UTC) — AC v0.5.28 backend
+verified-live; aweb 1.21.0 published end-to-end; site staging deploy 3
+just pushed; production site iteration held pending sign-off chain.
 
 ## Read this first
 
 You are Hestia. You carry every release across the build/ship boundary
-and keep the company machinery healthy in between.
+and keep the company machinery healthy in between. Hands on code stays
+Athena's surface; hands on site source stays Iris's surface.
 
-## Active cycle: aweb 1.20.8 verified-live + AC v0.5.26 ahead
+## Current live state
 
-**1.20.8 ship complete**:
-- Tags `server-v1.20.8` + `aw-v1.20.8` pushed individually at 637cd74
-  (Grace's backward-compat fix on top of Athena's server bump 78b364e).
-- PyPI: aweb 1.20.8 latest.
-- npm: @awebai/aw 1.20.8 latest.
-- aw upgrade 1.20.7 → 1.20.8 dogfood-clean (5th self-upgrade
-  attestation: 1.20.3 → 4 → 5 → 6 → 7 → 8 all clean).
-- aw version: 1.20.8 commit=303e0e3 built=2026-05-10T07:49:18Z.
-- make ship at 637cd74 (mine): ALL PASSED 218 tests (matches Athena's).
+- `app.aweb.ai/health`: `release_tag=v0.5.28`,
+  `aweb_version=1.21.0`, `awid_service_version=0.5.4`,
+  `git_sha=00064992` (Athena's ContactView schema fix).
+- `api.awid.ai/health`: `version=0.5.4`, all green.
+- Site **production** (aweb.ai): Sofia's Pass-3 framing (60be8f4e) —
+  pre-pain-narrative.
+- Site **staging** (preview-urw1.onrender.com): pain-narrative
+  iteration at main HEAD `0a9b1654`, pushed to
+  `deploy-landing-staging` 2026-05-13 19:15Z.
 
-**Verified-live framing — option 2 (Sofia + Athena confirmed)**:
+## In-flight: site staging deploy 3
 
-CLOSED for ALL customers:
-- aweb-aang (LOAD-BEARING): hosted add-worktree + cli-signup api_key.
-  Pepe-class autonomous-install no longer hits 'API key required' wall.
-- aweb-aanh: aw init --hosted produces fully-bound workspace.yaml.
-- aweb-aanj: aw roles set accepts array-shaped bundles (CLI-only, no AC
-  interception).
+- `make deploy-staging` from ac/ at main HEAD `0a9b1654` (Mia merged
+  origin/peter; new commit 9093a225 inside).
+- Push: `9093a225..0a9b1654 → deploy-landing-staging`.
+- Diff vs ce2bf922 (last staging tip): 4 files in `site/` only.
+- Hugo build local: 33 pages, 13 static, clean.
+- Athena signaled (mail a0bf1a1d) for fresh walk; **Bertha/Eugenie
+  sign-off pass + Sofia framing-pass + Juan per-deploy greenlight**
+  required before any `make deploy-site` to production.
 
-CLOSED for OSS-direct customers (self-hosted aweb without AC):
-- aweb-aani: aw role-name set works end-to-end via OSS PatchWorkspace
-  alias resolution.
+## OPEN — Sofia's release-notes question (mail 574185f5)
 
-DEFERRED to AC v0.5.26:
-- aweb-aani for AC-hosted customers (including Pepe). AC's
-  agent_lifecycle.UpdateAgentRequest at agent_lifecycle.py:84 intercepts
-  /api/v1/agents/me PATCH before the OSS /api mount handles it. The
-  empirical 422 returns AC's schema error (access_mode required, role/
-  role_name extra_forbidden), NOT OSS's PatchWorkspaceRequest.
+v0.5.28 release notes claim aanv full receipt, but the site portion
+is staging-only. **Juan must call one of three**:
 
-**Pepe Reyero correction (per Athena 5/10)**: Pepe IS AC-hosted (signed
-up via `aw init --hosted --username formlab --alias vision`). His
-original aw role-name set 422 matches AC UpdateAgentRequest exactly —
-the empirical probe today replicates his original failure. aang/aanh
-unblock his autonomous-install NOW; aani waits for v0.5.26.
+1. Push site to production (requires sign-off chain above).
+2. Reframe release notes to backend-only.
+3. Split verified-live: backend-now + site-pending.
 
-**Mails sent this cycle**:
-- Verified-live to athena (02414be4), sofia (7e56ec43), aida (e817fbd5).
-- Pepe partial-unblock brief to bertha (5a73c5ed) for Eugenie/Juan relay.
-- Re-confirmation to sofia (a597cd86) on HOLD direction.
-- Aida tech-accuracy review (d3fcdfd8) for runbook aani entry.
-- Initial finding mail to athena (f159c881) which surfaced the AC
-  intercept — kicked off the option 2 framing alignment.
+Don't act unilaterally. This is direction territory.
 
-## Active holds (HESTIA's lane to break)
+## Cycle summary — what's verified-live 2026-05-13
 
-- **Iris dispatch**: HELD until v0.5.26 verified-live. NOTE: Sofia
-  takes the actual dispatch (her lane), with the full customer-evidence
-  arc receipt: "real customer hit four frictions on 2026-05-09; all
-  four shipped end-to-end within 48hrs across two coordinated
-  releases." I do NOT auto-dispatch on the Pass-2 trigger.
+**aweb 1.21.0** end-to-end (PyPI ✓ npm ✓ aw upgrade ✓):
+- PyPI publish succeeded first time.
+- npm publish: 404 PUT initial failure → diagnosed as **GAT 90-day
+  expiration cap exactly hit (Feb 12 + 90 = May 13)**. New GAT
+  generated by Juan, set via
+  `printf '%s' '<token>' | gh secret set NPM_TOKEN --repo awebai/aw`.
+  Rerun published cleanly across all 7 platform packages.
+- **Banked foot-gun**: npm returns 404 on anonymous PUT, not 401 — so
+  the diagnostic shape masquerades as "package missing." Juan pushed
+  back hard ("are you sure" + "you are assuming they have changed
+  something. why?") and that pushback was correct — the answer was
+  the token, not a policy change.
 
-- **Aida runbook aani entry**: stack-on-e15838c on her sign-off, will
-  be removed with TIME-LIMITED close-trigger when v0.5.26 verifies.
-  When v0.5.26 lands verified-live, send a short close mail to Aida
-  explicitly tagging the entry for removal.
+**AC v0.5.28** backend (tag at 00064992):
+- aweb >=1.21.0 pin landed at d64ce84c.
+- First release-ready: 2 ContactView validation failures (aweb 1.21.0
+  added reference_type / status / handle_namespace / target_agent_name;
+  `extra='forbid'` on AC's ContactView rejected them).
+- Athena fixed at 00064992 (Path A: Literal types for enums).
+- GHA + Render: Juan manual deploy trigger.
 
-## AC v0.5.26 — what's coming
+## Banked discipline #29 (homepage-refresh slip 2026-05-10)
 
-Athena's confirmed scope:
-1. aweb pin lockfile bump (>=1.20.2 → 1.20.8 floor pulled).
-2. AC route fix for aani: extend UpdateAgentRequest with role/role_name
-   fields, thread to OSS PatchWorkspace flow (Athena's lane, possibly
-   coordinating with Mia or Grace).
-3. Backend regression tests covering all body shapes (role-only,
-   role_name-only, both, access_mode-only, mixed).
-4. Real-Docker AC + e2e CLI to confirm Pepe's flow works end-to-end.
+**Refuse interpretive-doc-only wire-ins.** A draft markdown that
+describes what to change is incomplete. Hestia cannot deploy from
+narrative. The author commits actual edits to the source surface;
+markdown serves as narrative around them, not substitute.
 
-When Athena signals release-ready: pull, run `make release-ready`
-end-to-end (discipline #21), tag, push, watch deploy, verify aani
-post-deploy probe. Then signal Sofia for the full-arc Iris dispatch.
+Catalyst: I started wiring Iris's first homepage bundle from
+publishing/drafts/. Juan caught it — "you should never be the one
+modifying the site. that's iris' job." Reverted. Iris re-authored on
+ac main as 58ed6c53. Lane sharpened in her CLAUDE.md.
 
-ETA estimate (told to Aida): 1-2 days from now (2026-05-10 08:25 UTC),
-so landing Mon 5/11 or Tue 5/12 if nothing surprises. Render deploy
-lag pattern (last 2 cycles 4-7h GHA→/health flip) adds a few hours
-buffer.
+## Site deploy architecture (operational 2026-05-10)
 
-## Identity (live since 2026-05-01 21:05 UTC)
+- **Staging**: `make deploy-staging` (in ac/) → pushes current
+  branch → `deploy-landing-staging` → Render rebuilds
+  preview-urw1.onrender.com. Staging push is **autonomous** — no
+  per-push greenlight needed.
+- **Production**: `make deploy-site` (in ac/) → pushes current
+  branch → `deploy-landing` → Render rebuilds aweb.ai. Production
+  push requires the four-step gate every time:
+  1. Iris signal: 'staging green at <preview URL>; ready'.
+  2. Bertha validation (Eugenie's read for non-technical framing).
+  3. Sofia framing review.
+  4. Juan explicit per-deploy greenlight.
+- **Rollback authority**: Hestia only.
+- **Branch protection on deploy-landing**: pending (Task #88, Juan's
+  lane, PR-based with Juan + Sofia approvers).
 
-- did: `did:key:z6MkebRpF7qEFNt5vAYa5BWjegFk1igt6mRESqWb5r3kp9AK`
-- stable: `did:aw:3fC4cfvFuVAxZCWyJNRCoUxHVAim`
-- address: `aweb.ai/hestia` (reachability=nobody)
-- active team: `default:aweb.ai`
+## Operational debt — still open
 
-## What's live (verified 2026-05-10 07:38:54Z)
+- **OIDC trusted publisher for npm**: would eliminate the GAT 90-day
+  treadmill. Next forced rotation Aug 11 if we stay on GAT.
+- **Render image-watcher lag** (4-7h pattern): manual deploy trigger
+  bypasses; root cause unknown.
+- **CronCreate `durable=true` not durable**: Bertha/multi-agent crons
+  survive only inside session. Metis taking over via admin entrypoints
+  is the proper architecture.
+- **Neon DB connection-timeout transients**: 2 events (2026-05-10/12),
+  Task #89 tracks.
+- **`AWEB_CLOUD_FRONTEND_URL` env var on Render**: confirm low-priority.
 
-- **ac**: v0.5.25 at app.aweb.ai,
-  git_sha=`77e60e5bdf7566e2c712cef8cb6462341cdb6ede`,
-  aweb_version=1.20.7, awid_service_version=0.5.4. Started
-  2026-05-10T07:07:11Z.
-- **aw CLI**: 1.20.8 published on npm (`@awebai/aw`).
-- **aweb server**: 1.20.8 on PyPI.
-- **awid registry**: 0.5.4 at api.awid.ai. Healthy.
-- **channel**: 1.4.0 on npm.
+## Crons running this session
 
-App.aweb.ai still pinned to aweb 1.20.7 — v0.5.26 lockfile bump pulls
-1.20.8 + ships AC route fix.
+- Hourly multi-agent milestone check (`f6adaa50`).
+- Daily 08:13 CEST sign-up export to Bertha (`2ddbdd18`).
 
-## Bertha pipeline (operational since 2026-05-08)
+Both session-only. Metis briefed (mail this cycle) on admin-entrypoint
+architecture to replace.
 
-- **Daily sign-up export** (cron 2ddbdd18, daily 08:13 CEST).
-- **Hourly multi-agent milestone check** (cron f6adaa50, hourly).
-  Last fire 2026-05-10 07:36:02Z, 0 candidates.
+## Standing release-discipline — banked through #29
 
-Both crons are session-only (CronCreate `durable=true` doesn't take —
-ops debt; system cron / launchd is durable answer).
+See `../../status/operations.md` for the full numbered list (29
+items as of 2026-05-10). The most recently banked:
 
-## Banked this cycle
+- **#24a/b** — Pre-empirical SHA-diff covers route topology across
+  deployment targets.
+- **#27a** — CLI-only release pattern: tag aw-vX.Y.Z directly, don't
+  bump server/pyproject.toml.
+- **#28** — Tool-driven destructive git-state mutation is never
+  acceptable as a side effect of a non-git-management command.
+- **#29** — Refuse interpretive-doc-only wire-ins.
 
-**Discipline #24b** (refines #24a) — adopted verbatim by Athena and
-Sofia; lives in operations.md standing release-discipline list:
+## Next wake-up checks
 
-> "Pre-empirical SHA-diff inspection covers ROUTE TOPOLOGY across
-> deployment targets. When a fix touches a path that is mounted under
-> both AC's direct routes AND the OSS /api mount, verify which handler
-> wins on the actual deployed surface. Make ship's OSS-direct Docker
-> e2e attests OSS path correctness; it does NOT attest AC's
-> interception layer. Empirical probe against deployed AC surface is
-> required for AC-deployable claims."
+1. Athena's fresh walk on preview-urw1.onrender.com post-rebuild.
+2. Bertha/Eugenie sign-off mail on iterated pain-narrative.
+3. Sofia framing-pass + Juan greenlight on production site push.
+4. Sofia's release-notes-reframing question — Juan's call.
+5. `app.aweb.ai/health` + `api.awid.ai/health` daily.
+6. Hourly milestone-check cron firings (state-tracked, only ack new).
+7. Daily 08:13 CEST sign-up export firing.
 
-The v0.5.26 cycle being load-bearing for AC-hosted aani is itself the
-discipline working — pre-empirical route-topology check this cycle
-correctly identified v0.5.26 as required follow-up, not optional.
+## How to pick up clean
 
-## Open follow-ups (Hestia's lane)
+```bash
+cd /Users/juanre/prj/awebai/ai.aweb/agents/hestia
+git pull
+aw chat pending
+aw mail inbox
+curl -sS https://app.aweb.ai/health
+curl -sS https://api.awid.ai/health
+```
 
-1. **AC v0.5.26 ship** when Athena signals release-ready.
-2. **Render deploy lag pattern** (2 cycles in a row): re-flag if
-   v0.5.26 also shows it. Pattern, not blip — needs investigation.
-3. **CronCreate `durable=true`**: not taking; system cron / launchd
-   needed for true durability beyond session.
-4. **Aida's e15838c push** pending Juan greenlight (BYOD-422 +
-   framing-invariant only; aani entry stacks on top after v0.5.26).
-5. **Multi-team agent_id-vs-did follow-up**: Athena's lane.
-6. **Iris agent registration**: Hetzner identity bootstrap pending.
-
-## What to check FIRST on next wake-up
-
-1. `aw mail inbox` and `aw chat pending` — sweep messages.
-2. `curl https://app.aweb.ai/health` — confirm v0.5.25 still live OR
-   v0.5.26 if it shipped. If v0.5.26 live, run aani probe:
-   `aw role-name set coordinator` should now succeed (HTTP 200).
-3. `curl https://api.awid.ai/health` — confirm AWID healthy.
-4. `aw work active` and `aw work blocked` — sweep stale claims.
-5. Re-read `docs/decisions.md` for entries newer than last handoff.
-6. Hourly milestone-check cron firings — note any non-empty results.
-7. Athena's release-ready mail for v0.5.26 if landing.
-
-## Sibling repo symlinks under this dir
-
-- `aweb` → `../../../aweb` (run gates here for aweb releases)
-- `ac` → `../../../ac` (run gates here for ac releases)
-
-Prefer `git -C aweb log` over `cd aweb && git log`. Do NOT run
-`aw` from sibling repos. Read sibling repos to run gates and
-verify what shipped; do NOT edit code there (Athena's surface).
-
-## Note on git author attribution
-
-Commits authored by dev-team members (Mia / Grace et al.) appear
-as "Juan Reyero" in `git log`. The actual agent identity is
-carried via the aweb cert. Grace's 637cd74 = dev-team agent.
+Then read this file, `../../status/operations.md` lead, and any new
+entries in `../../docs/decisions.md`.

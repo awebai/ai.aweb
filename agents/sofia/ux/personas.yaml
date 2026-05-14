@@ -1,0 +1,73 @@
+# Persona definitions for UX surface scoring.
+# Canonical persona definitions live in docs/audiences.md.
+# Priority ordering set in docs/decisions.md 2026-05-12.
+#
+# weight_linear: equal-increment weights (conservative read of priority)
+# weight_exponential: each priority step doubles weight (favors P1 hard)
+# Surface scores computed under both schemes; surfaces that change
+# category between them are the close calls worth discussing.
+#
+# role_for_weights: maps the qualitative role taxonomy (used in
+# surfaces.yaml) to numeric weights for V(S) computation. Note that
+# `friction` and `harmful` contribute 0 to V(S) — those signals flow
+# through the per-persona action lists (HIDE_FOR / REFRAME_FOR), NOT
+# through the aggregate value score. Two distinct dimensions.
+
+role_for_weights:
+  essential: 4    # persona cannot function without this surface
+  heavy: 3        # used often, core to the persona's workflow
+  useful: 2       # used occasionally, valued when needed
+  irrelevant: 0   # not used; not in the way (invisible / hidden)
+  friction: 0     # visible but unused; cognitive load -> HIDE_FOR
+  harmful: 0      # breaks mental model (vocab leak / wrong frame) -> REFRAME_FOR
+
+personas:
+  P1:
+    name: "Personal-AI consumer"
+    priority: 1
+    weight_linear: 4
+    weight_exponential: 8
+    short: "consumer"
+    vocabulary_do_not_introduce:
+      - team
+      - role
+      - namespace
+      - controller
+      - certificate
+      - "team cert"
+      - "did:aw"
+      - DNS
+      - "agent identity"
+      - workspace
+      - cli
+
+  P2:
+    name: "Company with AI-using employees"
+    priority: 2
+    weight_linear: 3
+    weight_exponential: 4
+    short: "company"
+    vocabulary_do_not_introduce:
+      - controller
+      - "did:aw"
+
+  P3:
+    name: "Developer team"
+    priority: 3
+    weight_linear: 2
+    weight_exponential: 2
+    short: "dev"
+    vocabulary_do_not_introduce: []
+
+  P4:
+    name: "Platform builder / self-host"
+    priority: 4
+    weight_linear: 1
+    weight_exponential: 1
+    short: "platform"
+    vocabulary_do_not_introduce: []
+
+# Reference docs for what these personas mean and why they're ordered this way.
+reference:
+  persona_definitions: docs/audiences.md
+  priority_decision: "docs/decisions.md (2026-05-12)"
