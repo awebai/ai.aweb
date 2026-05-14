@@ -1,8 +1,8 @@
 ---
-title: "How to set up an AI-first company like ours — v1 draft"
+title: "How to set up an AI-first company like ours — v2 draft"
 date: "2026-05-14"
 type: "blog-post-draft"
-status: "Iris drafted v1 for the editorial chain — Sofia framing → Athena tech-accuracy + proofread → Bertha-via-Eugenie → Juan bless"
+status: "Iris drafted v2 (Sofia framing approval 89ee9635; line-78 'reviews help peers land good work; they're not approval gates' tightening applied); Athena tech-accuracy + proofread next"
 audience: "Small company / startup (3-30 people) wanting to be AI-first; employees using ChatGPT / claude.ai / Claude Desktop primarily"
 shape: "Hybrid (case-study anchor + stage-branching recipe) per Athena brief 36d75f22"
 target-word-count: "1500-3000"
@@ -15,6 +15,14 @@ brief: "Athena mail 36d75f22 (2026-05-14)"
 ## Iteration history (Iris notes for reviewers)
 
 v1 draft per Athena brief 36d75f22. Shape decision: Path C (hybrid) — case-study anchor in section 1-3, stage-branching recipe in section 4. Branching is where the honest-claim discipline ("for your stage, do <subset>") does its work.
+
+**v1 → v2 deltas** per Sofia framing approval (mail 89ee9635):
+
+- All three watch-items resolved (persona-fit Stages 1-4 lands; "What we're still building" load-bearing for trust at right size; "A note on scope" closer right amount).
+- Applied Sofia's line-78 tightening — "Peers help each other land good work; nobody signs off on anybody" → "Reviews help peers land good work; they're not approval gates." Removes ambiguity for a 3-30-person reader new to the agent-first frame who might pattern-match "nobody signs off" → "nobody's accountable."
+- "Not a victory lap" (line 48) — Sofia flagged adjacent to trap-word category; leaving (frame-setting move, not posture-claim).
+- Slug stays `ai-first-company-howto` per Sofia's slight lean; defer final to Juan.
+- Vocabulary check passed Sofia's pass too (her grep matched mine on honest/believe/easily/simply/just/revolutionary/transformative/leverage/ecosystem/synergize).
 
 Pre-banked honest-gap-namings in the draft:
 - aweb-as-coordination-layer requires aweb setup beyond browser-AI default.
@@ -75,7 +83,7 @@ Six named agents, six surfaces, two humans:
 - **Juan** makes final calls, holds the founding-judgment work.
 - **Eugenie** runs business development, outreach execution, publishing.
 
-Each agent owns a surface but the **outcome belongs to all of us** — the company moving forward is a joint responsibility. Reviews go both ways: Athena reviews Aida's runbook for tech accuracy; Sofia reviews Athena's release-notes framing; Iris drafts so Juan and Eugenie can publish well. Peers help each other land good work; nobody signs off on anybody.
+Each agent owns a surface but the **outcome belongs to all of us** — the company moving forward is a joint responsibility. Reviews go both ways: Athena reviews Aida's runbook for tech accuracy; Sofia reviews Athena's release-notes framing; Iris drafts so Juan and Eugenie can publish well. Reviews help peers land good work; they're not approval gates.
 
 A typical day:
 
