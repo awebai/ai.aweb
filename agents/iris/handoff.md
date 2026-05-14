@@ -1,6 +1,6 @@
 # Iris Handoff
 
-Last updated: 2026-05-14 (first real blog post v1 drafted → Sofia framing review; welcome guide v5 shipped; blog scaffold pending Juan greenlight)
+Last updated: 2026-05-14 (first real blog post v3 cleared Athena → Bertha-via-Eugenie next; welcome guide v5 shipped; blog scaffold pending Juan greenlight)
 
 ## Operating focus
 
@@ -15,7 +15,7 @@ Sensitive contacts/targets stay in `co.aweb/`.
 
 ## Active work
 
-### 1. First real blog post v1 → Sofia framing review (today's primary)
+### 1. First real blog post v3 → Bertha-via-Eugenie pass (today's primary)
 
 "How to set up an AI-first company like ours" per Athena brief
 `36d75f22`. Juan locked the audience: small/startup, 3-30 people,
@@ -23,23 +23,28 @@ AI-first ambitions, employees on browser AI (ChatGPT/claude.ai
 mostly).
 
 Draft at `publishing/drafts/2026-05-14-ai-first-company-howto.md`
-(commit `70d4a1f`). ~2150 words within 1500-3000 target. Shape:
+(commit `53ae94e`; trail: 70d4a1f → ab34853 → 53ae94e). Shape:
 Path C (hybrid) — case-study anchor + stage-branching recipe with
-honest-gap namings on each stage. "Five real consumer users (3 are
-Juan)" surfaced explicitly per the brief's honest-claim discipline.
+honest-gap namings on each stage.
 
-Editorial chain queued:
-- Sofia framing review (mail `3ba69562` to her thread
-  `345f95bb`) — in flight.
-- Athena tech-accuracy + proofread (mail `415a31a2` ack;
-  taking slot after Sofia clears, pre-thinking N=5 verification +
-  tier matrix verbatim + feature-claim audit).
-- Bertha-via-Eugenie validation.
-- Juan bless.
-- Publish at `ac/site/content/blog/<slug>.md`.
+Editorial chain status:
+- ✓ Iris drafts (v1 → v2 → v3)
+- ✓ Sofia framing (mail `89ee9635`) — three watch-items resolved
+  + line-78 tightening applied in v2
+- ✓ Athena tech-accuracy + proofread (mail `8a26e303`) — three
+  substantive corrections applied in v3 (dev-team agent framing
+  replacing ephemeral-pair overclaim; scheduled-meetings build
+  "queued" not "in flight"; team-shape lineage clarified) +
+  framing tighten on user-count + style fix + template URL filled
+- → Bertha-via-Eugenie (Athena routing now)
+- → Juan bless
+- → Publish at `ac/site/content/blog/ai-first-company-howto.md`
+  (slug locked unless Juan revises)
 
-Template-repo link in draft is `[TEMPLATE_REPO_URL]` placeholder;
-revise on Juan name lock + Athena's parallel scaffolding.
+Template repo: `github.com/awebai/agent-first-company-template`
+(name locked by Athena via mail `fa04e2c5`). Athena scaffolding in
+parallel — aim to land around bless time so the link goes live with
+the post.
 
 ### 2. MCP onboarding artifacts (shipped + verified)
 
