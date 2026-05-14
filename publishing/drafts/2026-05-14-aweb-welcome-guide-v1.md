@@ -1,10 +1,10 @@
 ---
-title: "aweb welcome guide — v3 draft for MCP welcome tool + resource"
+title: "aweb welcome guide — v4 draft for MCP welcome tool + resource"
 date: "2026-05-14"
 type: "ai-facing-doc-draft"
-status: "Iris drafted v3 (Sofia framing pass approved with cross-surface alignment ask; Athena tool-name lock applied: create_invite_link); Athena formal tech-accuracy pending; Aida support-integration review (her checkpoints addressed in draft); Juan bless pending"
-canonical-destination: "TBD pending Grace's mount-path trace — probably ac/backend/src/aweb_cloud/resources/welcome.md or synced from aweb/docs/. Moves to canonical path on Juan's bless."
-brief: "Athena mail 44c8c92a (spec lock 2026-05-14); Aida pre-think relayed via Athena mail 204e971e; Sofia framing approval 55bed1b7; Athena tool-name lock a58bc12b + 69ed8365."
+status: "Iris drafted v4 (Athena tech-accuracy revisions applied: lifecycle two-paths, send-on-pending errors-not-queues, read_messages_from_contact added); Athena v4 re-read pending; Aida support-integration review next; Juan bless pending"
+canonical-destination: "ac/backend/src/aweb_cloud/resources/welcome.md (AC-canonical per Athena tech-accuracy read; Grace's load_welcome_guide() reads from that path via importlib.resources). Moves on Juan's bless."
+brief: "Athena spec lock 44c8c92a; Aida pre-think 204e971e; Sofia framing approval 55bed1b7; Athena tool-name lock a58bc12b + 69ed8365; Athena tech-accuracy revisions dfeb103a."
 ---
 
 ## Iteration history (Iris notes for reviewers)
@@ -28,6 +28,14 @@ Voice-howto.md scaffolding applied; per-section honesty noted; failure-mode fram
 - `create_contact_invite` → `create_invite_link` (Grace's actually-shipping name, verified in ac/backend/src/aweb_cloud/hosted_mcp.py:91). Four mentions updated: SMALLEST FIRST ACTION call-out, TOOLS YOU HAVE entry, COMMON ASKS handle-discovery handling, Routing-notes-to-Athena list.
 - All other tool names (`add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `aweb_welcome_guide`) confirmed correct against Grace's diff.
 - Sofia framing pass (mail 55bed1b7) approved v2 content; her cross-surface alignment ask applies to serverInfo (give-user-literal-prompt → AI-offers-to-do-it shape) — welcome guide v2 already had the AI-offers-it shape, so no content change here. serverInfo revised separately to align.
+
+**v3 → v4 deltas** per Athena's tech-accuracy revisions (mail dfeb103a):
+
+- **Lifecycle two-paths corrected**: invite-link creates contacts ACTIVE on both sides simultaneously (no pending state on this path); pending state only exists for the handle-add path when the friend isn't on aweb yet. WHAT HAPPENS AFTER THE INVITE section restructured to make the two-paths distinction explicit.
+- **send_message_to_contact on pending errors, doesn't queue**: previous v2/v3 claim of "message queues until friend joins" was wrong (verified against aweb/server/src/aweb/mcp/tools/contacts.py:101+ — returns ValidationError "No active agent found for handle contact"). Revised WHAT HAPPENS AFTER paragraph + "Did Sarah get my message?" common-ask handler to be honest about the error + what to suggest (create_invite_link or wait for friend to accept).
+- **Added read_messages_from_contact** to TOOLS YOU HAVE list — registered MCP tool (verified in aweb/server/src/aweb/mcp/server.py); Sofia's question landed; needed because the welcome guide covers post-first-turn flow and the AI will need to read replies once the friend joins.
+- **Source-of-truth location locked**: ac/backend/src/aweb_cloud/resources/welcome.md (AC-canonical per Athena's read — consumer-cloud-product content lives in cloud-product code; the aweb/docs/welcome-guide.md option lean was wrong). Grace's load_welcome_guide() in hosted_mcp.py reads from that path via importlib.resources.
+- **Default-reachability claim verified correct** by Athena's pass — no change.
 
 ---
 
@@ -59,17 +67,23 @@ This is THE thing to anchor on. Don't suggest 17 other things on first contact �
 
 - `create_invite_link` — generate an invite link for a friend (the smallest first action above)
 - `add_contact_by_handle` — add a friend who already has an aweb @handle
-- `list_contacts` — list the user's contacts and their state (pending / active)
+- `list_contacts` — list the user's contacts and their state (active / pending)
 - `send_message_to_contact` — send mail (async) or chat (sync) to a named contact
+- `read_messages_from_contact` — read incoming mail or chat from a saved contact
 - `aweb_welcome_guide` — re-fetch this guide (it gets updated; call again when something feels stale)
 
 Tool descriptions carry the full parameter signatures. Read them when you call.
 
 ## What happens after the invite
 
-Once the friend clicks the link, they sign in and connect their AI. Their agent becomes active; both contact lists update; the two agents can exchange messages.
+Once the friend clicks the link, they sign in and connect their AI. The two agents become active contacts on both sides simultaneously, and the agents can exchange messages immediately.
 
-State to track: contacts can be **pending** (invite sent, friend hasn't joined yet) or **active** (friend joined; both sides can message). Use `list_contacts` to see state. **A user can call `send_message_to_contact` on a pending contact — the message queues but is not delivered until the friend's agent is active.** If the user asks "did Sarah get my message?", check the contact's state first and be honest about pending-vs-delivered.
+How contacts get created (two paths):
+
+- **Invite-link** (`create_invite_link`) — creates the contact bilaterally and active once the friend signs up. No pending state on this path.
+- **Handle-add** (`add_contact_by_handle`) — creates a **pending** contact if the friend isn't on aweb yet; the contact flips to active once their agent is active.
+
+Use `list_contacts` to see state. Pending contacts on the handle-add path do not yet have a deliverable target — sending a message to a pending contact errors with "No active agent found for handle contact" (the friend isn't on aweb). The friend has to join aweb first.
 
 ## Vocabulary you'll use
 
@@ -88,7 +102,7 @@ Common asks and how to handle:
 
 - **"I don't know my friend's handle"** — the invite-link path doesn't need it. Suggest that path (`create_invite_link`). If the user wants to add someone who already has a handle they know, use `add_contact_by_handle`.
 - **"How do I block someone?"** — the default IS contacts-only-reachability; non-contacts can't reach the user. To stop messages from an existing contact, the user removes them from contacts. If a remove-contact tool isn't available yet, suggest support.
-- **"Did Sarah get my message?"** — check `list_contacts` for Sarah's state. If pending, tell the user the message queues until Sarah joins; if active, the message has been delivered.
+- **"Did Sarah get my message?"** — check `list_contacts` for Sarah's state. If active, the message has been delivered (and the user can call `read_messages_from_contact` to see any reply). If pending, sending fails — Sarah isn't on aweb yet. Tell the user honestly: the friend needs to join aweb before messages can reach them. If the user hasn't already invited Sarah, suggest `create_invite_link`; otherwise wait for her to accept the existing invite.
 
 ## DRAFT CONTENT ENDS
 
@@ -98,49 +112,54 @@ Common asks and how to handle:
 
 ### Sofia (framing)
 
-Same shape as v1 routing notes plus the v2 deltas. Specifically watch:
+Sofia v2 framing pass approved (mail 55bed1b7). All three watch-items resolved:
 
-- Is the "agent vs AI" vocabulary section helpful for the AI reading or does it duplicate-and-confuse? My read: helpful, because Aida named question shape #4 as guide-canonical; the AI needs this distinction to handle the user-question shape.
-- Pending-vs-active framing reads honest? Aida named this as load-bearing for trust ("did my message go?"). I went with the explicit "message queues until friend joins" framing.
-- Voice register on the "Don't suggest 17 other things on first contact" line — does the slight conversational register clash with the otherwise-imperative tone elsewhere?
+- ✓ Agent-vs-AI vocabulary section: keep (canonical-shaped per Aida #4).
+- ✓ Pending-vs-active framing: honest pending Athena verification — Athena's v3 tech-accuracy revealed v2 was WRONG on this; rewritten in v4 (invite-link is bilateral-active immediately; pending state only on handle-add path; send-on-pending errors).
+- ✓ Voice register on "17 other things": keep (concept landing > tonal uniformity).
 
-### Athena (tech-accuracy)
+Sofia's cross-surface alignment ask (give-user-literal-prompt → AI-offers-it shape) applied to serverInfo separately; welcome guide already had the right shape.
 
-Pending Grace's tool-name lock:
+### Athena (tech-accuracy) — v3 pass dfeb103a; v4 re-read pending
 
-- `create_invite_link`, `add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `aweb_welcome_guide` — confirmed against Grace's commit c6f270e8 (Athena mail a58bc12b + 69ed8365).
-- Does the invite-link flow produce a "pending → active" lifecycle in the v1 contact model (verbatim with what I wrote), or is there nuance (e.g., separate accept step, or active-on-both-sides-after-mutual-add)?
-- Does `send_message_to_contact` on a pending contact actually queue the message (as I claim) or fail? If it fails, the guide needs revision; if it queues, the guide is honest.
-- Does the default-reachability statement match v1 implementation? ("only added contacts can reach the user.")
-- Length OK for the MCP welcome tool / resource response.
+Five claim-verifications:
+
+- ✓ Tool names — `create_invite_link`, `add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `read_messages_from_contact`, `aweb_welcome_guide` — confirmed against Grace's commit c6f270e8 + server.py registration.
+- ✓ Default-reachability ("only added contacts can reach the user") — verified accurate (mechanism is address_reachability="nobody" + bilateral contact routing, but user-facing framing is right).
+- ✗ → fixed in v4: invite-link "pending → active" lifecycle claim was wrong — invite-link is bilateral-active immediately; pending state only exists on the handle-add path.
+- ✗ → fixed in v4: send_message_to_contact on pending "queues" claim was wrong — it errors with "No active agent found for handle contact" (verified at aweb/server/src/aweb/mcp/tools/contacts.py:101+). LOAD-BEARING for trust per Aida — revised to honest "sending fails; suggest invite link or wait for accept" handling.
+- ✗ → fixed in v4: `read_messages_from_contact` was missing from tools list (registered tool in aweb/server/src/aweb/mcp/server.py); Sofia raised the omission and Athena confirmed registration; added.
+
+Athena v4 re-read should converge in 5-10 min per her sequencing.
 
 ### Aida (support-integration)
 
-Your pre-think (relayed via Athena 204e971e) folded into v2. Specific checkpoints addressed:
+Your pre-think (relayed via Athena 204e971e) folded into v2 then sharpened in v4 after Athena's tech-accuracy pass:
 
 - ✓ vocabulary consistency (agent / AI / handle per aanw.7) — VOCABULARY section.
-- ✓ state-lifecycle clarity (pending vs active) — WHAT HAPPENS AFTER section, explicit.
+- ✓ state-lifecycle clarity (active default for invite-link; pending only for handle-add) — WHAT HAPPENS AFTER section, restructured v4 with two-paths distinction.
 - ✓ default-discoverability (contacts-only-reachability) — WHAT AWEB IS final line + "common asks" handling.
-- ✓ failure-mode honesty — pending-contact-message-queues is the load-bearing one; included.
-- ⏳ tool-name canonical-ness — pending Grace's lock; Athena tech-accuracy pass aligns.
+- ✓ failure-mode honesty — v4 fixes load-bearing trust claim: send_message_to_contact on pending ERRORS (doesn't queue); revised "did Sarah get my message?" handler is honest about failure + suggests the right next action (`create_invite_link` or wait for accept).
+- ✓ tool-name canonical-ness — Athena tool-name lock applied; `create_invite_link` is shipping name.
 - ✓ update-mechanism transparency — `aweb_welcome_guide` re-fetch tool in TOOLS list, with "(call again when something feels stale)" hint.
 
-For your review-chain slot when it comes: confirm I caught the load-bearing intel; flag anything I missed; surface any net-new question shape from the welcome-guide-delivery model (your NEW-question-shapes list 1-5) that I should pre-empt and didn't.
+For your review-chain slot: confirm I caught the load-bearing intel after the v4 corrections; flag anything I missed; surface any net-new question shape from the welcome-guide-delivery model (your NEW-question-shapes list 1-5) that I should pre-empt and didn't.
 
 ### Juan (bless)
 
 Final read for voice + posture. AI-first audience makes this a different shape; voice still has to feel like the team (practitioner, honest, not overclaiming).
 
-## Source-of-truth location decision (pending Grace's mount-path trace)
+## Source-of-truth location decision (locked v4)
 
-Same options as v1. My lean: option (2) — canonical in `aweb/docs/welcome-guide.md`, synced into ac via deploy-site or equivalent (matches existing agent-guide.md sync pattern per Hestia mail d4910f87). Defer to Athena's read.
+`ac/backend/src/aweb_cloud/resources/welcome.md` per Athena's tech-accuracy read (mail dfeb103a). Consumer-cloud-product content lives in cloud-product code; the agent-guide.md sync pattern is for aweb-protocol surface (different audience and authorship). Grace's `load_welcome_guide()` in hosted_mcp.py reads from that path via importlib.resources. Mirror to docs site is a downstream sync if wanted.
 
 ## Sequencing
 
-- Today: this draft (v2) ready for Sofia framing pass.
-- Sofia framing review: when she gets to it.
-- Athena tech-accuracy: after Sofia clears + Grace's tool naming lands.
-- Aida support-integration: after Athena clears; her pre-think mostly addressed in v2, so her review should converge fast.
-- Juan bless: after all three clear.
-- On bless: move/commit to canonical path; flag back to Athena for Grace's stub-replacement.
-- Adjacent: serverInfo.instructions co-authoring with Sofia in parallel (Sofia mail fefcfed4; voice pass underway today).
+- ✓ v2 draft → Sofia framing review (approved 55bed1b7 with cross-surface alignment ask).
+- ✓ v3 → Athena tool-name lock (a58bc12b + 69ed8365): create_invite_link.
+- ✓ v4 → Athena tech-accuracy revisions applied (dfeb103a): lifecycle two-paths, send-on-pending errors, read_messages_from_contact added, source-of-truth locked AC-canonical.
+- → Athena v4 re-read (pending; her sequencing said 5-10 min).
+- → Aida support-integration pass (her pre-think folded; should converge fast after the v4 trust-line fix).
+- → Juan bless.
+- → On bless: commit to ac/backend/src/aweb_cloud/resources/welcome.md; flag back to Athena for Grace's stub-replacement.
+- Adjacent: serverInfo.instructions v4 bundled with welcome-guide v4 to Athena.
