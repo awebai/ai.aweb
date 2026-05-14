@@ -1,6 +1,6 @@
 # Iris Handoff
 
-Last updated: 2026-05-14 (welcome-guide v5 SHIPPED to AC-canonical; review chain complete)
+Last updated: 2026-05-14 (first real blog post v1 drafted → Sofia framing review; welcome guide v5 shipped; blog scaffold pending Juan greenlight)
 
 ## Operating focus
 
@@ -15,38 +15,59 @@ Sensitive contacts/targets stay in `co.aweb/`.
 
 ## Active work
 
-### 1. MCP onboarding artifacts (today's primary)
+### 1. First real blog post v1 → Sofia framing review (today's primary)
 
-Two parallel surfaces in flight for Athena/Grace's hosted-MCP welcome
-shipment:
+"How to set up an AI-first company like ours" per Athena brief
+`36d75f22`. Juan locked the audience: small/startup, 3-30 people,
+AI-first ambitions, employees on browser AI (ChatGPT/claude.ai
+mostly).
 
-- **Welcome guide v5 SHIPPED** — review chain complete (Sofia framing
-  ✓ Athena tech-accuracy ✓ Aida support-integration ✓ Juan bless ✓).
-  Source draft: `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
-  (ai.aweb commit `80cb00d`). Content committed to AC-canonical at
-  `ac/backend/src/aweb_cloud/resources/welcome.md` (ac commit
-  `95481339`, on main). Grace's `load_welcome_guide()` reads from
-  there via importlib.resources — picks up automatically on next
-  version bump. Signaled Athena (mail `6adf43ef`); she runs the
-  version bump + gate with Hestia. Captured in
-  `publishing/history.md`.
+Draft at `publishing/drafts/2026-05-14-ai-first-company-howto.md`
+(commit `70d4a1f`). ~2150 words within 1500-3000 target. Shape:
+Path C (hybrid) — case-study anchor + stage-branching recipe with
+honest-gap namings on each stage. "Five real consumer users (3 are
+Juan)" surfaced explicitly per the brief's honest-claim discipline.
 
-- **serverInfo.instructions v5** (495 chars) — same bless; ready to
-  wire. Text in mail `c7073487` to Athena; Grace's FastMCP
-  constructor wiring is happening in parallel with the welcome-guide
-  ship.
+Editorial chain queued:
+- Sofia framing review (mail `3ba69562` to her thread
+  `345f95bb`) — in flight.
+- Athena tech-accuracy + proofread (mail `415a31a2` ack;
+  taking slot after Sofia clears, pre-thinking N=5 verification +
+  tier matrix verbatim + feature-claim audit).
+- Bertha-via-Eugenie validation.
+- Juan bless.
+- Publish at `ac/site/content/blog/<slug>.md`.
 
-Tool names locked (per Athena's verification of Grace's commit
-`c6f270e8` + server.py registration): `create_invite_link`,
-`add_contact_by_handle`, `contacts_remove`, `list_contacts`,
-`send_message_to_contact`, `read_messages_from_contact`,
-`aweb_welcome_guide`.
+Template-repo link in draft is `[TEMPLATE_REPO_URL]` placeholder;
+revise on Juan name lock + Athena's parallel scaffolding.
 
-Next: Grace + Hestia run version bump + gate. Iris signal collection
-once mcp_oauth_grants start firing post-deploy (Metis when she's
-active; signal-shape: invite-link creates within N min of OAuth
-grants on hosted custodial consumer agents; mutual-active contact
-pairs created).
+### 2. MCP onboarding artifacts (shipped + verified)
+
+- **Welcome guide v5 SHIPPED** — review chain complete (Sofia ✓
+  Athena ✓ Aida ✓ Juan ✓). Source: `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
+  (ai.aweb `80cb00d`); content at `ac/backend/src/aweb_cloud/resources/welcome.md`
+  (ac `95481339`).
+
+  Note: ac `a1bfa166` (Juan, 2026-05-14) corrected the default-
+  reachability claim in the live welcome.md — new consumers default
+  to publicly reachable (not contacts-only). Draft retains the
+  historical review-chain record; AC-path is authoritative.
+
+- **serverInfo.instructions v5 WIRED** — Grace landed at ac
+  `34251767`; shipped in v0.5.33 morning of 2026-05-14. Both
+  surfaces live.
+
+Tool names locked: `create_invite_link`, `add_contact_by_handle`,
+`contacts_remove`, `list_contacts`, `send_message_to_contact`,
+`read_messages_from_contact`, `aweb_welcome_guide`.
+
+### 3. Blog scaffold ship pending Juan greenlight
+
+ac main HEAD `d6bcef6e` (Peter's blog scaffold + welcome post + hero
+polish + Sofia "honest"-word fix). Staging cleared customer-voice
+walk + Sofia framing. On Juan greenlight, Hestia runs
+`make deploy-site`. Bertha-via-Eugenie reserved for the first real
+post (#1 above), not this scaffold.
 
 ### 2. Twitter thread P1 launch
 
