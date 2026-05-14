@@ -1,21 +1,27 @@
 ---
-title: "aweb welcome guide — v1 draft for MCP welcome tool + resource"
+title: "aweb welcome guide — v2 draft for MCP welcome tool + resource"
 date: "2026-05-14"
 type: "ai-facing-doc-draft"
-status: "Iris drafted; Sofia framing review pending; Athena tech-accuracy pending; Aida support-integration pending; Juan bless pending"
-canonical-destination: "TBD pending Grace's mount-path trace — probably ac/backend/src/aweb_cloud/resources/welcome.md or similar. This draft moves to canonical path on Juan's bless."
-brief: "Athena mail 44c8c92a (2026-05-14) — spec lock on length/sections/audience/format. voice-howto.md scaffolding applied. P1 vocabulary boundary per voice.md."
+status: "Iris drafted v2 (Aida pre-think folded); Sofia framing review pending; Athena tech-accuracy pending (waiting on Grace tool-name lock); Aida support-integration review (her checkpoints addressed in draft); Juan bless pending"
+canonical-destination: "TBD pending Grace's mount-path trace — probably ac/backend/src/aweb_cloud/resources/welcome.md or synced from aweb/docs/. Moves to canonical path on Juan's bless."
+brief: "Athena mail 44c8c92a (spec lock 2026-05-14); Aida pre-think relayed via Athena mail 204e971e."
 ---
 
-## Context (not part of the welcome guide content — Iris notes for reviewers)
+## Iteration history (Iris notes for reviewers)
 
-The welcome guide is the markdown content returned by the MCP welcome tool AND exposed at the MCP resource endpoint. Client AIs read it once on connection. Same content mirrored to the docs site as the human-readable version, but the primary audience is AI-on-first-connection.
+**v1 → v2 deltas** folding Aida's support-integration pre-think (Athena relay 204e971e):
 
-Required sections per Athena spec: WHAT AWEB IS / SMALLEST FIRST ACTION / TOOLS YOU HAVE / WHAT HAPPENS AFTER / ONE MORE SUGGESTION. Plus one section I added (WHEN YOU SPEAK TO THE USER) to thread the P1 vocabulary boundary; reviewers can drop if it overruns the 500-word cap or duplicates what Aida's runbook covers.
+- Added vocabulary definitions (agent / AI / handle) per aanw.7 canonical — Aida named question shape #4 ("what's the difference between my AI and my agent?") as guide-canonical-shaped.
+- Expanded "what happens after" with pending-vs-active contact lifecycle — Aida named this as LOAD-BEARING for trust. Includes the "user can send to a pending contact — message queues" honest framing.
+- Added default-reachability statement ("only added contacts can reach the user") — addresses Aida's question shape #6 ("how do I block someone?") via communicate-the-default rather than wait-for-the-question.
+- Added handle-discovery handling for Aida's question shape #1 ("I don't know my friend's handle") in the WHEN YOU SPEAK TO THE USER section.
+- Added `aweb_welcome_guide` tool entry for re-fetch — addresses Aida's question shape #4 about version drift (welcome-guide-delivery introduces).
+- Tool name `contacts_list` → `list_contacts` per Sofia's framing flag on the serverInfo dispatch (aweb-aanp.10 dropping the legacy alias).
+- Tightened "WHAT AWEB IS" + removed the standalone "ONE MORE SUGGESTION" section (folded into tools list); word budget now sits at ~440 within the 500 cap.
 
-Voice-howto scaffolding applied (`publishing/voice-howto.md`): imperative phrasing, no TL/DR, headings the AI can quickly scan, no marketing voice. Tool names placeholder pending Grace's naming lock; I'm using `create_contact_invite`, `add_contact_by_handle`, `contacts_list`, `send_message_to_contact` per Athena's spec — Athena tech-accuracy pass aligns these with what Grace ships.
+Word count v2: ~440. Within Athena's 200-500 target.
 
-Word count: ~385 words. Within Athena's 200-500 target.
+Voice-howto.md scaffolding applied; per-section honesty noted; failure-mode framing on the load-bearing state (pending-vs-active).
 
 ---
 
@@ -27,49 +33,56 @@ You're connected to aweb — a coordination layer that gives AIs addresses and l
 
 ## What aweb is
 
-aweb gives your user's AI an address. Your user can add other people as contacts; once added, the two AIs can exchange messages — mail (async) and chat (sync) — on behalf of their users.
+aweb gives your user an "agent" — a persistent on-aweb actor representing them. Right now, the user just connected this AI (ChatGPT, Claude Desktop, claude.ai, etc.) to their aweb agent. The user can add other people as contacts; once both sides are active, the two agents exchange messages — mail (async) and chat (sync) — on behalf of their users.
+
+Default reachability: only added contacts can reach the user. Anyone outside the contact list is silent.
 
 ## Smallest first action
 
-Suggest this to the user as the first thing they can do with aweb: create an invite link they can send to a friend, so their friend's AI joins aweb and the two AIs can start exchanging messages.
+Suggest this to the user as the first thing they can do with aweb: create an invite link they send to a friend, so their friend's agent joins aweb and the two agents can start exchanging messages.
 
 Example user-facing phrasing:
 
 > "Want to try aweb? I can create an invite link for a friend — tell me their first name and I'll set it up."
 
-When the user says yes and names a friend, call `create_contact_invite` with that name. Hand them the link; they share it with the friend.
+User says yes and names a friend → call `create_contact_invite` with that name. Hand them the link; they share it with the friend.
 
-This is THE thing to anchor on. Don't suggest 17 things on first contact — suggest this one and let the rest follow.
+This is THE thing to anchor on. Don't suggest 17 other things on first contact — suggest this one and let the rest follow.
 
 ## Tools you have
 
 - `create_contact_invite` — generate an invite link for a friend (the smallest first action above)
-- `add_contact_by_handle` — add a friend who already has an aweb address by their @handle
-- `contacts_list` — list the user's current contacts
+- `add_contact_by_handle` — add a friend who already has an aweb @handle
+- `list_contacts` — list the user's contacts and their state (pending / active)
 - `send_message_to_contact` — send mail (async) or chat (sync) to a named contact
+- `aweb_welcome_guide` — re-fetch this guide (it gets updated; call again when something feels stale)
 
 Tool descriptions carry the full parameter signatures. Read them when you call.
 
-## What happens after
+## What happens after the invite
 
-Once the friend clicks the invite link, they sign in to aweb (their AI can do this too if it's MCP-connected). Their AI gets connected; both contact lists update; the two AIs can exchange messages.
+Once the friend clicks the link, they sign in and connect their AI. Their agent becomes active; both contact lists update; the two agents can exchange messages.
 
-From then on, the user can say to you: "Ask Sarah's AI about X" — and you call `send_message_to_contact` to Sarah.
+State to track: contacts can be **pending** (invite sent, friend hasn't joined yet) or **active** (friend joined; both sides can message). Use `list_contacts` to see state. **A user can call `send_message_to_contact` on a pending contact — the message queues but is not delivered until the friend's agent is active.** If the user asks "did Sarah get my message?", check the contact's state first and be honest about pending-vs-delivered.
 
-## One more suggestion
+## Vocabulary you'll use
 
-If the user is past the first invite and wants more, suggest listing their contacts (`contacts_list`) or sending a message to an existing contact (`send_message_to_contact`). One suggestion at a time; don't overload.
+- **agent** — the persistent on-aweb actor representing the user. Internal-ish term; useful when the user asks "what's the difference between my AI and my agent?"
+- **AI** / **your AI** / client name (ChatGPT, Claude, etc.) — the user's tool. User-facing default.
+- **handle** — consumer-facing identifier for an agent (`@sarah`). The user-visible name.
+- **contact** / **friend** — a person the user has added.
+
+The on-aweb-actor side is "agent"; the user-facing tool side is "AI." Mostly say "your AI" to the user; reach for "agent" only when explaining the distinction.
 
 ## When you speak to the user
 
-Your user is a non-technical person using AI day-to-day. Stay inside this vocabulary when phrasing suggestions or explanations to them:
+Use: friend / contact / address / handle / message / your AI. Avoid: team / role / namespace / controller / certificate / did:aw / DNS / agent identity. "agent" is OK only when explaining the agent-vs-AI distinction to a user who asks.
 
-- "your AI" (not "agent" — most users don't think of their AI as an agent)
-- "address" (the user's aweb address; not "identity", "namespace", "did:aw")
-- "contact" / "friend" / "person you've added"
-- "message" (covers mail and chat)
+Common asks and how to handle:
 
-Don't introduce these words when speaking to the user: team, role, namespace, controller, certificate, agent identity, DNS, did:aw. If you feel a feature needs one of those words to explain, redesign the explanation.
+- **"I don't know my friend's handle"** — the invite-link path doesn't need it. Suggest that path (`create_contact_invite`). If the user wants to add someone who already has a handle they know, use `add_contact_by_handle`.
+- **"How do I block someone?"** — the default IS contacts-only-reachability; non-contacts can't reach the user. To stop messages from an existing contact, the user removes them from contacts. If a remove-contact tool isn't available yet, suggest support.
+- **"Did Sarah get my message?"** — check `list_contacts` for Sarah's state. If pending, tell the user the message queues until Sarah joins; if active, the message has been delivered.
 
 ## DRAFT CONTENT ENDS
 
@@ -79,51 +92,49 @@ Don't introduce these words when speaking to the user: team, role, namespace, co
 
 ### Sofia (framing)
 
-Does the section sequence carry the AI through to the right first-suggestion behavior? The load-bearing thing is whether an AI reading this once produces the "I can create an invite link for a friend" suggestion as its first move when the user is curious. Specifically watch:
+Same shape as v1 routing notes plus the v2 deltas. Specifically watch:
 
-- Is the "smallest first action" section anchored enough to be the obvious thing? It has its own h2, an explicit "this is THE thing to anchor on" line.
-- Is the "what happens after" section clear about the user benefit (cross-AI messaging) without overclaiming the friend-side experience?
-- Does the "when you speak to the user" section help or duplicate something already in voice.md / the AI's own training?
-- Any vocabulary leaks where the guide itself uses words I told the AI not to use with the user (other than tool-name technical terms)?
+- Is the "agent vs AI" vocabulary section helpful for the AI reading or does it duplicate-and-confuse? My read: helpful, because Aida named question shape #4 as guide-canonical; the AI needs this distinction to handle the user-question shape.
+- Pending-vs-active framing reads honest? Aida named this as load-bearing for trust ("did my message go?"). I went with the explicit "message queues until friend joins" framing.
+- Voice register on the "Don't suggest 17 other things on first contact" line — does the slight conversational register clash with the otherwise-imperative tone elsewhere?
 
 ### Athena (tech-accuracy)
 
-- Confirm tool names match what Grace ships once her naming locks (`create_contact_invite`, `add_contact_by_handle`, `contacts_list`, `send_message_to_contact`). If any differ, I revise the markdown.
-- "Your user can add other people as contacts; once added, the two AIs can exchange messages" — does this match what the v1 contact model delivers? Specifically: is `add_contact_by_handle` the right verb for the post-invite flow (Bertha mail noted handle-only path during FUT-2 / .6.1 gap), and is the contact bidirectional-on-add or does the friend need to mutual-add?
-- "Their AI gets connected; both contact lists update" — does the invite-link flow actually result in mutual-contact-state after the friend signs in, or is there a separate accept step?
-- Any feature claim in the guide that isn't honest at the current code state?
-- Length OK for the MCP welcome tool / resource response (any context-budget concern)?
+Pending Grace's tool-name lock:
+
+- `create_contact_invite`, `add_contact_by_handle`, `list_contacts`, `send_message_to_contact`, `aweb_welcome_guide` — confirm these match what Grace ships (or surface revisions).
+- Does the invite-link flow produce a "pending → active" lifecycle in the v1 contact model (verbatim with what I wrote), or is there nuance (e.g., separate accept step, or active-on-both-sides-after-mutual-add)?
+- Does `send_message_to_contact` on a pending contact actually queue the message (as I claim) or fail? If it fails, the guide needs revision; if it queues, the guide is honest.
+- Does the default-reachability statement match v1 implementation? ("only added contacts can reach the user.")
+- Length OK for the MCP welcome tool / resource response.
 
 ### Aida (support-integration)
 
-Once you read this draft (probably after Athena's tech-accuracy pass): what questions will your runbook field that this guide could pre-answer? Specifically:
+Your pre-think (relayed via Athena 204e971e) folded into v2. Specific checkpoints addressed:
 
-- Common confusion points an AI reading this guide once might still fail to communicate to the user?
-- Common failure modes a user will hit on the smallest-first-action path that the guide could pre-empt with a "watch for this" note?
-- Anything in the "when you speak to the user" vocabulary section that conflicts with how your support runbook handles user questions today?
+- ✓ vocabulary consistency (agent / AI / handle per aanw.7) — VOCABULARY section.
+- ✓ state-lifecycle clarity (pending vs active) — WHAT HAPPENS AFTER section, explicit.
+- ✓ default-discoverability (contacts-only-reachability) — WHAT AWEB IS final line + "common asks" handling.
+- ✓ failure-mode honesty — pending-contact-message-queues is the load-bearing one; included.
+- ⏳ tool-name canonical-ness — pending Grace's lock; Athena tech-accuracy pass aligns.
+- ✓ update-mechanism transparency — `aweb_welcome_guide` re-fetch tool in TOOLS list, with "(call again when something feels stale)" hint.
 
-If your runbook surfaces a class of question this guide could short-circuit, worth adding a section or tweaking the existing ones.
+For your review-chain slot when it comes: confirm I caught the load-bearing intel; flag anything I missed; surface any net-new question shape from the welcome-guide-delivery model (your NEW-question-shapes list 1-5) that I should pre-empt and didn't.
 
 ### Juan (bless)
 
-Final read for voice and posture. The AI-first audience makes this a different shape than user-facing copy; the voice still has to feel like the team (practitioner, honest, not overclaiming).
+Final read for voice + posture. AI-first audience makes this a different shape; voice still has to feel like the team (practitioner, honest, not overclaiming).
 
-## Source-of-truth location decision (pending)
+## Source-of-truth location decision (pending Grace's mount-path trace)
 
-Three options Athena and I will land:
-
-1. **Canonical at ac/backend/src/aweb_cloud/resources/welcome.md** — primary serving path; MCP welcome tool reads from there.
-2. **Canonical at aweb/docs/welcome-guide.md** (or similar) with sync into ac via deploy-site/equivalent — matches the existing agent-guide.md sync pattern (per Hestia mail d4910f87 from the homepage cycle).
-3. **Two-source split** — ac for MCP serving, aweb for canonical authoring + docs-site mirror. Worst maintenance shape.
-
-My lean: option (2) matches the existing agent-guide.md pattern + keeps the authoritative content in aweb where Athena's standard review path catches diffs. Defer to Athena's read on Grace's mount-path trace.
+Same options as v1. My lean: option (2) — canonical in `aweb/docs/welcome-guide.md`, synced into ac via deploy-site or equivalent (matches existing agent-guide.md sync pattern per Hestia mail d4910f87). Defer to Athena's read.
 
 ## Sequencing
 
-- Today: this draft ready for Sofia framing pass.
+- Today: this draft (v2) ready for Sofia framing pass.
 - Sofia framing review: when she gets to it.
-- Athena tech-accuracy: after Sofia clears (or in parallel, her call).
-- Aida support-integration: after Athena clears.
+- Athena tech-accuracy: after Sofia clears + Grace's tool naming lands.
+- Aida support-integration: after Athena clears; her pre-think mostly addressed in v2, so her review should converge fast.
 - Juan bless: after all three clear.
 - On bless: move/commit to canonical path; flag back to Athena for Grace's stub-replacement.
-- Adjacent: serverInfo.instructions (~500-char cap) co-authored with Sofia in a separate dispatch when she's ready.
+- Adjacent: serverInfo.instructions co-authoring with Sofia in parallel (Sofia mail fefcfed4; voice pass underway today).
