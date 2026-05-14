@@ -1,8 +1,8 @@
 ---
-title: "How to set up an AI-first company like ours — v2 draft"
+title: "How to set up an AI-first company like ours — v3 draft"
 date: "2026-05-14"
 type: "blog-post-draft"
-status: "Iris drafted v2 (Sofia framing approval 89ee9635; line-78 'reviews help peers land good work; they're not approval gates' tightening applied); Athena tech-accuracy + proofread next"
+status: "Iris drafted v3 (Athena tech-accuracy 798a24e4: dev-team agent framing replaces ephemeral-pair overclaim; scheduled-meetings status corrected to queued-not-in-flight; team-shape lineage clarified; user count tightened to active-hosted-agents precision; double-relationships style fix; template repo URL filled in)"
 audience: "Small company / startup (3-30 people) wanting to be AI-first; employees using ChatGPT / claude.ai / Claude Desktop primarily"
 shape: "Hybrid (case-study anchor + stage-branching recipe) per Athena brief 36d75f22"
 target-word-count: "1500-3000"
@@ -23,6 +23,16 @@ v1 draft per Athena brief 36d75f22. Shape decision: Path C (hybrid) — case-stu
 - "Not a victory lap" (line 48) — Sofia flagged adjacent to trap-word category; leaving (frame-setting move, not posture-claim).
 - Slug stays `ai-first-company-howto` per Sofia's slight lean; defer final to Juan.
 - Vocabulary check passed Sofia's pass too (her grep matched mine on honest/believe/easily/simply/just/revolutionary/transformative/leverage/ecosystem/synergize).
+
+**v2 → v3 deltas** per Athena tech-accuracy pass (mail 798a24e4):
+
+- **Ephemeral builder + reviewer pairs framing** → **dev-team agents** framing. Two sites: Athena's bullet ("briefs for the dev-team agents who author features") + typical-day Steps 2-3 ("dispatches it to a dev-team agent" / "The dev-team agent commits to a branch"). The ephemeral-pair pattern IS documented as a model in Athena's CLAUDE.md, but current practice dispatches to persistent dev-team agents (Grace, Olivia, Mia, Kate). The post avoids naming the internal devs to keep reader focus on the SHAPE, not the implementation.
+- **Scheduled meetings build status**: "the build is in flight" → "the build is queued behind the consumer-onboarding work." Build isn't authored yet; honest framing prevents the mismatch a reader checking current commits would catch.
+- **Team-shape lineage**: "We've been operating this way for several months" → "We've been operating as an agent-first company for several months; the specific six-surface team shape (Sofia, Athena, Hestia, Aida, Iris, Metis) is more recent — settled at the end of April." Per Athena: longer-lineage practice + recent-shape specifics. Same shape concern Sofia + Athena caught on the Bertha brief earlier today.
+- **User-count tightening** (Athena's framing item): "five real consumer users — three of them Juan on different test accounts" → "three accounts with active hosted agents (all mine, on different test domains), plus a handful of external signups that haven't activated yet." Two sites: intro paragraph + closer paragraph. Athena's option (b) — most precise framing. Trades the punchy "5/3" for accuracy; an article called "How to set up an AI-first company like ours" earns trust by reading honest if a reader spot-checks.
+- **Double-"relationships" style fix** (line 64): "(customer relationships, hiring, the actual building of relationships)" → "— customer relationships, hiring, the in-person trust work." Em-dash construction; dropped the parenthetical-with-redundancy.
+- **Template repo URL filled** (mail fa04e2c5): `[TEMPLATE_REPO_URL]` → `https://github.com/awebai/agent-first-company-template`. Athena's locked name (matches docs/agent-first-company.md canonical framing).
+- **Sofia's `aweb.ai/connect` 404 item**: deferred to Peter as a separate site-side flag (not blocking this post).
 
 Pre-banked honest-gap-namings in the draft:
 - aweb-as-coordination-layer requires aweb setup beyond browser-AI default.
@@ -53,7 +63,7 @@ We run aweb.ai as a company where most of the work is done by AI agents.
 
 Six of them. Each has a name, a responsibility area, persistent context, and the ability to message any of the others directly. Two humans — Juan and Eugenie — set strategy, make the final calls, and do the parts AIs can't do (talking to customers, publishing externally, the founding-judgment work).
 
-This post is what we figured out doing it. Not a victory lap — we have five real consumer users so far, three of them Juan on different accounts. We're early. What's working is the operating model, not the scale.
+This post is what we figured out doing it. Not a victory lap — we have three accounts with active hosted agents so far (all mine, on different test domains), plus a handful of external signups that haven't activated yet. We're early. What's working is the operating model, not the scale.
 
 If you're at a small company trying to figure out what "AI-first" actually looks like operationally, this is how it's worked for us, and how it might translate to your team.
 
@@ -61,7 +71,7 @@ If you're at a small company trying to figure out what "AI-first" actually looks
 
 It doesn't mean every employee uses ChatGPT to write emails faster. That's "AI-assisted" — useful, but the AI is still serving an individual workflow.
 
-AI-first means the **work is done by AI agents with named responsibilities, persistent context, and durable handoffs between them**. The humans set direction, hold the founding judgment, and carry the parts that need human presence (customer relationships, hiring, the actual building of relationships). The agents carry the rest.
+AI-first means the **work is done by AI agents with named responsibilities, persistent context, and durable handoffs between them**. The humans set direction, hold the founding judgment, and carry the parts that need human presence — customer relationships, hiring, the in-person trust work. The agents carry the rest.
 
 The shift sounds small. It isn't. When the work is done by agents, the company's coordination is between *them* — not just between you. A few things follow from that:
 
@@ -75,7 +85,7 @@ The shift sounds small. It isn't. When the work is done by agents, the company's
 Six named agents, six surfaces, two humans:
 
 - **Sofia** carries direction. Priorities, decisions, technical-direction calls, framing for anything we say externally.
-- **Athena** owns the code. Architecture, review of every change, briefs for the ephemeral builder + reviewer pairs that author features.
+- **Athena** owns the code. Architecture, review of every change, briefs for the dev-team agents who author features.
 - **Hestia** ships. Release gates, deploys, live verification, dashboard hygiene.
 - **Aida** supports customers. Answers, runbook, customer voice routed back to the team.
 - **Iris** prepares outreach. Drafts, market scanning, signal capture from external responses.
@@ -88,8 +98,8 @@ Each agent owns a surface but the **outcome belongs to all of us** — the compa
 A typical day:
 
 1. Sofia sees a priority change (a customer signal, an architectural read, a release-claim implication). She writes a decision record, updates `status/product.md`, and creates the `aw` task.
-2. Athena picks up the task. Either she writes the change herself (small fixes, non-feature work) or she scopes a brief and dispatches an ephemeral builder + reviewer pair on worktrees.
-3. The pair commits to a branch. Athena reviews the diff against invariants. The change lands on main.
+2. Athena picks up the task. Either she writes the change herself (small fixes, non-feature work) or she scopes a brief and dispatches it to a dev-team agent.
+3. The dev-team agent commits to a branch. Athena reviews the diff against invariants. The change lands on main.
 4. Hestia runs the release gates, tags, deploys, and verifies live with a `/health` probe + smoke test of the changed surface. She posts the verified-live mail with evidence.
 5. Iris drafts a release-notes companion or distribution artifact if appropriate. Sofia frames external claims. Juan or Eugenie publishes.
 6. Aida fields any customer questions that arrive about the change. If she needs code context, she asks Athena. If a question reveals a runbook gap, she updates the runbook.
@@ -167,7 +177,7 @@ Stage 4 is operating discipline. The tools are downstream of the habits.
 
 Two things worth naming since the case study above implies them:
 
-**Scheduled meetings between agents.** Agents should be able to schedule a conversation with an agenda and invite other agents (or humans who don't yet have agents) to join. The architectural design is documented; the build is in flight. Today, our agents coordinate via async mail and sync chat — no calendar primitive yet.
+**Scheduled meetings between agents.** Agents should be able to schedule a conversation with an agenda and invite other agents (or humans who don't yet have agents) to join. The architectural design is documented; the build is queued behind the consumer-onboarding work. Today, our agents coordinate via async mail and sync chat — no calendar primitive yet.
 
 **Cross-org agent networks at scale.** aweb is built for AIs in one organization to coordinate with AIs in another. We have the protocol; we have a handful of users on it; we don't yet have the scale that makes the cross-org coordination effect compound. We're early.
 
@@ -175,13 +185,13 @@ If you'd asked us a year from now, the post would say more. For now, what we can
 
 ## A template you can fork
 
-We've published a template repo with the agent operating documents (decision-record templates, handoff structure, status-file shapes, voice notes) that we use ourselves: [TEMPLATE_REPO_URL]. Fork it; gut what doesn't apply; keep what does.
+We've published a template repo with the agent operating documents (decision-record templates, handoff structure, status-file shapes, voice notes) that we use ourselves: [github.com/awebai/agent-first-company-template](https://github.com/awebai/agent-first-company-template). Fork it; gut what doesn't apply; keep what does.
 
 The templates are tools, not prescriptions. The principles above are what holds the shape together. Adapt the templates, and the shape, to what your company actually does.
 
 ## A note on scope
 
-We've been operating this way for several months. We have five real consumer users — three of them Juan on different test accounts. The discipline is what's working. The shape we use is one valid arrangement among several. The principles we lean on are the more durable claim.
+We've been operating as an agent-first company for several months; the specific six-surface team shape (Sofia, Athena, Hestia, Aida, Iris, Metis) is more recent — settled at the end of April. We have three accounts with active hosted agents (all mine, on different test domains) plus a handful of external signups that haven't activated yet. The discipline is what's working. The shape we use is one valid arrangement among several. The principles we lean on are the more durable claim.
 
 Try the principles. Adapt the shape. Keep the discipline.
 
