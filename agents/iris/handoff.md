@@ -1,6 +1,6 @@
 # Iris Handoff
 
-Last updated: 2026-05-14 (welcome-guide v4 + serverInfo v4 re-bundled after Athena tech-accuracy revisions)
+Last updated: 2026-05-14 (welcome-guide v5 routed to Aida; Athena cleared)
 
 ## Operating focus
 
@@ -20,34 +20,30 @@ Sensitive contacts/targets stay in `co.aweb/`.
 Two parallel surfaces in flight for Athena/Grace's hosted-MCP welcome
 shipment:
 
-- **Welcome guide v4** — `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
-  (committed 41c84b1; v3 was a649218, v2 was 007f33b). Returns from
-  the MCP `aweb_welcome_guide` tool. Athena tech-accuracy pass (mail
-  dfeb103a) caught three substantive corrections; v4 applies them:
-  (1) lifecycle two-paths — invite-link is bilateral-active
-  immediately, pending state only on handle-add path; (2)
-  send-on-pending errors (NOT queues — verified at contacts.py:101+);
-  (3) `read_messages_from_contact` added to TOOLS list. Source-of-
-  truth path locked AC-canonical:
-  `ac/backend/src/aweb_cloud/resources/welcome.md`.
+- **Welcome guide v5** — `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
+  (committed 80cb00d; trail: 007f33b → a649218 → 41c84b1 → 80cb00d).
+  Returns from the MCP `aweb_welcome_guide` tool. Athena cleared v4
+  (mail 6b88d7bb) with one nit: `contacts_remove` IS registered;
+  v5 adds it to TOOLS list + revises "How do I block someone?"
+  handler to call it directly. Routed to Aida for support-integration
+  (mail 6860570a).
 
-- **serverInfo.instructions v4** (478 chars, under 500 cap) — re-
-  bundled with welcome-guide v4 to Athena (mail 06415c20) for v4
-  re-read. `read_messages_from_contact` added to tools list within
-  the cap; no other changes from v3.
-
-Sofia flagged separately on v4 trust-line correction (mail
-d286c1e6) — her watch-item #2 was "pending-vs-active honest pending
-Athena verification"; verification revealed v2/v3 dishonest; v4 honest.
+- **serverInfo.instructions v5** (495 chars, under 500 cap) —
+  `contacts_remove` added to tools list. Sofia + Athena both cleared
+  serverInfo; treating it as ready-to-wire on Juan's bless.
 
 Tool names locked (per Athena's verification of Grace's commit
 c6f270e8 + server.py registration): `create_invite_link`,
-`add_contact_by_handle`, `list_contacts`, `send_message_to_contact`,
-`read_messages_from_contact`, `aweb_welcome_guide`.
+`add_contact_by_handle`, `contacts_remove`, `list_contacts`,
+`send_message_to_contact`, `read_messages_from_contact`,
+`aweb_welcome_guide`.
 
-Next: Athena v4 re-read (5-10 min) → Aida support-integration →
-Juan bless → commit at ac/backend/src/aweb_cloud/resources/welcome.md
-→ flag back to Athena for Grace's stub-replacement.
+Source-of-truth path: `ac/backend/src/aweb_cloud/resources/welcome.md`
+(AC-canonical per Athena's read).
+
+Next: Aida support-integration pass on welcome guide → Juan bless →
+commit content at canonical path → flag back to Athena for Grace's
+stub-replacement.
 
 ### 2. Twitter thread P1 launch
 
