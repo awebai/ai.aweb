@@ -1,14 +1,16 @@
 # Operations Status
 
-Last updated: 2026-05-14 15:40 CEST (13:40 UTC) — **AC v0.5.33
-backend verified-live** at 59ac4c81 (post-OAuth onboarding bundle:
-MCP create_invite_link + aweb_welcome_guide + aweb://welcome
-resource + consent-page banner + welcome guide v5 content +
-serverInfo.instructions). Juan triggered Render at 13:36Z; image
-landed at 13:37:17Z. #30 schema check green (8 files = 8 applied).
-**v0.5.32** (Grace email hotfix at 34650a93) was tagged + GHA
-SUCCESS but never deployed — superseded by v0.5.33 (forward-progress
-ancestor confirmed). Image stays in GHCR as a halted-deploy entry.
+Last updated: 2026-05-14 18:00 CEST (16:00 UTC) — **AC v0.5.35
+verified-live** at d8eeed01 (Grace's reachability default
+nobody→public for new consumer users + welcome.md content updates).
+Live 15:54:15Z; #30 schema check green (8 files = 8 applied).
+**v0.5.32 and v0.5.34** are halted-entry images in GHCR (both ancestors
+of newer live versions; v0.5.32 was the email hotfix superseded by
+v0.5.33, v0.5.34 was Olivia's 409 UX fix superseded by v0.5.35).
+**Site production deploy 4** (Peter's blog + Sofia's "and honest"→"short" edit)
+**held on banked four-step gate** — Iris cleared customer-voice walk
+per Athena 97fe13d7; Sofia framing + Bertha/Eugenie + Juan greenlight
+still pending.
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
@@ -145,15 +147,18 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-14 13:37Z)
+## Live state (verified 2026-05-14 15:55Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.33`, `aweb_version=1.21.0`,
-  `awid_service_version=0.5.4`, `git_sha=59ac4c81f25f6bd05e2b145d7d44021d23c834ad`.
-  Fresh deploy 13:36:46Z (Juan manual Render trigger).
+- `app.aweb.ai/health`: `release_tag=v0.5.35`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=d8eeed0197fac4a1561157d15739872eca410623`.
+  Fresh deploy 15:54:15Z.
 - Prod data: `aweb_cloud.managed_namespaces` controller alignment
   backfill (2026-05-13 22:18Z) holds. Predicate re-run = 0 rows.
 - Schema: 8 migration files = 8 applied rows across server (1),
   aweb (2), aweb_cloud (5). No drift.
+- juanre soft-deleted managed_namespaces row remains diverged (latent
+  issue caught during v0.5.33 incident triangulation, Task #125). Not
+  currently hit but would fire if juanre attempts new_agent flow.
 - Schema-migration state empirically current across all 3 schemas:
   - `server.schema_migrations`: 001 (1 row)
   - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
@@ -209,7 +214,9 @@ metis (sent this cycle).
 | AC v0.5.30 (controller_did reuse first-pass + OAuth raw-JSON wrap) | **HALTED** at tag-push — Grace surfaced 4 invariant gaps post-tag; GHA cancelled, no image, no deploy. Tag at 8c3d9dc1 stays as halted entry. |
 | AC v0.5.31 (invariant-correct controller_did reuse + OAuth defensive tightening M1/M2/m1) | shipped + verified-live at 21cb6c23 + P0 prod-data backfill (5 rows aligned) |
 | AC v0.5.32 (Grace returning-consumer email hotfix at 34650a93) | tagged + GHA SUCCESS; never deployed (superseded by v0.5.33 forward-progress) |
-| **AC v0.5.33** (post-OAuth onboarding bundle: MCP invite tool + welcome resource + consent banner + welcome guide v5 + serverInfo) | shipped + verified-live at 59ac4c81 + #30 schema check green |
+| AC v0.5.33 (post-OAuth onboarding bundle: MCP invite tool + welcome resource + consent banner + welcome guide v5 + serverInfo) | shipped + verified-live at 59ac4c81 + #30 schema check green |
+| AC v0.5.34 (Olivia 409 alias-conflict UX fix at 299cb185) | tagged + GHA SUCCESS; never deployed (superseded by v0.5.35 forward-progress) |
+| **AC v0.5.35** (Grace reachability nobody→public for new consumer users + welcome.md content updates) | shipped + verified-live at d8eeed01 + #30 schema check green |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
