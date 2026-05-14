@@ -1,8 +1,8 @@
 ---
-title: "How to set up an AI-first company like ours — v3 draft"
+title: "How to set up an AI-first company like ours — v4 (Juan bless + published)"
 date: "2026-05-14"
 type: "blog-post-draft"
-status: "Iris drafted v3 (Athena tech-accuracy 798a24e4: dev-team agent framing replaces ephemeral-pair overclaim; scheduled-meetings status corrected to queued-not-in-flight; team-shape lineage clarified; user count tightened to active-hosted-agents precision; double-relationships style fix; template repo URL filled in)"
+status: "Iris drafted v4 (Juan bless 2026-05-14 + line fix on internal Iris-framing reference); published to ac/site/content/blog/ai-first-company-howto.md; staging deploy requested from Hestia"
 audience: "Small company / startup (3-30 people) wanting to be AI-first; employees using ChatGPT / claude.ai / Claude Desktop primarily"
 shape: "Hybrid (case-study anchor + stage-branching recipe) per Athena brief 36d75f22"
 target-word-count: "1500-3000"
@@ -33,6 +33,13 @@ v1 draft per Athena brief 36d75f22. Shape decision: Path C (hybrid) — case-stu
 - **Double-"relationships" style fix** (line 64): "(customer relationships, hiring, the actual building of relationships)" → "— customer relationships, hiring, the in-person trust work." Em-dash construction; dropped the parenthetical-with-redundancy.
 - **Template repo URL filled** (mail fa04e2c5): `[TEMPLATE_REPO_URL]` → `https://github.com/awebai/agent-first-company-template`. Athena's locked name (matches docs/agent-first-company.md canonical framing).
 - **Sofia's `aweb.ai/connect` 404 item**: deferred to Peter as a separate site-side flag (not blocking this post).
+
+**v3 → v4 deltas** per Juan's bless + read-pass:
+
+- Juan blessed v3 read; flagged one line for reader-clarity fix.
+- Stage 2 "The gap:" paragraph — the "This is where Iris's framing for our homepage lands — 'you're the most expensive messenger in the room.'" sentence dropped the Iris attribution + "our homepage" self-reference (both opaque to a cold reader). Revised to embed the phrase directly: "you're paying the relay tax — you're 'the most expensive messenger in the room.'" The quoted phrase still functions as a labeled concept; the reader gets the punch without needing internal context.
+- Bertha-via-Eugenie pass: not waiting on a separate ack — Juan's direct bless supersedes the chain step.
+- Published to `ac/site/content/blog/ai-first-company-howto.md` (Hestia runs staging deploy per separate signal).
 
 Pre-banked honest-gap-namings in the draft:
 - aweb-as-coordination-layer requires aweb setup beyond browser-AI default.
@@ -143,7 +150,7 @@ Here's where the case study has to translate. Our shape is more elaborate than w
 
 **What you need:** Per-area personas with persistent context. Still no cross-AI messaging — the humans relay.
 
-**The gap:** The relay overhead starts to bite here. Every time you tell "Sarah's AI" the latest from "Marketing's AI," you're paying the relay tax. This is where Iris's framing for our homepage lands — "you're the most expensive messenger in the room." You can keep relaying manually until it hurts; the pain itself is the signal that Stage 3 is next.
+**The gap:** The relay overhead starts to bite here. Every time you tell "Sarah's AI" the latest from "Marketing's AI," you're paying the relay tax — you're "the most expensive messenger in the room." You can keep relaying manually until it hurts; the pain itself is the signal that Stage 3 is next.
 
 ### Stage 3 — Cross-AI coordination (when relay overhead hurts)
 
