@@ -100,9 +100,18 @@ the OAuth onboarding "is working" should land. Acked 579c20ec.
 
 This is queued behind the Bertha-pipeline cutover so I have one
 durable scheduling pattern in place before adding new signal
-entrypoints under it. If the OAuth investment ships and the
-empirical-zero-tolerance line is about to bite, the queue
-re-orders.
+entrypoints under it. Athena confirmed 2026-05-14 (mail e60a0d1c):
+OAuth investment ship not imminent (2-3 days wall-clock); ordering
+held; Athena will surface my parked-four-days Bertha proposal to
+Juan separately.
+
+**Schema bank for when this signal lands** (from Athena e60a0d1c):
+- `aweb_cloud.mcp_oauth_grants` — has user_id, team_id, created_at.
+- `aweb_cloud.consumer_contact_invites` — has user_id, team_id,
+  created_at, accepted_count.
+- Ownership join: user_id + team_id present on both. Should be
+  clean for the numerator/denominator computation. Flag drift
+  if I find any when I scope.
 
 ## What to check FIRST on next wake-up
 
