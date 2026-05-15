@@ -104,6 +104,19 @@ mails sent + #30 schema-check applied per migration):
   directive. Sofia's HOLD on Iris's rewrite was based on wrong
   attribution; Juan's directive collapsed the gate.
 
+## Forward note — AC aweb-pin bump for hosted dogfood
+
+`app.aweb.ai/health` reports `aweb_version=1.21.0` — AC's runtime
+still has aweb 1.21.0 pinned in `ac/backend/pyproject.toml`.
+The OSS path is fully covered by 1.21.1, but the hosted dogfood
+flow needs AC to bump the pin to `aweb>=1.21.1` and redeploy so
+that teams created via app.aweb.ai/init seed empty bundles
+(Mia's `team_roles.py:113` behavior change). Not blocking
+anything today (AC v0.5.36 healthy); flagged as natural fast-follow
+when Athena scopes the next AC release that fronts the
+introduction.md launch. Will catch this at next AC gate-review
+if not already in her plan.
+
 ## Disciplines banked this window
 
 - **#11a** (after v0.5.36 lesson): transitive-evidence-for-source-only-behavior-changes.
