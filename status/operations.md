@@ -1,16 +1,21 @@
 # Operations Status
 
-Last updated: 2026-05-14 18:00 CEST (16:00 UTC) — **AC v0.5.35
-verified-live** at d8eeed01 (Grace's reachability default
-nobody→public for new consumer users + welcome.md content updates).
-Live 15:54:15Z; #30 schema check green (8 files = 8 applied).
-**v0.5.32 and v0.5.34** are halted-entry images in GHCR (both ancestors
-of newer live versions; v0.5.32 was the email hotfix superseded by
-v0.5.33, v0.5.34 was Olivia's 409 UX fix superseded by v0.5.35).
-**Site production deploy 4** (Peter's blog + Sofia's "and honest"→"short" edit)
-**held on banked four-step gate** — Iris cleared customer-voice walk
-per Athena 97fe13d7; Sofia framing + Bertha/Eugenie + Juan greenlight
-still pending.
+Last updated: 2026-05-15 19:50 CEST (17:50 UTC) — **AC v0.5.36 deploy-
+verified-live** at 73db479a (bundled: Business $250→$150 via Stripe
+env-var refresh on process restart + Free tier 100→50 messages/day).
+Live 17:43:40Z. #30 schema check green (8 files = 8 applied).
+Behavior smokes (Business $150 checkout, Free 51st-msg 429) pending
+Athena probe per her offer in mail e5e5345b — deferred to her
+empirical attestation per #11.
+**Site staging is at 98aefe58 (header 3-zone grid)**. Iteration cycles
+12-14 deployed staging since v0.5.35: font swap to system stacks
+(8dba7b41), tagline v2 'Spin a web of agents, skip the bottlenecks'
+(8926e610), header 3-zone grid rework (98aefe58). Production aweb.ai
+unchanged from blog deploy 131632e0 — production-merge gate held on
+Athena Playwright validation + Peter regression vitest + Juan walk
++ Sofia framing pass per Athena 7d5364cd cadence.
+**v0.5.32 and v0.5.34** remain halted-entry images in GHCR (both
+ancestors of newer live versions; superseded forward-progress).
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
@@ -147,11 +152,12 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-14 15:55Z)
+## Live state (verified 2026-05-15 17:43Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.35`, `aweb_version=1.21.0`,
-  `awid_service_version=0.5.4`, `git_sha=d8eeed0197fac4a1561157d15739872eca410623`.
-  Fresh deploy 15:54:15Z.
+- `app.aweb.ai/health`: `release_tag=v0.5.36`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=73db479a20cd6d614f9ad2a3f7c7123a4ce94291`.
+  Fresh deploy 17:43:40Z. Stripe `STRIPE_BUSINESS_PRICE_ID` env var
+  picked up on process restart.
 - Prod data: `aweb_cloud.managed_namespaces` controller alignment
   backfill (2026-05-13 22:18Z) holds. Predicate re-run = 0 rows.
 - Schema: 8 migration files = 8 applied rows across server (1),
@@ -159,6 +165,9 @@ changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 - juanre soft-deleted managed_namespaces row remains diverged (latent
   issue caught during v0.5.33 incident triangulation, Task #125). Not
   currently hit but would fire if juanre attempts new_agent flow.
+- Render apscheduler still not started in prod (Task #132 + Metis
+  default-aaae triage); daily_active_workspace_facts still empty.
+  Pending Juan path choice (dashboard provision vs RENDER_API_KEY).
 - Schema-migration state empirically current across all 3 schemas:
   - `server.schema_migrations`: 001 (1 row)
   - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
@@ -216,7 +225,8 @@ metis (sent this cycle).
 | AC v0.5.32 (Grace returning-consumer email hotfix at 34650a93) | tagged + GHA SUCCESS; never deployed (superseded by v0.5.33 forward-progress) |
 | AC v0.5.33 (post-OAuth onboarding bundle: MCP invite tool + welcome resource + consent banner + welcome guide v5 + serverInfo) | shipped + verified-live at 59ac4c81 + #30 schema check green |
 | AC v0.5.34 (Olivia 409 alias-conflict UX fix at 299cb185) | tagged + GHA SUCCESS; never deployed (superseded by v0.5.35 forward-progress) |
-| **AC v0.5.35** (Grace reachability nobody→public for new consumer users + welcome.md content updates) | shipped + verified-live at d8eeed01 + #30 schema check green |
+| AC v0.5.35 (Grace reachability nobody→public for new consumer users + welcome.md content updates) | shipped + verified-live at d8eeed01 |
+| **AC v0.5.36** (bundled: Business $250→$150 Stripe env-var refresh + Free tier 100→50 msg/day) | shipped + deploy-verified-live at 73db479a; behavior smokes pending Athena probe |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
