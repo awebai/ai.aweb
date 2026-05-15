@@ -326,6 +326,50 @@ Athena is the cross-team bridge.
 9. Published artifact ≠ deployed service
 10. Browser-verify UI-surface releases
 11. Closure framing rests on empirical attestation
+11a. **Transitive evidence is sufficient for source-only behavior changes;
+    independent variables need separate empirical query.**
+    Closure attestation depends on the change class:
+
+    - **Source-code behavior** (functions, constants, conditionals, code
+      paths within a single deterministic build): empirical attestation
+      is transitive — git_sha → source equivalence + release-ready
+      tests-passing at that SHA + `/health` reporting that
+      `release_tag`. No separate end-to-end probe needed. The image is
+      functionally equivalent to source at git_sha for Python-runtime
+      behavior: uv.lock pins direct + transitive Python deps, source is
+      COPYed verbatim, and tests at that SHA asserted the behavior. The
+      chain closes.
+    - **Independent variables** drift independently of code. These DO
+      need separate empirical query at verify-live:
+      - schema state → #30 (`schema_migrations` query)
+      - prod-data state → #31 (predicate against the new invariant)
+      - env vars (e.g. `STRIPE_BUSINESS_PRICE_ID`, `DATABASE_URL`,
+        feature flags) → behavior probe preferred (implicitly attests
+        restart by observing new behavior); `/health` restart shape
+        alone is necessary-but-not-sufficient (proves reload, not the
+        new value)
+      - cache state (Redis: rate-limit counters, daily-message usage,
+        session caches) → service count-getter probe against a known
+        billing_id / session-id
+      - process-internal state (in-memory schedulers, in-process
+        caches — apscheduler MemoryJobStore is the canonical example
+        per Task #132 + Metis default-aaae) → scheduler list-getter
+        OR evidence the expected job fired post-restart
+      - external API state (AWID registry, Stripe, npm registry) →
+        query the external surface
+
+    Catalyst: v0.5.36 bundled Business $250→$150 (env-var refresh —
+    independent variable, needs Juan visual walk OR a probe) with Free
+    tier 100→50 messages/day (source-only TIER_LIMITS change —
+    transitive sufficient). Started by demanding empirical probes for
+    both; Athena pointed out the asymmetry. Banking the axis explicitly
+    avoids over-engineering future smokes for source-only changes and
+    avoids under-engineering future env-var / cache / process-state
+    changes.
+
+    Tied to: #11 (closure rests on empirical attestation), #18
+    (verified-live cites actually-committed SHA), #30 (schema check),
+    #31 (prod-data state).
 12. Reproducer-as-gate
 13. Code-reviewer subagent for gate-input commits (Athena pre-flight)
 14. Migration-checksum chase covers BOTH OSS wheel and AC embedded copy
