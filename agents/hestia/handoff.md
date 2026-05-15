@@ -1,8 +1,9 @@
 # Hestia Handoff
 
-Last updated: 2026-05-15 22:55 CEST (20:55 UTC) — AC v0.5.36 verified-live;
-site production at Juan-authored homepage (ee2252dc); aweb 1.21.1 release
-candidate HALTED at first gate in Phase 15 e2e, awaiting Athena fix.
+Last updated: 2026-05-15 23:25 CEST (21:25 UTC) — AC v0.5.36 verified-live;
+site production at Juan-authored homepage (ee2252dc); **aweb 1.21.1
+VERIFIED LIVE** end-to-end after gate-failure recovery cycle (Athena
+fix at 9035252, my re-run at 02e992b green with 218 tests).
 
 ## Read this first
 
@@ -23,35 +24,57 @@ site push.
 - Site **staging** (preview-urw1.onrender.com): in sync with main
   via deploy-landing-staging (cadence is fast / autonomous).
 
-## IN-FLIGHT — aweb 1.21.1 gate HALTED
+## aweb 1.21.1 — VERIFIED LIVE 2026-05-15 21:25Z
 
-**State**: First gate at aweb main HEAD `452c755` (CLI comment-only
-follow-up on 2ad4fdb) — `make ship` aborted mid-Phase-15 of
-`scripts/e2e-oss-user-journey.sh`.
+**Source HEAD**: 9035252 (Athena's `cli/go/cmd/aw/roles.go` fix)
+**Release commit**: 02e992b (server pyproject 1.21.0→1.21.1)
+**Tags pushed individually**: server-v1.21.1 + aw-v1.21.1.
 
-**Root cause**: Mia's empty-bundle bootstrap (server/coordination/routes/team_roles.py:113)
-interacts with `aw roles show` defaults:
-- CLI defaults to `role_name="developer"`, `only_selected=true`
-  (`cli/go/cmd/aw/roles.go:321`).
-- Server endpoint (`team_roles.py:419-424`) raises HTTP 400 when
-  the resolved role name isn't in the (now-empty) bundle.
+**What shipped**:
+- Server-side default-zero-roles bootstrap for new teams
+  (`server/.../team_roles.py:113` — Mia's 2ad4fdb).
+- `aw init` hosted-persistent: always persistent, no prompt
+  (Mia's 2ad4fdb).
+- `aw init` hosted-persistent: "alice" as canonical default alias
+  (Mia's 2ad4fdb).
+- `aw roles show`: handles empty bundle without 400 — resolves to
+  `only_selected=false`, emits "No roles configured for this team.
+  Add roles with `aw roles add`." (Athena's 9035252).
+
+**Gate-failure recovery shape** (banked operational lesson):
+First attempt at 452c755 aborted mid-Phase-15 of
+`scripts/e2e-oss-user-journey.sh`. Root cause:
+- CLI `cli/go/cmd/aw/roles.go:321` defaulted to `role_name="developer"`.
+- Server `team_roles.py:419-424` raised HTTP 400 on missing role
+  against empty bundle.
 - Bash 5.3 `set -euo pipefail` propagates command-substitution
-  failure through assignment → e2e script aborts.
+  failure through `x=$(failing_cmd)` assignment (different from
+  older bashes).
+- e2e script aborted at `roles_out="$(run_aw_in ... roles show 2>/dev/null)"`.
 
-**Action taken**:
-- Reverted local server/pyproject.toml + server/uv.lock bump
-  (1.21.1 → 1.21.0). Working tree clean.
-- Mailed Athena with failure shape + three fix-shape options
-  (mail 40feddee). My read: option B (server returns 200 with
-  empty roles when bundle is empty, even with only_selected=true)
-  is the right shape; option C (e2e probe change) just hides the
-  regression.
+Halted release pre-tag. Reverted local server/pyproject + uv.lock.
+Mailed Athena with failure shape + three fix-shape options
+(mail 40feddee). Athena chose option A (CLI-side) at 9035252 +
+new `TestAwRolesShowEmptyBundleExitsZero` regression test +
+code-reviewer subagent pass per #13. My re-run at 02e992b
+green — 218 tests (33 more than prior 185 because Phase 15-22
+now reach previously-unreachable code).
 
-**Next**: When Athena re-signals from her fix HEAD, re-bump server
-pyproject to 1.21.1, refresh uv.lock, run `make ship`, then
-per-product tag (`release-server-tag` + `release-cli-tag` —
-NOT `release-all-tag`, which would try to recreate the unchanged
-awid-v0.5.4 + channel-v1.4.0 tags).
+**Live evidence**:
+- PyPI: `aweb==1.21.1` published.
+- npm: all 6 platform packages at 1.21.1
+  (@awebai/aw{,-darwin-arm64,-darwin-x64,-linux-x64,-linux-arm64,-windows-x64}).
+- `aw upgrade` flipped local install 1.21.0 → 1.21.1; `aw version`
+  reports commit 294a08d (auto-sync to awebai/aw).
+- `aw roles show` against existing non-empty bundle still prints
+  "Role: coordinator" — non-regression for membership-role path.
+
+**Per-product tag rationale** (banked):
+- Used `release-server-tag` + `release-cli-tag` (not `release-all-tag`).
+- `release-all-tag` would try to re-create awid-v0.5.4 and channel-v1.4.0
+  even though awid/channel sources didn't change → would fail with
+  "tag already exists." Right pattern for server+CLI-only patch
+  bumps.
 
 ## Cycle 2026-05-14 through 2026-05-15 — verified-live ladder
 

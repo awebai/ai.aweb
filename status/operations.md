@@ -1,6 +1,30 @@
 # Operations Status
 
-Last updated: 2026-05-15 21:10 CEST (19:10 UTC) — **aweb.ai
+Last updated: 2026-05-15 23:25 CEST (21:25 UTC) — **aweb 1.21.1
+VERIFIED LIVE end-to-end**. PyPI (`aweb==1.21.1`) + npm (all 6
+platform packages flipped) + `aw upgrade` 1.21.0 → 1.21.1 clean +
+218-test e2e green (up from 185 — Phase 15 Roles now reachable
+plus Phases 16-22 which were never reached before). Ships Mia's
+onboarding rework (2ad4fdb): server-side default-zero-roles
+bootstrap + CLI hosted-persistent no-prompt + alice canonical
+default alias, plus Athena's roles.go fix at 9035252 (`aw roles
+show` handles empty bundle without 400). Release tags
+server-v1.21.1 + aw-v1.21.1 pushed individually per #7. ac
+introduction.md sync (5ae400be) still pending site deploy —
+independent of this aweb tag.
+
+**Gate-failure halt + recovery this cycle**: First attempt at
+452c755 aborted mid-Phase-15 of `scripts/e2e-oss-user-journey.sh`
+(`aw roles show` hit server 400 on empty bundle due to CLI default
+of role_name="developer" + only_selected=true; bash 5.3 errexit
+propagated through command substitution in assignment). Halted
+release, reverted local bump, mailed Athena with three fix-shape
+options (40feddee). Athena landed option A (CLI-side) at 9035252
+with new `TestAwRolesShowEmptyBundleExitsZero` regression test +
+code-reviewer subagent pass per #13. Re-bumped from her HEAD and
+shipped.
+
+Last updated previously: 2026-05-15 21:10 CEST (19:10 UTC) — **aweb.ai
 production deployed at 13a5da63** (19:06:46Z). Full bundle live:
 Eugenie chunks 1+2, tagline v2 'Spin a web of agents, skip the
 bottlenecks', font swap to system stacks, header 3-zone rework,
