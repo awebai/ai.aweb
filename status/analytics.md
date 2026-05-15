@@ -1,5 +1,17 @@
 # Analytics Status
-Last updated: 2026-05-14 11:25 CEST
+Last updated: 2026-05-15 14:00 CEST
+
+## First signal brief shipped
+
+`agents/metis/briefs/2026-05-15-adoption-state-first-brief.md`
+closes aweb-aals.4. Headline: external signup rate steady at 2-5/
+week for last 7 weeks; no observable lift from pain-narrative deploy
+2026-05-13 22:28Z in first 36h; mcp_oauth_grants table has counting
+trap — true external population is n=1 (2 of 3 "external" grants
+are Juan testing), so OAuth-onboarding-investment baseline is
+effectively absent. Empirical-zero-tolerance framing: do NOT claim
+"0% conversion"; correct framing is "insufficient grant volume to
+compute conversion rate; will re-baseline at n>=10."
 
 ## Current focus
 
