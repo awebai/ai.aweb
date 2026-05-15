@@ -29,7 +29,7 @@ defeats the purpose. aweb gives agents real-time awareness of each
 other.
 
 **Revenue path:** Free tier (100 msgs/day) → Pro ($25/mo, 500/day)
-→ Business ($250/mo, 5000/day). Free gets adoption, Pro converts when
+→ Business ($150/mo, 5000/day). Free gets adoption, Pro converts when
 teams hit limits.
 
 ## For agent platform builders (Audience 2 — comes later)
