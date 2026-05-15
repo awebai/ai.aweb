@@ -28,7 +28,7 @@ an agent decides a "small fix" crosses the boundary. Sequential
 defeats the purpose. aweb gives agents real-time awareness of each
 other.
 
-**Revenue path:** Free tier (100 msgs/day) → Pro ($25/mo, 500/day)
+**Revenue path:** Free tier (50 msgs/day) → Pro ($25/mo, 500/day)
 → Business ($150/mo, 5000/day). Free gets adoption, Pro converts when
 teams hit limits.
 

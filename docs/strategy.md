@@ -246,7 +246,7 @@ The hosted service (aweb-cloud) has three tiers:
 | Business | $150/mo | Larger teams, full coordination      |
 
 The free tier gets adoption. Pro converts when teams hit the daily
-message limit (100 msgs/day on free). Business converts when
+message limit (50 msgs/day on free). Business converts when
 organizations need cross-project coordination and roles.
 
 The OSS self-hosted option is the trust builder. Developers who can
