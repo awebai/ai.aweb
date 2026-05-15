@@ -1,21 +1,23 @@
 # Operations Status
 
-Last updated: 2026-05-15 19:50 CEST (17:50 UTC) — **AC v0.5.36 deploy-
-verified-live** at 73db479a (bundled: Business $250→$150 via Stripe
-env-var refresh on process restart + Free tier 100→50 messages/day).
-Live 17:43:40Z. #30 schema check green (8 files = 8 applied).
-Behavior smokes (Business $150 checkout, Free 51st-msg 429) pending
-Athena probe per her offer in mail e5e5345b — deferred to her
-empirical attestation per #11.
-**Site staging is at 98aefe58 (header 3-zone grid)**. Iteration cycles
-12-14 deployed staging since v0.5.35: font swap to system stacks
-(8dba7b41), tagline v2 'Spin a web of agents, skip the bottlenecks'
-(8926e610), header 3-zone grid rework (98aefe58). Production aweb.ai
-unchanged from blog deploy 131632e0 — production-merge gate held on
-Athena Playwright validation + Peter regression vitest + Juan walk
-+ Sofia framing pass per Athena 7d5364cd cadence.
-**v0.5.32 and v0.5.34** remain halted-entry images in GHCR (both
-ancestors of newer live versions; superseded forward-progress).
+Last updated: 2026-05-15 21:10 CEST (19:10 UTC) — **aweb.ai
+production deployed at 13a5da63** (19:06:46Z). Full bundle live:
+Eugenie chunks 1+2, tagline v2 'Spin a web of agents, skip the
+bottlenecks', font swap to system stacks, header 3-zone rework,
+375px overflow fix, $150 Business display, 50 msg/day Free display,
+full SEO bundle (robots/sitemap/OG/JSON-LD/og-default/apple-touch/
+theme-color/enableGitInfo), Juan-authored "How to set up an
+AI-native organization" first real blog post. Gate-collapse
+narrative: Sofia surfaced ee2252dc as voice-shape rewrite assumed
+to be Iris-going-around-chain; Juan clarified authorship +
+directive "ship as I left it" → Sofia's axis closed; Athena Rich
+Results validation cleared on staging (edb7e0e3) carries through
+to production unchanged (template-driven schema).
+**AC v0.5.36 deploy-verified-live** at 73db479a (Business
+$250→$150 Stripe env-var refresh + Free 100→50 msg/day) — public
+$150 display now coherent with backend charge. Stripe Checkout
+visual walk still pending Juan per Athena bde3a525.
+**v0.5.32 and v0.5.34** remain halted-entry images in GHCR.
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
