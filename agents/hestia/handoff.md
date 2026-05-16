@@ -1,11 +1,60 @@
 # Hestia Handoff
 
-Last updated: 2026-05-16 10:15 CEST (08:15 UTC) — **1.21.2
-coordinated cut LIVE end-to-end**. AC v0.5.37 at app.aweb.ai
-(sha=4ad0e1df). aweb 1.21.2 on PyPI + all 6 npm packages +
-`aw upgrade` 1.21.1→1.21.2 clean. Site production still at
-ee2252dc (Juan-authored 2026-05-14); staging chain 16→20 at
-f5dae250 queued for four-step gate.
+Last updated: 2026-05-16 12:05 CEST (10:05 UTC) — **1.21.2
++ landing pages bundle + Plausible/robots.txt all LIVE end-to-end**.
+
+- AC v0.5.37 backend live at app.aweb.ai (sha=4ad0e1df).
+- aweb 1.21.2 on PyPI + all 6 npm packages + `aw upgrade` clean.
+- aweb.ai production: full Iris bundle (homepage rework,
+  hero subtitle + brand-mark, .proto-hero-graphic constellation,
+  agent-to-agent label, day-in-life mobile carousel + peek,
+  Connect-your-AI single CTA) + Grace's introduction.md +
+  teams.md (via Makefile docs sync) + d92b001b border fix +
+  Plausible analytics + robots.txt AI-bot explicit-allow.
+- Production HEAD on deploy-landing: e105d2b0.
+
+## Banked discipline #32 — deploy-target reads working-branch
+
+**Rule**: `make deploy-staging` and `make deploy-site` push from
+`git -C ac symbolic-ref --short HEAD`. The repo's CURRENT BRANCH
+becomes the source of the push. **Before running either, verify
+`git -C ac branch --show-current = main`.**
+
+**Why**: caught this on 2026-05-16. Athena/Mia switched the ac
+repo to `mia-aaom-consumer-updates` between my prior cycle's
+end (on main) and Iris's next staging signal. My `make
+deploy-staging` ran from that branch — pushed Mia's aaom
+paired-consumer commit to deploy-landing-staging alongside the
+target Plausible commit. Staging was contaminated until I
+re-deployed.
+
+**How to apply**:
+1. `cd /Users/juanre/prj/awebai/ac && git branch --show-current` →
+   confirm `main` before any `make deploy-*`.
+2. If on another branch: stash any WIP with a clear label
+   (`git stash push -m "<branch>-WIP-handoff: ..."`),
+   `git checkout main`, `git pull --ff-only`, deploy, then
+   restore (checkout original branch + `git stash pop` if the
+   owner needs the WIP back).
+3. Mail the branch owner about the stash so they can recover.
+4. **Future**: a Makefile guard like
+   `test "$$(git symbolic-ref --short HEAD)" = main || (echo "Not on main"; exit 1)`
+   would make this structurally safe. Not yet landed; Athena's
+   call on whether to add it.
+
+## Note on staging today
+
+`origin/deploy-landing-staging` (099f2e3e) carries Mia's
+`8c4c9e3b aaom paired-consumer` commit because of the
+branch-trap above. Production `deploy-landing` (e105d2b0) is
+clean — pushed from main HEAD only. Mia's branch
+(`origin/mia-aaom-consumer-updates`) is intact; she can
+recover her WIP via the stash labeled
+`mia-WIP-handoff: ... 2026-05-16` (flagged to Athena mail
+b88da9b2). Staging will self-correct on the next clean
+deploy-staging from main (force-push not needed if the next
+deploy is from main HEAD that includes the same Plausible commit
+already).
 
 ## Read this first
 
