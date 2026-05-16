@@ -1,5 +1,26 @@
 # Hestia Handoff
 
+Last updated: 2026-05-16 21:55 CEST (19:55 UTC) — **aaoq+aaor
+wave LIVE end-to-end**: aweb 1.22.0 (MCP tool surface rename:
+send_mail/send_chat/check_mail/check_chats/read_chat/
+mark_chat_read; doc restructure intro.md→cli-tutorial.md +
+mcp-tutorial.md; aaor hosted spawn-invite authority + bare-alias
+messaging fix) on PyPI + npm + `aw upgrade` clean. AC v0.5.39
+live (sha=8a5a8275; Olivia P0 dashboard fix + aaom paired
+consumer test updates + complete roles-optional sweep on
+frontend + e2e). Site production at fd0829cd: /docs/cli-tutorial/
++ /docs/mcp-tutorial/ HTML routes + raw .md, /developers hero
+drops "aw init" line, getting-started umbrella rewritten,
+backend mcp-tutorial.md (welcome.md replaced), legacy
+intro/teams.md 404. Many gate halts this wave (Phase 10 mail
+fix at 76956ab, docker postgres infra flake, apt-get build
+network, ac auth-bridge developer-role assertion, check_inbox
+→check_mail sweep miss, 3 more empty-bundle surfaces, Makefile
+legacy-path git-add bombing on idempotent run, Cloudflare
+s-maxage CDN cache on legacy /agent-guide.md). All recovered;
+all artifacts verified-live.
+
+Earlier:
 Last updated: 2026-05-16 12:05 CEST (10:05 UTC) — **1.21.2
 + landing pages bundle + Plausible/robots.txt all LIVE end-to-end**.
 
