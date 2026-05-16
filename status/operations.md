@@ -1,5 +1,17 @@
 # Operations Status
 
+Last updated: 2026-05-16 11:35 CEST (09:35 UTC) — **Site deploy #23
+VERIFIED LIVE**: docs header overhaul live on aweb.ai at 5a9ac11f.
+/docs/cli-tutorial + /docs/mcp-tutorial now carry Anthropic-style
+header (kicker "Agent tutorial" → H1 → description), pill Copy-page
+menu with Copy page + View as Markdown (Open-in-Claude dropped per
+Juan), tutorial titles "aweb CLI Tutorial for agents" / "aweb MCP
+Tutorial for agents", body H1 dedup across tutorials and agent-guide.
+Legacy /teams.md / /agent-guide.md / /introduction.md root paths
+removed (404 on legacy URLs). Mailed Athena verified-live evidence.
+Open Render/migration follow-ups (#109, #110) unchanged.
+
+Previous lead:
 Last updated: 2026-05-16 10:15 CEST (08:15 UTC) — **1.21.2
 coordinated cut VERIFIED LIVE end-to-end**. AC v0.5.37 at
 `app.aweb.ai/health` (sha=4ad0e1df) — backend half: empty-bundle

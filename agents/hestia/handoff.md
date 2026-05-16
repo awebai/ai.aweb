@@ -1,5 +1,16 @@
 # Hestia Handoff
 
+Last updated: 2026-05-17 (post-resume) — **Site deploy #23
+VERIFIED LIVE**: docs header overhaul at 5a9ac11f live on aweb.ai.
+/docs/cli-tutorial + /docs/mcp-tutorial now render Anthropic-style
+header (kicker "Agent tutorial" → docs-page-title H1 → description),
+pill Copy-page menu with Copy page + View as Markdown only
+(Open-in-Claude dropped per Juan), tutorial titles "aweb CLI Tutorial
+for agents" / "aweb MCP Tutorial for agents", body H1 deduped on
+tutorials + agent-guide. /docs/teams/ correctly 404 (legacy
+root-doc sweep). Mailed Athena evidence; status updated.
+
+Earlier:
 Last updated: 2026-05-16 21:55 CEST (19:55 UTC) — **aaoq+aaor
 wave LIVE end-to-end**: aweb 1.22.0 (MCP tool surface rename:
 send_mail/send_chat/check_mail/check_chats/read_chat/
