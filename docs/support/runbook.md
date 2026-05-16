@@ -429,6 +429,134 @@ entry mail `f393168c` (2026-05-02), Athena's review mail `df41abbc`
 finding #3. Captured 422 envelopes were verified against the
 production schema by Mia on 2026-05-02.
 
+## Customer Orientation Responses
+
+For open-ended customer questions that are NOT errors — orientation,
+"what next," routing — that the customer asks after finishing a
+tutorial or completing setup. Distinct from Known Errors above (which
+are symptom-keyed) and from Cases 1-7 (which are bug/recovery-shaped).
+
+Each response below carries the empirical-verification trail at the
+end. **Per discipline #27**: every action-command was source-grep
+verified against current `aweb/cli/go/cmd/aw/` at draft time; if a
+release wave lands, re-verify before using (especially commands that
+took role / workspace / identity flags — those are the surfaces
+that change). The verification date is in each entry's Source line.
+
+### "I finished the CLI tutorial — what should I try next?"
+
+**When this applies.** Customer completed the CLI tutorial
+(`introduction.md`, `cli-tutorial.md` once published, or similar)
+and reaches out via the support-aida path the tutorial points them
+at: `aw chat send-and-wait aweb.ai/aida "..."`. The question is
+open-ended ("what should I try next?", "what's the next step?",
+"where do I go from here?"). Not an error; orientation-shaped.
+
+**Response template** — three buckets, in this order:
+
+1. **Action tier** (one concrete next thing to do, ~10-15 minutes):
+
+   ```
+   aw workspace add-worktree --alias <name>
+   ```
+
+   Gives the customer a second agent in a sibling worktree, both
+   sharing the same team. The aha moment for CLI users is usually
+   "two agents I can see each other" not just "I exist on aweb."
+
+   **DO NOT** recommend `aw workspace add-worktree developer` (or
+   any role-positional shape) without first checking whether the
+   customer's team has that role in its bundle. Post-aweb-1.22.0,
+   hosted aweb.ai teams ship with an EMPTY roles bundle by default
+   (per agent-guide.md F16 / OSS-vs-hosted distinction). Passing
+   a role that isn't in the bundle 400s or silently confuses. Use
+   `--alias <name>` form unless you've confirmed the role exists.
+
+2. **Depth-reading tier** (3-4 docs, ordered by likely usefulness):
+
+   ```
+   https://aweb.ai/docs/coordination/   — work, claims, locks
+   https://aweb.ai/docs/communication/  — mail vs chat, contacts, reachability
+   https://aweb.ai/agent-guide.md       — full primitive reference
+   ```
+
+   `coordination` and `communication` are the most-used surfaces for
+   CLI customers building real workflows. The agent-guide is the
+   reference; long-form, deeper than the customer needs in the first
+   day but useful as a hub for "what else is there."
+
+3. **Optional — dashboard bridge** (when the customer wants to link
+   a human account later):
+
+   ```
+   aw claim-human --email you@example.com
+   ```
+
+   Bridges a CLI-created team to the hosted dashboard without
+   changing identity. For BYOD customers (their workspace is on a
+   non-`.aweb.ai` namespace), also pass `--username
+   <dashboard-username>` explicitly — see the BYOD-422 Known Errors
+   entry above for the wave context.
+
+**Invitation to narrow.** Close every "what next" response with:
+
+> "What was your goal with aweb? If you tell me what you're trying
+> to build I can narrow the next step rather than handing you the
+> whole landscape."
+
+The invitation IS the value-add. The three buckets above are the
+fallback when the customer hasn't told you their goal yet; once
+they share it, the answer narrows to the specific path that fits
+(messaging-focused → emphasize `communication`; task-coordination
+→ emphasize `coordination` + `aw task`; multi-machine → BYOIT flow
+via `aw id team request`/`add-member`/`fetch-cert`).
+
+**What this response does NOT do.**
+
+- Does not recommend `aw run claude` (sunsetting; channel plugin is
+  recommended for Claude Code). `aw run codex` only if customer is
+  specifically on Codex.
+- Does not recommend any role-bearing command without first
+  verifying the customer's team has that role.
+- Does not promise specific dashboard features without verifying
+  current cloud state (the dashboard ships frequently; check
+  `status/operations.md` for live state if making claims).
+
+**Source.** Action-command source-grep verifications (current as of
+2026-05-16):
+
+- `aw workspace add-worktree --alias <name>`: confirmed in
+  `aweb/cli/go/cmd/aw/workspace.go:33` (`Use: "add-worktree [role]"`,
+  `Args: cobra.RangeArgs(0, 1)` — role positional optional;
+  `--alias` flag at line ~initialized in `init()`).
+- `aw claim-human --email <email> [--username <name>]`: confirmed
+  in `aw claim-human --help` output; `--username` flag described as
+  "Override the default dashboard username derived from the
+  registered domain."
+- Hosted docs URLs `/docs/coordination/` and `/docs/communication/`:
+  confirmed exist as Hugo-rendered pages from
+  `ac/site/content/docs/coordination.md` + `communication.md`.
+- Hosted reference URL `https://aweb.ai/agent-guide.md`: confirmed
+  served from `ac/site/static/agent-guide.md` (root-relative
+  static-folder serving; synced from `aweb/docs/agent-guide.md`).
+- Post-1.22.0 role-empty-bundle context: per Athena's mail
+  `05dae217` (2026-05-16), confirmed by `aweb` commit
+  `9035252` ("fix(roles): aw roles show handles empty bundle without
+  400").
+
+Seed example #1: `gracetut194441.aweb.ai/alice` (2026-05-16,
+captured via tutorial-walkthrough by Grace). Triggered the
+discipline #27 banking and shaped this entry's "DO NOT recommend
+role-positional without confirmation" guard.
+
+**Tied to docs-system invariants.** This response template assumes:
+the customer-facing docs at `/docs/*` are kept current per the
+Athena/Mia inventory pass (Wave 1 + Wave 2); commands referenced
+here remain source-grep accurate; the welcome guide v5 in
+`ac/backend/src/aweb_cloud/resources/welcome.md` defines the
+customer-facing tool vocabulary. If any of those invariants
+breaks, this entry needs re-verification.
+
 ## Escalation Packet
 
 When asking Engineering, include:
