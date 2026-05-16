@@ -1,9 +1,11 @@
 # Hestia Handoff
 
-Last updated: 2026-05-15 23:25 CEST (21:25 UTC) — AC v0.5.36 verified-live;
-site production at Juan-authored homepage (ee2252dc); **aweb 1.21.1
-VERIFIED LIVE** end-to-end after gate-failure recovery cycle (Athena
-fix at 9035252, my re-run at 02e992b green with 218 tests).
+Last updated: 2026-05-16 10:15 CEST (08:15 UTC) — **1.21.2
+coordinated cut LIVE end-to-end**. AC v0.5.37 at app.aweb.ai
+(sha=4ad0e1df). aweb 1.21.2 on PyPI + all 6 npm packages +
+`aw upgrade` 1.21.1→1.21.2 clean. Site production still at
+ee2252dc (Juan-authored 2026-05-14); staging chain 16→20 at
+f5dae250 queued for four-step gate.
 
 ## Read this first
 

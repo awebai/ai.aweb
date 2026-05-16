@@ -1,5 +1,22 @@
 # Operations Status
 
+Last updated: 2026-05-16 10:15 CEST (08:15 UTC) — **1.21.2
+coordinated cut VERIFIED LIVE end-to-end**. AC v0.5.37 at
+`app.aweb.ai/health` (sha=4ad0e1df) — backend half: empty-bundle
+bootstrap + role_name Optional, gates green after 2 sweep-miss
+halts (test_two_service_e2e + e2e-cloud-user-journey.sh). aweb
+1.21.2 on PyPI + all 6 npm packages + `aw upgrade` 1.21.1→1.21.2
+clean — CLI half: ephemeral default for hosted-persistent, alice
+canonical alias on Enter, server bootstrap empty bundle (aligned
+with ac/embedded). Grace's introduction.md + teams.md rewrites
++ Codex Step 9 correction live via Makefile docs sync. End-to-end
+introduction.md flow now serves the designed shape.
+
+Render image-watcher lag observation: GHA build completed
+07:01:31Z; /health flipped 07:58:51Z = ~13h delay until Juan
+manual trigger. Task #109 root-cause still open.
+
+Previous lead:
 Last updated: 2026-05-15 23:25 CEST (21:25 UTC) — **aweb 1.21.1
 VERIFIED LIVE end-to-end**. PyPI (`aweb==1.21.1`) + npm (all 6
 platform packages flipped) + `aw upgrade` 1.21.0 → 1.21.1 clean +
