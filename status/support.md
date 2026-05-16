@@ -103,6 +103,46 @@ catch up the discipline pointer once Iris's update lands.
   AWID-publicly-indexed; chat is alias-only (no `--to-did`); when in
   doubt and the work is engineering-coordination, route through
   Athena per the discipline in AGENTS.md.
+- **Discipline #26** — sibling-repo local-checkout staleness is a
+  failure mode when answering shipped-state questions. Before
+  grep-attesting whether a doc / file / route exists in `ac` or
+  `aweb`, run `git -C <repo> fetch && git ls-tree -r origin/main`
+  on the sibling repo. Caught when `ConsumerClientPickerPage.tsx`
+  in origin/main of `ac` showed as missing in my stale local
+  checkout (2026-05-15).
+- **Discipline #27 candidate** — pre-wave CLI guidance can become
+  stale rapidly across release waves. Before recommending any
+  role-bearing or behavior-altering CLI command, source-grep
+  `aweb/cli/go/cmd/aw/` + check recent commit log against the
+  relevant code path. Local-binary `aw --help` may be pre-wave.
+  Caught when "what next" guidance to `gracetut194441.aweb.ai/alice`
+  recommended `aw workspace add-worktree developer` (pre-1.22.0
+  role-injection shape) post the aweb 1.22.0 / AC v0.5.39 wave
+  that made roles optional. Grace caught it; Athena flagged it;
+  corrective sent (2026-05-16). Companion to #26: #26 is about
+  doc/file existence verification, #27 is about command-shape /
+  behavior verification.
+- **"What next" support response — post-1.22.0 corrected shape**.
+  When a customer finishes the CLI tutorial and asks "what
+  should I try next?", the action-tier recommendation is:
+  `aw workspace add-worktree --alias <name>` (NO role injection;
+  roles are now opt-in on fresh teams). If they want roles, they
+  create them via `aw roles` first. Depth-reading + dashboard
+  follow-up unchanged. Full prioritized runbook entry pending
+  docs audit completion + source-grep verification on each
+  action-command per #27.
+
+## Recent customer interactions (live evidence base)
+
+- **gracetut194441.aweb.ai/alice (2026-05-16)** — first real
+  "what next" customer ask after the consumer-entry ship.
+  Improvised reply from doc-set survey since runbook entry
+  not yet authored. Reply included stale pre-1.22.0
+  add-worktree shape; Grace caught it; Athena flagged via mail
+  `05dae217`; corrective sent via chat (mail-by-address 404'd —
+  namespace not AWID-public; chat works). Banked as seed
+  example #1 for the eventual "what next" runbook entry, with
+  the staleness lesson banked as discipline #27 candidate.
 
 ## Standing held items (separate from this status update)
 
