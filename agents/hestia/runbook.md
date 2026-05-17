@@ -874,6 +874,27 @@ Discipline:
   load-bearing AND its signal-vs-artifact linkage is in doubt, halt
   the release and surface the doubt to Athena rather than tag.
 
+Addenda from Grace's fix-cycle 2026-05-17:
+
+- **Trust gate signal MORE when an explicit assertion enforces the
+  gate-source binding** (e.g., `check_release_model` pattern in
+  Dockerfile.release that fails the build if the venv doesn't
+  resolve to the local source). Without an explicit assert,
+  gate-harness drift can silently reintroduce the stale-dep failure
+  mode. With an explicit assert, regressions fire loudly. When
+  evaluating whether a gate signal is load-bearing, look for the
+  explicit binding assertion as evidence the gate has been hardened
+  against drift.
+- **Different gates carry different evidence**. Unit-test gate is
+  necessary but not sufficient for customer-behavior correctness.
+  Federation-only or surface-specific gates exercise narrow paths.
+  The "real Docker cloud gate" (e.g., AC release-image driven
+  end-to-end user-journey) is the load-bearing signal for
+  customer-visible behavior. Match the gate to the claim: if the
+  claim is "federation works in real two-server scenarios", the
+  load-bearing signal is the Docker cloud gate, not the
+  federation-isolated unit suite.
+
 ### P0 fast-track release — re-verify package shape against current main
 
 **[banked from aaox.16 cycle 2026-05-17]**
