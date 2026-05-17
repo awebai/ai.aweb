@@ -103,34 +103,45 @@ catch up the discipline pointer once Iris's update lands.
   AWID-publicly-indexed; chat is alias-only (no `--to-did`); when in
   doubt and the work is engineering-coordination, route through
   Athena per the discipline in AGENTS.md.
-- **Discipline #26** — sibling-repo local-checkout staleness is a
-  failure mode when answering shipped-state questions. Before
-  grep-attesting whether a doc / file / route exists in `ac` or
-  `aweb`, run `git -C <repo> fetch && git ls-tree -r origin/main`
-  on the sibling repo. Caught when `ConsumerClientPickerPage.tsx`
-  in origin/main of `ac` showed as missing in my stale local
-  checkout (2026-05-15).
-- **Discipline #27 candidate** — pre-wave CLI guidance can become
-  stale rapidly across release waves. Before recommending any
-  role-bearing or behavior-altering CLI command, source-grep
-  `aweb/cli/go/cmd/aw/` + check recent commit log against the
-  relevant code path. Local-binary `aw --help` may be pre-wave.
-  Caught when "what next" guidance to `gracetut194441.aweb.ai/alice`
-  recommended `aw workspace add-worktree developer` (pre-1.22.0
-  role-injection shape) post the aweb 1.22.0 / AC v0.5.39 wave
-  that made roles optional. Grace caught it; Athena flagged it;
-  corrective sent (2026-05-16). Companion to #26: #26 is about
-  doc/file existence verification, #27 is about command-shape /
-  behavior verification.
-- **"What next" support response — post-1.22.0 corrected shape**.
-  When a customer finishes the CLI tutorial and asks "what
-  should I try next?", the action-tier recommendation is:
-  `aw workspace add-worktree --alias <name>` (NO role injection;
-  roles are now opt-in on fresh teams). If they want roles, they
-  create them via `aw roles` first. Depth-reading + dashboard
-  follow-up unchanged. Full prioritized runbook entry pending
-  docs audit completion + source-grep verification on each
-  action-command per #27.
+- **Discipline #26** (narrowly scoped) — when answering a peer's
+  question about shipped state in a support context, sibling-repo
+  local-checkout can be stale. Before grep-attesting whether a
+  doc / file / route exists in `ac` or `aweb`, run
+  `git -C <repo> fetch && git ls-tree -r origin/main` on the
+  sibling repo. Originating moment: I told Athena
+  `ConsumerClientPickerPage.tsx` didn't exist in `ac/frontend`
+  when it did — my local checkout was stale (2026-05-15). This
+  applies to in-support-response state-attestation; it is NOT a
+  license to walk sibling repos beyond what a specific support
+  question needs.
+- **Discipline #27** (narrowly scoped) — before recommending any
+  role-bearing or behavior-altering CLI command IN A SUPPORT
+  RESPONSE, source-grep `aweb/cli/go/cmd/aw/` to verify the
+  current shape. Local-binary `aw --help` may be pre-wave.
+  Originating moment: my "what next" guidance to
+  `gracetut194441.aweb.ai/alice` recommended
+  `aw workspace add-worktree developer` (pre-1.22.0 role-injection
+  shape) post the aweb 1.22.0 / AC v0.5.39 wave that made roles
+  optional. Grace caught it; Athena flagged it; corrective sent
+  (2026-05-16). **Lane note (2026-05-17 reorient per Athena
+  `6199af24`)**: #27 is for support-response command-shape
+  verification only. It is NOT a license to audit engineering
+  docs for command-shape drift across many files — that's
+  Athena / Mia's surface, where intra-team engineering context
+  (recent cleanups, in-flight refactors, deliberate naming
+  choices) is required to interpret what's "drift" vs "intended
+  state."
+- **"What next" support response** — full runbook entry landed
+  at commit `9537fe8` (2026-05-16) under a new "Customer
+  Orientation Responses" section in `docs/support/runbook.md`.
+  Three-bucket template (action / depth-reading / dashboard-link)
+  + invitation-to-share-goal close. Action-tier recommendation
+  is `aw workspace add-worktree --alias <name>` (NO role
+  injection per #27). Source-grep verification trail at the
+  bottom of the entry; tied-to-invariants section anchors the
+  entry's correctness to docs-inventory currency + welcome-guide-v5
+  vocabulary canon. First template; future entries land as real
+  customer seed examples accumulate.
 
 ## Recent customer interactions (live evidence base)
 
