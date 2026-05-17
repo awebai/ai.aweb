@@ -557,6 +557,94 @@ here remain source-grep accurate; the welcome guide v5 in
 customer-facing tool vocabulary. If any of those invariants
 breaks, this entry needs re-verification.
 
+## Customer-Content Cross-Check Methodology
+
+When asked to cross-check customer-facing content surfaces (e.g.,
+skills vs this runbook, this runbook vs `/docs/*`, two
+overlapping runbook entries), apply this methodology. Derived from
+the Item 1 skills-vs-runbook cross-check (2026-05-17, Athena
+relayed from Olivia + Dave); banked here per Athena's discipline-
+credit framing in mail `e91e264f`.
+
+### Read all the files first
+
+Read each surface fully before drafting findings. Skim-then-claim
+produces wrong-premise findings (the kind that fire on docs
+already aligned with a recent cleanup the cross-checker didn't
+know about).
+
+### Build a surface-map table
+
+For each policy or decision that appears on multiple surfaces,
+name which surface is canonical. Use the table structure:
+
+| Overlap | Canonical surface | Why |
+
+That's the artifact the cross-check should produce. Future
+authors reading the table know where to put new content of each
+shape.
+
+### Restating-enough-to-drift threshold
+
+When one surface points at another canonical surface, the pointer
+may carry a contextual anchor (one-line domain-specific reminder)
+without becoming a restatement. The threshold: does the pointer
+**direct attention** or **enumerate the policy**? Direct-attention
+form: "in coordination contexts, default to mail; chat only when
+a teammate is blocked." Enumerate-policy form: re-listing the full
+mail-use-case bullets. The first is below the drift threshold; the
+second isn't.
+
+When in doubt, lean toward direct-attention. The canonical surface
+is one click away; the pointer surface shouldn't try to be
+self-sufficient.
+
+### Parallel-correct surfaces exception
+
+Don't force canonical-per-overlap dogmatically. Two surfaces that
+independently apply the same root claim — in different contexts,
+without cross-surface dependency — are sometimes the cleaner
+shape than forcing one canonical and creating a dependency that
+adds little value.
+
+Example: F16 roles-are-opt-in framing lives canonically in
+`aweb/docs/agent-guide.md` (the root claim). The aweb-coordination
+skill applies it as "if the role bundle is empty, continue using
+normal task and messaging discipline." This runbook applies it as
+"DO NOT recommend `aw workspace add-worktree developer` without
+verification." Both correct, no cross-surface dependency. Banking
+them as parallel-correct rather than forcing one canonical is
+right.
+
+### Customer-bridge verification step
+
+After any change to a canonical surface, verify that the
+customer-bridge paths in this runbook still route correctly.
+Specifically: do the depth-reading URLs in any
+"Customer Orientation Responses" entry still hit content equivalent
+to the canonical-after-change?
+
+If the bridge stays intact, no runbook edit needed. If the bridge
+breaks (e.g., a canonical doc renamed; a policy moved to a
+different surface; a customer-facing URL retired), the runbook
+entry's depth-reading bucket needs updating.
+
+The customer-bridge step is what makes cross-check work
+support-shaped rather than purely-engineering-shaped. The
+question isn't "is the policy still correct somewhere" but "does
+the customer still find the policy via the path I told them about."
+
+### Scope-shape for where the cross-check artifact lives
+
+This runbook is the right host for **customer-orientation
+response templates** and **the cross-check methodology used to
+keep them coherent**. It is NOT the right host for
+**cross-surface authoring-discipline artifacts** like
+`skills/POLICY-SOURCES.md` (banked separately in the OSS skills
+tree per Athena 2026-05-17). Rule of thumb: if the artifact
+serves customer-orientation, it lives here; if it serves
+skill-authors or doc-authors, it lives at their surface.
+
 ## Escalation Packet
 
 When asking Engineering, include:
