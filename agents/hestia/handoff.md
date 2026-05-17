@@ -1,5 +1,41 @@
 # Hestia Handoff
 
+Last updated: 2026-05-17 10:50 CEST (08:50 UTC) — **Site deploy #24
+VERIFIED LIVE**: Wave 1 docs at 53a95476 live on aweb.ai.
+/docs/agent-guide/ flipped from March-8 orphan to today's build
+via Hugo file-overwrite (Athena's hypothesis confirmed: pages with
+NEW source overwrite stale Render artifacts via normal file-upload;
+cache-clear only needed for no-source orphans). New template with
+kicker "Agent reference", H1 "aweb Agent Guide", Mia's rewrite of
+identity/addressing/team/messaging content for 1.22.x. /docs/ landing
+got Iris's voice-pass with Primitives + Integrations subsections.
+Hugo built 44 pages. Two true no-source orphans persist
+(/docs/consumer-onboarding/ + /agent-guide.md root) with May 13
+last-modified — these need Juan's Render dashboard cache-clear when
+he gets to it. F25 dead-link sweep in aweb/docs gated on root
+/agent-guide.md 404. render.yaml IaC deferred to Wave 3.
+
+## Operational learning from this cycle
+
+**File-overwrite vs. artifact preservation are distinct mechanisms.**
+For orphan-purge on Render static sites:
+- Orphan with NEW Hugo source: Hugo build → file-overwrite at upload
+  retires it automatically. No cache-clear needed.
+- Orphan with NO source: stays as preserved artifact across deploys;
+  needs Render "Clear build cache & deploy" dashboard action.
+Diagnosis: curl the URL pre-deploy. If a new source IS being added
+in the deploy, expect today's last-modified post-deploy. If no
+source ever (or only being deleted), the page persists unchanged
+unless cache-clear runs.
+
+I initially gated the Wave 1 deploy on Juan's dashboard probe (good
+caution, correct sequencing for a no-source orphan). Athena corrected
+the framing for agent-guide specifically — it had a new source in the
+Wave 1 bundle. Deploying immediately surfaced the file-overwrite
+behavior cleanly. The cache-clear gate stays valid for the remaining
+no-source orphans.
+
+Earlier:
 Last updated: 2026-05-17 (post-resume) — **Site deploy #23
 VERIFIED LIVE**: docs header overhaul at 5a9ac11f live on aweb.ai.
 /docs/cli-tutorial + /docs/mcp-tutorial now render Anthropic-style

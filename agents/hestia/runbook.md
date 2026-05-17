@@ -810,6 +810,32 @@ See step 7 above. Banked from aweb 1.18.0 ghost-tag.
 See step 9c. Banked symptom: HTTP 401 timestamp errors on signed
 requests after laptop sleep. Restart the stack.
 
+### Render static-site: file-overwrite vs. artifact preservation
+
+**[banked from Wave 1 docs cycle 2026-05-17]**
+
+When a previously-served URL on the Render static site is changing
+shape, distinguish two mechanisms:
+
+- **Orphan with NEW Hugo source**: the next `make deploy-site`
+  generates the page → upload overwrites the stale artifact via
+  normal file-upload semantics. Today's `last-modified` shows up
+  post-deploy. No dashboard intervention needed.
+
+- **Orphan with NO source (path being retired)**: the page is never
+  regenerated, so Render keeps serving the preserved artifact across
+  deploys. Stuck `last-modified` from whichever earlier deploy last
+  built it. Needs Render dashboard "Clear build cache & deploy" to
+  retire.
+
+Diagnosis path: `curl -sI` the URL, note `last-modified`. After the
+next deploy, re-curl: if `last-modified` flipped to today, file-overwrite
+worked. If unchanged, it's a no-source orphan needing cache-clear.
+
+Don't gate replacement deploys on a dashboard probe — they don't
+need it. Do gate retirement-only deploys on the probe if no-source
+orphans are the issue.
+
 ### Gate failure in compat — script gaps masquerade as CLI bugs
 
 **[banked from v0.5.18 first-exercise gate failure 2026-05-02]**

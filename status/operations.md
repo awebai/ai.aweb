@@ -1,5 +1,22 @@
 # Operations Status
 
+Last updated: 2026-05-17 10:50 CEST (08:50 UTC) — **Site deploy #24
+VERIFIED LIVE**: Wave 1 docs (agent-guide promotion + /docs/ landing
+rewrite) live at 53a95476. /docs/agent-guide/ flipped from March-8
+orphan to today's fresh build (kicker "Agent reference", H1 "aweb
+Agent Guide", new docs-page-header template, Mia's rewrite covering
+1.22.x identity/addressing/team/messaging). /docs/ landing: Iris's
+voice-pass with Primitives + Integrations subsections. Hugo built
+44 pages. Athena's file-overwrite hypothesis confirmed empirically:
+pages with NEW source overwrite stale Render artifacts via normal
+upload; no cache-clear needed for replacements. Two true no-source
+orphans persist (/docs/consumer-onboarding/, /agent-guide.md root)
+with May 13 last-modified — these legitimately need Juan's Render
+dashboard "Clear build cache & deploy" when he gets to it. F25
+dead-link sweep in aweb/docs gated on root /agent-guide.md 404.
+render.yaml IaC deferred to Wave 3.
+
+Previous lead:
 Last updated: 2026-05-16 11:35 CEST (09:35 UTC) — **Site deploy #23
 VERIFIED LIVE**: docs header overhaul live on aweb.ai at 5a9ac11f.
 /docs/cli-tutorial + /docs/mcp-tutorial now carry Anthropic-style
