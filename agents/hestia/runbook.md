@@ -836,6 +836,39 @@ Don't gate replacement deploys on a dashboard probe — they don't
 need it. Do gate retirement-only deploys on the probe if no-source
 orphans are the issue.
 
+### P0 fast-track release — re-verify package shape against current main
+
+**[banked from aaox.16 cycle 2026-05-17]**
+
+P0 fast-track plans assume the package's `package.json` on main is
+stable. Re-verify against current main shape BEFORE committing to an
+independent-release path.
+
+Failure mode: a merge between the P0-filing and the release execution
+can layer new dependencies (especially `file:` deps from in-progress
+repo restructures) that turn a one-line atomic fix into a
+broken-package publish. Premise drift.
+
+The aaox.16 instance: claude-channel 1.4.1 was scoped as "add license
+field, ship as 1.4.1 patch, decoupled from the larger channel-core
+split work." Between the P0 filing and execution time, a merge of the
+pi-extension work landed on main and added
+`"@awebai/channel-core": "file:../channel-core"` to channel/package.json.
+Publishing 1.4.1 from main would have pushed a package whose npm
+install fails for every consumer (file: deps don't resolve from a
+registry). The "pure one-line fix" framing didn't survive contact
+with the layered merge.
+
+Discipline:
+- Before tag-push on any independent-release path, `git diff <prior-release-tag>..origin/main -- <package-dir>` and read the actual current state.
+- If a dep changed shape (especially toward `file:` or `link:`),
+  surface to coordinator BEFORE pushing; the fast-track premise
+  has broken.
+- The right resolution is often "fold into the next planned release"
+  rather than "tag at a pre-merge SHA" — non-linear tags create
+  customer-history confusion that outweighs the few-hours-faster
+  benefit.
+
 ### Gate failure in compat — script gaps masquerade as CLI bugs
 
 **[banked from v0.5.18 first-exercise gate failure 2026-05-02]**
