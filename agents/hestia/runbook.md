@@ -836,6 +836,44 @@ Don't gate replacement deploys on a dashboard probe — they don't
 need it. Do gate retirement-only deploys on the probe if no-source
 orphans are the issue.
 
+### Gate-harness must exercise the code under test
+
+**[banked from Grace's federation re-validation cycle 2026-05-17]**
+
+When validation signals come from CI gates, sanity-check that the gate
+actually exercises the code under test. A gate that "passes" by
+exercising a stale dependency is worse than a failing gate — it's
+false-signal disguised as evidence.
+
+The federation 1.23.0 instance: AC Docker user-journey-via-AC e2e gate
+copies sibling aweb sources into the image, BUT `uv sync` then installs
+PyPI `aweb==1.22.0` from uv.lock. The gate signal "Docker e2e green
+on federation work" was testing the prior PyPI release, not the
+1.23.0 main code. Multiple cycles of federation validation produced
+false-positive evidence before Grace caught it.
+
+Pattern recognition: anywhere a CI gate path runs through
+`Docker build → uv sync from lockfile → run tests`, the install-time
+resolution may pull a pinned-PyPI version that drowns out the
+sibling-copied current source. Same shape applies to npm `package.json`
+with stale lockfile, or any package manager that prefers cached/locked
+resolution over local source.
+
+Discipline:
+- For each release where the gate signal informs a tag-push decision,
+  re-verify the gate is exercising the code being shipped, not a
+  transitive prior version. Common check: log the package version
+  the test runtime resolves, compare to the version being released.
+- When you spot a transitive-evidence pattern (see also #144
+  "transitive-evidence-for-source-only-behavior-changes" banking),
+  the validation needs an explicit linkage check between the artifact
+  under test and the artifact being released.
+- This is Athena's code surface to fix (Dockerfile / Makefile / uv
+  sync behavior), but the operational call — "is this gate signal
+  load-bearing for tag-push?" — is mine to make. If a gate is
+  load-bearing AND its signal-vs-artifact linkage is in doubt, halt
+  the release and surface the doubt to Athena rather than tag.
+
 ### P0 fast-track release — re-verify package shape against current main
 
 **[banked from aaox.16 cycle 2026-05-17]**
