@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-18 15:55 GMT
+Last updated: 2026-05-18 16:15 GMT
 
 ## Read this first
 
@@ -50,10 +50,16 @@ release mechanics; to them, Athena is the gate.
   package as Proprietary until this closes.
 - **BLOCKED: AC hosted MCP OAuth selected-org regression fix is not
   production-ready.** Dave reported Grace had a fix summary, but Juan
-  said the solution is likely incomplete. Athena must NOT bless or
-  forward to Hestia until branch/commits are available, Mia reviews,
-  Athena reviews, and the incomplete-solution concern is explicitly
-  resolved.
+  said the solution is likely incomplete. Mia read the patch and routed
+  Q1/Q2 design calls. Athena decided: generic MCP OAuth may create a
+  new agent in a non-personal team without dashboard pre-handoff only
+  after explicit org-first/team-second UI selection and server-side
+  creation-authority revalidation; targeted dashboard handoff remains
+  strict; invalid/stale/inaccessible/already-bound targeted handoff
+  must fail closed and clear the bad cookie, never silently degrade to
+  generic/personal flow. Athena must NOT bless or forward to Hestia
+  until Grace surfaces branch/commits, Q2 is fixed/tested, Mia reviews,
+  and Athena completes code review.
 
 ## Active dev-team work visible
 
@@ -63,36 +69,37 @@ release mechanics; to them, Athena is the gate.
   claim still visible.
 - Ready P0: `aweb-aaox.16` claude-channel license metadata correction.
 - AC hosted MCP OAuth selected-org bug: Grace reportedly fixing; no
-  branch/commits seen by Athena yet. Dave summary of symptom: dashboard
-  selected org/team aweb → Claude.ai remote MCP connect → name marvin;
-  consent showed personal `@juanre/marvin`; POST returned
-  `Hosted handle is not available for this account`; Claude showed
-  `code: Field required` because no OAuth code. Blocked from deploy.
+  branch/commits seen by Athena after repeated `git fetch --all --prune`.
+  Dave summary of symptom: dashboard selected org/team aweb → Claude.ai
+  remote MCP connect → name marvin; consent showed personal
+  `@juanre/marvin`; POST returned `Hosted handle is not available for
+  this account`; Claude showed `code: Field required` because no OAuth
+  code. Blocked from deploy.
 
 ## Local repo caveats
 
 - `aweb` symlink works; current recent commits include Pi polish:
   `48cee5e`, `9376702`, `23f2bd0`, `37c9bb1`, `1944e3d`.
-- `ac` symlink is broken on this machine (`../../../ac` absent). Do
-  not claim AC code work or promise AC test runs until the sibling repo
-  is restored.
-- No uncommitted changes were present before this handoff/status edit;
-  current local changes are `status/engineering.md` and this handoff.
+- `ac` symlink now resolves through `/Users/juanre/prj/awebai/ac` →
+  `aweb-cloud`; AC main is clean at 7b33fba9. Earlier broken-symlink
+  note is superseded.
+- Current local changes are `status/engineering.md` and this handoff.
 
 ## Things to check first next wake-up
 
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. Check for Grace branch/commits for the selected-org OAuth bug, but
-   keep it blocked unless Juan's incomplete-solution concern is resolved.
+3. Check for Grace branch/commits for the selected-org OAuth bug. Keep
+   it blocked until Q2 fail-closed targeted-handoff fix + tests land.
 4. Get/confirm Mia's review before any Athena bless.
-5. Check whether Dave closed or handed off `aweb-aaov.12`.
-6. Check whether Hestia closed `aweb-aaox.16` or needs engineering
+5. Loop Sofia for narrow claim-shape framing before any customer-facing
+   claim.
+6. Check whether Dave closed or handed off `aweb-aaov.12`.
+7. Check whether Hestia closed `aweb-aaox.16` or needs engineering
    review/tooling help for the channel publish failure.
-7. If any channel event wakes the session, inspect metadata and sender
+8. If any channel event wakes the session, inspect metadata and sender
    verification before acting; reply in the existing thread/session.
-8. Restore or locate the AC sibling repo before any AC review/test work.
 
 ## Old debt still not closed
 
@@ -100,7 +107,7 @@ release mechanics; to them, Athena is the gate.
   Sofia did not supersede it. Source remains
   `agents/athena/aale-trust-contract.md` + aweb commit `7759abc`.
 - Playwright-MCP reproducer for Add-Existing dialog remains old
-  non-feature backlog, blocked locally by missing AC checkout.
+  non-feature backlog.
 - Multi-team `agent_id` vs `did` comparison grep remains old audit
   debt unless a later task/comment closed it; don't assume closure from
   the 1.20.7 strict-walk fix alone.

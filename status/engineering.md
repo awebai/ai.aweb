@@ -1,14 +1,15 @@
 # Engineering Status
-Last updated: 2026-05-18 15:55 GMT
+Last updated: 2026-05-18 16:15 GMT
 
 ## Current focus
 
 0. **BLOCKED: AC hosted MCP OAuth selected-org fix is NOT production-ready.**
    Juan says the current solution is likely incomplete; Athena will not
    bless or forward to Hestia. Grace/Mia/Dave/Hestia have been notified.
-   Required before any bless: pushed AC branch/commits, Mia review,
-   Athena invariant review, and explicit resolution of the incomplete-
-   solution concern.
+   Required before any bless: Grace surfaces pushed AC branch/commits,
+   Q2 targeted-handoff fail-closed fix + tests, Mia review, Athena
+   invariant review, and explicit resolution of the incomplete-solution
+   concern.
 1. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
    and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
    reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
@@ -37,12 +38,14 @@ Last updated: 2026-05-18 15:55 GMT
 - **aweb-aalr.2 — AWID ensure-team endpoint + AC persist refactor**:
   Mia still has a stale claim from the older readiness epic.
 - **AC hosted MCP OAuth selected-org regression**: Grace reportedly has
-  a fix, but no branch/commit has reached Athena yet. Blocked from
-  production by Juan's incomplete-solution concern. Review focus:
-  dashboard selected-team handoff, server-side validation, forged /
-  inaccessible team rejection, selected-org new-agent POST, exact
-  Claude.ai remote MCP flow, and preservation of the personal consumer
-  path.
+  a fix, but no branch/commit has reached Athena yet after repeated
+  `git fetch --all --prune`. Blocked from production by Juan's
+  incomplete-solution concern. Athena design calls sent: generic `/mcp/`
+  may allow non-personal new-agent only after explicit org-first /
+  team-second UI selection + server-side creation-authority revalidation;
+  targeted dashboard handoff remains strict; invalid/stale/inaccessible /
+  already-bound targeted handoff must fail closed and clear the bad
+  cookie, never silently degrade to generic/personal flow.
 - **aweb-aaox.16 — claude-channel license metadata P0**: ready work;
   Hestia publish-owner per task, engineering available if the release
   workflow/tooling fix needs code review.
@@ -70,8 +73,9 @@ Last updated: 2026-05-18 15:55 GMT
   unless Sofia has superseded it. Source:
   `agents/athena/aale-trust-contract.md` + aweb commit `7759abc`.
 - **Playwright-MCP reproducer for Add-Existing dialog** remains old
-  non-feature backlog; local `ac` symlink is currently broken on this
-  checkout, so AC work needs repo availability restored first.
+  non-feature backlog. AC checkout is available at
+  `/Users/juanre/prj/awebai/ac` (symlink to aweb-cloud), main clean at
+  7b33fba9 as of 16:15 GMT.
 
 ## Risks
 
@@ -89,6 +93,11 @@ Last updated: 2026-05-18 15:55 GMT
 
 ## Next checks
 
+- Selected-org OAuth P0: wait for Grace to push/surface branch/commits;
+  then review Q2 fail-closed stale-targeted-handoff fix + tests; wait for
+  Mia approval before Athena bless.
+- Sofia is drafting narrow claim-shape framing for this OAuth fix; loop
+  her in before any customer-facing claim.
 - Watch `aweb-aaov.12` for Dave's close/handoff and `aweb-aaox.16` for
   Hestia's publish result.
 - If asked to act on Pi release, review the current aweb diff/commits
