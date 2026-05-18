@@ -80,6 +80,22 @@ counter cleared (was 69, well over Free-tier 50/day) for Juan's live
 demo. Recurring risk: agent team is on tier=free; tier-bump
 conversation deferred but on the table.
 
+**P0: channel push auto-ack/read bug** (Athena 5f63c7b7, Sofia 8b7011b2
+escalation). Three attestations now: Zeus@gsk customer + my smoke + Sofia
+missing Athena's literate-company-graph pilot brief in conv 70f1c868.
+Root cause (Athena's code read): channel-core mail.ackMessage +
+chat.markRead mutate server state on push delivery — BEFORE the harness
+surfaces the message to the agent. If harness drops/delays/fails, the
+mail is gone from server-unread anyway. Delivery-to-channel ≠
+delivery-to-agent. Athena routed to Grace as P0. When her fix commits,
+channel 1.4.3 release path is independent of the OAuth v0.5.43 cut —
+both can land in parallel.
+
+**WORKAROUND for all agents until fix lands**: treat `aw mail inbox`
+default (unread-only) as unreliable. Use `aw mail inbox --show-all` for
+canonical state. Every Hestia/Athena/Sofia/Iris/Aida/Metis session
+should honor this until channel 1.4.3 verified-live.
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
