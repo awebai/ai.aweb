@@ -1,13 +1,14 @@
 # Engineering Status
-Last updated: 2026-05-18 17:40 GMT
+Last updated: 2026-05-18 18:05 GMT
 
 ## Current focus
 
-0. **MCP OAuth selected-org/reconnect fix blessed to Hestia.** Grace
-   landed AC `cb223c34` and aweb `03fe4bf`; Mia approved; Athena
-   reviewed and sent Hestia a bless-and-run. The earlier production block
-   is lifted only for this reviewed release set; Hestia still owns gate,
-   deploy, and live verification.
+0. **MCP OAuth/reconnect release lane is still with Hestia.** Initial
+   bless was AC `cb223c34` + aweb `03fe4bf`. Gate then found stale AC
+   alias test; Mia/Grace patched it (`bc2e48dd` / `5b44f724`). Grace also
+   fixed the Hestia↔Athena duplicate-chat 409 in aweb `99cc2cb`. Athena
+   approved the added fixes and recommended aweb `1.24.1` + AC `v0.5.43`
+   repin because `99cc2cb` is after the already-published `1.24.0` tag.
 1. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
    and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
    reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
@@ -35,11 +36,11 @@ Last updated: 2026-05-18 17:40 GMT
   remains visible.
 - **aweb-aalr.2 — AWID ensure-team endpoint + AC persist refactor**:
   Mia still has a stale claim from the older readiness epic.
-- **MCP OAuth selected-org/reconnect fix**: Grace pushed AC `cb223c34`
-  and aweb `03fe4bf`; Mia signed off; Athena approved and sent Hestia
-  bless-and-run. Fixes targeted dashboard handoff fail-closed behavior,
-  generic org-first/team-second selection, connected-identity reconnect
-  UX, and additive legacy MCP tool aliases for cached clients.
+- **MCP OAuth selected-org/reconnect fix**: base reviewed set is AC
+  `cb223c34` + aweb `03fe4bf`. Follow-ups: AC `5b44f724` aligns stale
+  hosted MCP alias gate test; aweb `99cc2cb` makes duplicate 1:1 chat
+  routing continue newest instead of 409. Athena approved both follow-ups
+  for Hestia gate input.
 - **aweb-aaox.16 — claude-channel license metadata P0**: ready work;
   Hestia publish-owner per task, engineering available if the release
   workflow/tooling fix needs code review.
@@ -53,9 +54,11 @@ Last updated: 2026-05-18 17:40 GMT
 
 ## Release-ready state (handoff to Hestia)
 
-- **Bless-and-run sent to Hestia** for AC `cb223c34` + aweb `03fe4bf`.
-  Hestia should deploy only this reviewed release set and live-verify
-  before any customer-facing claim.
+- **Bless-and-run expanded to include follow-ups**: AC `5b44f724` and
+  aweb `99cc2cb` are approved for gate input. Since `server-v1.24.0` /
+  `aw-v1.24.0` were tagged at `f443abc` and do not include `99cc2cb`,
+  Athena recommended aweb `1.24.1` then AC `v0.5.43` repinned to that
+  patch release before tag/deploy.
 - Latest verified-live chain per Operations: awid-service-v0.5.6,
   awid-v0.5.6, aweb 1.23.0, AC v0.5.42.
 - Pi package release path appears to be in the aaov/aaox release lane;
@@ -69,7 +72,7 @@ Last updated: 2026-05-18 17:40 GMT
 - **Playwright-MCP reproducer for Add-Existing dialog** remains old
   non-feature backlog. AC checkout is available at
   `/Users/juanre/prj/awebai/ac` (symlink to aweb-cloud), main is at
-  `cb223c34` as of 17:40 GMT.
+  `5b44f724` as of 18:05 GMT.
 
 ## Risks
 
@@ -89,8 +92,9 @@ Last updated: 2026-05-18 17:40 GMT
 
 ## Next checks
 
-- Watch Hestia gate/deploy/live-verify for AC `cb223c34` + aweb
-  `03fe4bf`; assist if a gate fails.
+- Watch Hestia's revised gate/deploy/live-verify. Expected release shape
+  if she accepts Athena recommendation: aweb `1.24.1` containing
+  `99cc2cb`, then AC `v0.5.43` with aweb pin updated beyond `5b44f724`.
 - Sofia has been notified of narrow claim shape; loop her in before any
   customer-facing claim.
 - Watch `aweb-aaov.12` for Dave's close/handoff and `aweb-aaox.16` for

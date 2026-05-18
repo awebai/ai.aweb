@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-18 17:40 GMT
+Last updated: 2026-05-18 18:05 GMT
 
 ## Read this first
 
@@ -48,13 +48,15 @@ release mechanics; to them, Athena is the gate.
   channel-v1.4.1 tag exists but npm publish failed because GHA didn't
   install channel-core deps before building; npm may still show the
   package as Proprietary until this closes.
-- **MCP OAuth selected-org/reconnect fix blessed to Hestia.** Grace
-  landed AC `cb223c34` and aweb `03fe4bf`; Mia approved; Athena
-  invariant-reviewed and sent Hestia a bless-and-run. The earlier block is
-  lifted only for this reviewed release set. Hestia owns gate/deploy/live
-  verification before any customer-facing claim. Non-blocking follow-up:
-  `targeted_handoff_error.reason` remains coarse (`stale`) across failure
-  modes, which limits telemetry but is not a ship blocker.
+- **MCP OAuth/reconnect release lane is still with Hestia.** Initial
+  bless was AC `cb223c34` + aweb `03fe4bf`. Gate found stale AC alias
+  test; Mia/Grace patched it (`bc2e48dd` / `5b44f724`). Grace also fixed
+  the Hestia↔Athena duplicate-chat 409 in aweb `99cc2cb`. Athena
+  approved the added fixes and recommended aweb `1.24.1` + AC `v0.5.43`
+  repin because `99cc2cb` is after the already-published `1.24.0` tag.
+  Hestia owns gate/deploy/live verification before any customer-facing
+  claim. Non-blocking follow-up: `targeted_handoff_error.reason` remains
+  coarse (`stale`) across failure modes.
 
 ## Active dev-team work visible
 
@@ -63,28 +65,27 @@ release mechanics; to them, Athena is the gate.
 - Mia: `aweb-aalr.2` stale/old AWID ensure-team + AC persist refactor
   claim still visible.
 - Ready P0: `aweb-aaox.16` claude-channel license metadata correction.
-- MCP OAuth selected-org/reconnect fix: Grace pushed AC `cb223c34` and
-  aweb `03fe4bf`. Local Athena validation: AC backend focused OAuth/MCP
-  tests 91 passed; AC py_compile touched files pass; AC black --check
-  touched backend files/tests pass; AC frontend vitest run 193 passed
-  (known jsdom scrollTo stderr); AC frontend `tsc --noEmit` pass; AC diff
-  check clean; aweb `test_mcp_contacts_consumer.py` 17 passed in detached
-  worktree; aweb diff check clean. Dave summary of original symptom:
-  dashboard selected org/team aweb → Claude.ai remote MCP connect → name
-  marvin; consent showed personal `@juanre/marvin`; POST returned
-  `Hosted handle is not available for this account`; Claude showed
-  `code: Field required` because no OAuth code.
+- MCP OAuth selected-org/reconnect fix: base reviewed set was AC
+  `cb223c34` + aweb `03fe4bf`. Follow-up validation by Athena: AC
+  `5b44f724` hosted MCP invite test 4 passed, black check pass,
+  diff-check clean; aweb `99cc2cb` conversations + MCP contacts tests 34
+  passed in detached worktree, py_compile touched files pass, diff-check
+  clean. Dave summary of original OAuth symptom: dashboard selected
+  org/team aweb → Claude.ai remote MCP connect → name marvin; consent
+  showed personal `@juanre/marvin`; POST returned `Hosted handle is not
+  available for this account`; Claude showed `code: Field required`
+  because no OAuth code.
 
 ## Local repo caveats
 
 - `aweb` symlink works; current recent commits include Pi polish:
   `48cee5e`, `9376702`, `23f2bd0`, `37c9bb1`, `1944e3d`.
 - `ac` symlink now resolves through `/Users/juanre/prj/awebai/ac` →
-  `aweb-cloud`; AC main is at `cb223c34`. Earlier broken-symlink note is
+  `aweb-cloud`; AC main is at `5b44f724`. Earlier broken-symlink note is
   superseded.
 - Local `aweb` checkout is still on Dave's Pi branch, not origin/main;
-  Athena reviewed aweb `03fe4bf` in a detached temp worktree and removed
-  it afterwards.
+  Athena reviewed aweb `03fe4bf` and `99cc2cb` in detached temp worktrees
+  and removed them afterwards.
 - Current local changes are `status/engineering.md` and this handoff.
 
 ## Things to check first next wake-up
@@ -92,8 +93,9 @@ release mechanics; to them, Athena is the gate.
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. Watch Hestia gate/deploy/live-verify for AC `cb223c34` + aweb
-   `03fe4bf`; assist if a gate fails.
+3. Watch Hestia's revised gate/deploy/live-verify. Expected release
+   shape if she accepts Athena recommendation: aweb `1.24.1` containing
+   `99cc2cb`, then AC `v0.5.43` with aweb pin updated beyond `5b44f724`.
 4. Loop Sofia for narrow claim-shape framing before any customer-facing
    claim. Precise claim: dashboard-targeted existing hosted identity
    preserves selected org/team; generic `/mcp/` uses explicit org-first /
