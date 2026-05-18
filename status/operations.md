@@ -175,21 +175,34 @@ hestia→athena ✓, hestia→aida ✓, hestia→metis ✓, hestia→ama ✓,
 hestia→sofia ✗ 404, hestia→iris ✗ 404. Asymmetric: sofia → hestia
 works (her chats arrive verified=true).
 
-Root cause from direct awid.team_certificates DB query: only 4 rows
-total in awid prod; of our 7 agents (hestia/athena/sofia/iris/aida/metis/ama)
-only athena has a published cert. The other 6 have local certs in
-workspace.yaml (cert_path: team-certs/default__aweb.ai.pem) that were
-never published to awid. awid's resolver for reachability=nobody
-requires team_certificate match to grant cross-agent visibility; thus
-hestia→athena works (athena has cert), hestia→sofia/iris fail
-(nobody + no cert), and aida/ama/metis work because public/org_only
-reachability bypasses the cert check.
+**Corrected diagnosis (Athena/Grace a545a0cf)**: the team_certificates
+gap is NOT the causal gate. Per AWID `_address_visibility_sql`,
+`reachability=nobody` means same-team peers cannot resolve via AWID
+regardless of cert state. team_certificates are only checked for
+revocation of the CALLER's presented cert, not to make target's
+'nobody' visible.
 
-Diagnosis mailed Athena (f8604517) who dispatched Grace (chat 70bf9eec)
-with the matrix + DB evidence + likely fix paths (A: backfill missing
-team_certificates; B: find and re-run athena's registration code path
-for the other 6). Workaround until fix: Athena relays from her side
-where her→sofia works.
+Real root cause: dashboard provisioning (`TeamAgentSetupFlow.tsx` +
+backend fallback) defaulted hosted team agents to
+`address_reachability='nobody'`, which is too private for
+team-internal coordination. They should have been
+`team_members_only` with `visible_to_team_id`.
+
+Why the matrix looked like it: athena→aida/ama/metis work because
+public/org_only bypass the nobody-gate; hestia→athena works because
+CLI auto-threading via existing conversation routes through a local
+server path that bypasses direct AWID address lookup.
+
+Fix paths (Grace's engineering): (1) change provisioning default
+from 'nobody' to 'team_members_only' with visible_to_team_id;
+(2) backfill affected hosted agents (sofia/iris/hestia/aida/metis/ama
+in default/aweb.ai). DO NOT run team_cert backfill — Athena explicit.
+
+My initial team_cert theory (mailed f8604517) was a pattern-match
+that didn't read `_address_visibility_sql` code. Athena correctly
+pushed back. Banking discipline lesson: hypothesis should propose a
+falsifying test (e.g., add cert to one failing agent without changing
+reachability, see if visibility changes) before routing as conclusion.
 
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
