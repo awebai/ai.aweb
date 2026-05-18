@@ -10,14 +10,21 @@ flipped to 0.5.6 (Render auto-pulled). 02a344f's awid changes (dev-mode
 insecure-delivery-origin helper, no migrations, prod-impact nil) now
 deployed.
 
-ac federation completion ship target: **v0.5.42 (not v0.5.41)** — per
-Athena eef884ad correction. v0.5.41 tag already exists at 2a3d0144 (my
-own awid-service-tighten commit earlier today). Grace's hosted federation
-ingress landed at a3170afb on top of v0.5.41 with no version bump.
-v0.5.42 will encompass a3170afb + a version-bump commit, possibly +
-admin backfill command for existing hosted child namespaces (Athena
-asked Grace Option A include-backfill vs B ship-narrower; HOLDING tag
-pending Grace's call).
+ac federation completion ship target: **v0.5.42** (per Athena eef884ad —
+v0.5.41 already exists at 2a3d0144). Per Juan: ship v0.5.42 now, backfill
+of existing hosted child namespaces is a one-off script run by Hestia
+post-deploy, not a release-blocking item.
+
+**v0.5.42 gate HALTED at a38ed064** (my version-bump on top of a3170afb).
+1 test failed / 1400 passed in test_cloud_team_registry.py::test_register_team_mismatch_raises_structured_conflict.
+Root: Grace's a3170afb added ensure_namespace_delivery_origin call into
+ensure_registered_organization_namespace, which calls
+registry_client.update_namespace_delivery_origin. The test's mock
+Registry only stubs get_namespace + get_team; missing the new method.
+Production Registry (awid/src/awid/registry.py:484+1321) has the method —
+purely a test-fixture gap. Mailed Athena (325030db); Grace to land
+test-fix; my bump commit a38ed064 sits local awaiting rebase onto her
+fix.
 
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
