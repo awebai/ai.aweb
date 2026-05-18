@@ -1,15 +1,120 @@
 # Operations Status
 
-Last updated: 2026-05-14 00:35 CEST (22:35 UTC 2026-05-13) — **AC v0.5.31
-backend verified-live + P0 prod-data backfill complete + Pain-narrative
-site live on aweb.ai**. Juan retested ChatGPT-connect on tsm post-backfill
-and reports "this has worked." Site production deploy
-(`make deploy-site` 46a0e526..21cb6c23) landed at 22:28Z carrying
-Peter's pain-narrative rewrite + Eugenie's iteration. Hero copy
-"You're still doing the work your AI should be doing" + all assets
-200. **v0.5.30 halted at tag-push** (tag at 8c3d9dc1, no GHCR image,
-no deploy). Sofia's release-notes-reframing decision closed (decisions
-6eb1571, Option 3 transparency).
+Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0
+wave VERIFIED LIVE end-to-end**. aweb 1.23.0 on PyPI + npm + `aw
+upgrade` clean (server-v1.23.0 + aw-v1.23.0 individually tagged at
+eb779c3). ac v0.5.41 live at app.aweb.ai (release_tag=v0.5.41,
+aweb_version=1.23.0, awid_service_version=0.5.5, git_sha=2a3d0144).
+awid 0.5.5 live at api.awid.ai (Docker GHCR + awid-service@0.5.5 on
+PyPI). Coordinated three-deploy chain: aweb 1.23.0 → ac v0.5.40 (Mia
+test-fix at 3853e09d resolved 4-test gate fail) → awid 0.5.5 → ac
+v0.5.41 (awid-service dep bump 0.5.4→0.5.5, constraint tightened to
+>=0.5.5 per Grace via Athena).
+
+Critical migration gap surfaced + fixed: deployed ac v0.5.40 had
+federation code but Render startup didn't apply the 003/004/005
+federation mirror migrations to ac aweb schema (Task #109 latent).
+Mail-send was 500-ing post-deploy. Applied via ac's own
+database_infra.initialize() against .env.production; mirror migrations
+landed; mail-send confirmed working. awid 002_namespace_delivery_origin
+likewise needed manual `make awid-prod-migrate`.
+
+Channel 1.4.1 release-tooling gap surfaced: GHA Channel Release fails
+because channel-core/node_modules empty on GHA (no npm install in
+channel-core/ before channel build). Tooling fix landed at aweb 7776312
+(Athena). channel-v1.4.1 tag exists on origin but no npm publish;
+license still "Proprietary" on registry. Re-fire when bandwidth allows
+— Athena said either re-run same tag GHA or rev to 1.4.2.
+
+Previous lead:
+Last updated: 2026-05-17 10:50 CEST (08:50 UTC) — **Site deploy #24
+VERIFIED LIVE**: Wave 1 docs (agent-guide promotion + /docs/ landing
+rewrite) live at 53a95476. /docs/agent-guide/ flipped from March-8
+orphan to today's fresh build (kicker "Agent reference", H1 "aweb
+Agent Guide", new docs-page-header template, Mia's rewrite covering
+1.22.x identity/addressing/team/messaging). /docs/ landing: Iris's
+voice-pass with Primitives + Integrations subsections. Hugo built
+44 pages. Athena's file-overwrite hypothesis confirmed empirically:
+pages with NEW source overwrite stale Render artifacts via normal
+upload; no cache-clear needed for replacements. Two true no-source
+orphans persist (/docs/consumer-onboarding/, /agent-guide.md root)
+with May 13 last-modified — these legitimately need Juan's Render
+dashboard "Clear build cache & deploy" when he gets to it. F25
+dead-link sweep in aweb/docs gated on root /agent-guide.md 404.
+render.yaml IaC deferred to Wave 3.
+
+Previous lead:
+Last updated: 2026-05-16 11:35 CEST (09:35 UTC) — **Site deploy #23
+VERIFIED LIVE**: docs header overhaul live on aweb.ai at 5a9ac11f.
+/docs/cli-tutorial + /docs/mcp-tutorial now carry Anthropic-style
+header (kicker "Agent tutorial" → H1 → description), pill Copy-page
+menu with Copy page + View as Markdown (Open-in-Claude dropped per
+Juan), tutorial titles "aweb CLI Tutorial for agents" / "aweb MCP
+Tutorial for agents", body H1 dedup across tutorials and agent-guide.
+Legacy /teams.md / /agent-guide.md / /introduction.md root paths
+removed (404 on legacy URLs). Mailed Athena verified-live evidence.
+Open Render/migration follow-ups (#109, #110) unchanged.
+
+Previous lead:
+Last updated: 2026-05-16 10:15 CEST (08:15 UTC) — **1.21.2
+coordinated cut VERIFIED LIVE end-to-end**. AC v0.5.37 at
+`app.aweb.ai/health` (sha=4ad0e1df) — backend half: empty-bundle
+bootstrap + role_name Optional, gates green after 2 sweep-miss
+halts (test_two_service_e2e + e2e-cloud-user-journey.sh). aweb
+1.21.2 on PyPI + all 6 npm packages + `aw upgrade` 1.21.1→1.21.2
+clean — CLI half: ephemeral default for hosted-persistent, alice
+canonical alias on Enter, server bootstrap empty bundle (aligned
+with ac/embedded). Grace's introduction.md + teams.md rewrites
++ Codex Step 9 correction live via Makefile docs sync. End-to-end
+introduction.md flow now serves the designed shape.
+
+Render image-watcher lag observation: GHA build completed
+07:01:31Z; /health flipped 07:58:51Z = ~13h delay until Juan
+manual trigger. Task #109 root-cause still open.
+
+Previous lead:
+Last updated: 2026-05-15 23:25 CEST (21:25 UTC) — **aweb 1.21.1
+VERIFIED LIVE end-to-end**. PyPI (`aweb==1.21.1`) + npm (all 6
+platform packages flipped) + `aw upgrade` 1.21.0 → 1.21.1 clean +
+218-test e2e green (up from 185 — Phase 15 Roles now reachable
+plus Phases 16-22 which were never reached before). Ships Mia's
+onboarding rework (2ad4fdb): server-side default-zero-roles
+bootstrap + CLI hosted-persistent no-prompt + alice canonical
+default alias, plus Athena's roles.go fix at 9035252 (`aw roles
+show` handles empty bundle without 400). Release tags
+server-v1.21.1 + aw-v1.21.1 pushed individually per #7. ac
+introduction.md sync (5ae400be) still pending site deploy —
+independent of this aweb tag.
+
+**Gate-failure halt + recovery this cycle**: First attempt at
+452c755 aborted mid-Phase-15 of `scripts/e2e-oss-user-journey.sh`
+(`aw roles show` hit server 400 on empty bundle due to CLI default
+of role_name="developer" + only_selected=true; bash 5.3 errexit
+propagated through command substitution in assignment). Halted
+release, reverted local bump, mailed Athena with three fix-shape
+options (40feddee). Athena landed option A (CLI-side) at 9035252
+with new `TestAwRolesShowEmptyBundleExitsZero` regression test +
+code-reviewer subagent pass per #13. Re-bumped from her HEAD and
+shipped.
+
+Last updated previously: 2026-05-15 21:10 CEST (19:10 UTC) — **aweb.ai
+production deployed at 13a5da63** (19:06:46Z). Full bundle live:
+Eugenie chunks 1+2, tagline v2 'Spin a web of agents, skip the
+bottlenecks', font swap to system stacks, header 3-zone rework,
+375px overflow fix, $150 Business display, 50 msg/day Free display,
+full SEO bundle (robots/sitemap/OG/JSON-LD/og-default/apple-touch/
+theme-color/enableGitInfo), Juan-authored "How to set up an
+AI-native organization" first real blog post. Gate-collapse
+narrative: Sofia surfaced ee2252dc as voice-shape rewrite assumed
+to be Iris-going-around-chain; Juan clarified authorship +
+directive "ship as I left it" → Sofia's axis closed; Athena Rich
+Results validation cleared on staging (edb7e0e3) carries through
+to production unchanged (template-driven schema).
+**AC v0.5.36 deploy-verified-live** at 73db479a (Business
+$250→$150 Stripe env-var refresh + Free 100→50 msg/day) — public
+$150 display now coherent with backend charge. Stripe Checkout
+visual walk still pending Juan per Athena bde3a525.
+**v0.5.32 and v0.5.34** remain halted-entry images in GHCR.
 
 **Sofia OPEN QUESTION** (mail 574185f5): v0.5.28 release notes
 overclaim — the site portion of the aanv-pain-narrative iteration is
@@ -146,15 +251,22 @@ Last 2 cycles (v0.5.24, v0.5.25): GHA→/health flip 4-7h vs historical
 Pattern unresolved. Hypothesis: Render image-watcher poll interval
 changed or upgrade-window held. Re-flag if v0.5.27 shows it again.
 
-## Live state (verified 2026-05-13 22:25Z)
+## Live state (verified 2026-05-15 17:43Z)
 
-- `app.aweb.ai/health`: `release_tag=v0.5.31`, `aweb_version=1.21.0`,
-  `awid_service_version=0.5.4`, `git_sha=21cb6c23d97a4020548369a1ef3419d223940491`.
-  Fresh deploy ~21:51Z (Juan manual Render trigger after GHA 25828109184 SUCCESS).
+- `app.aweb.ai/health`: `release_tag=v0.5.36`, `aweb_version=1.21.0`,
+  `awid_service_version=0.5.4`, `git_sha=73db479a20cd6d614f9ad2a3f7c7123a4ce94291`.
+  Fresh deploy 17:43:40Z. Stripe `STRIPE_BUSINESS_PRICE_ID` env var
+  picked up on process restart.
 - Prod data: `aweb_cloud.managed_namespaces` controller alignment
-  backfill applied 22:18Z. 5/5 rows updated (jos/jro/seamnniel/test/tsm).
-  Predicate re-run = 0 rows. AWID registry unchanged (we touched
-  local, not registry).
+  backfill (2026-05-13 22:18Z) holds. Predicate re-run = 0 rows.
+- Schema: 8 migration files = 8 applied rows across server (1),
+  aweb (2), aweb_cloud (5). No drift.
+- juanre soft-deleted managed_namespaces row remains diverged (latent
+  issue caught during v0.5.33 incident triangulation, Task #125). Not
+  currently hit but would fire if juanre attempts new_agent flow.
+- Render apscheduler still not started in prod (Task #132 + Metis
+  default-aaae triage); daily_active_workspace_facts still empty.
+  Pending Juan path choice (dashboard provision vs RENDER_API_KEY).
 - Schema-migration state empirically current across all 3 schemas:
   - `server.schema_migrations`: 001 (1 row)
   - `aweb.schema_migrations`: 001 + 002_contacts_handle_state (2 rows)
@@ -208,7 +320,12 @@ metis (sent this cycle).
 | AC v0.5.28 (1.21.0 uptake + ContactView schema fix) | shipped + backend verified-live; site iteration staging-only |
 | AC v0.5.29 (session-recognition fast-follow: /connect + /login + Google OAuth verified_email) | shipped + backend verified-live; schema brought current via prod-migrate-direct (4 pending migrations applied) |
 | AC v0.5.30 (controller_did reuse first-pass + OAuth raw-JSON wrap) | **HALTED** at tag-push — Grace surfaced 4 invariant gaps post-tag; GHA cancelled, no image, no deploy. Tag at 8c3d9dc1 stays as halted entry. |
-| **AC v0.5.31** (invariant-correct controller_did reuse + OAuth defensive tightening M1/M2/m1) | shipped + verified-live at 21cb6c23; #30 schema check green |
+| AC v0.5.31 (invariant-correct controller_did reuse + OAuth defensive tightening M1/M2/m1) | shipped + verified-live at 21cb6c23 + P0 prod-data backfill (5 rows aligned) |
+| AC v0.5.32 (Grace returning-consumer email hotfix at 34650a93) | tagged + GHA SUCCESS; never deployed (superseded by v0.5.33 forward-progress) |
+| AC v0.5.33 (post-OAuth onboarding bundle: MCP invite tool + welcome resource + consent banner + welcome guide v5 + serverInfo) | shipped + verified-live at 59ac4c81 + #30 schema check green |
+| AC v0.5.34 (Olivia 409 alias-conflict UX fix at 299cb185) | tagged + GHA SUCCESS; never deployed (superseded by v0.5.35 forward-progress) |
+| AC v0.5.35 (Grace reachability nobody→public for new consumer users + welcome.md content updates) | shipped + verified-live at d8eeed01 |
+| **AC v0.5.36** (bundled: Business $250→$150 Stripe env-var refresh + Free tier 100→50 msg/day) | shipped + deploy-verified-live at 73db479a; behavior smokes pending Athena probe |
 
 ## Site deploy protocol (Juan-authorized 2026-05-10)
 
@@ -308,6 +425,50 @@ Athena is the cross-team bridge.
 9. Published artifact ≠ deployed service
 10. Browser-verify UI-surface releases
 11. Closure framing rests on empirical attestation
+11a. **Transitive evidence is sufficient for source-only behavior changes;
+    independent variables need separate empirical query.**
+    Closure attestation depends on the change class:
+
+    - **Source-code behavior** (functions, constants, conditionals, code
+      paths within a single deterministic build): empirical attestation
+      is transitive — git_sha → source equivalence + release-ready
+      tests-passing at that SHA + `/health` reporting that
+      `release_tag`. No separate end-to-end probe needed. The image is
+      functionally equivalent to source at git_sha for Python-runtime
+      behavior: uv.lock pins direct + transitive Python deps, source is
+      COPYed verbatim, and tests at that SHA asserted the behavior. The
+      chain closes.
+    - **Independent variables** drift independently of code. These DO
+      need separate empirical query at verify-live:
+      - schema state → #30 (`schema_migrations` query)
+      - prod-data state → #31 (predicate against the new invariant)
+      - env vars (e.g. `STRIPE_BUSINESS_PRICE_ID`, `DATABASE_URL`,
+        feature flags) → behavior probe preferred (implicitly attests
+        restart by observing new behavior); `/health` restart shape
+        alone is necessary-but-not-sufficient (proves reload, not the
+        new value)
+      - cache state (Redis: rate-limit counters, daily-message usage,
+        session caches) → service count-getter probe against a known
+        billing_id / session-id
+      - process-internal state (in-memory schedulers, in-process
+        caches — apscheduler MemoryJobStore is the canonical example
+        per Task #132 + Metis default-aaae) → scheduler list-getter
+        OR evidence the expected job fired post-restart
+      - external API state (AWID registry, Stripe, npm registry) →
+        query the external surface
+
+    Catalyst: v0.5.36 bundled Business $250→$150 (env-var refresh —
+    independent variable, needs Juan visual walk OR a probe) with Free
+    tier 100→50 messages/day (source-only TIER_LIMITS change —
+    transitive sufficient). Started by demanding empirical probes for
+    both; Athena pointed out the asymmetry. Banking the axis explicitly
+    avoids over-engineering future smokes for source-only changes and
+    avoids under-engineering future env-var / cache / process-state
+    changes.
+
+    Tied to: #11 (closure rests on empirical attestation), #18
+    (verified-live cites actually-committed SHA), #30 (schema check),
+    #31 (prod-data state).
 12. Reproducer-as-gate
 13. Code-reviewer subagent for gate-input commits (Athena pre-flight)
 14. Migration-checksum chase covers BOTH OSS wheel and AC embedded copy

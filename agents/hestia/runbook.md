@@ -810,6 +810,158 @@ See step 7 above. Banked from aweb 1.18.0 ghost-tag.
 See step 9c. Banked symptom: HTTP 401 timestamp errors on signed
 requests after laptop sleep. Restart the stack.
 
+### Render static-site: file-overwrite vs. artifact preservation
+
+**[banked from Wave 1 docs cycle 2026-05-17]**
+
+When a previously-served URL on the Render static site is changing
+shape, distinguish two mechanisms:
+
+- **Orphan with NEW Hugo source**: the next `make deploy-site`
+  generates the page → upload overwrites the stale artifact via
+  normal file-upload semantics. Today's `last-modified` shows up
+  post-deploy. No dashboard intervention needed.
+
+- **Orphan with NO source (path being retired)**: the page is never
+  regenerated, so Render keeps serving the preserved artifact across
+  deploys. Stuck `last-modified` from whichever earlier deploy last
+  built it. Needs Render dashboard "Clear build cache & deploy" to
+  retire.
+
+Diagnosis path: `curl -sI` the URL, note `last-modified`. After the
+next deploy, re-curl: if `last-modified` flipped to today, file-overwrite
+worked. If unchanged, it's a no-source orphan needing cache-clear.
+
+Don't gate replacement deploys on a dashboard probe — they don't
+need it. Do gate retirement-only deploys on the probe if no-source
+orphans are the issue.
+
+### Gate-harness must exercise the code under test
+
+**[banked from Grace's federation re-validation cycle 2026-05-17]**
+
+When validation signals come from CI gates, sanity-check that the gate
+actually exercises the code under test. A gate that "passes" by
+exercising a stale dependency is worse than a failing gate — it's
+false-signal disguised as evidence.
+
+The federation 1.23.0 instance: AC Docker user-journey-via-AC e2e gate
+copies sibling aweb sources into the image, BUT `uv sync` then installs
+PyPI `aweb==1.22.0` from uv.lock. The gate signal "Docker e2e green
+on federation work" was testing the prior PyPI release, not the
+1.23.0 main code. Multiple cycles of federation validation produced
+false-positive evidence before Grace caught it.
+
+Pattern recognition: anywhere a CI gate path runs through
+`Docker build → uv sync from lockfile → run tests`, the install-time
+resolution may pull a pinned-PyPI version that drowns out the
+sibling-copied current source. Same shape applies to npm `package.json`
+with stale lockfile, or any package manager that prefers cached/locked
+resolution over local source.
+
+Discipline:
+- For each release where the gate signal informs a tag-push decision,
+  re-verify the gate is exercising the code being shipped, not a
+  transitive prior version. Common check: log the package version
+  the test runtime resolves, compare to the version being released.
+- When you spot a transitive-evidence pattern (see also #144
+  "transitive-evidence-for-source-only-behavior-changes" banking),
+  the validation needs an explicit linkage check between the artifact
+  under test and the artifact being released.
+- This is Athena's code surface to fix (Dockerfile / Makefile / uv
+  sync behavior), but the operational call — "is this gate signal
+  load-bearing for tag-push?" — is mine to make. If a gate is
+  load-bearing AND its signal-vs-artifact linkage is in doubt, halt
+  the release and surface the doubt to Athena rather than tag.
+
+Addenda from Grace's fix-cycle 2026-05-17:
+
+- **Trust gate signal MORE when an explicit assertion enforces the
+  gate-source binding** (e.g., `check_release_model` pattern in
+  Dockerfile.release that fails the build if the venv doesn't
+  resolve to the local source). Without an explicit assert,
+  gate-harness drift can silently reintroduce the stale-dep failure
+  mode. With an explicit assert, regressions fire loudly. When
+  evaluating whether a gate signal is load-bearing, look for the
+  explicit binding assertion as evidence the gate has been hardened
+  against drift.
+- **Different gates carry different evidence**. Unit-test gate is
+  necessary but not sufficient for customer-behavior correctness.
+  Federation-only or surface-specific gates exercise narrow paths.
+  The "real Docker cloud gate" (e.g., AC release-image driven
+  end-to-end user-journey) is the load-bearing signal for
+  customer-visible behavior. Match the gate to the claim: if the
+  claim is "federation works in real two-server scenarios", the
+  load-bearing signal is the Docker cloud gate, not the
+  federation-isolated unit suite.
+
+### NPM_TOKEN rotation — sweep ALL consuming repos
+
+**[banked from channel-v1.4.2 cycle 2026-05-18]**
+
+The NPM_TOKEN GitHub Actions secret is per-repo, not org-wide. When
+an npm token is rotated (or revoked, or its scope changes), every
+repo with a workflow that uses NPM_TOKEN needs its secret updated
+individually.
+
+Failure mode: a token rotation can leave some repos with stale tokens
+that silently fail with `E404 PUT https://registry.npmjs.org/@scope/pkg
+- Not found` — which is npm's classic "your token can't publish to
+this scope" disguised as 404. The rotation appears to have worked in
+the repos exercised soon after; stale-token repos don't surface the
+gap until a later publish attempt.
+
+Discipline:
+- When a token rotation happens, before declaring it complete, sweep
+  `gh secret list -R awebai/<each-repo-with-npm-publish-workflow>`
+  and confirm the secret's `Updated` timestamp matches the rotation
+  event.
+- Diagnose 404-on-PUT as auth failure first, not registry-missing.
+- The durable fix is OIDC trusted publishing (Task #104): updates
+  workflows to use `permissions: id-token: write` and configures the
+  npm package to trust github.com/<org>/<repo> as a publisher. No
+  more token treadmill, no more per-repo drift. Wider rollout
+  should sit on Task #104.
+
+To set the secret via gh CLI without exposing the value in shell
+history or logs:
+```
+printf '%s' '<token>' | gh secret set NPM_TOKEN -R awebai/<repo>
+```
+
+### P0 fast-track release — re-verify package shape against current main
+
+**[banked from aaox.16 cycle 2026-05-17]**
+
+P0 fast-track plans assume the package's `package.json` on main is
+stable. Re-verify against current main shape BEFORE committing to an
+independent-release path.
+
+Failure mode: a merge between the P0-filing and the release execution
+can layer new dependencies (especially `file:` deps from in-progress
+repo restructures) that turn a one-line atomic fix into a
+broken-package publish. Premise drift.
+
+The aaox.16 instance: claude-channel 1.4.1 was scoped as "add license
+field, ship as 1.4.1 patch, decoupled from the larger channel-core
+split work." Between the P0 filing and execution time, a merge of the
+pi-extension work landed on main and added
+`"@awebai/channel-core": "file:../channel-core"` to channel/package.json.
+Publishing 1.4.1 from main would have pushed a package whose npm
+install fails for every consumer (file: deps don't resolve from a
+registry). The "pure one-line fix" framing didn't survive contact
+with the layered merge.
+
+Discipline:
+- Before tag-push on any independent-release path, `git diff <prior-release-tag>..origin/main -- <package-dir>` and read the actual current state.
+- If a dep changed shape (especially toward `file:` or `link:`),
+  surface to coordinator BEFORE pushing; the fast-track premise
+  has broken.
+- The right resolution is often "fold into the next planned release"
+  rather than "tag at a pre-merge SHA" — non-linear tags create
+  customer-history confusion that outweighs the few-hours-faster
+  benefit.
+
 ### Gate failure in compat — script gaps masquerade as CLI bugs
 
 **[banked from v0.5.18 first-exercise gate failure 2026-05-02]**

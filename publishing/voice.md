@@ -90,6 +90,38 @@ is a Persona 1 mechanic; if the underlying product mechanism
 requires CLI to enact the share, the copy is broken even though
 the words sound consumer-shaped.
 
+## Voice inheritance across co-authored skill + reference files
+
+When agent-facing skills (`aweb/skills/<name>/SKILL.md`) and their
+depth-load references (`aweb/skills/<name>/references/<topic>.md`)
+are co-authored in the same wave by the same author, voice
+consistency tends to propagate from body to references without
+explicit cross-file effort. The framing-review at the SKILL.md
+body level captures the substrate; references inherit cleanly.
+
+What this means for voice-pass routing:
+
+- Voice-pass the SKILL.md body first. Establish the register.
+- Verify the references rather than rewrite them. If the
+  references inherit cleanly, the pass is a check-and-clear.
+- If a reference drifts from the parent body's register
+  (different author, different wave, copy-pasted from another
+  surface), it gets a full voice-pass instead of a verify.
+
+What stays load-bearing regardless of inheritance:
+
+- **Cross-surface mirrors**: strings that must be identical
+  between SKILL.md, references/, and the runtime payload an
+  agent receives. They're immutable in scope of a voice-pass.
+  Touching them breaks the consistency that makes the surface
+  work. The author should mark mirrors explicitly when routing
+  for voice-pass; otherwise infer from context and preserve
+  verbatim.
+
+This discipline applies to agent-facing skills authoring.
+Customer-facing landing / blog / docs voice still goes through
+the per-persona pitch test below.
+
 ## The pitches, ordered by persona priority
 
 Use the pitch matching the audience the surface is targeting.

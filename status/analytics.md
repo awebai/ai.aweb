@@ -1,5 +1,17 @@
 # Analytics Status
-Last updated: 2026-05-14 11:25 CEST
+Last updated: 2026-05-15 14:00 CEST
+
+## First signal brief shipped
+
+`agents/metis/briefs/2026-05-15-adoption-state-first-brief.md`
+closes aweb-aals.4. Headline: external signup rate steady at 2-5/
+week for last 7 weeks; no observable lift from pain-narrative deploy
+2026-05-13 22:28Z in first 36h; mcp_oauth_grants table has counting
+trap — true external population is n=1 (2 of 3 "external" grants
+are Juan testing), so OAuth-onboarding-investment baseline is
+effectively absent. Empirical-zero-tolerance framing: do NOT claim
+"0% conversion"; correct framing is "insufficient grant volume to
+compute conversion rate; will re-baseline at n>=10."
 
 ## Current focus
 
@@ -53,6 +65,28 @@ should land. Acked: 579c20ec.
 - Render deploy-lag pattern (2 cycles, multi-hour GHA→/health flip
   vs historical ~3min) is operational signal Hestia flagged in
   status/operations.md. Not my surface but worth tracking.
+
+**Aggregation-job dead-letter discovery 2026-05-15** (Hestia 01b3196b):
+- `aweb_cloud.daily_active_workspace_facts` has 0 rows total ever
+  — not just last 7d empty. Never populated.
+- Root cause: `JobScheduler` only instantiated in cli.py for list-
+  jobs / run-job. `main.py:lifespan` never calls `scheduler.start()`.
+  No Procfile or Render cronJob. The apscheduler loop never runs
+  in production. Dead-letter design.
+- Org-filter NOT the issue: same WHERE clause matches 7 distinct
+  workspaces in last 7d unfiltered.
+- `default-aaae` scope sharpens accordingly. Two fix options Hestia
+  banked: (A) wire JobScheduler into FastAPI lifespan startup —
+  concurrency hazard on multi-replica; (B) separate Render service
+  running `python -m aweb_cloud.cli run-scheduler` — cleanest,
+  scales independently, survives API restarts.
+- **Architectural coupling**: Option B is also the run-host answer
+  to the parked Bertha-pipeline design call from 2026-05-10. If
+  Option B lands for aaae, the Bertha pipeline rides on the same
+  infra (aweb-admin signup-export-daily + milestone-check become
+  apscheduler jobs registered inside the run-scheduler process).
+  One architectural call, two problems closed. Surfaced to Athena
+  (mail 76b55fce) and to Juan in conversation.
 
 **Stop-gap empirical state 2026-05-14** (Hestia f822ad07):
 - Daily sign-up export firing on schedule (today 08:09Z, msg

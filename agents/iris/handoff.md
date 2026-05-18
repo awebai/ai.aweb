@@ -1,6 +1,6 @@
 # Iris Handoff
 
-Last updated: 2026-05-14 (welcome-guide v4 + serverInfo v4 re-bundled after Athena tech-accuracy revisions)
+Last updated: 2026-05-14 (first real blog post v3 cleared Athena → Bertha-via-Eugenie next; welcome guide v5 shipped; blog scaffold pending Juan greenlight)
 
 ## Operating focus
 
@@ -15,39 +15,64 @@ Sensitive contacts/targets stay in `co.aweb/`.
 
 ## Active work
 
-### 1. MCP onboarding artifacts (today's primary)
+### 1. First real blog post v3 → Bertha-via-Eugenie pass (today's primary)
 
-Two parallel surfaces in flight for Athena/Grace's hosted-MCP welcome
-shipment:
+"How to set up an AI-first company like ours" per Athena brief
+`36d75f22`. Juan locked the audience: small/startup, 3-30 people,
+AI-first ambitions, employees on browser AI (ChatGPT/claude.ai
+mostly).
 
-- **Welcome guide v4** — `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
-  (committed 41c84b1; v3 was a649218, v2 was 007f33b). Returns from
-  the MCP `aweb_welcome_guide` tool. Athena tech-accuracy pass (mail
-  dfeb103a) caught three substantive corrections; v4 applies them:
-  (1) lifecycle two-paths — invite-link is bilateral-active
-  immediately, pending state only on handle-add path; (2)
-  send-on-pending errors (NOT queues — verified at contacts.py:101+);
-  (3) `read_messages_from_contact` added to TOOLS list. Source-of-
-  truth path locked AC-canonical:
-  `ac/backend/src/aweb_cloud/resources/welcome.md`.
+Draft at `publishing/drafts/2026-05-14-ai-first-company-howto.md`
+(commit `53ae94e`; trail: 70d4a1f → ab34853 → 53ae94e). Shape:
+Path C (hybrid) — case-study anchor + stage-branching recipe with
+honest-gap namings on each stage.
 
-- **serverInfo.instructions v4** (478 chars, under 500 cap) — re-
-  bundled with welcome-guide v4 to Athena (mail 06415c20) for v4
-  re-read. `read_messages_from_contact` added to tools list within
-  the cap; no other changes from v3.
+Editorial chain status:
+- ✓ Iris drafts (v1 → v2 → v3)
+- ✓ Sofia framing (mail `89ee9635`) — three watch-items resolved
+  + line-78 tightening applied in v2
+- ✓ Athena tech-accuracy + proofread (mail `8a26e303`) — three
+  substantive corrections applied in v3 (dev-team agent framing
+  replacing ephemeral-pair overclaim; scheduled-meetings build
+  "queued" not "in flight"; team-shape lineage clarified) +
+  framing tighten on user-count + style fix + template URL filled
+- → Bertha-via-Eugenie (Athena routing now)
+- → Juan bless
+- → Publish at `ac/site/content/blog/ai-first-company-howto.md`
+  (slug locked unless Juan revises)
 
-Sofia flagged separately on v4 trust-line correction (mail
-d286c1e6) — her watch-item #2 was "pending-vs-active honest pending
-Athena verification"; verification revealed v2/v3 dishonest; v4 honest.
+Template repo: `github.com/awebai/agent-first-company-template`
+(name locked by Athena via mail `fa04e2c5`). Athena scaffolding in
+parallel — aim to land around bless time so the link goes live with
+the post.
 
-Tool names locked (per Athena's verification of Grace's commit
-c6f270e8 + server.py registration): `create_invite_link`,
-`add_contact_by_handle`, `list_contacts`, `send_message_to_contact`,
+### 2. MCP onboarding artifacts (shipped + verified)
+
+- **Welcome guide v5 SHIPPED** — review chain complete (Sofia ✓
+  Athena ✓ Aida ✓ Juan ✓). Source: `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`
+  (ai.aweb `80cb00d`); content at `ac/backend/src/aweb_cloud/resources/welcome.md`
+  (ac `95481339`).
+
+  Note: ac `a1bfa166` (Juan, 2026-05-14) corrected the default-
+  reachability claim in the live welcome.md — new consumers default
+  to publicly reachable (not contacts-only). Draft retains the
+  historical review-chain record; AC-path is authoritative.
+
+- **serverInfo.instructions v5 WIRED** — Grace landed at ac
+  `34251767`; shipped in v0.5.33 morning of 2026-05-14. Both
+  surfaces live.
+
+Tool names locked: `create_invite_link`, `add_contact_by_handle`,
+`contacts_remove`, `list_contacts`, `send_message_to_contact`,
 `read_messages_from_contact`, `aweb_welcome_guide`.
 
-Next: Athena v4 re-read (5-10 min) → Aida support-integration →
-Juan bless → commit at ac/backend/src/aweb_cloud/resources/welcome.md
-→ flag back to Athena for Grace's stub-replacement.
+### 3. Blog scaffold ship pending Juan greenlight
+
+ac main HEAD `d6bcef6e` (Peter's blog scaffold + welcome post + hero
+polish + Sofia "honest"-word fix). Staging cleared customer-voice
+walk + Sofia framing. On Juan greenlight, Hestia runs
+`make deploy-site`. Bertha-via-Eugenie reserved for the first real
+post (#1 above), not this scaffold.
 
 ### 2. Twitter thread P1 launch
 

@@ -8,6 +8,41 @@ signal, attribution caveat.
 
 ---
 
+## 2026-05-14 · aweb welcome guide v5 — committed to AC-canonical path (Juan blessed)
+
+**Channel**: `aweb_welcome_guide` MCP tool + `aweb://welcome` MCP resource (hosted MCP server at app.aweb.ai/mcp/)
+**Public link**: returned at runtime by the MCP tool; not a public URL
+**Artifact**: `ac/backend/src/aweb_cloud/resources/welcome.md` (ac commit `95481339`, main)
+**Source draft**: `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md` (ai.aweb commit `80cb00d`)
+**Audience**: AI clients on first connection (ChatGPT / Claude Desktop / claude.ai) — semi-spec, AI-facing
+**Word count**: ~440 (within Athena's 200-500 target)
+
+### Cross-cutting review chain (1 day)
+
+- v1 → v2 (Iris): folded Aida's pre-think relayed via Athena `204e971e`
+- Sofia framing review: approved (mail `55bed1b7`) with cross-surface alignment ask
+- v3 (Iris): Athena tool-name lock — `create_contact_invite` → `create_invite_link` per Grace's commit `c6f270e8` (mails `a58bc12b`, `69ed8365`)
+- v4 (Iris): Athena tech-accuracy revisions — lifecycle two-paths (invite-link bilateral-active; pending only on handle-add); send-on-pending errors (not queues; verified at `contacts.py:101+`); `read_messages_from_contact` added; source-of-truth path locked AC-canonical (mail `dfeb103a`)
+- v5 (Iris): Athena v4 clear + `contacts_remove` nit folded (mail `6b88d7bb`)
+- Aida support-integration clear (mail `e197415a`) — all 6 pre-think checkpoints satisfied; one runbook-intake question shape banked, not authored
+- Juan bless: 2026-05-14 (relayed via Athena mail `39b75bbd`)
+
+### Parallel artifact: serverInfo.instructions v5 (495 chars)
+
+Same review chain, same bless. Ready to wire by Grace into the FastMCP constructor.
+
+> aweb gives the AIs you use addresses; they message each other directly. The user just connected this AI. To start: offer to create an invite link for a friend — ask for their first name, then call `create_invite_link`. Tools: create_invite_link, add_contact_by_handle, contacts_remove, list_contacts, send_message_to_contact, read_messages_from_contact, aweb_welcome_guide (call for fuller context). When phrasing to the user, use friend/contact/address/message — not team, role, namespace.
+
+### Signal (post-ship, deferred)
+
+Empirical signal pending. Hosted-MCP-agent-to-hosted-MCP-agent flow had zero exercises in production over the past two weeks (Athena query 2026-05-13 in tweet-3 tech-accuracy mail `366ca36e`). The welcome guide is part of the surface that converts new MCP-connect events into first-action attempts. Signal to watch: invite-link create attempts within N minutes of OAuth grant on hosted custodial consumer agents; replies-to-friend-invites; mutual-active contact pairs created.
+
+### Attribution caveat
+
+The welcome guide is AI-context priming, not user-facing copy. Direct attribution to specific user actions is structurally weak — the AI mediates. Signal-strength judgment goes through Metis when she's active.
+
+---
+
 ## 2026-05-13 · aweb.ai homepage — pain-narrative rewrite verified-live
 
 **Channel**: aweb.ai (landing page)

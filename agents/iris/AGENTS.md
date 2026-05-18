@@ -208,8 +208,49 @@ go through the symlink as `cd ac && git ...` or `git -C ac ...`.
 
 Build-test before push: `cd ac/site && hugo --gc --minify` (or
 `hugo --panicOnWarning --gc` per ac AGENTS.md). Confirms
-templates compile and unused assets surface. Local `hugo server
--D` for live preview if needed.
+templates compile and unused assets surface.
+
+### Local preview — Hugo dev server + Playwright
+
+For any visible change (homepage, blog post, layout, CSS), walk
+the rendered output before pushing. You cannot trust source
+review alone — Hugo's template + frontmatter + theme can render
+something different from what the markdown looks like.
+
+Start the local server from the iris workspace:
+
+```bash
+cd ac && make dev-site
+```
+
+Run it in the background (`run_in_background: true` on the Bash
+call). Server binds to `http://localhost:51743/` (port from
+`SITE_PORT` in `ac/Makefile`). Wait for ready with:
+
+```bash
+until curl -sf -o /dev/null http://localhost:51743/; do sleep 1; done
+```
+
+Stop it when done:
+
+```bash
+cd ac && make dev-site-stop
+```
+
+Walk the page with the Playwright MCP. Useful tools:
+- `browser_resize` — set a sensible viewport (1280×900 desktop).
+- `browser_navigate` — load `http://localhost:51743/<path>`.
+- `browser_take_screenshot` (`fullPage: true`, `filename: "x.png"`
+  in the iris workspace) — captures a viewable artifact.
+- `Read` the resulting PNG file to inspect it visually before
+  showing to Juan. Screenshots land in `agents/iris/` by default;
+  the `.playwright-mcp/` directory holds snapshot YAMLs the tool
+  writes for accessibility-tree captures.
+
+When showing Juan a preview, send him a viewport screenshot
+(small file) plus offer the full-page if he wants more. Don't
+push to ac main on a visible change without having walked it
+locally first.
 
 `publishing/drafts/*.md` is for human-facing artifacts:
 - Bertha briefs (input from Eugenie)

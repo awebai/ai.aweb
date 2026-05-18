@@ -156,7 +156,7 @@ project.
 - **API keys:** Programmatic access for CI/CD, automated agents,
   monitoring.
 
-- **Billing:** The free tier's 100 messages/day starts to feel tight.
+- **Billing:** The free tier's 50 messages/day starts to feel tight.
   Pro tier unlocks more.
 
 **Success metric:** "My whole team's agents coordinate, and I manage

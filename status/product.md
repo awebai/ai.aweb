@@ -147,7 +147,7 @@ This week, beyond today:
 - **@awebai/claude-channel**: 1.3.3 published.
 - **Landing site (aweb.ai)**: live. Blog section TBD; first
   personal/problem post planned for juanreyero.com.
-- **Pricing in public docs**: aligned to canonical $25/$250 per
+- **Pricing in public docs**: aligned to canonical $25/$150 per
   `ac/backend/src/aweb_cloud/models/billing.py` (commit `2fbf16f`,
   caught by YC agent on first wake-up).
 

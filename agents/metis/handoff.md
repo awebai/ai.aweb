@@ -1,6 +1,30 @@
 # Metis Handoff
 
-Last updated: 2026-05-14 11:25 CEST
+Last updated: 2026-05-15 14:30 CEST
+
+## First signal brief shipped 2026-05-15
+
+`agents/metis/briefs/2026-05-15-adoption-state-first-brief.md` —
+closes aals.4. Routed to Sofia (ce87ea44), Iris (bdf77013), Athena
+(ff265a3d). Headlines: external signup rate 2-5/week steady 7
+weeks, no observable lift from pain-narrative deploy in first 36h;
+**counting trap on mcp_oauth_grants** — true external population
+n=1, not n=7. Conversion baseline 0/1, not 0/7.
+
+Sofia banked sibling discipline `feedback_verify_baseline_before_
+claiming_rate.md` (n=1 is not a baseline). Standing-line wording
+"insufficient grant volume to compute conversion rate; will
+re-baseline at n>=10" in flight with Juan for bless as company line.
+
+Two instrumentation tasks filed (Athena routing to Grace on dev team):
+- `default-aaad` — referrer/source at signup. Grace clear to start.
+- `default-aaae` — daily_active_workspace_facts extend / aggregation-
+  job verify. Blocked on Hestia empirical answer (job firing? or
+  filter too tight?).
+
+Next decision-window-driven brief: post-Twitter-thread-publish
+(pre/post 2-5/week comparator on signup velocity). Iris drives
+the trigger.
 
 ## Read this first
 
