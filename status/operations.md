@@ -62,6 +62,24 @@ explicit bless-and-run with reviewed commit SHA + tests + release notes.
 No tag pushes, no deploys, no /health flips without that bundle. Honored
 by all Hestia instances.
 
+Sofia closures (3149c5dc):
+- Validator v1 framing: Sofia's call is AFTER aaou.15-18 (diverges from
+  Athena's earlier 'before'). Validator hardens next cycle. Don't wait on
+  her framing for the design doc.
+- Commando sequencing confirmed: 1-2-3 = internal-verified → commando
+  smoke → public claim. Option (A) if Ben loop-able, (B) with footnote
+  if not. Decision-record on Sofia post-Ben.
+- Mail-routing 404: noted, chat-with workaround; revisit after v0.5.42
+  dust settles.
+- Selected-org OAuth P0: Sofia framing the narrow customer-facing claim
+  shape in parallel; release blocked behind framing + Athena bless +
+  Grace authoring + Mia review.
+
+Daily-messages reset 2026-05-18 ~15:40 UTC: default:aweb.ai team
+counter cleared (was 69, well over Free-tier 50/day) for Juan's live
+demo. Recurring risk: agent team is on tier=free; tier-bump
+conversation deferred but on the table.
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
