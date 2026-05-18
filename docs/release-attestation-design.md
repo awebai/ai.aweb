@@ -1,7 +1,8 @@
 # Release attestation: design
 
 Author: Hestia
-Status: draft for engineering review (Athena)
+Status: v2 — post-engineering-review (Athena 980f9360); ready for direction review (Sofia)
+Reviewers: Athena (engineering — signed off on shape, pushback incorporated below)
 
 ## Problem
 
@@ -46,6 +47,12 @@ the live system, and on full green writes a signed attestation to
 a known location (`ai.aweb/status/attestations/`). Without an
 attestation, no release.
 
+This layer **builds on** Mia's gate-shape-sanity-check discipline
+(verify the gate exercises the code under test). It does not
+replace it. The two compose: gate-shape ensures each individual
+gate measures what it claims; attestations ensure the assembled
+system actually works.
+
 This places the contract IN CODE, not in tribal knowledge. The
 contract is machine-readable, recursively verifiable, and
 co-located with the source repo that knows what its release needs.
@@ -75,6 +82,16 @@ produces:
       module_name: <string>   # as written to schema_migrations (e.g., awid-service)
       migrations_through: <string>  # filename of last migration file in this release
       # Validator checks the live DB's schema_migrations table.
+
+  # Mirror declarations: when this release ships migration files that
+  # are COPIES of another component's migrations (e.g., ac's aweb-schema
+  # mirrors aweb-server's migrations), declare the mirror relationship.
+  # Validator asserts content equality between source and target.
+  mirrors:
+    - source_component: <string>            # e.g., aweb
+      source_path: <string>                 # e.g., aweb/server/src/aweb/migrations/aweb/005_*.sql
+      target_path: <string>                 # e.g., ac/backend/src/aweb_cloud/migrations/aweb/004_*.sql
+      # Validator reads both files; asserts byte-equality (or canonicalized SQL equality).
 
   deployed_services:
     - service: <string>       # e.g., app.aweb.ai
@@ -185,6 +202,31 @@ validator repo), named, versioned, and small. Each release's
 release.yaml references smokes by name. Smokes themselves get
 PR review like any other gating code.
 
+## Pre-requisites before validator v1 ships
+
+These have to land before the validator can do useful work. None
+are inherently blocked; flagged here so they get scheduled with
+the validator work.
+
+1. **Every deployed service exposes `release_tag` in /health.**
+   Today aweb /health returns `{status, checks}` only; ac /health
+   is auth-gated; awid I haven't fully audited. Each deployed
+   service needs `/health` build-info instrumented to expose
+   `release_tag` (the git tag, not the package version — cloud
+   carries multiple package versions). Three small PRs (aweb, ac,
+   awid).
+
+2. **Smoke-test team namespace on prod.** Mutating smokes (real
+   mail-send, real federation envelope) need a dedicated namespace
+   + aliases + cleanup discipline. One-time setup. Smokes
+   themselves write tear-down code as part of their assertion.
+
+3. **Attestation signing key in CI.** A GHA secret used by the
+   validator to sign attestations (HMAC or Ed25519). Same risk
+   class as NPM_TOKEN (leak = forge-able attestations);
+   defensible for internal trust. Banked: not designing for
+   third-party verification in v1.
+
 ## The validator
 
 A single shared tool, committed to `aweb/tools/release-validator/`
@@ -204,6 +246,12 @@ Behavior:
    a. Fetch the named component's release.yaml at the matching version's tag.
    b. Recursively call validate-release on it.
    c. If recursive call returns not-released, FAIL.
+   d. **Cycle detection**: maintain a stack of components currently
+      being validated; if a recurse-target is already on the stack,
+      FAIL with an explicit "release graph has a cycle: A → B → A.
+      Refactor to break the cycle, possibly via a release that adds
+      the new endpoint to one side without the dep, then a follow-up
+      adds the other side." Better than infinite recursion.
 6. For each `requires.artifacts`: registry query, floor assertion.
 7. For each `requires.deployed`: probe, assertion.
 8. For each `requires.schemas`: DB query, must_include assertion.
@@ -267,6 +315,19 @@ to refuse to claim it shipped.
   release-producing repo) automatically. New components need
   schema entries + smoke definitions added. One-time effort per
   new component.
+- **Federation smoke v1 limitation**: real federation between two
+  separate prod-grade aweb instances requires a second long-running
+  instance we don't have yet (would need staging cloud). v1 uses
+  the OSS 2-server e2e suite (`scripts/e2e-oss-federation.sh`,
+  which Grace added) as the federation smoke — runs in CI,
+  exercises the wire-level federation correctly, but does NOT probe
+  prod. Real-prod-federation-smoke deferred until staging
+  infrastructure exists.
+- **Smoke prod-mutation footprint**: mutating smokes (real
+  mail-send) write real rows to prod DBs. Each smoke is responsible
+  for its own cleanup. A dedicated smoke-test team namespace + test
+  aliases keep the footprint isolated. The hygiene discipline lives
+  in the smoke itself, not in some out-of-band process.
 
 ## Forced ordering as a feature, not a bug
 
@@ -295,27 +356,49 @@ in code.
 - **Migration ordering between components sharing a DB**: handled by `requires.schemas.must_include` — Y can't release until X's migration is applied.
 - **Backfill for currently-released versions**: a one-time exercise. The current production state we just verified-live today can be encoded as the first set of attestations.
 
-## Open design questions for Athena
+## Resolved design questions (Athena review 980f9360)
 
-1. **Attestation storage**: ai.aweb/status/attestations/ committed via PR is the simple option. Alternative: a dedicated bucket / signed JSON published to an HTTPS endpoint. Trade-off: simplicity vs. tamper-evidence.
+1. **Attestation storage**: `ai.aweb/status/attestations/` committed
+   via PR. JSON files, machine-readable, human-auditable, history in
+   git. Tamper-evidence comes from git commit signatures + the
+   signature field in the attestation body. No separate bucket
+   infrastructure in v1.
 
-2. **Attestation freshness**: should attestations expire? An attestation written 6 months ago for v1.0.0 may not reflect current state (e.g., a manual prod change since). Suggest: attestations have a `valid_until` field, default 30 days. Re-validate periodically.
+2. **Attestation freshness**: attestations carry a `valid_until`
+   field, default 30 days. A daily cron job re-runs the validator
+   for every released component; expired attestations either
+   re-validate green or flip to `released: false` and Hestia's
+   runbook surfaces them as red. This catches drift (manual prod
+   change, dep upgrade in a service we forgot to re-attest).
 
-3. **Validator language**: Python is the obvious choice (matches our backend stack, lets us reuse pgdbm for schema queries, easy registry HTTP). Athena's call.
+3. **Validator language**: Python. Matches backend stack, reuses
+   pgdbm for `schema_migrations` queries, easy registry HTTP via
+   httpx, easy YAML via PyYAML. No new runtime dependency.
 
-4. **Smokes location**: in the validator repo? per-component repo? Suggest validator repo (shared), with components referencing by name.
+4. **Smokes location**: validator repo. Smokes are shared,
+   versioned, reviewed in one place. Per-component `release.yaml`
+   references smokes by name only. Adding a smoke = PR to the
+   validator repo.
 
-5. **Validator versioning**: the validator itself is critical infra. Its own release.yaml + validator-validates-itself bootstrap. Athena's call on the boot sequence.
+5. **Validator self-validation**: the validator gets its own
+   `release.yaml` BUT does not recurse into itself. The validator
+   pins a specific validator version (its own) in the attestations
+   it writes. Bootstrapping: first validator release uses a
+   hand-signed attestation; subsequent releases use the previous
+   validator's attestation as proof of build. Avoids infinite
+   recursion while keeping the chain auditable.
 
-6. **CI wiring**: each repo's `release-ready` Makefile target gains a
-   `release-validate` step at the end. Failure fails the gate. No
-   tag-push unless validator wrote an attestation.
+6. **CI wiring**: `release-validate` is the FINAL step in each
+   repo's `release-ready` Makefile target. If it fails, the gate
+   fails, no tag push, no deploy. The attestation file is the
+   gate-output artifact.
 
-7. **Pre-merge vs. post-merge validation**: validate before tag-push
-   (catches problems early) or after tag-push (validates against
-   the actually-published artifacts). Probably both: pre-tag dry-run
-   skips the registry-published checks; post-tag full run including
-   smokes.
+7. **Pre-merge vs. post-merge validation**: both. Pre-tag dry-run
+   in `release-ready` skips registry-published checks and runs the
+   non-mutating smokes; catches obvious problems before tag push.
+   Post-tag full validation runs after deploy completes (triggered
+   by GHA on tag push), including registry checks and mutating
+   smokes; writes the canonical attestation.
 
 ## Closing
 
