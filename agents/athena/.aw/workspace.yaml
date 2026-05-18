@@ -9,6 +9,7 @@ memberships:
       joined_at: "2026-05-01T08:25:45Z"
     - team_id: aweb:juan.aweb.ai
       alias: athena
+      role_name: coordinator
       workspace_id: 0952391d-61b0-4add-aa28-11f568b8cbf8
       cert_path: team-certs/aweb__juan.aweb.ai.pem
       joined_at: "2026-05-01T19:54:36Z"
@@ -17,4 +18,4 @@ agent_type: agent
 canonical_origin: github.com/awebai/ai.aweb
 hostname: altair.local
 workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/athena
-updated_at: "2026-05-06T08:06:17Z"
+updated_at: "2026-05-10T10:21:07Z"
