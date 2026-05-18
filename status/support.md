@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-18 12:10 UTC (post federation docs customer-experience pass)
+Last updated: 2026-05-18 13:30 UTC (post Sofia confirm + Zeus follow-up close)
 
 ## Current focus
 
@@ -35,7 +35,16 @@ None active. Customer activity over recent period closed cleanly
 
 ## Waiting on engineering
 
-Nothing customer-blocking. Customer-shape discipline lives in each
+**Zeus onboarding-completion gap → Sofia escalating to Juan**:
+Sofia confirmed (mail `9bea8bb9`) the gap is real P2-validation
+signal and is surfacing to Juan separately for direction. Three
+design options on the table (automated reminder ping / clearer
+walkthrough framing / something else). Not pre-actioning with
+Athena until Juan blesses scope. I'll loop Zeus when there's a
+decision or when his team's controller-action actually unblocks
+them.
+
+Nothing else customer-blocking. Customer-shape discipline lives in each
 agent's own AGENTS.md operational section + the `aweb-aanp` brief
 in the dev team (per Sofia mail `7b3fd3a5`). The
 `customer-onboarding-flows.md` doc was deleted 2026-05-12 (commit
@@ -45,6 +54,18 @@ catch up the discipline pointer once Iris's update lands.
 ## Closed customer loops
 
 **Recent cycles, summarized**:
+
+- **Zeus consumer-entry scope ask (2026-05-18)**: Sofia confirmed
+  via mail `9bea8bb9` that the 2026-05-13 consumer-entry ship
+  (ac v0.5.31 + homepage + /developers + /connect +
+  /oauth/consent + new MCP contact-tools + welcome guide) is
+  additive across the board — no Path A flow change for
+  hosted-custodial developer-team customers. Sent Zeus the
+  follow-up (mail `fd65ae2c`) including Sofia's call-out that
+  the new MCP contact-tools (`list_contacts`,
+  `add_contact_by_handle`, `send_message_to_contact`) work for
+  any aweb user via MCP if his team finds handle-based
+  addressing useful. Promise to him kept ("within a day").
 
 - **chat-403 surface (2026-05-06)**: closed without runbook
   documentation. Empirically-zero customer reports + spec-lock on
@@ -131,6 +152,21 @@ catch up the discipline pointer once Iris's update lands.
   (recent cleanups, in-flight refactors, deliberate naming
   choices) is required to interpret what's "drift" vs "intended
   state."
+- **Discipline #28** (Hestia `cc92c768`, 2026-05-18) —
+  customer-signal escalation threshold. Single
+  customer-attested non-blocking signal: HOLD and package
+  with a second attestation before escalating to Juan. Second
+  attestation (within ~week window): surface together as
+  empirical-strength package. Blocking attestation
+  (customer says it's actually blocking them): escalate
+  immediately regardless of count. Reason: single-data-point
+  escalation is signal-inflation; cost of waiting for second
+  is at most one more customer noting the friction.
+  Originating moment: I forwarded Zeus's channel-auto-ack
+  friction to Hestia as customer-evidence-promotion; she held
+  the Juan escalation pending 2nd attestation. Applies to any
+  customer-signal-to-Juan routing question, not just
+  channel-plugin.
 - **"What next" support response** — full runbook entry landed
   at commit `9537fe8` (2026-05-16) under a new "Customer
   Orientation Responses" section in `docs/support/runbook.md`.
@@ -144,6 +180,38 @@ catch up the discipline pointer once Iris's update lands.
   customer seed examples accumulate.
 
 ## Recent customer interactions (live evidence base)
+
+- **gsk.aweb.ai/zeus (2026-05-18)** — re-engagement chat after
+  Juan routed Zeus to me ("important info + customer feedback").
+  Honest framing: no queued send on my side; Juan's routing was
+  prompt-shaped, not artifact-shaped. Opened the door for
+  customer feedback; Zeus delivered real signal across four
+  items:
+  1. **Onboarding-completion gap** — walkthrough ends at
+     human-controller action gate (Juan deciding which agents to
+     provision); team still single-member 12 days later. Verbatim:
+     "fine for engaged customers, may stall passive ones."
+     Routed to Sofia (`a3efa895`) as P2-shape product question.
+  2. **Channel auto-ack friction** — `aw mail inbox` shows empty
+     because channel push auto-marks read; he has to remember
+     `--show-all --json` to see canonical record. Real-customer-
+     attested promotion of Dave's previously-flagged design
+     question from "agent annoyance" to "customer-visible UX
+     cost." Routed to Hestia (`e470aa9c`) operationally + Athena
+     (`b4e982cc`) for eventual Dave cross-team relay.
+  3. **Bug-arc praise** — verbatim: "Bug-arc itself was handled
+     really well — fast escalation, named engineers, structured
+     tickets." Routed to Athena + Hestia as positive signal.
+  4. **Consumer-entry scope ask** — Zeus asked whether Sofia's
+     2026-05-13 ship affects his Path A flow. My answer to him:
+     additive (new surface for P1, not replacing his path), but
+     asked Sofia to confirm before authoritative; promised
+     follow-up within a day. See Waiting on Engineering.
+
+  Chat closed cleanly. Customer-feedback shape was unprompted +
+  candid because Juan engineered the re-engagement; banking the
+  pattern — when a customer is re-engaged via human routing,
+  ask open feedback questions before pivoting to specific asks.
 
 - **gracetut194441.aweb.ai/alice (2026-05-16)** — first real
   "what next" customer ask after the consumer-entry ship.
