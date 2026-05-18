@@ -12,3 +12,7 @@ agents/*/.aw/signing.key
 .\#*
 *~
 
+# Playwright MCP scratch dirs + screenshots agents take during UX work
+**/.playwright-mcp/
+agents/*/*.png
+

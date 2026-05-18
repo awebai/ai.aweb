@@ -1,5 +1,142 @@
 # Operations Status
 
+Last updated: 2026-05-18 14:05 CEST (12:05 UTC) — **Federation
+completion wave aaou.15-18 in flight**. awid 0.5.6 shipped FIRST per
+Juan's standing policy ('in case of doubt always ship awid service
+and awid first'): commit dad937a on aweb main, tags awid-service-v0.5.6
+(PyPI workflow 26031767028 success) + awid-v0.5.6 (GHCR workflow
+26031772227 success 1m18s). PyPI 0.5.6 verified live; api.awid.ai
+flipped to 0.5.6 (Render auto-pulled). 02a344f's awid changes (dev-mode
+insecure-delivery-origin helper, no migrations, prod-impact nil) now
+deployed.
+
+ac federation completion ship target: **v0.5.42** (per Athena eef884ad —
+v0.5.41 already exists at 2a3d0144). Per Juan: ship v0.5.42 now, backfill
+of existing hosted child namespaces is a one-off script run by Hestia
+post-deploy, not a release-blocking item.
+
+**v0.5.42 VERIFIED LIVE** at 7ca6ce62. Gate runs 1-3 failed in
+diagnostic-useful ways (mock-Registry gap → docker-compose.test.yml
+ENVIRONMENT → docker-compose.local-container.yml ENVIRONMENT). Gate
+run #4 GREEN: ALL PASSED 264 tests. Tag pushed, GHA 26033745194
+success, Render deployed. /health: release_tag=v0.5.42,
+git_sha=7ca6ce62, aweb_version=1.23.0, awid_service_version=0.5.6.
+
+Backfill applied 2026-05-18: 72 hosted child namespaces updated (71
+first-run + 1 retry of xmythosx99x.aweb.ai after rate-limit), 0
+remaining failures, 7 blocked_awid_namespace_missing (ac DB has row,
+awid does not — separate cleanup thread). Spot-checks via awid:
+xanerp.aweb.ai + xglasswings99.aweb.ai both show default_delivery_origin=https://app.aweb.ai.
+
+Grace prod spot-check follow-ups (analyzed in full report to Athena
+4331abdb):
+- juan.aweb.ai + gsk.aweb.ai = updated (matches our JSON)
+- juanre.aweb.ai null = NOT in backfill scope (pre-existing Task #125
+  class — soft-deleted-with-divergence predicate gap; juanre.aweb.ai
+  is Juan's personal namespace from v0.5.31/v0.5.33 P0 era)
+- aida.aweb.ai + athena.aweb.ai 'namespace not found' = agent aliases,
+  not user-level namespaces; expected absence outside federation model.
+
+Open: commando-coordination step for the empirical hosted↔self-hosted
+smoke walk. aweb.missionctrl.dev controller registered, but
+default_delivery_origin is null (his side hasn't declared). Routing to
+Athena/Juan for Ben Ford coordination; 3 options laid out (loop in
+Ben for strongest claim / package internal-only and footnote /
+internal-loopback weaker-empirical).
+
+Banked signal: channel push auto-ack hides mail from default inbox
+(Zeus@gsk.aweb.ai customer-attested via Aida; same symptom hit me
+during Athena's mail-delivery smoke 13:11 UTC). Holding for 2nd
+independent customer attestation per strength-of-feedback discipline
+before escalating design question to Juan. Aida tracking on her side
+as discipline #28.
+
+Mail-delivery cross-team: Athena→Hestia smoke GREEN
+(message_id f427d408, verified=true, in inbox). Grace's 'never landed'
+case may be same flavor (auto-ack-as-read). Athena diagnosing.
+
+**HOLD (2c7d8087)**: hosted MCP OAuth selected-org fix is BLOCKED. Juan
+flagged solution likely incomplete; Athena has not blessed. Any release
+signal pointing at this fix → treat as blocked until Athena mails
+explicit bless-and-run with reviewed commit SHA + tests + release notes.
+No tag pushes, no deploys, no /health flips without that bundle. Honored
+by all Hestia instances.
+
+Sofia closures (3149c5dc):
+- Validator v1 framing: Sofia's call is AFTER aaou.15-18 (diverges from
+  Athena's earlier 'before'). Validator hardens next cycle. Don't wait on
+  her framing for the design doc.
+- Commando sequencing confirmed: 1-2-3 = internal-verified → commando
+  smoke → public claim. Option (A) if Ben loop-able, (B) with footnote
+  if not. Decision-record on Sofia post-Ben.
+- Mail-routing 404: noted, chat-with workaround; revisit after v0.5.42
+  dust settles.
+- Selected-org OAuth P0: Sofia framing the narrow customer-facing claim
+  shape in parallel; release blocked behind framing + Athena bless +
+  Grace authoring + Mia review.
+
+Daily-messages reset 2026-05-18 ~15:40 UTC: default:aweb.ai team
+counter cleared (was 69, well over Free-tier 50/day) for Juan's live
+demo. Recurring risk: agent team is on tier=free; tier-bump
+conversation deferred but on the table.
+
+**P0: channel push auto-ack/read bug** (Athena 5f63c7b7, Sofia 8b7011b2
+escalation). Three attestations now: Zeus@gsk customer + my smoke + Sofia
+missing Athena's literate-company-graph pilot brief in conv 70f1c868.
+Root cause (Athena's code read): channel-core mail.ackMessage +
+chat.markRead mutate server state on push delivery — BEFORE the harness
+surfaces the message to the agent. If harness drops/delays/fails, the
+mail is gone from server-unread anyway. Delivery-to-channel ≠
+delivery-to-agent. Athena routed to Grace as P0. When her fix commits,
+channel 1.4.3 release path is independent of the OAuth v0.5.43 cut —
+both can land in parallel.
+
+**WORKAROUND for all agents until fix lands**: treat `aw mail inbox`
+default (unread-only) as unreliable. Use `aw mail inbox --show-all` for
+canonical state. Every Hestia/Athena/Sofia/Iris/Aida/Metis session
+should honor this until channel 1.4.3 verified-live.
+
+**[2026-05-18 ~19:26 UTC] Channel 1.4.3 VERIFIED LIVE EMPIRICALLY**.
+After /plugin marketplace update + /plugin update aweb-channel +
+/reload-plugins, Athena sent POST-1.4.3-INBOX-PROOF-MARKER mail
+(message_id 7891897a) via channel push. Default `aw mail inbox`
+showed MAILS: 1 with the marker visible — pre-1.4.3 this would have
+been auto-ack'd to read-state on delivery and default inbox would
+say "No messages." Athena ACK'd (chat d88b5a29). P0 closed.
+Each agent needs to run `/plugin marketplace update awebai-marketplace
+&& /plugin update aweb-channel@awebai-marketplace` + relaunch to pick
+up the fix in their own session.
+
+**[2026-05-18 ~18:53 UTC] ac v0.5.43 deployed**: release_tag=v0.5.43,
+git_sha=05e65689, aweb_version=1.24.1, awid_service_version=0.5.6.
+Includes Athena bless 625c769a: cb223c34 (Harden targeted MCP OAuth
+reconnect flow) + aweb 03fe4bf (MCP legacy tool aliases) + Grace's
+99cc2cb (newest-duplicate 1:1 chat continuation, fixed the
+Hestia↔Athena 409s that bit this very release cycle).
+
+OAuth smoke per Athena's 5-item checklist (Phase 3 of bless):
+- Item 4 partial: stale aweb_handoff with full OAuth params → 401
+  invalid_client (endpoint refuses gracefully, no 500, no leaked
+  state). Cookie-clear semantics need browser to fully verify.
+- Items 1, 2, 3, 5 need browser + claude.ai-account-session-bearer.
+  Deferred until a session is available.
+
+External claim (Sofia framing + Iris distribution) gated on remaining
+smoke items.
+
+Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
+self-hosted user, mail AND chat both directions, message-ids + envelope
+verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
+— relationship-respecting + best-empirical-story. 1-2-3 sequencing:
+internal-verified-live → commando-notification → public claim.
+
+Ops discrepancy flagged: sofia awid address resolves 404 from hestia
+(`aw mail send --to sofia` and chat both fail). Athena confirms same
+cross-team mail-resolution skew Grace diagnosed — and ac v0.5.42 itself
+closes it (per Grace's diagnosis). Workaround: `aw chat-with --start-conversation`
+goes through. Mailed Juan + Athena flagged.
+
+Previous lead:
 Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0
 wave VERIFIED LIVE end-to-end**. aweb 1.23.0 on PyPI + npm + `aw
 upgrade` clean (server-v1.23.0 + aw-v1.23.0 individually tagged at
