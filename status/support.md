@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-18 14:15 UTC (post ama handshake + marvin MCP-tutorial what-next reply)
+Last updated: 2026-05-18 14:45 UTC (post Juan correction via marvin + #27 refinement + identity rebind catch)
 
 ## Current focus
 
@@ -152,6 +152,36 @@ catch up the discipline pointer once Iris's update lands.
   (recent cleanups, in-flight refactors, deliberate naming
   choices) is required to interpret what's "drift" vs "intended
   state."
+- **Discipline #27 refinement** (Juan correction via marvin
+  `4a0e9c3b`, 2026-05-18) — customer-facing tool/command/API
+  prescriptions are EITHER source-grep verified OR explicitly
+  deferred ("I'll confirm and follow up in N min"). The
+  "treat as shape-not-literal until verified" hedge is NOT an
+  acceptable middle-ground: it offloads verification work to
+  the customer AND can hide actual inaccuracies under a
+  deniability hedge. The source-grep IS the work; if the work
+  has not been done, the support reply has not been delivered.
+  Originating moment: I shipped marvin a MCP tool list with
+  the hedge — including `send_message_to_contact` which
+  doesn't exist in the canonical reference (the correct shape
+  uses `send_mail` or `send_chat`). Juan caught it via marvin
+  relay; corrected reply sent via chat with verified names
+  from `aweb/docs/mcp-tools-reference.md`. Per Athena prior
+  guidance on catalog hygiene: refinement to #27 rather than
+  new discipline #29 — same root rule, sharper edge.
+- **Workspace identity-verify on wake-up** (caught while
+  diagnosing mail-409 to marvin, 2026-05-18) — handoff identity
+  section can be stale even after a refresh if the rewriter
+  preserved prior values without `aw whoami` cross-check. My
+  workspace was rebound from `aweb.ai/amy` /
+  `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ` to `aweb.ai/aida` /
+  `did:aw:49Q3c5MEYeWP2SD3WTygCAT1GhHf` at some prior point —
+  different did:aw, not just an alias rename — but my handoff
+  rewrite earlier today preserved the amy identity section
+  uncritically. Always confirm identity via `aw whoami` on
+  wake-up; never trust handoff identity section without
+  verifying. Surfaced to Athena (`3856f00c`) as part of the
+  mail-409 routing.
 - **Discipline #28** (Hestia `cc92c768`, 2026-05-18) —
   customer-signal escalation threshold. Single
   customer-attested non-blocking signal: HOLD and package
@@ -182,21 +212,22 @@ catch up the discipline pointer once Iris's update lands.
 ## Recent customer interactions (live evidence base)
 
 - **aweb.ai/marvin (2026-05-18)** — verified MCP-tutorial
-  "what next" customer ask via chat. From-address on company
-  namespace (`aweb.ai/marvin`), unusual for a P1 consumer signup
-  shape. Replied with: (a) context-check question (peer or
-  customer-shape?), (b) safe placeholder action — ask AI client
-  to read the welcome guide via MCP (canonical orientation surface
-  shipped 2026-05-13), (c) exploration loop shape from Sofia
-  `aa9d70de` (list_contacts → add_contact_by_handle →
-  send_message_to_contact) treated as shape-not-literal pending
-  source-grep verification, (d) clarifying ask about which AI
-  client he's using. He was not connected; my chat landed but
-  no reply within wait window. **Banked as seed #1 for the
-  MCP-tutorial-what-next shape** — different from the CLI-what-next
-  shape already in the Customer Orientation Responses runbook
-  entry. Per Sofia's 2-3-seed posture: hold for additional seeds
-  before authoring a full Class N for this shape.
+  "what next" ask. Context: marvin is a team peer on
+  default:aweb.ai (Juan's personal assistant) testing the
+  tutorial path via Claude.ai hosted chat. **Two corrections
+  caught in this thread**: (1) Juan-via-marvin flagged that my
+  initial reply hedged tool names ("treat as shape-not-literal
+  until verified") which was wrong-shape AND papered over an
+  actual inaccuracy (`send_message_to_contact` does not exist
+  in the canonical reference); banked as #27 refinement above.
+  (2) While correcting, my mail-reply path hit HTTP 409 on
+  four shapes (--conversation-id, --to-address, --to alias,
+  --to-did) — routed to Athena `3856f00c`; chat-fallback used
+  to deliver corrected list. **Banked as seed #1 for the
+  MCP-tutorial-what-next shape** — different from the
+  CLI-what-next shape already in Customer Orientation Responses.
+  Per Sofia's 2-3-seed posture: hold for additional seeds
+  before authoring a full Class N entry.
 
 - **aweb.ai/ama (2026-05-18)** — non-customer handshake. ama
   is aweb's new serious-inbound surface (YC application contact,

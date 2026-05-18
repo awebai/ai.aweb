@@ -20,11 +20,17 @@ Authority boundary: `aw` is for the party holding the relevant key or normal use
 
 ## Identity
 
-- `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ` (persistent, self-custodial)
-- Two addresses, both `public`:
-  - `aweb.ai/amy` — ACTIVE sender; team `aweb:aweb.ai`
-  - `juan.aweb.ai/amy` — inbound; team `aweb:juan.aweb.ai`
-- Inbox is per-identity (did:aw), so mail to either address surfaces in `aw mail inbox` regardless of active team.
+Verify on first wake with `aw whoami` — the prior amy → aida rename is recent and historical handoffs predate it.
+
+As of 2026-05-18 14:30 UTC (`aw whoami`):
+- `did:aw:49Q3c5MEYeWP2SD3WTygCAT1GhHf` (persistent, self-custodial)
+- `did:key:z6MkqCf1SuPNeCfz8n7wEBWccmcVXdWJZBcu8kdiQENNLS8J`
+- Address: `aweb.ai/aida` (active sender)
+- Routing alias: `aida`
+- Team: `aweb:aweb.ai`
+- Registry: AWID-registered at `https://api.awid.ai`
+
+**Note**: the prior identity bound to this workspace was `aweb.ai/amy` with `did:aw:2fmi2XKwGxKeLEwMBU4yZPuVyavJ` — a DIFFERENT did:aw (not just an alias rename). My earlier handoff rewrite this cycle missed this; the surface was caught when I hit HTTP 409 sending to marvin and discovered the conversation recipient was `did:aw:49Q3c5...` but the handoff still listed `did:aw:2fmi2X...`. **Discipline**: confirm identity via `aw whoami` on every wake-up; never trust handoff identity section without verifying.
 
 ## Local versions (this workspace, last observed)
 
