@@ -1,5 +1,32 @@
 # Operations Status
 
+Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0
+wave VERIFIED LIVE end-to-end**. aweb 1.23.0 on PyPI + npm + `aw
+upgrade` clean (server-v1.23.0 + aw-v1.23.0 individually tagged at
+eb779c3). ac v0.5.41 live at app.aweb.ai (release_tag=v0.5.41,
+aweb_version=1.23.0, awid_service_version=0.5.5, git_sha=2a3d0144).
+awid 0.5.5 live at api.awid.ai (Docker GHCR + awid-service@0.5.5 on
+PyPI). Coordinated three-deploy chain: aweb 1.23.0 → ac v0.5.40 (Mia
+test-fix at 3853e09d resolved 4-test gate fail) → awid 0.5.5 → ac
+v0.5.41 (awid-service dep bump 0.5.4→0.5.5, constraint tightened to
+>=0.5.5 per Grace via Athena).
+
+Critical migration gap surfaced + fixed: deployed ac v0.5.40 had
+federation code but Render startup didn't apply the 003/004/005
+federation mirror migrations to ac aweb schema (Task #109 latent).
+Mail-send was 500-ing post-deploy. Applied via ac's own
+database_infra.initialize() against .env.production; mirror migrations
+landed; mail-send confirmed working. awid 002_namespace_delivery_origin
+likewise needed manual `make awid-prod-migrate`.
+
+Channel 1.4.1 release-tooling gap surfaced: GHA Channel Release fails
+because channel-core/node_modules empty on GHA (no npm install in
+channel-core/ before channel build). Tooling fix landed at aweb 7776312
+(Athena). channel-v1.4.1 tag exists on origin but no npm publish;
+license still "Proprietary" on registry. Re-fire when bandwidth allows
+— Athena said either re-run same tag GHA or rev to 1.4.2.
+
+Previous lead:
 Last updated: 2026-05-17 10:50 CEST (08:50 UTC) — **Site deploy #24
 VERIFIED LIVE**: Wave 1 docs (agent-guide promotion + /docs/ landing
 rewrite) live at 53a95476. /docs/agent-guide/ flipped from March-8

@@ -1,5 +1,77 @@
 # Hestia Handoff
 
+Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0
+wave VERIFIED LIVE**. Three coordinated deploys today:
+
+1. aweb 1.23.0 server + CLI (PyPI + npm)
+2. ac v0.5.40 (aweb 1.23.0 pin) → halt for 4-test gate fail → Mia
+   fix at 3853e09d → re-gate green → ship
+3. awid 0.5.5 (GHCR + PyPI awid-service)
+4. ac v0.5.41 (awid-service 0.5.5 pin + constraint tighten)
+
+Live state:
+- app.aweb.ai: release_tag=v0.5.41, aweb_version=1.23.0,
+  awid_service_version=0.5.5, git_sha=2a3d0144
+- api.awid.ai: version=0.5.5
+- Mail-send confirmed working post-migration (smoke to aida)
+
+## Critical learning from this cycle
+
+**Render startup didn't apply federation mirror migrations.** ac v0.5.40
+deployed with federation code BUT ac aweb-schema only had 001+002 (no
+003/004/005 federation mirrors). Mail-send 500-ed because runtime tried
+to write to federated_message_deliveries / participant.delivery_origin
+tables that didn't exist yet. Task #109 (Render startup migrations) is
+no longer just an investigate-when-bandwidth item — it directly broke
+a customer-facing deploy.
+
+Fix: applied via `cd ac/backend && uv run python -c "..."` invoking
+ac's own `database_infra.initialize(run_migrations=True)` against
+.env.production. This is the SAME code path Render startup should
+run — it just didn't fire on container start. Need to investigate
+why (probably AWEB_PUBLIC_ORIGIN env or some other gate condition;
+Task #109 still open).
+
+Likewise awid 002 needed manual `make awid-prod-migrate` — same
+class of issue.
+
+**Two-commit pattern for ac dep bumps** (banked from Mia + reaffirmed
+this cycle): dep bump + version bump in commit A, follow-up constraint
+tightening in commit B. Don't amend; let main carry the audit trail.
+
+## Channel 1.4.2 SHIPPED with MIT license
+
+Resolved end-to-end after two compounding gaps:
+1. **Tooling gap** (Athena fix at 7776312): channel-core/node_modules
+   empty on GHA → esbuild couldn't resolve transitive deps. Fix added
+   channel-core npm install + build BEFORE channel build in both
+   release-channel-check Makefile and channel-release.yml workflow.
+2. **Per-repo NPM_TOKEN drift**: Juan rotated NPM_TOKEN on 2026-05-13
+   but only set the new token in some repos (awebai/aw worked, but
+   awebai/aweb still had the April 2 token, which had since stopped
+   working). GHA failed with E404 PUT on @awebai/claude-channel.
+
+Fixes: Athena's tooling commit; I ran `gh secret set NPM_TOKEN -R awebai/aweb`
+with Juan's May 13 token (passed via stdin). Re-fired GHA at
+channel-v1.4.2 (commit c31176d) — published 2026-05-18T10:57:52Z.
+npm view confirms version=1.4.2, license=MIT.
+
+channel-v1.4.1 tag remains on origin as orphan (no npm publish landed).
+
+## Discipline banked from this cycle
+
+**When npm tokens are rotated, check ALL repos that consume them.**
+The NPM_TOKEN secret is per-repo, not org-wide. A rotation event on
+2026-05-13 left awebai/aweb's copy stale for 5 days because nothing
+exercised channel-release.yml in between. Banking-worthy: when an
+auth token is rotated, do a sweep of every workflow that uses it
+across every repo in the org and update each individually (or migrate
+to OIDC trusted publishing per Task #104 — eliminates the recurring
+treadmill).
+
+## Channel 1.4.1 STILL HELD (obsolete — see above)
+
+Earlier:
 Last updated: 2026-05-17 10:50 CEST (08:50 UTC) — **Site deploy #24
 VERIFIED LIVE**: Wave 1 docs at 53a95476 live on aweb.ai.
 /docs/agent-guide/ flipped from March-8 orphan to today's build

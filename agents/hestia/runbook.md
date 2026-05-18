@@ -895,6 +895,40 @@ Addenda from Grace's fix-cycle 2026-05-17:
   load-bearing signal is the Docker cloud gate, not the
   federation-isolated unit suite.
 
+### NPM_TOKEN rotation — sweep ALL consuming repos
+
+**[banked from channel-v1.4.2 cycle 2026-05-18]**
+
+The NPM_TOKEN GitHub Actions secret is per-repo, not org-wide. When
+an npm token is rotated (or revoked, or its scope changes), every
+repo with a workflow that uses NPM_TOKEN needs its secret updated
+individually.
+
+Failure mode: a token rotation can leave some repos with stale tokens
+that silently fail with `E404 PUT https://registry.npmjs.org/@scope/pkg
+- Not found` — which is npm's classic "your token can't publish to
+this scope" disguised as 404. The rotation appears to have worked in
+the repos exercised soon after; stale-token repos don't surface the
+gap until a later publish attempt.
+
+Discipline:
+- When a token rotation happens, before declaring it complete, sweep
+  `gh secret list -R awebai/<each-repo-with-npm-publish-workflow>`
+  and confirm the secret's `Updated` timestamp matches the rotation
+  event.
+- Diagnose 404-on-PUT as auth failure first, not registry-missing.
+- The durable fix is OIDC trusted publishing (Task #104): updates
+  workflows to use `permissions: id-token: write` and configures the
+  npm package to trust github.com/<org>/<repo> as a publisher. No
+  more token treadmill, no more per-repo drift. Wider rollout
+  should sit on Task #104.
+
+To set the secret via gh CLI without exposing the value in shell
+history or logs:
+```
+printf '%s' '<token>' | gh secret set NPM_TOKEN -R awebai/<repo>
+```
+
 ### P0 fast-track release — re-verify package shape against current main
 
 **[banked from aaox.16 cycle 2026-05-17]**
