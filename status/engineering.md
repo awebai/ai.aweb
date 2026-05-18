@@ -1,15 +1,16 @@
 # Engineering Status
-Last updated: 2026-05-18 16:15 GMT
+Last updated: 2026-05-18 17:15 GMT
 
 ## Current focus
 
 0. **BLOCKED: AC hosted MCP OAuth selected-org fix is NOT production-ready.**
    Juan says the current solution is likely incomplete; Athena will not
    bless or forward to Hestia. Grace/Mia/Dave/Hestia have been notified.
-   Required before any bless: Grace surfaces pushed AC branch/commits,
-   Q2 targeted-handoff fail-closed fix + tests, Mia review, Athena
-   invariant review, and explicit resolution of the incomplete-solution
-   concern.
+   AC commit 22268450 is now on origin/main and Mia signed off, but
+   Athena found blocker B1: invalid/expired targeted handoff still
+   silently degrades to generic flow. Required before any bless: B1 fix +
+   tests, Mia follow-up review, Athena re-review, and explicit resolution
+   of the incomplete-solution concern.
 1. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
    and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
    reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
@@ -37,15 +38,12 @@ Last updated: 2026-05-18 16:15 GMT
   remains visible.
 - **aweb-aalr.2 — AWID ensure-team endpoint + AC persist refactor**:
   Mia still has a stale claim from the older readiness epic.
-- **AC hosted MCP OAuth selected-org regression**: Grace reportedly has
-  a fix, but no branch/commit has reached Athena yet after repeated
-  `git fetch --all --prune`. Blocked from production by Juan's
-  incomplete-solution concern. Athena design calls sent: generic `/mcp/`
-  may allow non-personal new-agent only after explicit org-first /
-  team-second UI selection + server-side creation-authority revalidation;
-  targeted dashboard handoff remains strict; invalid/stale/inaccessible /
-  already-bound targeted handoff must fail closed and clear the bad
-  cookie, never silently degrade to generic/personal flow.
+- **AC hosted MCP OAuth selected-org regression**: Grace pushed
+  `22268450` to AC origin/main and Mia signed off. Athena review found
+  blocker B1: invalid/expired targeted handoff still silently degrades to
+  generic flow because `/mcp/?aweb_handoff=<bad-or-expired>` does not set
+  a fail-closed signal and invalid/expired `aweb_picker_handoff` cookies
+  decode as no handoff. Grace/Mia have been notified; no bless.
 - **aweb-aaox.16 — claude-channel license metadata P0**: ready work;
   Hestia publish-owner per task, engineering available if the release
   workflow/tooling fix needs code review.
@@ -86,16 +84,16 @@ Last updated: 2026-05-18 16:15 GMT
   auto-ack may hide mail from default inbox; treat inbox-empty as
   weaker signal until the second independent attestation/design call
   resolves the class.
-- **Selected-org OAuth fix incomplete risk**: the reported fix may only
-  partially address the dashboard → consent → OAuth POST contract. Do
-  not let validation-count summaries substitute for code review of the
-  actual handoff and server-side authority checks.
+- **Selected-org OAuth fix B1**: `22268450` covers stale/inaccessible /
+  already-bound DB states but not invalid/expired token states. Targeted
+  query token present-but-invalid and expired targeted cookies must not
+  fall back to generic/personal consent.
 
 ## Next checks
 
-- Selected-org OAuth P0: wait for Grace to push/surface branch/commits;
-  then review Q2 fail-closed stale-targeted-handoff fix + tests; wait for
-  Mia approval before Athena bless.
+- Selected-org OAuth P0: wait for Grace's B1 follow-up fixing invalid /
+  expired targeted handoff fail-closed behavior and adding tests; get Mia
+  follow-up approval; rerun focused backend/frontend gates before bless.
 - Sofia is drafting narrow claim-shape framing for this OAuth fix; loop
   her in before any customer-facing claim.
 - Watch `aweb-aaov.12` for Dave's close/handoff and `aweb-aaox.16` for
