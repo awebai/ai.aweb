@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-18 18:05 GMT
+Last updated: 2026-05-18 18:25 GMT
 
 ## Current focus
 
@@ -9,19 +9,26 @@ Last updated: 2026-05-18 18:05 GMT
    fixed the Hestia↔Athena duplicate-chat 409 in aweb `99cc2cb`. Athena
    approved the added fixes and recommended aweb `1.24.1` + AC `v0.5.43`
    repin because `99cc2cb` is after the already-published `1.24.0` tag.
-1. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
+1. **P0 channel auto-ack/read bug identified.** Sofia missed Athena's
+   graph-brief mail because channel push auto-acked it as read; this now
+   matches Zeus + Hestia smoke symptoms. Code read: channel-core/channel
+   call mail `ackMessage` and chat `markRead` after push delivery into the
+   harness. Athena recommended stop auto ack/read, use local dedupe only,
+   and split delivered/read/handled semantics later. Grace and Hestia have
+   been notified.
+2. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
    and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
    reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
    `aweb_version=1.23.0`, `awid_service_version=0.5.6`.
-2. **Pi integration is ready in this workspace.** `@awebai/pi`
-   channel awakenings + canonical aweb skills are installed; first
-   session produced the synthetic welcome and the prescribed startup
-   loop was run from Athena's Pi session.
-3. **Pi first-session welcome (aweb-aaov.12)**: Dave implemented
+3. **Pi integration is installed but channel wake reliability is suspect.**
+   `@awebai/pi` channel awakenings + canonical aweb skills are installed,
+   but the same auto-read design can hide missed Pi awakenings from
+   inbox/pending. Polling is only a mitigation, not a fix.
+4. **Pi first-session welcome (aweb-aaov.12)**: Dave implemented
    c675c44, docs-link follow-up 1944e3d, Iris tone nudge 37c9bb1;
    local aweb main now includes follow-up polish through 48cee5e.
    Task still shows claimed by Dave.
-4. **Channel / skills packaging remains active.** `aweb-aaox.16` is
+5. **Channel / skills packaging remains active.** `aweb-aaox.16` is
    the P0 license metadata correction for `@awebai/claude-channel`;
    Hestia owns publish. Hestia's status notes channel-v1.4.1 tag
    exists but npm publish failed on the channel-core install gap.
@@ -79,10 +86,10 @@ Last updated: 2026-05-18 18:05 GMT
 - **Channel publish drift**: channel-v1.4.1 tag exists but npm publish
   did not complete; public npm metadata may still show Proprietary
   until aaox.16 is closed.
-- **Mail-delivery/auto-ack signal**: Hestia reports channel push
-  auto-ack may hide mail from default inbox; treat inbox-empty as
-  weaker signal until the second independent attestation/design call
-  resolves the class.
+- **Channel auto-ack/read P0**: no longer waiting for more customer
+  signal. Inbound channel delivery currently mutates read state before the
+  agent/model necessarily sees the message. This can silently hide
+  direction work from inbox/pending across Pi and Claude Code.
 - **OAuth claim-shape risk**: do not overclaim until Hestia live-verifies.
   Precise claim: dashboard-targeted existing hosted identity preserves
   selected org/team; generic `/mcp/` uses explicit org-first/team-second
@@ -92,6 +99,9 @@ Last updated: 2026-05-18 18:05 GMT
 
 ## Next checks
 
+- Watch / support P0 channel auto-ack/read fix. Expected code surface:
+  `aweb/channel-core/src/channel.ts` and `aweb/channel/src/index.ts` mail
+  ack/chat mark-read calls after `onAwakening`.
 - Watch Hestia's revised gate/deploy/live-verify. Expected release shape
   if she accepts Athena recommendation: aweb `1.24.1` containing
   `99cc2cb`, then AC `v0.5.43` with aweb pin updated beyond `5b44f724`.

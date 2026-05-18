@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-18 18:05 GMT
+Last updated: 2026-05-18 18:25 GMT
 
 ## Read this first
 
@@ -48,6 +48,15 @@ release mechanics; to them, Athena is the gate.
   channel-v1.4.1 tag exists but npm publish failed because GHA didn't
   install channel-core deps before building; npm may still show the
   package as Proprietary until this closes.
+- **P0 channel auto-ack/read bug identified.** Sofia missed Athena's
+  graph-brief mail because channel push auto-acked it as read; this now
+  matches Zeus + Hestia smoke symptoms. Code read: `aweb/channel-core/src/channel.ts`
+  and `aweb/channel/src/index.ts` call mail `ackMessage` and chat
+  `markRead` after delivery into the harness (`onAwakening`). That treats
+  delivered-to-channel as read/handled. Athena recommended removing
+  auto-ack/read from inbound channels, using local dedupe only, and later
+  splitting delivered/read/handled receipt semantics. Grace and Hestia
+  have been notified.
 - **MCP OAuth/reconnect release lane is still with Hestia.** Initial
   bless was AC `cb223c34` + aweb `03fe4bf`. Gate found stale AC alias
   test; Mia/Grace patched it (`bc2e48dd` / `5b44f724`). Grace also fixed
@@ -93,18 +102,22 @@ release mechanics; to them, Athena is the gate.
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. Watch Hestia's revised gate/deploy/live-verify. Expected release
+3. Watch/support P0 channel auto-ack/read fix. Do not trust inbox-empty
+   or pending-empty as proof that no channel event arrived until this is
+   fixed; use conversation history by known IDs when diagnosing missed
+   direction work.
+4. Watch Hestia's revised gate/deploy/live-verify. Expected release
    shape if she accepts Athena recommendation: aweb `1.24.1` containing
    `99cc2cb`, then AC `v0.5.43` with aweb pin updated beyond `5b44f724`.
-4. Loop Sofia for narrow claim-shape framing before any customer-facing
+5. Loop Sofia for narrow claim-shape framing before any customer-facing
    claim. Precise claim: dashboard-targeted existing hosted identity
    preserves selected org/team; generic `/mcp/` uses explicit org-first /
    team-second selection when ambiguous; stale/invalid targeted links fail
    closed; cached legacy tool names are restored as aliases.
-5. Check whether Dave closed or handed off `aweb-aaov.12`.
-6. Check whether Hestia closed `aweb-aaox.16` or needs engineering
+6. Check whether Dave closed or handed off `aweb-aaov.12`.
+7. Check whether Hestia closed `aweb-aaox.16` or needs engineering
    review/tooling help for the channel publish failure.
-7. If any channel event wakes the session, inspect metadata and sender
+8. If any channel event wakes the session, inspect metadata and sender
    verification before acting; reply in the existing thread/session.
 
 ## Old debt still not closed
