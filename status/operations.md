@@ -55,6 +55,13 @@ Mail-delivery cross-team: Athena→Hestia smoke GREEN
 (message_id f427d408, verified=true, in inbox). Grace's 'never landed'
 case may be same flavor (auto-ack-as-read). Athena diagnosing.
 
+**HOLD (2c7d8087)**: hosted MCP OAuth selected-org fix is BLOCKED. Juan
+flagged solution likely incomplete; Athena has not blessed. Any release
+signal pointing at this fix → treat as blocked until Athena mails
+explicit bless-and-run with reviewed commit SHA + tests + release notes.
+No tag pushes, no deploys, no /health flips without that bundle. Honored
+by all Hestia instances.
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
