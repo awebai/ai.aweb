@@ -15,21 +15,13 @@ v0.5.41 already exists at 2a3d0144). Per Juan: ship v0.5.42 now, backfill
 of existing hosted child namespaces is a one-off script run by Hestia
 post-deploy, not a release-blocking item.
 
-**v0.5.42 gate run #2 FAILED at dfe806b6** (Grace's bundle: backfill
-script + test fix + version bump). Backend tests 1400 passed; the
-two-service e2e in docker-compose.test.yml failed 5 + 9 errors.
-
-Lead failure: TestCLIBootstrapContract::test_hosted_signup_cli_contract.
-awid validator rejects 'http://localhost:8071' (the cloud's
-configured_public_origin in test stack) because docker-compose.test.yml's
-awid service has no APP_ENV / ENVIRONMENT env var, so
-_is_development_environment()=False, and the localhost+http branch
-fails. Cross-product regression: a3170afb's new
-ensure_namespace_delivery_origin call now runs on every hosted signup
-and exercises a path that was never test-stack-validated before.
-
-Fix shape (test-infra only): add APP_ENV=test to docker-compose.test.yml
-awid service env. Mailed Athena (cc5796b7) for landing on origin.
+**v0.5.42 gate run #3 at 68f1ac01** (Athena's docker-compose.test.yml
+ENVIRONMENT=testing fix on top of Grace's dfe806b6 bundle): backend
+1400/1400 + two-service e2e + frontend GREEN. New failure surface:
+test-cloud-user-journeys-local-aw 207 fail / 56 pass, same root issue
+in docker-compose.local-container.yml (also missing APP_ENV/ENVIRONMENT
+on awid). Mailed Athena (2efaad12) with surgical patch + suggested
+durable fix (default ENVIRONMENT=development in awid Dockerfile).
 
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
