@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-18 17:15 GMT
+Last updated: 2026-05-18 17:40 GMT
 
 ## Read this first
 
@@ -48,16 +48,13 @@ release mechanics; to them, Athena is the gate.
   channel-v1.4.1 tag exists but npm publish failed because GHA didn't
   install channel-core deps before building; npm may still show the
   package as Proprietary until this closes.
-- **BLOCKED: AC hosted MCP OAuth selected-org regression fix is not
-  production-ready.** Grace pushed AC `22268450` to origin/main and Mia
-  initially signed off. Athena reviewed and found blocker B1: the Q2
-  fail-closed path covers decoded-token stale DB state but not invalid /
-  expired token state. `/mcp/?aweb_handoff=<bad-or-expired>` silently
-  behaves like generic `/mcp/`, and invalid/expired `aweb_picker_handoff`
-  cookies decode as no handoff and are not cleared. Mia acknowledged her
-  approval was incomplete and supports the hold. Athena must NOT bless or
-  forward to Hestia until Grace lands B1 fix + tests, Mia follow-up
-  review lands, and Athena re-reviews.
+- **MCP OAuth selected-org/reconnect fix blessed to Hestia.** Grace
+  landed AC `cb223c34` and aweb `03fe4bf`; Mia approved; Athena
+  invariant-reviewed and sent Hestia a bless-and-run. The earlier block is
+  lifted only for this reviewed release set. Hestia owns gate/deploy/live
+  verification before any customer-facing claim. Non-blocking follow-up:
+  `targeted_handoff_error.reason` remains coarse (`stale`) across failure
+  modes, which limits telemetry but is not a ship blocker.
 
 ## Active dev-team work visible
 
@@ -66,23 +63,28 @@ release mechanics; to them, Athena is the gate.
 - Mia: `aweb-aalr.2` stale/old AWID ensure-team + AC persist refactor
   claim still visible.
 - Ready P0: `aweb-aaox.16` claude-channel license metadata correction.
-- AC hosted MCP OAuth selected-org bug: Grace pushed `22268450`; local
-  Athena validation passed backend focused OAuth/MCP tests (88), ruff on
-  touched backend files/tests, frontend vitest run (191, known jsdom
-  scrollTo stderr), and frontend `tsc --noEmit`. Still blocked by B1.
-  Dave summary of original symptom: dashboard selected org/team aweb →
-  Claude.ai remote MCP connect → name marvin; consent showed personal
-  `@juanre/marvin`; POST returned `Hosted handle is not available for
-  this account`; Claude showed `code: Field required` because no OAuth
-  code.
+- MCP OAuth selected-org/reconnect fix: Grace pushed AC `cb223c34` and
+  aweb `03fe4bf`. Local Athena validation: AC backend focused OAuth/MCP
+  tests 91 passed; AC py_compile touched files pass; AC black --check
+  touched backend files/tests pass; AC frontend vitest run 193 passed
+  (known jsdom scrollTo stderr); AC frontend `tsc --noEmit` pass; AC diff
+  check clean; aweb `test_mcp_contacts_consumer.py` 17 passed in detached
+  worktree; aweb diff check clean. Dave summary of original symptom:
+  dashboard selected org/team aweb → Claude.ai remote MCP connect → name
+  marvin; consent showed personal `@juanre/marvin`; POST returned
+  `Hosted handle is not available for this account`; Claude showed
+  `code: Field required` because no OAuth code.
 
 ## Local repo caveats
 
 - `aweb` symlink works; current recent commits include Pi polish:
   `48cee5e`, `9376702`, `23f2bd0`, `37c9bb1`, `1944e3d`.
 - `ac` symlink now resolves through `/Users/juanre/prj/awebai/ac` →
-  `aweb-cloud`; AC main is at `22268450`. Earlier broken-symlink note is
+  `aweb-cloud`; AC main is at `cb223c34`. Earlier broken-symlink note is
   superseded.
+- Local `aweb` checkout is still on Dave's Pi branch, not origin/main;
+  Athena reviewed aweb `03fe4bf` in a detached temp worktree and removed
+  it afterwards.
 - Current local changes are `status/engineering.md` and this handoff.
 
 ## Things to check first next wake-up
@@ -90,21 +92,17 @@ release mechanics; to them, Athena is the gate.
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. Check for Grace follow-up after `22268450`. Keep it blocked until B1
-   is fixed: invalid/expired targeted URL token and invalid/expired
-   targeted cookie must fail closed, clear bad cookie where applicable,
-   and never degrade to generic/personal flow.
-4. Required B1 tests: URL token signature-invalid, URL token expired,
-   cookie signature-invalid, cookie expired, and cookie-clear-on-error.
-   Legacy generic malformed picker-cookie fallthrough may remain only if
-   targeted vs generic remains distinguishable.
-5. Get/confirm Mia's follow-up review before any Athena bless.
-6. Loop Sofia for narrow claim-shape framing before any customer-facing
-   claim.
-7. Check whether Dave closed or handed off `aweb-aaov.12`.
-8. Check whether Hestia closed `aweb-aaox.16` or needs engineering
+3. Watch Hestia gate/deploy/live-verify for AC `cb223c34` + aweb
+   `03fe4bf`; assist if a gate fails.
+4. Loop Sofia for narrow claim-shape framing before any customer-facing
+   claim. Precise claim: dashboard-targeted existing hosted identity
+   preserves selected org/team; generic `/mcp/` uses explicit org-first /
+   team-second selection when ambiguous; stale/invalid targeted links fail
+   closed; cached legacy tool names are restored as aliases.
+5. Check whether Dave closed or handed off `aweb-aaov.12`.
+6. Check whether Hestia closed `aweb-aaox.16` or needs engineering
    review/tooling help for the channel publish failure.
-9. If any channel event wakes the session, inspect metadata and sender
+7. If any channel event wakes the session, inspect metadata and sender
    verification before acting; reply in the existing thread/session.
 
 ## Old debt still not closed

@@ -1,16 +1,13 @@
 # Engineering Status
-Last updated: 2026-05-18 17:15 GMT
+Last updated: 2026-05-18 17:40 GMT
 
 ## Current focus
 
-0. **BLOCKED: AC hosted MCP OAuth selected-org fix is NOT production-ready.**
-   Juan says the current solution is likely incomplete; Athena will not
-   bless or forward to Hestia. Grace/Mia/Dave/Hestia have been notified.
-   AC commit 22268450 is now on origin/main and Mia signed off, but
-   Athena found blocker B1: invalid/expired targeted handoff still
-   silently degrades to generic flow. Required before any bless: B1 fix +
-   tests, Mia follow-up review, Athena re-review, and explicit resolution
-   of the incomplete-solution concern.
+0. **MCP OAuth selected-org/reconnect fix blessed to Hestia.** Grace
+   landed AC `cb223c34` and aweb `03fe4bf`; Mia approved; Athena
+   reviewed and sent Hestia a bless-and-run. The earlier production block
+   is lifted only for this reviewed release set; Hestia still owns gate,
+   deploy, and live verification.
 1. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
    and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
    reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
@@ -38,12 +35,11 @@ Last updated: 2026-05-18 17:15 GMT
   remains visible.
 - **aweb-aalr.2 — AWID ensure-team endpoint + AC persist refactor**:
   Mia still has a stale claim from the older readiness epic.
-- **AC hosted MCP OAuth selected-org regression**: Grace pushed
-  `22268450` to AC origin/main and Mia signed off. Athena review found
-  blocker B1: invalid/expired targeted handoff still silently degrades to
-  generic flow because `/mcp/?aweb_handoff=<bad-or-expired>` does not set
-  a fail-closed signal and invalid/expired `aweb_picker_handoff` cookies
-  decode as no handoff. Grace/Mia have been notified; no bless.
+- **MCP OAuth selected-org/reconnect fix**: Grace pushed AC `cb223c34`
+  and aweb `03fe4bf`; Mia signed off; Athena approved and sent Hestia
+  bless-and-run. Fixes targeted dashboard handoff fail-closed behavior,
+  generic org-first/team-second selection, connected-identity reconnect
+  UX, and additive legacy MCP tool aliases for cached clients.
 - **aweb-aaox.16 — claude-channel license metadata P0**: ready work;
   Hestia publish-owner per task, engineering available if the release
   workflow/tooling fix needs code review.
@@ -57,9 +53,9 @@ Last updated: 2026-05-18 17:15 GMT
 
 ## Release-ready state (handoff to Hestia)
 
-- **Do not deploy the selected-org OAuth fix.** No bless-and-run exists;
-  Hestia was explicitly told to treat any release signal for this fix as
-  blocked unless Athena sends an explicit reviewed bless.
+- **Bless-and-run sent to Hestia** for AC `cb223c34` + aweb `03fe4bf`.
+  Hestia should deploy only this reviewed release set and live-verify
+  before any customer-facing claim.
 - Latest verified-live chain per Operations: awid-service-v0.5.6,
   awid-v0.5.6, aweb 1.23.0, AC v0.5.42.
 - Pi package release path appears to be in the aaov/aaox release lane;
@@ -72,8 +68,8 @@ Last updated: 2026-05-18 17:15 GMT
   `agents/athena/aale-trust-contract.md` + aweb commit `7759abc`.
 - **Playwright-MCP reproducer for Add-Existing dialog** remains old
   non-feature backlog. AC checkout is available at
-  `/Users/juanre/prj/awebai/ac` (symlink to aweb-cloud), main clean at
-  7b33fba9 as of 16:15 GMT.
+  `/Users/juanre/prj/awebai/ac` (symlink to aweb-cloud), main is at
+  `cb223c34` as of 17:40 GMT.
 
 ## Risks
 
@@ -84,18 +80,19 @@ Last updated: 2026-05-18 17:15 GMT
   auto-ack may hide mail from default inbox; treat inbox-empty as
   weaker signal until the second independent attestation/design call
   resolves the class.
-- **Selected-org OAuth fix B1**: `22268450` covers stale/inaccessible /
-  already-bound DB states but not invalid/expired token states. Targeted
-  query token present-but-invalid and expired targeted cookies must not
-  fall back to generic/personal consent.
+- **OAuth claim-shape risk**: do not overclaim until Hestia live-verifies.
+  Precise claim: dashboard-targeted existing hosted identity preserves
+  selected org/team; generic `/mcp/` uses explicit org-first/team-second
+  selection when ambiguous; invalid/stale targeted links fail closed;
+  legacy aliases help cached clients but do not force client-side tool
+  refresh.
 
 ## Next checks
 
-- Selected-org OAuth P0: wait for Grace's B1 follow-up fixing invalid /
-  expired targeted handoff fail-closed behavior and adding tests; get Mia
-  follow-up approval; rerun focused backend/frontend gates before bless.
-- Sofia is drafting narrow claim-shape framing for this OAuth fix; loop
-  her in before any customer-facing claim.
+- Watch Hestia gate/deploy/live-verify for AC `cb223c34` + aweb
+  `03fe4bf`; assist if a gate fails.
+- Sofia has been notified of narrow claim shape; loop her in before any
+  customer-facing claim.
 - Watch `aweb-aaov.12` for Dave's close/handoff and `aweb-aaox.16` for
   Hestia's publish result.
 - If asked to act on Pi release, review the current aweb diff/commits
