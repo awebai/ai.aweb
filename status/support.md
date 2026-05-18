@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-18 13:30 UTC (post Sofia confirm + Zeus follow-up close)
+Last updated: 2026-05-18 14:15 UTC (post ama handshake + marvin MCP-tutorial what-next reply)
 
 ## Current focus
 
@@ -180,6 +180,33 @@ catch up the discipline pointer once Iris's update lands.
   customer seed examples accumulate.
 
 ## Recent customer interactions (live evidence base)
+
+- **aweb.ai/marvin (2026-05-18)** — verified MCP-tutorial
+  "what next" customer ask via chat. From-address on company
+  namespace (`aweb.ai/marvin`), unusual for a P1 consumer signup
+  shape. Replied with: (a) context-check question (peer or
+  customer-shape?), (b) safe placeholder action — ask AI client
+  to read the welcome guide via MCP (canonical orientation surface
+  shipped 2026-05-13), (c) exploration loop shape from Sofia
+  `aa9d70de` (list_contacts → add_contact_by_handle →
+  send_message_to_contact) treated as shape-not-literal pending
+  source-grep verification, (d) clarifying ask about which AI
+  client he's using. He was not connected; my chat landed but
+  no reply within wait window. **Banked as seed #1 for the
+  MCP-tutorial-what-next shape** — different from the CLI-what-next
+  shape already in the Customer Orientation Responses runbook
+  entry. Per Sofia's 2-3-seed posture: hold for additional seeds
+  before authoring a full Class N for this shape.
+
+- **aweb.ai/ama (2026-05-18)** — non-customer handshake. ama
+  is aweb's new serious-inbound surface (YC application contact,
+  press/investor/acquirer-shape). Directory was `co.aweb/agents/yc`
+  bound to `aweb.ai/yc` until the 2026-05-01 frame-switch (YC
+  application now points at the address); Juan completed identity
+  rebind `yc → ama` 2026-05-18 08:05 UTC. Lane split agreed in
+  the handshake: runbook = Aida, live external comms = ama; mutual
+  commitment to mail-before-guess across the lane boundary.
+  Handoff.md routing table updated to include ama.
 
 - **gsk.aweb.ai/zeus (2026-05-18)** — re-engagement chat after
   Juan routed Zeus to me ("important info + customer feedback").

@@ -87,9 +87,12 @@ AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing sections) uncommi
 | Identity / namespace / team recovery (code-dependent) | Athena |
 | Operational stuck-ness (queue stuck, deploy gap, health drift) | Hestia |
 | Support pattern signal questions | Metis |
+| Serious-inbound shape (press, YC partners, investors, acquirers, partner asks) | ama (`aweb.ai/ama`) |
 | Urgent + ambiguous + no peer response | Juan |
 
 You do API-first triage on identity-recovery cases but do not execute dashboard Replace — that's a human action.
+
+**ama context** (introduced 2026-05-18 via handshake chat `d8d6f9a1`): aweb's interrogatable surface for serious external inbound. Directory was `co.aweb/agents/yc` bound to `aweb.ai/yc` until 2026-05-01 frame-switch (YC application went in pointing at this address); Juan completed `yc → ama` identity rebind 2026-05-18 08:05 UTC. Lane split agreed in handshake: runbook = mine, live external comms = ama's. If a customer probe smells like serious-inbound (press, investor, partner), route to ama. ama's reciprocal commitment: mail me before guessing about runbook content for an external probe.
 
 ## Knowledge base
 
