@@ -167,6 +167,30 @@ in her inbox earlier). Run /plugin marketplace update awebai-marketplace
 && /plugin update aweb-channel@awebai-marketplace + relaunch to pick
 up 1.4.3.
 
+**P1 production routing bug ROOT CAUSE FOUND (Task #194)**:
+hestia → sofia + hestia → iris persistently 404 with
+'resolve recipient "aweb.ai/<alias>" for signed mail: aweb: http 404'.
+Matrix probe (2026-05-18 21:14 UTC) showed 2 of 6 peer targets fail:
+hestia→athena ✓, hestia→aida ✓, hestia→metis ✓, hestia→ama ✓,
+hestia→sofia ✗ 404, hestia→iris ✗ 404. Asymmetric: sofia → hestia
+works (her chats arrive verified=true).
+
+Root cause from direct awid.team_certificates DB query: only 4 rows
+total in awid prod; of our 7 agents (hestia/athena/sofia/iris/aida/metis/ama)
+only athena has a published cert. The other 6 have local certs in
+workspace.yaml (cert_path: team-certs/default__aweb.ai.pem) that were
+never published to awid. awid's resolver for reachability=nobody
+requires team_certificate match to grant cross-agent visibility; thus
+hestia→athena works (athena has cert), hestia→sofia/iris fail
+(nobody + no cert), and aida/ama/metis work because public/org_only
+reachability bypasses the cert check.
+
+Diagnosis mailed Athena (f8604517) who dispatched Grace (chat 70bf9eec)
+with the matrix + DB evidence + likely fix paths (A: backfill missing
+team_certificates; B: find and re-run athena's registration code path
+for the other 6). Workaround until fix: Athena relays from her side
+where her→sofia works.
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
