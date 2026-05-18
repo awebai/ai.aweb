@@ -15,13 +15,45 @@ v0.5.41 already exists at 2a3d0144). Per Juan: ship v0.5.42 now, backfill
 of existing hosted child namespaces is a one-off script run by Hestia
 post-deploy, not a release-blocking item.
 
-**v0.5.42 gate run #3 at 68f1ac01** (Athena's docker-compose.test.yml
-ENVIRONMENT=testing fix on top of Grace's dfe806b6 bundle): backend
-1400/1400 + two-service e2e + frontend GREEN. New failure surface:
-test-cloud-user-journeys-local-aw 207 fail / 56 pass, same root issue
-in docker-compose.local-container.yml (also missing APP_ENV/ENVIRONMENT
-on awid). Mailed Athena (2efaad12) with surgical patch + suggested
-durable fix (default ENVIRONMENT=development in awid Dockerfile).
+**v0.5.42 VERIFIED LIVE** at 7ca6ce62. Gate runs 1-3 failed in
+diagnostic-useful ways (mock-Registry gap → docker-compose.test.yml
+ENVIRONMENT → docker-compose.local-container.yml ENVIRONMENT). Gate
+run #4 GREEN: ALL PASSED 264 tests. Tag pushed, GHA 26033745194
+success, Render deployed. /health: release_tag=v0.5.42,
+git_sha=7ca6ce62, aweb_version=1.23.0, awid_service_version=0.5.6.
+
+Backfill applied 2026-05-18: 72 hosted child namespaces updated (71
+first-run + 1 retry of xmythosx99x.aweb.ai after rate-limit), 0
+remaining failures, 7 blocked_awid_namespace_missing (ac DB has row,
+awid does not — separate cleanup thread). Spot-checks via awid:
+xanerp.aweb.ai + xglasswings99.aweb.ai both show default_delivery_origin=https://app.aweb.ai.
+
+Grace prod spot-check follow-ups (analyzed in full report to Athena
+4331abdb):
+- juan.aweb.ai + gsk.aweb.ai = updated (matches our JSON)
+- juanre.aweb.ai null = NOT in backfill scope (pre-existing Task #125
+  class — soft-deleted-with-divergence predicate gap; juanre.aweb.ai
+  is Juan's personal namespace from v0.5.31/v0.5.33 P0 era)
+- aida.aweb.ai + athena.aweb.ai 'namespace not found' = agent aliases,
+  not user-level namespaces; expected absence outside federation model.
+
+Open: commando-coordination step for the empirical hosted↔self-hosted
+smoke walk. aweb.missionctrl.dev controller registered, but
+default_delivery_origin is null (his side hasn't declared). Routing to
+Athena/Juan for Ben Ford coordination; 3 options laid out (loop in
+Ben for strongest claim / package internal-only and footnote /
+internal-loopback weaker-empirical).
+
+Banked signal: channel push auto-ack hides mail from default inbox
+(Zeus@gsk.aweb.ai customer-attested via Aida; same symptom hit me
+during Athena's mail-delivery smoke 13:11 UTC). Holding for 2nd
+independent customer attestation per strength-of-feedback discipline
+before escalating design question to Juan. Aida tracking on her side
+as discipline #28.
+
+Mail-delivery cross-team: Athena→Hestia smoke GREEN
+(message_id f427d408, verified=true, in inbox). Grace's 'never landed'
+case may be same flavor (auto-ack-as-read). Athena diagnosing.
 
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope

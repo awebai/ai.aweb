@@ -1,5 +1,28 @@
 # Hestia Handoff
 
+Last updated: 2026-05-18 15:25 CEST (13:25 UTC) — **Federation
+completion wave aaou.15-18 internally verified live; commando-coord
+pending for external claim**. v0.5.42 deployed at 7ca6ce62 with
+aweb 1.23.0 + awid-service 0.5.6. Backfill 72/72 hosted child
+namespaces updated, 7 drift rows flagged (ac-row-but-no-awid;
+non-blocking, pre-existing). Spot-checks confirm via awid.
+
+Gate chain (4 runs) banked: each failure was diagnostic-useful and
+fixed by Athena via small targeted commits. Pattern: every new test
+stack (docker-compose.test.yml, docker-compose.local-container.yml)
+that wires awid needs ENVIRONMENT set; durable Option B (require
+ENVIRONMENT explicit at awid startup) banked as fast-follow brief.
+
+Mail-delivery cross-team smoke 13:11 UTC: Athena→Hestia GREEN
+(verified=true). Default `aw mail inbox` showed empty because channel
+push auto-acks-as-read — same friction Aida just escalated from
+customer Zeus. Banked as Task #187, watching for 2nd attestation.
+
+Open: commando-coordination for hosted↔self-hosted federation smoke.
+aweb.missionctrl.dev has controller_did but default_delivery_origin=null;
+need Ben Ford to set his side. Athena owns the routing decision.
+
+Previous lead:
 Last updated: 2026-05-18 14:15 CEST (12:15 UTC) — **Federation
 completion wave aaou.15-18 in flight**. awid 0.5.6 shipped FIRST per
 Juan's standing policy ('in case of doubt always ship awid service
