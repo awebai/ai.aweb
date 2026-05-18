@@ -96,6 +96,34 @@ default (unread-only) as unreliable. Use `aw mail inbox --show-all` for
 canonical state. Every Hestia/Athena/Sofia/Iris/Aida/Metis session
 should honor this until channel 1.4.3 verified-live.
 
+**[2026-05-18 ~19:26 UTC] Channel 1.4.3 VERIFIED LIVE EMPIRICALLY**.
+After /plugin marketplace update + /plugin update aweb-channel +
+/reload-plugins, Athena sent POST-1.4.3-INBOX-PROOF-MARKER mail
+(message_id 7891897a) via channel push. Default `aw mail inbox`
+showed MAILS: 1 with the marker visible — pre-1.4.3 this would have
+been auto-ack'd to read-state on delivery and default inbox would
+say "No messages." Athena ACK'd (chat d88b5a29). P0 closed.
+Each agent needs to run `/plugin marketplace update awebai-marketplace
+&& /plugin update aweb-channel@awebai-marketplace` + relaunch to pick
+up the fix in their own session.
+
+**[2026-05-18 ~18:53 UTC] ac v0.5.43 deployed**: release_tag=v0.5.43,
+git_sha=05e65689, aweb_version=1.24.1, awid_service_version=0.5.6.
+Includes Athena bless 625c769a: cb223c34 (Harden targeted MCP OAuth
+reconnect flow) + aweb 03fe4bf (MCP legacy tool aliases) + Grace's
+99cc2cb (newest-duplicate 1:1 chat continuation, fixed the
+Hestia↔Athena 409s that bit this very release cycle).
+
+OAuth smoke per Athena's 5-item checklist (Phase 3 of bless):
+- Item 4 partial: stale aweb_handoff with full OAuth params → 401
+  invalid_client (endpoint refuses gracefully, no 500, no leaked
+  state). Cookie-clear semantics need browser to fully verify.
+- Items 1, 2, 3, 5 need browser + claude.ai-account-session-bearer.
+  Deferred until a session is available.
+
+External claim (Sofia framing + Iris distribution) gated on remaining
+smoke items.
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
