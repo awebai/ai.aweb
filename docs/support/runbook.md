@@ -595,8 +595,7 @@ Questions to ask the customer to classify:
 - **Configuration state**: Is federation actually CONFIGURED on
   both sides? Specifically: is `AWEB_PUBLIC_ORIGIN` set on both
   servers, and has the recipient namespace's delivery origin
-  been published? (Verification commands depend on Grace's
-  federation cycle landing on origin/main.)
+  been published via `aw id namespace set-delivery-origin`?
 
 Routing:
 
@@ -654,17 +653,21 @@ exists — flag as doc gap if not).
 
 If the customer wants a hands-on smoke-test path, sketch:
 
-- Confirm `AWEB_PUBLIC_ORIGIN` set on both servers.
-- Confirm recipient namespace's delivery origin is published
-  (via whatever Grace's federation command surface lands as on
-  origin/main).
+- Confirm `AWEB_PUBLIC_ORIGIN` set on both servers (scheme must
+  match how remote servers reach this deployment; if TLS
+  terminates at a reverse proxy, use the external `https://`
+  origin).
+- Confirm recipient namespace's delivery origin is published via
+  `aw id namespace set-delivery-origin --namespace <domain>
+  --origin <https://...>` (run on the machine that holds the
+  namespace controller key).
 - Send a mail from instance A to a recipient at instance B's
   namespace.
 - Confirm recipient sees it in their inbox.
 
-Do NOT prescribe specific commands until they're source-grep
-verified per discipline #27. The federation cycle is in flight;
-command shapes may shift between drafting and use.
+Per discipline #27, source-grep every command before prescribing
+in a real customer reply; the federation surface is young and
+flag shapes may shift between cycles.
 
 #### Class 5: "How do I enable federation between my two instances?" (configuration / onboarding ask)
 
@@ -680,23 +683,27 @@ Athena / Grace per the cross-check methodology below.
 ### Diagnostic primitives the customer or you can run
 
 **Per discipline #27**: source-grep each command against current
-`aweb/cli/go/cmd/aw/` before recommending. The federation cycle
-is mid-flight; command shapes may not yet be on origin/main.
+`aweb/cli/go/cmd/aw/` before recommending. Federation epic
+`aweb-aaou` is multi-subtask; aaou.17 is on origin/main, but
+later subtasks (e.g. aaou.18 hosted root ingress) may still be in
+flight and may change customer-facing command shapes.
 
-Verified-existing as of 2026-05-18 source check:
+Verified-existing as of 2026-05-18 source check (post aaou.17 push
+`02a344f` and `449cb17` polish on aweb origin/main):
 
 - `aw id namespace <domain>` — inspect or recover namespace
   controller state. Read-only inspection of namespace state
   including delivery-origin field.
+- `aw id namespace set-delivery-origin --namespace <domain>
+  --origin <https://aweb.example.com>` —
+  namespace-controller command to publish a delivery origin.
+  Requires the local namespace controller key. Uses
+  `AWID_REGISTRY_URL` when set; otherwise discovers the registry
+  from DNS. `--domain` is accepted as an alias for `--namespace`.
 - `aw doctor --online` — local-state + server-reach health
   checks; includes `awid.address.delivery_origin` check.
 - `/health` endpoint on each aweb instance — reports
   `aweb_version`, `release_tag`, `git_sha`.
-
-Pending Grace's push (uncommitted on shared working tree as of
-2026-05-18 per Athena `19a4fbe7`):
-
-- `aw id namespace set-delivery-origin --namespace <domain> --origin <origin> --registry <registry>` — namespace-controller command to publish a delivery origin. **Do not name this in customer-facing answers until it's on origin/main and source-grep verified.**
 
 ### Escalation paths
 
