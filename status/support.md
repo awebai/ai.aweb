@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-13 22:35 UTC (post aweb.ai consumer-entry ship)
+Last updated: 2026-05-18 12:10 UTC (post federation docs customer-experience pass)
 
 ## Current focus
 
@@ -155,11 +155,38 @@ catch up the discipline pointer once Iris's update lands.
   example #1 for the eventual "what next" runbook entry, with
   the staleness lesson banked as discipline #27 candidate.
 
+## Recent doc-surface work (no live customer; pre-customer scaffolding)
+
+- **Federation docs customer-experience pass (2026-05-18)** — after
+  Grace's `aaou.17` push (aweb `02a344f` + `449cb17` polish) landed
+  the federation surface on origin/main, did a scoped customer-
+  experience pass on `self-hosting-guide.md` + `federation-
+  architecture.md`. Six in-lane findings + two lower-priority
+  observations routed to Athena (mail `cc7ae071`); zero correctness
+  claims, all framed as confusion-points / missing-affordances /
+  edge-case-gaps from a self-hoster's seat. Iris's terminology flag
+  (BYOD/BYOIDT) closed by Grace at `449cb17` before the pass; dropped
+  from the batch per Athena `05865b23`. Federation Triage Skeleton
+  revised + committed at `302e481` to unmute `set-delivery-origin`
+  with source-grep-verified flag shape.
+
 ## Standing held items (separate from this status update)
 
-- 4-commit runbook stack (`e15838c` + `e6b1303` + `8179a3e` + merge
-  `2b3e392`) local-unpushed pending Juan's greenlight. Net runbook
-  content after push = `e15838c`-equivalent.
+- **13-commit local-unpushed stack** on `main` ahead of `origin/main`:
+  - Support runbook + status content (10 commits): `e15838c` BYOD-422
+    + invariant; `9537fe8` Customer Orientation Responses (what-next);
+    `90be163` Cross-Check Methodology; `44c234e` Federation Triage
+    Skeleton; `302e481` Triage Skeleton unmute (set-delivery-origin);
+    `faa84db` / `1ec79d0` / `f9b7329` status refreshes
+  - aani task management (1 commit + REMOVE): `e6b1303` add + `8179a3e`
+    REMOVE (net runbook content = `e15838c`-equivalent)
+  - Merges (3): `2b3e392`, `30c5078`, `58b174b`, `204ffb0`
+  - All Aida-owned artifacts; no engineering-blocker content. Athena
+    flagged the queue depth as "thing to watch" (mail `0c0c2884`);
+    default posture is wait for Juan's greenlight per the standing
+    "commit locally + don't push without review chain" discipline.
+    If stack reaches ~20 or content shifts to engineering-blocker
+    shape, revisit.
 - AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing
   sections) uncommitted, awaiting same greenlight.
 - AGENTS.md cleanup pass pending the right convergence point (the
