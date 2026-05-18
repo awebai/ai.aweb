@@ -1,5 +1,48 @@
 # Hestia Handoff
 
+Last updated: 2026-05-18 14:15 CEST (12:15 UTC) — **Federation
+completion wave aaou.15-18 in flight**. awid 0.5.6 shipped FIRST per
+Juan's standing policy ('in case of doubt always ship awid service
+and awid first'):
+
+- commit dad937a on aweb main
+- awid-service-v0.5.6 tag → PyPI workflow 26031767028 ✓
+- awid-v0.5.6 tag → GHCR workflow 26031772227 ✓ (1m18s)
+- PyPI awid-service@0.5.6 live ✓
+- api.awid.ai flipped to 0.5.6 ✓ (Render auto-pulled GHCR image)
+- 02a344f's awid changes (dev-mode insecure-delivery-origin helper,
+  no migrations, prod-impact nil) now deployed
+
+ac federation completion: **v0.5.42** (Athena correction eef884ad —
+v0.5.41 tag already exists at 2a3d0144 from my earlier awid-service
+tighten commit; Grace's hosted federation ingress at a3170afb landed
+without a bump). HOLDING v0.5.42 tag-push pending Grace's call:
+- Option A: include admin backfill command for existing hosted child
+  namespaces (alice.aweb.ai etc — without backfill they won't get
+  delivery_origin auto-set since only the BASE aweb.ai namespace gets
+  repaired at AC startup)
+- Option B: ship narrower without backfill, separate v0.5.43 follow-up
+
+Standing by for Grace's decision.
+
+Smoke-walk shape locked (Athena e39c743e + Sofia framing):
+- hosted ↔ self-hosted user, mail AND chat both directions
+- message-ids + envelope verification receipts in verified-live mail
+- preferred peer: commando (aweb.missionctrl.dev) — relationship-respecting +
+  best-empirical-story (he triggered the federation arc)
+- 1-2-3 sequencing: internal-verified-live → commando-notification →
+  public claim
+- fallback if commando unavailable: internal-loopback as weaker-empirical
+  footnote
+
+Ops discrepancy flagged: sofia awid address resolves 404 from hestia
+(`aw mail send --to sofia` AND chat both fail). Athena confirms same
+cross-team mail-resolution skew Grace diagnosed — and ac v0.5.42 itself
+closes it. Workaround for now: `aw chat-with --start-conversation`
+goes through. Mailed Juan + Athena flagged. Design doc v2 routed to
+Sofia via git pull instead.
+
+Previous lead:
 Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0
 wave VERIFIED LIVE**. Three coordinated deploys today:
 
@@ -9,7 +52,7 @@ wave VERIFIED LIVE**. Three coordinated deploys today:
 3. awid 0.5.5 (GHCR + PyPI awid-service)
 4. ac v0.5.41 (awid-service 0.5.5 pin + constraint tighten)
 
-Live state:
+Live state at v0.5.41:
 - app.aweb.ai: release_tag=v0.5.41, aweb_version=1.23.0,
   awid_service_version=0.5.5, git_sha=2a3d0144
 - api.awid.ai: version=0.5.5

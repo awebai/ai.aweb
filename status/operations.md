@@ -1,5 +1,37 @@
 # Operations Status
 
+Last updated: 2026-05-18 14:05 CEST (12:05 UTC) — **Federation
+completion wave aaou.15-18 in flight**. awid 0.5.6 shipped FIRST per
+Juan's standing policy ('in case of doubt always ship awid service
+and awid first'): commit dad937a on aweb main, tags awid-service-v0.5.6
+(PyPI workflow 26031767028 success) + awid-v0.5.6 (GHCR workflow
+26031772227 success 1m18s). PyPI 0.5.6 verified live; api.awid.ai
+flipped to 0.5.6 (Render auto-pulled). 02a344f's awid changes (dev-mode
+insecure-delivery-origin helper, no migrations, prod-impact nil) now
+deployed.
+
+ac federation completion ship target: **v0.5.42 (not v0.5.41)** — per
+Athena eef884ad correction. v0.5.41 tag already exists at 2a3d0144 (my
+own awid-service-tighten commit earlier today). Grace's hosted federation
+ingress landed at a3170afb on top of v0.5.41 with no version bump.
+v0.5.42 will encompass a3170afb + a version-bump commit, possibly +
+admin backfill command for existing hosted child namespaces (Athena
+asked Grace Option A include-backfill vs B ship-narrower; HOLDING tag
+pending Grace's call).
+
+Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
+self-hosted user, mail AND chat both directions, message-ids + envelope
+verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
+— relationship-respecting + best-empirical-story. 1-2-3 sequencing:
+internal-verified-live → commando-notification → public claim.
+
+Ops discrepancy flagged: sofia awid address resolves 404 from hestia
+(`aw mail send --to sofia` and chat both fail). Athena confirms same
+cross-team mail-resolution skew Grace diagnosed — and ac v0.5.42 itself
+closes it (per Grace's diagnosis). Workaround: `aw chat-with --start-conversation`
+goes through. Mailed Juan + Athena flagged.
+
+Previous lead:
 Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0
 wave VERIFIED LIVE end-to-end**. aweb 1.23.0 on PyPI + npm + `aw
 upgrade` clean (server-v1.23.0 + aw-v1.23.0 individually tagged at
