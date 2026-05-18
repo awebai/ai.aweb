@@ -651,19 +651,30 @@ This is a docs-pointer question. Route to the verification
 recipe in `aweb/docs/federation-architecture.md` (if/when one
 exists — flag as doc gap if not).
 
-If the customer wants a hands-on smoke-test path, sketch:
+If the customer wants a hands-on smoke-test path, the
+engineering-confirmed simple recipe is (Athena `7e6d2f1b`,
+2026-05-18):
 
-- Confirm `AWEB_PUBLIC_ORIGIN` set on both servers (scheme must
-  match how remote servers reach this deployment; if TLS
-  terminates at a reverse proxy, use the external `https://`
-  origin).
-- Confirm recipient namespace's delivery origin is published via
-  `aw id namespace set-delivery-origin --namespace <domain>
-  --origin <https://...>` (run on the machine that holds the
-  namespace controller key).
-- Send a mail from instance A to a recipient at instance B's
-  namespace.
-- Confirm recipient sees it in their inbox.
+```bash
+# On instance A:
+aw mail send --to <domain-B>/<user> --subject test --body hello
+
+# On instance B:
+aw mail inbox  # should show the message
+```
+
+That recipe assumes federation is already CONFIGURED (i.e.
+`AWEB_PUBLIC_ORIGIN` is set on both servers and both namespaces
+have a delivery origin published via `aw id namespace
+set-delivery-origin`). The customer asking this question may
+have completed setup but not yet verified; the recipe above is
+the canonical first-check. If it fails, drop into Class 1 (broad
+federation-isn't-working) triage.
+
+The full OSS 2-server suite is `scripts/e2e-oss-federation.sh`
+in `aweb` — that requires two stacks side-by-side with fixtures
+and is for engineering use, not customer-facing first-smoke. Do
+not recommend it for a customer's verify-my-setup ask.
 
 Per discipline #27, source-grep every command before prescribing
 in a real customer reply; the federation surface is young and
