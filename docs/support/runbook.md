@@ -557,6 +557,183 @@ here remain source-grep accurate; the welcome guide v5 in
 customer-facing tool vocabulary. If any of those invariants
 breaks, this entry needs re-verification.
 
+## Federation Triage Skeleton
+
+**Pre-empirical artifact.** Question-shape only, not authoritative
+answers. Federation (`aweb-aaou` epic — messaging-only v1 across
+self-hosted aweb instances) is shipped infrastructure but I have
+zero customer reports of federation issues as of 2026-05-18.
+Per Sofia's standing 2-3-seeds-before-authoring posture + Athena's
+affirmation in mail `6f2d8c9c`: this skeleton encodes the QUESTIONS
+to ask, not the ANSWERS. Full triage entries follow when real
+customer reports arrive.
+
+If you are a future Aida instance reading this BEFORE the first
+real federation customer report lands, the decision-tree below is
+your scaffold. After 2-3 reports surface and patterns emerge, fold
+empirical answers into the relevant Class N below and elevate
+recurring ones into Known Errors entries.
+
+### When a customer reports a federation issue
+
+Classify the report into one of these five top-level shapes
+before doing anything else. Each has different routing.
+
+#### Class 1: "Federation isn't working" (broad, unclassified)
+
+Questions to ask the customer to classify:
+
+- **Scope**: Are you sending across two self-hosted instances?
+  Self-hosted ↔ hosted `aweb.ai`? Hosted ↔ hosted? Federation v1
+  scope is messaging-only (mail + chat). Confirm they're within
+  the v1 scope before deeper triage.
+- **Surface**: What command or UI triggered the failure?
+  `aw mail send`? Dashboard send? MCP tool from a connected AI?
+- **Symptom**: Error response (with text), timeout, or silent
+  failure (the message looks sent on sender side but never
+  arrives)?
+- **Configuration state**: Is federation actually CONFIGURED on
+  both sides? Specifically: is `AWEB_PUBLIC_ORIGIN` set on both
+  servers, and has the recipient namespace's delivery origin
+  been published? (Verification commands depend on Grace's
+  federation cycle landing on origin/main.)
+
+Routing:
+
+- If federation isn't configured: this is an onboarding/setup
+  question, not a bug. Route to the federation sections of
+  `aweb/docs/self-hosting-guide.md` + `aweb/docs/federation-architecture.md`.
+- If configured but failing: needs engineering. Route to Athena.
+- If hosted-side state involved: route to Hestia + Athena.
+
+#### Class 2: "Federation worked, now it doesn't" (regression)
+
+Questions to ask:
+
+- **When did it stop?** Recent customer-side upgrade? Recent
+  cloud-side deploy? Namespace controller key rotation? Other
+  config change?
+- **Scope + surface + symptom**: same as Class 1.
+- **Versions on each side**: server-side `aweb_version` and
+  `release_tag` from `/health` on both instances; CLI version
+  via `aw version`.
+
+Routing:
+
+- Regression with a clear recent change → route to Athena with
+  the change + symptom shape.
+- Regression with no apparent change → ask Hestia about silent
+  cloud-side state changes; route to Athena if no operational
+  cause surfaces.
+
+#### Class 3: Specific error report (HTTP status / body / stderr)
+
+Capture before routing:
+
+- **Exact error text**: HTTP status code, response body (redacted
+  if needed), CLI stderr.
+- **Command that triggered it**: exact invocation.
+- **Versions**: both ends (`aweb_version` from `/health` on each;
+  `aw version` on the CLI side).
+- **Repeatability**: does the error fire every time, or
+  intermittently?
+
+Routing:
+
+- Known error from a prior cycle → if a Known Errors entry
+  exists, follow it.
+- Unknown error → route to Athena with the captured shape.
+- Intermittent errors → flag to Hestia for operations-side
+  diagnosis.
+
+#### Class 4: "How do I verify federation works on my self-hosted instance?" (smoke-test ask)
+
+This is a docs-pointer question. Route to the verification
+recipe in `aweb/docs/federation-architecture.md` (if/when one
+exists — flag as doc gap if not).
+
+If the customer wants a hands-on smoke-test path, sketch:
+
+- Confirm `AWEB_PUBLIC_ORIGIN` set on both servers.
+- Confirm recipient namespace's delivery origin is published
+  (via whatever Grace's federation command surface lands as on
+  origin/main).
+- Send a mail from instance A to a recipient at instance B's
+  namespace.
+- Confirm recipient sees it in their inbox.
+
+Do NOT prescribe specific commands until they're source-grep
+verified per discipline #27. The federation cycle is in flight;
+command shapes may shift between drafting and use.
+
+#### Class 5: "How do I enable federation between my two instances?" (configuration / onboarding ask)
+
+This is a docs-pointer question, not a triage one. Route to:
+
+- `aweb/docs/self-hosting-guide.md` federation sections
+- `aweb/docs/federation-architecture.md`
+
+If the customer hits friction in the docs themselves, that
+becomes a customer-experience finding worth surfacing to Mia /
+Athena / Grace per the cross-check methodology below.
+
+### Diagnostic primitives the customer or you can run
+
+**Per discipline #27**: source-grep each command against current
+`aweb/cli/go/cmd/aw/` before recommending. The federation cycle
+is mid-flight; command shapes may not yet be on origin/main.
+
+Verified-existing as of 2026-05-18 source check:
+
+- `aw id namespace <domain>` — inspect or recover namespace
+  controller state. Read-only inspection of namespace state
+  including delivery-origin field.
+- `aw doctor --online` — local-state + server-reach health
+  checks; includes `awid.address.delivery_origin` check.
+- `/health` endpoint on each aweb instance — reports
+  `aweb_version`, `release_tag`, `git_sha`.
+
+Pending Grace's push (uncommitted on shared working tree as of
+2026-05-18 per Athena `19a4fbe7`):
+
+- `aw id namespace set-delivery-origin --namespace <domain> --origin <origin> --registry <registry>` — namespace-controller command to publish a delivery origin. **Do not name this in customer-facing answers until it's on origin/main and source-grep verified.**
+
+### Escalation paths
+
+- Configuration / onboarding question → docs (and surface
+  doc-gaps to Mia/Athena/Grace via the cross-check methodology
+  below).
+- Specific error / regression / unclear behavior → Athena.
+- Cross-org / cloud-state involvement → Hestia + Athena.
+- Pattern of repeated questions across 2-3+ customers → upgrade
+  this skeleton's relevant Class N to a fully-authored entry
+  (per Sofia's standing 2-3-seeds-before-authoring posture).
+
+### What this triage skeleton does NOT do
+
+- Does not assert specific error meanings or fix recipes
+  (empirical-zero on federation customer reports as of
+  2026-05-18).
+- Does not propose engineering-side fixes (route to
+  Athena / Mia).
+- Does not name commands not yet on origin/main as if they
+  were available (per discipline #27 + #26 +
+  uncommitted-on-shared-tree caveat).
+- Does not commit to runbook entries until 2-3 real federation
+  customer reports surface (per Sofia's standing posture).
+
+### Source
+
+Question-shape derived from the federation architecture
+described in `aweb/docs/federation-architecture.md` (origin/main)
++ Athena's mail `6f2d8c9c` (2026-05-17) affirming the
+decision-tree shape as the pre-empirical artifact + Athena's
+mail `19a4fbe7` (2026-05-18) confirming Grace's federation doc
+content is uncommitted as of writing.
+
+Re-verify command names against current source when the first
+real federation customer report arrives — discipline #27.
+
 ## Customer-Content Cross-Check Methodology
 
 When asked to cross-check customer-facing content surfaces (e.g.,
