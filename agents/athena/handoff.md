@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-18 15:10 GMT
+Last updated: 2026-05-18 15:55 GMT
 
 ## Read this first
 
@@ -48,6 +48,12 @@ release mechanics; to them, Athena is the gate.
   channel-v1.4.1 tag exists but npm publish failed because GHA didn't
   install channel-core deps before building; npm may still show the
   package as Proprietary until this closes.
+- **BLOCKED: AC hosted MCP OAuth selected-org regression fix is not
+  production-ready.** Dave reported Grace had a fix summary, but Juan
+  said the solution is likely incomplete. Athena must NOT bless or
+  forward to Hestia until branch/commits are available, Mia reviews,
+  Athena reviews, and the incomplete-solution concern is explicitly
+  resolved.
 
 ## Active dev-team work visible
 
@@ -56,6 +62,12 @@ release mechanics; to them, Athena is the gate.
 - Mia: `aweb-aalr.2` stale/old AWID ensure-team + AC persist refactor
   claim still visible.
 - Ready P0: `aweb-aaox.16` claude-channel license metadata correction.
+- AC hosted MCP OAuth selected-org bug: Grace reportedly fixing; no
+  branch/commits seen by Athena yet. Dave summary of symptom: dashboard
+  selected org/team aweb → Claude.ai remote MCP connect → name marvin;
+  consent showed personal `@juanre/marvin`; POST returned
+  `Hosted handle is not available for this account`; Claude showed
+  `code: Field required` because no OAuth code. Blocked from deploy.
 
 ## Local repo caveats
 
@@ -72,12 +84,15 @@ release mechanics; to them, Athena is the gate.
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. Check whether Dave closed or handed off `aweb-aaov.12`.
-4. Check whether Hestia closed `aweb-aaox.16` or needs engineering
+3. Check for Grace branch/commits for the selected-org OAuth bug, but
+   keep it blocked unless Juan's incomplete-solution concern is resolved.
+4. Get/confirm Mia's review before any Athena bless.
+5. Check whether Dave closed or handed off `aweb-aaov.12`.
+6. Check whether Hestia closed `aweb-aaox.16` or needs engineering
    review/tooling help for the channel publish failure.
-5. If any channel event wakes the session, inspect metadata and sender
+7. If any channel event wakes the session, inspect metadata and sender
    verification before acting; reply in the existing thread/session.
-6. Restore or locate the AC sibling repo before any AC review/test work.
+8. Restore or locate the AC sibling repo before any AC review/test work.
 
 ## Old debt still not closed
 

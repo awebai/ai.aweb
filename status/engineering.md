@@ -1,8 +1,14 @@
 # Engineering Status
-Last updated: 2026-05-18 15:10 GMT
+Last updated: 2026-05-18 15:55 GMT
 
 ## Current focus
 
+0. **BLOCKED: AC hosted MCP OAuth selected-org fix is NOT production-ready.**
+   Juan says the current solution is likely incomplete; Athena will not
+   bless or forward to Hestia. Grace/Mia/Dave/Hestia have been notified.
+   Required before any bless: pushed AC branch/commits, Mia review,
+   Athena invariant review, and explicit resolution of the incomplete-
+   solution concern.
 1. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
    and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
    reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
@@ -30,6 +36,13 @@ Last updated: 2026-05-18 15:10 GMT
   remains visible.
 - **aweb-aalr.2 — AWID ensure-team endpoint + AC persist refactor**:
   Mia still has a stale claim from the older readiness epic.
+- **AC hosted MCP OAuth selected-org regression**: Grace reportedly has
+  a fix, but no branch/commit has reached Athena yet. Blocked from
+  production by Juan's incomplete-solution concern. Review focus:
+  dashboard selected-team handoff, server-side validation, forged /
+  inaccessible team rejection, selected-org new-agent POST, exact
+  Claude.ai remote MCP flow, and preservation of the personal consumer
+  path.
 - **aweb-aaox.16 — claude-channel license metadata P0**: ready work;
   Hestia publish-owner per task, engineering available if the release
   workflow/tooling fix needs code review.
@@ -43,7 +56,9 @@ Last updated: 2026-05-18 15:10 GMT
 
 ## Release-ready state (handoff to Hestia)
 
-- No Athena-authored bless-and-run is pending from this session.
+- **Do not deploy the selected-org OAuth fix.** No bless-and-run exists;
+  Hestia was explicitly told to treat any release signal for this fix as
+  blocked unless Athena sends an explicit reviewed bless.
 - Latest verified-live chain per Operations: awid-service-v0.5.6,
   awid-v0.5.6, aweb 1.23.0, AC v0.5.42.
 - Pi package release path appears to be in the aaov/aaox release lane;
@@ -67,9 +82,10 @@ Last updated: 2026-05-18 15:10 GMT
   auto-ack may hide mail from default inbox; treat inbox-empty as
   weaker signal until the second independent attestation/design call
   resolves the class.
-- **Broken local AC symlink**: `agents/athena/ac -> ../../../ac` is
-  absent on this machine. Anything requiring AC code review or tests
-  needs the sibling repo restored before claiming.
+- **Selected-org OAuth fix incomplete risk**: the reported fix may only
+  partially address the dashboard → consent → OAuth POST contract. Do
+  not let validation-count summaries substitute for code review of the
+  actual handoff and server-side authority checks.
 
 ## Next checks
 
