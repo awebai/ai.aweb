@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 16:46 GMT
+Last updated: 2026-05-19 18:16 GMT
 
 ## Read this first
 
@@ -81,13 +81,17 @@ release mechanics; to them, Athena is the gate.
   rotation continuation, and duplicate-alias active-team routing coverage. Grace's
   runtime evidence at `2d42d23`: federation 28 passed and OSS user journey 211
   passed; final `99d029d` is label-only and Athena static validation was green.
-- `aweb-aapf.5` is now assigned/in progress with Peter. Athena sent the AC brief
-  on 2026-05-19 16:46 GMT. Core reminder from Juan: **local is old ephemeral;
-  global is old persistent**. `.5` scope is AC hosted global/local identity
-  UX/backend only: hosted global registers DID/address and sets identity-level
-  `delivery_origin` with hosted custodial key; hosted local is did:key-only with
-  no AWID DID/address; remove user-facing reachability controls. Keep `.6`
-  migration and `.8` deletion out of `.5`.
+- `aweb-aapf.5` is approved/closed at AC `173b9f7e` over `583970cf`. Athena
+  reviewed the full `.5` series and reran validation: `git diff --check`,
+  focused backend local/global/OAuth tests, OAuth regression set,
+  `make test-backend-fast` (75 passed), focused frontend setup/connect tests
+  (9 passed), and `make test-frontend` (195 tests + build passed). Approved
+  invariants: hosted global registers DID/address and sets identity-level
+  `delivery_origin` with hosted custody; hosted local stores SQL NULL
+  `agents.did_aw`/`agents.stable_id`, has no AWID DID/address/delivery-origin,
+  and stays out of OAuth binding/probing/connect UI except explicit team-local
+  bearer-token MCP. Peter ACKed he will stop `.5` at `173b9f7e` and not tag,
+  deploy, or start `.6`/`.8`.
 
 ## 2026-05-19 hosted identity routing/default release update
 
