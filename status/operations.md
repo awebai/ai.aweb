@@ -1,7 +1,33 @@
 # Operations Status
 
-Last updated: 2026-05-18 14:05 CEST (12:05 UTC) — **Federation
-completion wave aaou.15-18 in flight**. awid 0.5.6 shipped FIRST per
+Last updated: 2026-05-19 12:55 CEST (10:55 UTC) — **aweb 1.24.3
+SHIPPED at 4c45619**. ac v0.5.44 ship in flight at 583970cf
+(commit pushed, `make ship` running gate end-to-end).
+
+**aweb 1.24.3 VERIFIED LIVE**. Grace's CLI-side fix (4c45619 "Fix
+federated continuation signing from stable DID") closes the
+conversation-only reply path: RegistryResolver did:aw→did:key
+fallback + ChatSendMessage signs full from-address for in-session
+federated targets. After 3 prior halts (#1 8064558 generic 'to', #2
+78482b9 narrowed 'to_did', #3 d664988 widened acceptance still
+mismatched), attempt #4 at 4c45619 GREEN end-to-end:
+- make ship (pipefail set): federation e2e Phase 4 reply PASS both
+  mail + chat directions; OSS user journey 224 tests ALL PASSED
+- server-v1.24.3 + aw-v1.24.3 tagged + pushed individually (3
+  separate git push commands per discipline 7)
+- GHA: Server Release (PyPI) 26091884490 + aw Sync 26091890177 +
+  awebai/aw Release 26091900560 all success
+- PyPI simple index: aweb-1.24.3.tar.gz + aweb-1.24.3-py3-none-any.whl
+- npm: @awebai/aw@1.24.3
+
+Discipline lesson banked from attempt #1: `make X 2>&1 | tee log`
+returns tee's exit code (0) unless pipefail set. Attempt #1 reported
+exit 0 but actually halted at Phase 4. Use `set -o pipefail` before
+make-and-tee, or check log tail for FAIL/ALL PASSED. Wrapping make
+ship in subshell with pipefail caught attempt #4's real green
+properly.
+
+Previous federation completion wave (aaou.15-18): awid 0.5.6 shipped FIRST per
 Juan's standing policy ('in case of doubt always ship awid service
 and awid first'): commit dad937a on aweb main, tags awid-service-v0.5.6
 (PyPI workflow 26031767028 success) + awid-v0.5.6 (GHCR workflow
