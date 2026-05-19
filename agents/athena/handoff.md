@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 13:41 GMT
+Last updated: 2026-05-19 13:54 GMT
 
 ## Read this first
 
@@ -48,7 +48,13 @@ release mechanics; to them, Athena is the gate.
   + reply-in-established-context behavior. Athena tightened the gate: preserve
   and simplify existing ephemeral/local reply behavior, do not grow a local
   mini-registry/protocol unless a concrete exploit requires it, and require a
-  deletion/complexity note with the patched commit. Peter ACKed the pivot.
+  deletion/complexity note with the patched commit. Conversation_id may be an
+  index into local conversation/session state, but not routing authority or the
+  implementation center: sender must be authenticated/signed as a stored
+  participant, target must be the other stored participant, and route/identity
+  must come from stored participant/session state; guessed conversation_id,
+  non-participant, sender/target mismatch, missing/stale route, and federated
+  first-contact to local did:key must fail closed. Peter ACKed the pivot.
   CLI/channel/AC work remains gated until `.3` approval.
 - `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass.
   Grace ACKed. She may inventory stale reachability/private-address/team-cert/
