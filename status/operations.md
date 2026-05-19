@@ -206,6 +206,64 @@ hypothesis-with-falsifying-test before routing as conclusion;
 do not name a mechanism for a separate observation while answering
 the primary question — keep the conclusion tight to evidence.
 
+**[2026-05-19 ~00:30 UTC] Coordinated cut HALTED + matrix degraded**.
+
+Engineering release handoff received (Athena b879302c): aweb HEAD
+8064558 + ac HEAD bdfe5631. Started Phase 1 aweb 1.24.3 ship. Two
+issues:
+
+1. **make ship halted at test-federation-e2e Phase 4** with
+   `aweb: http 422: {"detail":"Federation signed_payload to does not
+   match"}` after 18 phase-4 PASS. The new continuation-binding logic
+   in 8064558 (CLI-only) is producing a 'to' field cross-server
+   federation receiver doesn't accept on reply/follow-up. Needs Grace's
+   CLI-side fix before aw-v1.24.3 can tag.
+
+2. **Athena discipline 27a pushback (chat 13813d66)**: 8064558 is
+   CLI-only (cli/go/*). Banked rule: CLI-only releases tag `aw-v1.24.3`
+   ONLY; do not bump server/pyproject or tag server-v1.24.3 for it.
+   Also do not `uv lock --upgrade-package aweb` in AC to chase the CLI
+   tag — ac v0.5.44 can ship bdfe5631 without an aweb pin bump unless
+   release-ready exposes a real server-pkg dep.
+
+   I had bumped server/pyproject 1.24.2 → 1.24.3 + locked before her
+   pushback arrived. Reverted both immediately; working tree clean at
+   origin/main f4d13f4. No PyPI/npm publish would have fired (gate
+   halted first).
+
+3. **Matrix degraded after my 1.24.2 client upgrade**: hestia→athena
+   now ALSO 404s. Earlier today athena worked (the continuation-binding
+   masking path that Athena scoped out of the root-cause conclusion).
+   Upgrading my local aw to 1.24.2 (the trust-display fix) likely
+   disabled that masking path, so hestia→athena now hits the same
+   reachability=nobody 404 as hestia→sofia/iris. This validates
+   Athena's framing that the athena-success path was a separate
+   masking mechanism, not part of the root cause.
+
+   Current matrix (re-probed):
+     hestia → athena ✗ 404
+     hestia → sofia  ✗ 404
+     hestia → iris   ✗ 404
+     hestia → aida   ✓ (reachability=public)
+     hestia → ama    ✓ (reachability=public)
+     hestia → metis  ✓ (reachability=org_only)
+
+Revised release plan (for Athena's confirmation when reachable):
+- Wait for Grace's CLI-side fix to 8064558 federation-reply path.
+- Once on origin/main: tag `aw-v1.24.3` ONLY at that commit (no
+  server-v1.24.3). aweb 1.24.3 is a CLI-only release.
+- ac v0.5.44 ships bdfe5631 without aweb pin bump. Bump
+  ac/backend/pyproject 0.5.43 → 0.5.44, uv lock (no
+  --upgrade-package aweb), run release-ready, tag v0.5.44, push,
+  watch Render.
+- Then scoped audited repair for the 4 affected nobody rows
+  (hestia, athena, sofia, iris in default/aweb.ai) — method TBD,
+  routed to Grace before applying. No blanket migration.
+- Matrix re-probe expectation: all 6 peers reachable.
+
+Hestia outbound to athena/sofia/iris all 404'ing right now; can't
+route gate-halt to Athena directly. Banked here for git pull.
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
