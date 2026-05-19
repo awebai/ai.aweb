@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 21:14 GMT
+Last updated: 2026-05-19 23:04 GMT
 
 ## Read this first
 
@@ -124,6 +124,22 @@ release mechanics; to them, Athena is the gate.
   data and hidden/limited legacy global rows are surfaced for explicit decision.
   Reachability metadata is ignored by resolver after deploy; it is not safe to
   skip the audit and assume existing hidden rows are harmless.
+- Juan then rejected shipping the transition artifact and asked Athena to keep
+  going until the system is actually simplified. Grace's critique: target
+  global/local architecture can be simpler, but current main is halfway
+  migration, not ship-grade simplification. Hestia's real AWID audit found 43
+  hidden/limited rows and 0 persistent hosted agents on contacts policy. Grace
+  also found old->new federation wire break: old v1 senders emit four fields
+  current `FederationEnvelope` hard-rejects with `extra="forbid"`.
+- New P0 epic `aweb-aapg` tracks ship-grade simplification. Subtasks:
+  `.1` federation v1 compatibility tolerance (assigned Peter; started), `.2`
+  hidden/limited AWID row policy, `.3` identity delivery-origin rollout
+  (assigned Peter; hold until routed), `.4` messaging-policy simplification
+  decision, `.5` docs convergence, `.6` minimal e2e proof (assigned Peter;
+  blocked on `.1-.5,.7`), `.7` AC local/global product cleanup (assigned
+  Peter; blocked on `.3,.4`). Peter was told to start only `.1` for now.
+  Pull Grace back for boundary review on compatibility/migration/simplification
+  decisions; she is not implementing unless asked.
 
 ## 2026-05-19 hosted identity routing/default release update
 
