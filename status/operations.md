@@ -317,6 +317,61 @@ cross-team mail-resolution skew Grace diagnosed — and ac v0.5.42 itself
 closes it (per Grace's diagnosis). Workaround: `aw chat-with --start-conversation`
 goes through. Mailed Juan + Athena flagged.
 
+**[2026-05-19 ~13:30 UTC] aweb 1.24.3 ship attempt #3 at d664988
+HALTED — SAME Phase 4 reply path 422 'to_did does not match'**.
+
+Athena blessed (e1a2e3b1 in conversation 96317ca9): aweb HEAD now
+includes d664988 ("Accept stable recipient DID in federation
+payloads") on top of 78482b9 + 3198d6e + 8064558. d664988 widens
+signed_payload.to_did acceptance from only target_current_did_key to
+either target_current_did_key OR target_did_aw. Her bless validation
+at d664988: server focused envelope + continuation route 15 passed,
+selected federat/continuation sweep 30 passed, cli/go pass, py_compile
+clean.
+
+I bumped server/pyproject 1.24.2 → 1.24.3 + re-locked, ran
+`make test-federation-e2e` directly (not full `make ship` — I
+verified the Makefile has individual targets, no `release-ready`
+umbrella). Halted at SAME step as attempt #2 with SAME refined
+error:
+
+  === Phase 4: Public cross-server first contact and replies ===
+    PASS: public federated mail delivered to beta
+    PASS: public federated mail conversation id
+  aweb: http 422: 'Federation signed_payload to_did does not match'
+
+18 prior assertions passed. The failing CLI call is at
+scripts/e2e-oss-federation.sh:477:
+  bob mail send --conversation-id $public_conversation_id \
+    --subject "Public federated reply" \
+    --body "reply from beta bob"
+
+So: alice→bob FIRST CONTACT works (Phase 4 first 2 asserts pass).
+bob's REPLY via --conversation-id back to alice still 422s on
+to_did. d664988 did NOT close this. Her pytest 15-pass continuation
+route set must exercise a different code path than the shell
+e2e:477 hits via the real aw CLI.
+
+State:
+- aweb origin/main HEAD: d664988 (no new commits, no new tags).
+- My local: pyproject 1.24.3 → REVERTED back to 1.24.2, uv lock
+  re-locked, working tree clean at origin/main d664988.
+- No tags. No PyPI/npm publish fired.
+- Full gate log at /tmp/test-fed-e2e-1.24.3-attempt3.log.
+- Halt mail sent to Athena 0651e0af in conversation 96317ca9
+  (delivered — same routable conversation as her bless e1a2e3b1 +
+  ACK bdf1abde).
+
+Hypothesis (not verified, athena-territory): the reply path's
+signed_payload.to_did is NEITHER target_current_did_key NOR
+target_did_aw — possibly built from a different source (cached
+from inbound first-contact, or resolved via a different awid
+lookup branch). The widening in d664988 won't help if the actual
+to_did is some third identifier.
+
+Next: standing by for Athena's narrower diagnosis. AC v0.5.44
+remains blocked behind aweb 1.24.3 landing.
+
 Previous lead:
 Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0
 wave VERIFIED LIVE end-to-end**. aweb 1.23.0 on PyPI + npm + `aw
