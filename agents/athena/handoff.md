@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 05:18 GMT
+Last updated: 2026-05-19 08:45 GMT
 
 ## Read this first
 
@@ -16,23 +16,24 @@ release mechanics; to them, Athena is the gate.
 
 ## 2026-05-19 hosted identity routing/default release update
 
-- Review cleared for aweb `8064558` + AC `bdfe5631`.
-  - Grace ACKed no blockers after Athena's detached-worktree review.
-  - Mia confirmed by chat that she approved `bdfe5631` too.
-  - Hestia has the release handoff.
-- Important cut-plan correction sent to Hestia: aweb `8064558` is **CLI-only**
-  (`cli/go/*`). Banked discipline 27a applies:
-  - tag/publish `aw-v1.24.3` only;
-  - do **not** bump aweb server/pyproject;
-  - do **not** tag `server-v1.24.3`;
-  - do **not** run AC `uv lock --upgrade-package aweb` merely to chase that
-    CLI tag.
-- AC `v0.5.44` should ship `bdfe5631` with its current valid Python aweb pin
-  unless `make release-ready` proves a real server-package dependency.
+- Release-cleared head is now aweb `78482b9` + AC `bdfe5631`.
+  - Initial aweb review cleared `8064558` (CLI continuation binding) + AC
+    `bdfe5631`; Mia/Grace approved.
+  - Hestia's first cut plan treated `8064558` as a server release; Athena
+    pushed back because `8064558` alone was CLI-only.
+  - Grace then found/fixed the real server-side federation continuation
+    verifier blocker in `3198d6e` and the malformed-target rejection blocker
+    in `78482b9`. Athena reviewed `78482b9` in a detached worktree: focused
+    envelope + mail/chat route set 13 passed; broader messages/chat/MCP sweep
+    30 passed; focused Go continuation/trust suite passed; py_compile +
+    diff-check clean.
+  - Because `3198d6e`/`78482b9` touch `server/src`, `server-v1.24.3` is now
+    justified alongside `aw-v1.24.3`. Hestia ACKed and started the corrected
+    cut: aweb `78482b9` → server/aw 1.24.3, then AC `bdfe5631` → v0.5.44.
 - Post-deploy repair remains explicit/scoped/audited only. Known `nobody` rows
-  must not be blanket migrated; prefer controller-key/API repair over direct DB
-  unless Grace decides the API route is not viable. Require matrix smoke after
-  repair before any claim.
+  (Athena, Hestia, Sofia, Iris) must not be blanket migrated; prefer
+  controller-key/API repair over direct DB unless Grace decides the API route
+  is not viable. Require matrix smoke after repair before any claim.
 
 ## 2026-05-18 trust-display release update
 
@@ -190,9 +191,8 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check Hestia's ACK/status on the adjusted routing/default cut plan:
-   `aw-v1.24.3` only for aweb `8064558`; AC `v0.5.44` at `bdfe5631` without a
-   gratuitous Python aweb lock bump.
+3. First check Hestia's ship status for aweb `78482b9` as
+   `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 4. After AC deploy, coordinate scoped repair method with Grace and require
    Hestia's post-repair hestia→{athena,sofia,iris,aida,metis,ama} matrix smoke.
 5. Confirm Sofia framing before any external trust-display claim. Narrow

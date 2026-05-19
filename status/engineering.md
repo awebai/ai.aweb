@@ -1,8 +1,8 @@
 # Engineering Status
-Last updated: 2026-05-19 05:18 GMT
+Last updated: 2026-05-19 08:34 GMT
 
 ## Current focus
-0. **Hosted identity routing/default fix is release-cleared with a cut-plan correction.** Athena + Mia + Grace cleared aweb `8064558` and AC `bdfe5631`; Hestia has the handoff. Pushback sent: `8064558` is CLI-only, so release `aw-v1.24.3` only (no server/pyproject bump, no `server-v1.24.3`, no AC `uv lock --upgrade-package aweb` just to chase the CLI tag). AC `v0.5.44` should ship `bdfe5631` with its current valid aweb Python pin unless release-ready proves a real dependency.
+0. **Hosted identity routing/default fix is release-cleared at aweb `78482b9` + AC `bdfe5631`.** Grace added server-side federation continuation verifier fixes (`3198d6e`, `78482b9`) after the CLI continuation binding (`8064558`). Athena found one malformed-target blocker in `3198d6e`; Grace fixed it in `78482b9`; Athena reran focused validation and cleared release. Because `3198d6e`/`78482b9` touch `server/src`, server package/tag for `server-v1.24.3` is now justified alongside `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631` after the aweb package is available.
 1. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
@@ -27,7 +27,7 @@ Last updated: 2026-05-19 05:18 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **Hosted identity routing/default fix**: Grace landed aweb `8064558` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved; Athena reviewed in detached worktrees and handed to Hestia. Release boundary is `aw-v1.24.3` for CLI continuation binding plus AC `v0.5.44` for hosted team-visible defaults/lifecycle scope preservation; no Python aweb package bump is justified by `8064558`.
+- **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved; Athena reviewed in detached worktrees and handed to Hestia. Release boundary is now `server-v1.24.3` + `aw-v1.24.3` at aweb `78482b9`, followed by AC `v0.5.44` at `bdfe5631`.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
   aweb/aw 1.24.2 green. No open dev blocker for this fix set.
@@ -59,7 +59,7 @@ Last updated: 2026-05-19 05:18 GMT
   symptom, but the broader codebase grep has not been banked as done.
 
 ## Release-ready state (handoff to Hestia)
-- **Hosted identity routing/default fix cleared for Hestia.** Handoff sent for aweb `8064558` + AC `bdfe5631`; Grace ACKed no blockers. Hestia proposed a coordinated cut, but Athena pushed back on the server package portion: `8064558` touches only `cli/go/*`, so tag/publish `aw-v1.24.3` only and do not bump server/pyproject or AC's Python `aweb` lock solely for this CLI change. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
+- **Hosted identity routing/default fix cleared for Hestia.** Initial handoff was aweb `8064558` + AC `bdfe5631`; Grace then added server verifier fixes `3198d6e` and `78482b9`. Athena reviewed `78482b9`: focused envelope + mail/chat route set 13 passed; broader messages/chat/MCP `federat|continuation|delivery_origin` sweep 30 passed; focused Go continuation/trust suite passed; py_compile + diff-check clean. Release head is aweb `78482b9`; server-v1.24.3 + aw-v1.24.3 is appropriate. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
 - **Trust/display fix set shipped/verified-live as aweb/aw 1.24.2.**
   Hestia smoke evidence: live `aw chat send-and-wait` against Athena
   rendered `Chat from: aweb.ai/athena [not in contacts]` with no
@@ -86,7 +86,7 @@ Last updated: 2026-05-19 05:18 GMT
   `5b44f724` as of 18:05 GMT.
 
 ## Risks
-- **Release-shape risk for `8064558`**: Hestia's first cut plan treated the CLI-only continuation-binding change as a server package bump. Athena corrected this by mail/chat: no `server-v1.24.3`, no server/pyproject bump, no AC `uv lock --upgrade-package aweb` just to chase the CLI tag.
+- **Release-shape risk resolved for aweb 1.24.3**: the earlier no-server-tag correction applied only when release head was CLI-only `8064558`. With `3198d6e`/`78482b9` in `server/src`, server package bump/tag is justified. Keep release head at `78482b9`, not `8064558` or `3198d6e`.
 - **Existing hosted identity repair risk**: the code fix does not mutate existing `reachability=nobody` rows. Repair known hosted team-internal identities only through explicit scoped/audited action after AC is live; prefer controller-key/API path over direct DB unless Grace determines API repair is not viable.
 - **Pi update/release risk (`aweb-aapb`)**: pi-extension source/dist now
   contains current channel-core behavior, but there is no verified user
@@ -108,7 +108,7 @@ Last updated: 2026-05-19 05:18 GMT
   refresh.
 
 ## Next checks
-- Watch for Hestia ACK of the adjusted routing/default cut plan before tags: `aw-v1.24.3` only for aweb `8064558`, then AC `v0.5.44` at `bdfe5631` without a gratuitous Python aweb lock bump.
+- Watch Hestia's release of aweb `78482b9` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow
   claim: aweb/aw 1.24.2 fixes CLI live chat trust-display for stable
