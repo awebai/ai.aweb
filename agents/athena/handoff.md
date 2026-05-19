@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 08:45 GMT
+Last updated: 2026-05-19 09:07 GMT
 
 ## Read this first
 
@@ -16,20 +16,21 @@ release mechanics; to them, Athena is the gate.
 
 ## 2026-05-19 hosted identity routing/default release update
 
-- Release-cleared head is now aweb `78482b9` + AC `bdfe5631`.
+- Release-blessed head is now aweb `d664988` + AC `bdfe5631`.
   - Initial aweb review cleared `8064558` (CLI continuation binding) + AC
     `bdfe5631`; Mia/Grace approved.
   - Hestia's first cut plan treated `8064558` as a server release; Athena
     pushed back because `8064558` alone was CLI-only.
   - Grace then found/fixed the real server-side federation continuation
-    verifier blocker in `3198d6e` and the malformed-target rejection blocker
-    in `78482b9`. Athena reviewed `78482b9` in a detached worktree: focused
-    envelope + mail/chat route set 13 passed; broader messages/chat/MCP sweep
-    30 passed; focused Go continuation/trust suite passed; py_compile +
-    diff-check clean.
-  - Because `3198d6e`/`78482b9` touch `server/src`, `server-v1.24.3` is now
-    justified alongside `aw-v1.24.3`. Hestia ACKed and started the corrected
-    cut: aweb `78482b9` → server/aw 1.24.3, then AC `bdfe5631` → v0.5.44.
+    verifier blockers in `3198d6e` (`signed_payload.to` identity-bound),
+    `78482b9` (malformed-target rejection), and `d664988` (`to_did` stable
+    did:aw acceptance). Athena reviewed `d664988` in a detached worktree:
+    focused envelope + mail/chat route set 15 passed; broader
+    messages/chat/MCP sweep 30 passed; full Go `./cmd/aw ./awid ./chat`
+    passed; py_compile + diff-check clean.
+  - Because `3198d6e`/`78482b9`/`d664988` touch `server/src`,
+    `server-v1.24.3` is justified alongside `aw-v1.24.3`. Athena blessed to
+    Hestia: aweb `d664988` → server/aw 1.24.3, then AC `bdfe5631` → v0.5.44.
 - Post-deploy repair remains explicit/scoped/audited only. Known `nobody` rows
   (Athena, Hestia, Sofia, Iris) must not be blanket migrated; prefer
   controller-key/API repair over direct DB unless Grace decides the API route
@@ -191,7 +192,7 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check Hestia's ship status for aweb `78482b9` as
+3. First check Hestia's ship status for aweb `d664988` as
    `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 4. After AC deploy, coordinate scoped repair method with Grace and require
    Hestia's post-repair hestia→{athena,sofia,iris,aida,metis,ama} matrix smoke.
