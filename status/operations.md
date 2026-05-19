@@ -1,8 +1,77 @@
 # Operations Status
 
-Last updated: 2026-05-19 12:55 CEST (10:55 UTC) — **aweb 1.24.3
-SHIPPED at 4c45619**. ac v0.5.44 ship in flight at 583970cf
-(commit pushed, `make ship` running gate end-to-end).
+Last updated: 2026-05-19 16:10 CEST (14:10 UTC) — **aweb 1.24.3 + ac
+v0.5.44 BOTH SHIPPED VERIFIED LIVE**. Next wave (aweb 1.24.4 + ac
+v0.5.45 global/local deletion) on **HARD HOLD pending Juan direction
+call** (Sofia 9fa07306 + Athena 514675d1 + bb55efda agreement: "do not
+ship as-is").
+
+**v0.5.44 verified-live evidence**:
+- /health: release_tag=v0.5.44, git_sha=583970cf, aweb_version=1.24.3,
+  awid_service_version=0.5.6
+- Smoke matrix 4/4 mail green (athena existing-conv 67f89848 +
+  sofia/iris/aida via FRESH conversation IDs 0daa2599/5872ec1b/
+  0c4fd9b7) — all 4 replied verified=true confirming bidirectional
+  reachability
+- Smoke matrix 4/4 chat green (2 first-try, 2 retried after transient
+  awid 503)
+- Local aw upgraded clean 1.24.2 → 1.24.3 (commit 40cd86f); routing
+  404 P1 (task #194) empirically resolved — Grace's 4c45619
+  RegistryResolver did:aw→did:key fallback covers both federation
+  reply path AND first-contact resolution.
+
+**Deletion-wave HOLD state (deletion-wave heads on origin/main but
+NOT released):**
+- aweb origin/main: 3550251 'Remove init reachability write surface'
+- ac origin/main: 06364f1e 'Neutralize hosted address reachability writes'
+- New migration in AC: 006_identity_delivery_origin.sql (adds
+  did_aw_mappings.delivery_origin; NOT applied to prod)
+- Local AC working tree: at origin/main 06364f1e post-pull (read-only
+  inspection of audit script); pyproject still at 0.5.44, no bump.
+- Local aweb working tree: at 1.24.3 release commit 5842eef on
+  origin/main 3550251 = 4 commits ahead of release tag; not bumped.
+- No tags pushed. No gates run on deletion-wave HEAD.
+
+**HOLD reasons (Sofia 9fa07306):**
+1. P1 voice.md promise '2026-05-13: Only the AIs of people I've added
+   can reach me' may have been enforced by reachability=nobody at
+   AWID resolver. Removing it without replacement breaks the promise.
+2. Existing reachability=nobody users lose privacy affordance they
+   chose. 'Inert metadata' is not 'privacy preserved.'
+3. Federation envelope API surface change: Pydantic extra='forbid'
+   means 3rd-party builders using removed fields (sender_team_certificate,
+   target_address_lookup_*) get 422.
+4. Process: substantial direction change should have come through
+   direction first, not framing-review-before-tag.
+
+**Audit data delivered for direction call:**
+- 43 affected AWID prod rows (19 nobody / 18 org_only / 6 team_members_only)
+  would become globally resolvable after .8 demotes reachability
+- 4 of the 19 nobody rows are our internal aweb.ai team rows
+  (sofia/athena/hestia/iris); 4 are Athena preflight/wt scaffolds;
+  remaining ~11 mix Juan-personal-namespace + likely external customers
+- 99 persistent agents in aweb_cloud: messaging_policy 'everyone'=96,
+  'org'=3, **'contacts'=0** — NO fallback enforcement of P1 contacts-only
+  via messaging_policy is currently active.
+- Full report at /tmp/identity-compat-audit-2026-05-19-v2.txt
+
+**Tool bug banked**: audit_identity_compat.py reads aweb_cloud's
+aweb.public_addresses (empty in prod). Real data lives in awid-service
+separate DB. Athena agreed to bank as tool bug.
+
+**Athena next**: analyzing main-vs-pre-wave code/test deletion + API-surface
+deltas for Juan's direction call. Sofia estimated within-the-hour for
+Juan's call.
+
+**Branches to handle on revert path** (if Juan calls revert):
+- ac local: reset to 583970cf (v0.5.44 commit); origin/main has 3 new
+  commits (06364f1e + 59bd16f1 + 9f8eada5) over 583970cf that would
+  need revert PRs from Athena.
+- aweb local: still at 5842eef (release tag commit); origin/main has
+  4 commits ahead (3550251 + 133ab05 + 3f2c451 + 99d029d + cd92f51
+  + 19f2f4c + eee1497) that would need revert.
+
+Previous federation wave (v0.5.44 lead):
 
 **aweb 1.24.3 VERIFIED LIVE**. Grace's CLI-side fix (4c45619 "Fix
 federated continuation signing from stable DID") closes the
