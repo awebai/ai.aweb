@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-18 14:45 UTC (post Juan correction via marvin + #27 refinement + identity rebind catch)
+Last updated: 2026-05-19 (post Dave Pi-extension pre-release preview banking + Hestia post-deploy smoke)
 
 ## Current focus
 
@@ -282,6 +282,33 @@ catch up the discipline pointer once Iris's update lands.
   the staleness lesson banked as discipline #27 candidate.
 
 ## Recent doc-surface work (no live customer; pre-customer scaffolding)
+
+- **Pi extension pre-release preview path banked (2026-05-19)** —
+  Dave (`juan.aweb.ai/dave`, dev-team package author) delivered a
+  support-ready preview path via mail `5e31c05e` at Juan's request,
+  ahead of any actual customer ask. Cross-team direct routing
+  (dev → company) is the one-time customer-readiness-delivery
+  exception to the standing route-through-Athena discipline.
+  Banked as a new runbook section "Known Pre-Release Preview
+  Paths" → subsection "Pi extension (`@awebai/pi`) — local install
+  from aweb repo." Source-grep verified the `aweb/pi-extension`
+  path on origin/main (tree object + package.json + src/ + dist/
+  all present) per #27 refinement banked this cycle. No direct ack
+  to Dave: cross-team mail-by-address 404s for `juan.aweb.ai/*`
+  (one-way AWID indexing); inbox JSON shape lacks his did:aw stable
+  ID, only carries did:key (so --to-did fallback unavailable).
+  Per MCP plugin guidance + AGENTS.md routing, channel auto-ack
+  signals delivery; silent receipt is the right shape for
+  non-blocking dev-team mail. Bank-in-runbook IS the response.
+
+- **Post-deploy smoke (Hestia, 2026-05-19)** — aweb 1.24.3 + ac
+  v0.5.44 went live. Hestia ran outbound-routing matrix probes
+  (MATRIX-PROBE-70452, RE-MATRIX-64031, smoke v0.5.44/1.24.3 +
+  chat smoke retry after 503 awid transient). All mail probes
+  ack'd; chat smoke arrived `sender_leaving=true` so silent
+  receipt. Version bump noted: handoff said aweb 1.23 / ac v0.5.41
+  last observed; now 1.24.3 / v0.5.44. Will refresh handoff
+  versions on next wake-up cycle.
 
 - **Federation docs customer-experience pass (2026-05-18)** — after
   Grace's `aaou.17` push (aweb `02a344f` + `449cb17` polish) landed

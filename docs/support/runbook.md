@@ -429,6 +429,95 @@ entry mail `f393168c` (2026-05-02), Athena's review mail `df41abbc`
 finding #3. Captured 422 envelopes were verified against the
 production schema by Mia on 2026-05-02.
 
+## Known Pre-Release Preview Paths
+
+For customer asks about trying features that exist in code but are
+not publicly released. Distinct from Known Errors (symptom-keyed):
+these are NOT bugs; they are intentional pre-release states with a
+sanctioned preview path the customer can use.
+
+Per discipline #27 refinement: command shapes below are
+engineering-authored (the package author or release owner provided
+the canonical preview steps). Re-verify against the relevant source
+before recommending if more than one release cycle has passed since
+the entry was banked.
+
+### Pi extension (`@awebai/pi`) — local install from aweb repo
+
+**When this applies.** Customer asks about trying the aweb Pi
+integration before public release. The npm package `@awebai/pi`
+is NOT yet published; do not point customers at
+`npm install @awebai/pi`.
+
+**Supported preview path** (clone + local install):
+
+```bash
+# 1. Clone aweb and build the Pi package
+git clone https://github.com/awebai/aweb.git
+cd aweb/pi-extension
+npm install
+npm run build
+```
+
+Notes on the build:
+- Package lives at `aweb/pi-extension` on aweb origin/main
+  (source-grep verified 2026-05-19: tree object exists, package.json
+  + src/ + dist/ present).
+- Build also copies the canonical aweb skills into
+  `pi-extension/skills`.
+- Package bundles channel-core from the repo; no separate npm
+  publish is required for this local path.
+
+```bash
+# 2. Install or run the local package in Pi
+#    Persistent local install:
+pi install /absolute/path/to/aweb/pi-extension
+
+#    One-off test run without writing settings:
+pi -e /absolute/path/to/aweb/pi-extension
+
+# 3. Start Pi from an aweb-initialized workspace, not a random dir
+cd /path/to/customer/workspace
+aw workspace status   # should show their aweb identity/team
+pi
+```
+
+If the workspace is not initialized yet, run `aw init` first, then
+start Pi.
+
+**Expected signs of success:**
+
+- Pi footer/status shows: `✓ aweb connected`
+- First-time local install may show the aweb welcome message.
+- Incoming aweb mail/chat events wake Pi with message content,
+  metadata, and sender verification status.
+- Bundled skills appear as `aweb-coordination`, `aweb-messaging`,
+  and `aweb-team-membership`.
+
+**Common support notes:**
+
+- If Pi still shows old status text or behavior after rebuilding,
+  fully quit/restart Pi; `/reload` may not clear the loaded
+  extension module.
+- If Pi says "aweb installed but not ready," check
+  `aw workspace status` in the same directory.
+- Do NOT tell customers to install `npm:@awebai/pi` yet; use the
+  local path until the package is announced as released.
+- This is preview/local testing guidance, not the final customer
+  install path; the public install path will replace this entry
+  when the package is published.
+
+**Short version for customer reply.** Clone aweb, build
+`pi-extension`, run `pi install /path/to/aweb/pi-extension`, then
+launch Pi from an `aw`-initialized workspace.
+
+**Source.** Dave (`juan.aweb.ai/dave`, dev-team package author),
+mail `5e31c05e` 2026-05-19 — engineering-authored preview path
+delivered for customer-readiness ahead of any actual customer ask.
+Cross-team routing through Athena is the standing discipline for
+engineering coordination; Dave routed directly here at Juan's
+request as a one-time customer-readiness delivery.
+
 ## Customer Orientation Responses
 
 For open-ended customer questions that are NOT errors — orientation,
