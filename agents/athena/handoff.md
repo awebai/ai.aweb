@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 16:07 GMT
+Last updated: 2026-05-19 16:22 GMT
 
 ## Read this first
 
@@ -72,16 +72,15 @@ release mechanics; to them, Athena is the gate.
   server participant/session route state supplies the current key. Validation by
   Athena: diff-check, docs regression, Go `./...`, server 532, AWID 168, channel
   89, channel-core build all green.
-- `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass and
-  is now unblocked. Grace ACKed she will rebase onto `cd92f51`, use
-  `aw id set-delivery-origin --origin <origin>` in e2e setup (no DB mutation),
-  and keep pruning narrow: remove old reachability/private-address/team-cert-as-
-  routing/conversation-auth assertions while preserving team membership/trust,
-  verification, delivery-origin, signed binding, participant-state routing, and
-  conversation UX/threading coverage. First targets remain
-  `scripts/e2e-oss-federation.sh` Phase 5 and `scripts/e2e-oss-user-journey.sh`
-  Phase 12e. Goal is fewer tests/e2e that prove only the new contract, plus stale
-  test deletion.
+- `aweb-aapf.7` is approved/closed at Grace commit `99d029d` over approved `.4`
+  base `cd92f51`. It rebased onto `.4`, uses `aw id set-delivery-origin --origin
+  <origin>` in e2e setup (no DB mutation), removes old reachability/private-
+  address/team-cert-as-routing/conversation-auth assertions, and preserves team
+  membership/trust, verification, delivery-origin, signed binding, participant-
+  state routing, conversation UX/threading, stable did:aw targeting, did:key
+  rotation continuation, and duplicate-alias active-team routing coverage. Grace's
+  runtime evidence at `2d42d23`: federation 28 passed and OSS user journey 211
+  passed; final `99d029d` is label-only and Athena static validation was green.
 
 ## 2026-05-19 hosted identity routing/default release update
 
@@ -265,10 +264,9 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check whether Grace sent the `aweb-aapf.7` e2e/test-contract pruning
-   review request. `.7` should use supported `aw id set-delivery-origin` setup,
-   not DB mutation, and should delete old reachability/conversation-auth ballast
-   rather than preserve compatibility tests.
+3. Next global/local work is `aweb-aapf.5` AC hosted global/local identity
+   UX/backend. Keep it scoped to hosted custodial identity delivery-origin setup
+   and related UX/backend; do not blend `.6` migration or `.8` deletion.
 4. Check Hestia's ship status for aweb `4c45619` as `server-v1.24.3` +
    `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 5. After AC deploy, coordinate scoped repair method with Grace and require

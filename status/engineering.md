@@ -1,9 +1,9 @@
 # Engineering Status
-Last updated: 2026-05-19 16:07 GMT
+Last updated: 2026-05-19 16:22 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is live at aweb `1.24.3` + AC `v0.5.44`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Hestia smoked live outbound routing post-deploy via verified mail + chat to Athena; Athena replied to the mail. Next release-adjacent check is scoped repair/matrix smoke for hosted `reachability=nobody` rows if Hestia/Grace proceed.
-1. **Global/local simplification epic: `.4` is approved/closed; `.7` e2e pruning is unblocked.** `aweb-aapf` target model: global = `did:aw` + AWID identity delivery origin; local = renamed ephemeral `did:key`, not globally first-contactable, replyable in established context. Athena approved/closed `.1`, `.2`, `.3`, `.9`, and now `.4` (`cd92f51`). `.4` added the supported `aw id set-delivery-origin --origin ...` identity-signed setup path, kept namespace defaults out of routing authority, fixed direct global `did:aw` current-key binding, and preserved stored-route continuations. Grace has been told `.7` can proceed using the supported CLI/operator setup path, not DB mutation. AC `.5` may proceed only under its scoped hosted global/local identity brief; `.6` migration and `.8` deletion remain separate.
+1. **Global/local simplification epic: `.4` and `.7` are approved/closed; next is AC `.5`.** `aweb-aapf` target model: global = `did:aw` + AWID identity delivery origin; local = renamed ephemeral `did:key`, not globally first-contactable, replyable in established context. Athena approved/closed `.1`, `.2`, `.3`, `.9`, `.4` (`cd92f51`), and `.7` (`99d029d`). `.4` added the supported `aw id set-delivery-origin --origin ...` identity-signed setup path and fixed global signed bindings. `.7` pruned e2e/test-contract coverage to the new global/local contract using the supported setup path. AC `.5` may proceed only under its scoped hosted global/local identity brief; `.6` migration and `.8` deletion remain separate.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
@@ -28,7 +28,7 @@ Last updated: 2026-05-19 16:07 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight original subtasks plus `.9`. `.1` approved/closed at `4b51af1`; `.2` at `4509c9f`; `.3` at `103fa9e`; `.9` at `eee1497`; `.4` at `cd92f51`. `.4` validation by Athena was green: diff-check, docs regression, Go `./...`, server 532, AWID 168, channel 89, channel-core build. Grace owns `.7` and is now unblocked to rewrite/prune e2e/test contracts using `aw id set-delivery-origin`; `.8` deletion remains the simplification proof point.
+- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight original subtasks plus `.9`. Approved/closed: `.1` `4b51af1`; `.2` `4509c9f`; `.3` `103fa9e`; `.9` `eee1497`; `.4` `cd92f51`; `.7` `99d029d`. `.7` accepted Grace's prior runtime evidence (federation 28, OSS user journey 211) plus label-only final patch; static validation by Athena was green. Remaining work: `.5` AC hosted global/local identity UX/backend, `.6` migration/compat plan, `.8` deletion of reachability/conversation-auth dead code.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Hestia shipped aweb `1.24.3` + AC `v0.5.44` and smoked verified live mail/chat routing to Athena green.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
@@ -110,7 +110,7 @@ Last updated: 2026-05-19 16:07 GMT
   refresh.
 
 ## Next checks
-- Watch Grace's `.7` e2e/test-contract pruning now that `.4` is approved; first targets are `scripts/e2e-oss-federation.sh` Phase 5 and `scripts/e2e-oss-user-journey.sh` Phase 12e using supported `aw id set-delivery-origin`, not DB mutation.
+- Start/brief/review `aweb-aapf.5` AC hosted global/local identity UX/backend next. Keep `.5` scoped: hosted custodial equivalent for identity delivery-origin setup and related UX/backend only; do not blend `.6` migration or `.8` deletion.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow
