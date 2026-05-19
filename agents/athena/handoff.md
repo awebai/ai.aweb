@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 09:38 GMT
+Last updated: 2026-05-19 10:54 GMT
 
 ## Read this first
 
@@ -40,21 +40,25 @@ release mechanics; to them, Athena is the gate.
 
 ## 2026-05-19 hosted identity routing/default release update
 
-- Release-blessed head is now aweb `d664988` + AC `bdfe5631`.
+- Release ship-clear head is now aweb `4c45619` + AC `bdfe5631`.
   - Initial aweb review cleared `8064558` (CLI continuation binding) + AC
     `bdfe5631`; Mia/Grace approved.
   - Hestia's first cut plan treated `8064558` as a server release; Athena
     pushed back because `8064558` alone was CLI-only.
-  - Grace then found/fixed the real server-side federation continuation
-    verifier blockers in `3198d6e` (`signed_payload.to` identity-bound),
-    `78482b9` (malformed-target rejection), and `d664988` (`to_did` stable
-    did:aw acceptance). Athena reviewed `d664988` in a detached worktree:
-    focused envelope + mail/chat route set 15 passed; broader
-    messages/chat/MCP sweep 30 passed; full Go `./cmd/aw ./awid ./chat`
-    passed; py_compile + diff-check clean.
+  - Grace then found/fixed server-side federation continuation verifier
+    blockers in `3198d6e` (`signed_payload.to` identity-bound), `78482b9`
+    (malformed-target rejection), and `d664988` (`to_did` stable did:aw
+    acceptance). Hestia's real e2e still failed at `d664988` on
+    conversation-only federation reply.
+  - Grace fixed the real e2e path in `4c45619`: RegistryResolver resolves bare
+    did:aw via fallback registry `/v1/did/<did:aw>/key`; chat continuation signs
+    full sender address for federated DID/address targets. Grace's canonical
+    `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel
+    89, release checks, federation e2e 27/27, OSS user journey 224, tree clean.
   - Because `3198d6e`/`78482b9`/`d664988` touch `server/src`,
-    `server-v1.24.3` is justified alongside `aw-v1.24.3`. Athena blessed to
-    Hestia: aweb `d664988` → server/aw 1.24.3, then AC `bdfe5631` → v0.5.44.
+    `server-v1.24.3` is justified alongside `aw-v1.24.3`. Athena relayed
+    ship-clear to Hestia: aweb `4c45619` → server/aw 1.24.3, then AC
+    `bdfe5631` → v0.5.44.
 - Post-deploy repair remains explicit/scoped/audited only. Known `nobody` rows
   (Athena, Hestia, Sofia, Iris) must not be blanket migrated; prefer
   controller-key/API repair over direct DB unless Grace decides the API route
@@ -219,7 +223,7 @@ Use current shipped federation facts, not stale local-branch docs:
 3. First check whether Peter sent the `aweb-aapf.2` AWID review request.
    Scope must stay limited to AWID identity-level delivery origin/resolver model
    and tests; no server/CLI/AC refactors until `.2` is approved.
-4. Check Hestia's ship status for aweb `d664988` as `server-v1.24.3` +
+4. Check Hestia's ship status for aweb `4c45619` as `server-v1.24.3` +
    `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 5. After AC deploy, coordinate scoped repair method with Grace and require
    Hestia's post-repair hestia→{athena,sofia,iris,aida,metis,ama} matrix smoke.

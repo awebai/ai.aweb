@@ -1,8 +1,8 @@
 # Engineering Status
-Last updated: 2026-05-19 09:36 GMT
+Last updated: 2026-05-19 10:54 GMT
 
 ## Current focus
-0. **Hosted identity routing/default fix is blessed at aweb `d664988` + AC `bdfe5631`.** Grace added server-side federation continuation verifier fixes (`3198d6e`, `78482b9`, `d664988`) after the CLI continuation binding (`8064558`). Athena found one malformed-target blocker in `3198d6e`; Grace fixed it in `78482b9`; `d664988` widened federation `to_did` to accept stable did:aw or current did:key while keeping `to_stable_id` strict. Mia approved; Athena reran validation and blessed release to Hestia. Release shape: `server-v1.24.3` + `aw-v1.24.3` at aweb `d664988`, then AC `v0.5.44` at `bdfe5631` after the aweb package is available.
+0. **Hosted identity routing/default fix is ship-clear at aweb `4c45619` + AC `bdfe5631`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Athena relayed ship-clear to Hestia; Hestia ACKed and is running canonical `make ship` before tagging `server-v1.24.3` + `aw-v1.24.3`. AC `v0.5.44` at `bdfe5631` follows after aweb publishes.
 1. **Global/local simplification epic is moving; `aweb-aapf.1` approved.** `aweb-aapf` captures Juan's target model: persistent→global (`did:aw`, globally reachable), ephemeral→local (`did:key`, no AWID row, replyable after outbound contact via learned route), no reachability resolver gates, and no conversation_id routing authority. Peter delivered SOT/design commits `25a290a` + `4b51af1`; Athena reviewed, requested two authority clarifications, approved `4b51af1`, and closed `aweb-aapf.1`. Peter is cleared for `aweb-aapf.2` only (AWID identity-level delivery origin/resolver model); server/CLI/AC remain gated.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
@@ -29,7 +29,7 @@ Last updated: 2026-05-19 09:36 GMT
 
 ## Dev team work in flight
 - **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight dependent subtasks. `aweb-aapf.1` SOT/design is approved/closed at Peter commit `4b51af1`. Next allowed work is `aweb-aapf.2` only: AWID identity-level delivery origin/resolver model and tests. Target deletes reachability and conversation-id-as-auth over the epic.
-- **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved; Athena reviewed in detached worktrees and handed/blessed to Hestia. Release boundary is now `server-v1.24.3` + `aw-v1.24.3` at aweb `d664988`, followed by AC `v0.5.44` at `bdfe5631`.
+- **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Athena relayed ship-clear to Hestia. Release boundary is now `server-v1.24.3` + `aw-v1.24.3` at aweb `4c45619`, followed by AC `v0.5.44` at `bdfe5631`.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
   aweb/aw 1.24.2 green. No open dev blocker for this fix set.
@@ -61,7 +61,7 @@ Last updated: 2026-05-19 09:36 GMT
   symptom, but the broader codebase grep has not been banked as done.
 
 ## Release-ready state (handoff to Hestia)
-- **Hosted identity routing/default fix blessed for Hestia.** Initial handoff was aweb `8064558` + AC `bdfe5631`; Grace then added server verifier fixes `3198d6e`, `78482b9`, and `d664988`. Athena reviewed `d664988`: focused envelope + mail/chat route set 15 passed; broader messages/chat/MCP `federat|continuation|delivery_origin` sweep 30 passed; full Go `./cmd/aw ./awid ./chat` passed; py_compile + diff-check clean. Release head is aweb `d664988`; server-v1.24.3 + aw-v1.24.3 is appropriate. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
+- **Hosted identity routing/default fix ship-clear for Hestia.** Initial handoff was aweb `8064558` + AC `bdfe5631`; Grace then added server verifier fixes `3198d6e`, `78482b9`, `d664988`, and CLI-side e2e fix `4c45619`. Hestia's real e2e failed at `d664988`; Grace's `4c45619` full `make ship` passed and Athena relayed to Hestia. Release head is aweb `4c45619`; server-v1.24.3 + aw-v1.24.3 is appropriate. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
 - **Trust/display fix set shipped/verified-live as aweb/aw 1.24.2.**
   Hestia smoke evidence: live `aw chat send-and-wait` against Athena
   rendered `Chat from: aweb.ai/athena [not in contacts]` with no
@@ -88,7 +88,7 @@ Last updated: 2026-05-19 09:36 GMT
   `5b44f724` as of 18:05 GMT.
 
 ## Risks
-- **Release-shape risk resolved for aweb 1.24.3**: the earlier no-server-tag correction applied only when release head was CLI-only `8064558`. With `3198d6e`/`78482b9`/`d664988` in `server/src`, server package bump/tag is justified. Keep release head at `d664988`, not `8064558`, `3198d6e`, or `78482b9`.
+- **Release-shape risk resolved for aweb 1.24.3**: the earlier no-server-tag correction applied only when release head was CLI-only `8064558`. With `3198d6e`/`78482b9`/`d664988` in `server/src`, server package bump/tag is justified. Keep release head at `4c45619`, not `8064558`, `3198d6e`, `78482b9`, or `d664988`.
 - **Existing hosted identity repair risk**: the code fix does not mutate existing `reachability=nobody` rows. Repair known hosted team-internal identities only through explicit scoped/audited action after AC is live; prefer controller-key/API path over direct DB unless Grace determines API repair is not viable.
 - **Pi update/release risk (`aweb-aapb`)**: pi-extension source/dist now
   contains current channel-core behavior, but there is no verified user
@@ -111,7 +111,7 @@ Last updated: 2026-05-19 09:36 GMT
 
 ## Next checks
 - Watch for Peter's `aweb-aapf.2` review request. Scope must stay limited to AWID identity-level delivery origin/resolver model and tests; no server/CLI/AC refactors until `.2` is approved.
-- Watch Hestia's release of aweb `d664988` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
+- Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow
   claim: aweb/aw 1.24.2 fixes CLI live chat trust-display for stable
