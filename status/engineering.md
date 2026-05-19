@@ -1,9 +1,9 @@
 # Engineering Status
-Last updated: 2026-05-19 14:41 GMT
+Last updated: 2026-05-19 14:57 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is live at aweb `1.24.3` + AC `v0.5.44`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Hestia smoked live outbound routing post-deploy via verified mail + chat to Athena; Athena replied to the mail. Next release-adjacent check is scoped repair/matrix smoke for hosted `reachability=nobody` rows if Hestia/Grace proceed.
-1. **Global/local simplification epic: `aweb-aapf.3` patched, still not approved.** `aweb-aapf` captures Juan's target model: global = `did:aw` + AWID identity delivery origin; local = renamed ephemeral `did:key`, not globally first-contactable, replyable in established context. Athena approved/closed `.1` and `.2`. Peter patched `.3` at `97797af`; validation rerun by Athena was green (server 531, AWID 168, Go `./...`, docs/diff clean), but one blocker remains: local did:key chat reply verifies existing conversation + `chat_sessions` row but not that `chat_participants` contains both sender and target. Peter must add that fail-closed binding test/fix before `.3` approval. Conversation_id may be an index into local conversation/session state, but never routing authority. `aweb-aapf.7` is assigned to Grace as a separate test-contract/prune pass; inventory-only complete. CLI/channel/AC remain gated.
+1. **Global/local simplification epic: `aweb-aapf.3` approved; `.4`/`.7` now blocked by `.9`.** `aweb-aapf` captures Juan's target model: global = `did:aw` + AWID identity delivery origin; local = renamed ephemeral `did:key`, not globally first-contactable, replyable in established context. Athena approved/closed `.1`, `.2`, and `.3` (`103fa9e`). `.3` acceptance: global routes by AWID identity/address delivery origin; local replies use existing conversation/session participant state; `conversation_id` is only an index, not routing authority; no local route mini-protocol. Grace then found live 503 evidence that continuation still calls AWID `resolve_key` because stored participant route state lacks remote current did:key. Athena created `.9` for Peter: persist current did:key in participant route state and remove hot-path AWID dependency for mail/chat continuation. `.4` and `.7` depend on `.9`; AC remains gated.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
@@ -28,7 +28,7 @@ Last updated: 2026-05-19 14:41 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight dependent subtasks. `.1` approved/closed at `4b51af1`; `.2` approved/closed at `4509c9f`. `.3` patched commit `97797af` reviewed/not approved; only remaining blocker is chat local did:key reply must verify both sender and target exist in `chat_participants`, not just conversation participants + session row. `.7` assigned to Grace for second-developer test-contract/e2e pruning; `.8` deletion is the proof point.
+- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight original subtasks plus `.9`. `.1` approved/closed at `4b51af1`; `.2` approved/closed at `4509c9f`; `.3` approved/closed at `103fa9e`. `.9` is now assigned to Peter and blocks `.4`/`.7`: persist remote current did:key in stored participant route state so continuation does not require AWID on every send. Grace may inventory `.7`, but broad e2e/test edits should wait for `.9`; `.8` deletion is the proof point.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Hestia shipped aweb `1.24.3` + AC `v0.5.44` and smoked verified live mail/chat routing to Athena green.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
@@ -110,7 +110,7 @@ Last updated: 2026-05-19 14:41 GMT
   refresh.
 
 ## Next checks
-- Watch for Peter's patched `aweb-aapf.3` review request. Scope must stay limited to aweb server routing/federation; no CLI/channel/AC refactors until `.3` is approved.
+- Watch Peter's `aweb-aapf.9` server/schema review request first. `.4` CLI/channel and `.7` broad e2e/test-contract edits are blocked until `.9` lands. AC remains gated until `.4` is approved.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow

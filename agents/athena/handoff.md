@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 14:43 GMT
+Last updated: 2026-05-19 14:58 GMT
 
 ## Read this first
 
@@ -50,14 +50,22 @@ release mechanics; to them, Athena is the gate.
   deletion/complexity note with the patched commit. Conversation_id may be an
   index into local conversation/session state, but not routing authority.
 - `aweb-aapf.3` patched commit `97797af` was reviewed and validation rerun by
-  Athena: `git diff --check`, docs regression, server 531, AWID 168, Go `./...`
-  all green. Still not approved: one blocker remains. For local did:key inbound
-  chat replies, `_ensure_federated_chat_session()` checks existing active
-  conversation + `chat_sessions` row, but not that `chat_participants` contains
-  both sender and target. `send_in_session()` only requires sender, so a stale
-  session missing the target participant can accept a message. Peter ACKed and
-  will make the narrow fix + regression. CLI/channel/AC work remains gated until
-  `.3` approval.
+  Athena; one blocker remained: local did:key inbound chat replies checked
+  existing active conversation + `chat_sessions` row, but not that
+  `chat_participants` contained both sender and target.
+- `aweb-aapf.3` is now approved and closed at Peter commit `103fa9e`. The final
+  narrow fix verifies both sender and target in `chat_participants` for local
+  did:key inbound chat, with a stale/missing-target regression. Validation rerun
+  by Athena: `git diff --check`, docs regression, server 532, AWID 168, Go
+  `./...` all green.
+- Grace found a live 503 (`AWID registry unavailable`) on chat continuation:
+  stored participant route state lacks remote current did:key, so continuation
+  still calls AWID `resolve_key` on every send. Athena created `aweb-aapf.9` and
+  assigned it to Peter: persist remote current did:key in conversation/chat
+  participant route state at first contact/federated inbound/global resolution;
+  use stored did:aw/current did:key/delivery_origin for mail/chat continuation;
+  missing/stale route fails distinctly. `.9` blocks `.4` and `.7`. Peter ACKed
+  and paused `.4` to take `.9`; AC remains gated.
 - `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass.
   Grace completed inventory-only with no edits. Stale clusters: OSS user-journey
   Phase 12e reachability/conversation-gate matrix; OSS federation Phase 5
@@ -66,9 +74,10 @@ release mechanics; to them, Athena is the gate.
   reachability/visible_to_team_id fixtures. Boundary: team certs still matter
   for membership/trust, but team-cert-as-private-address-reachability is stale;
   conversation_id still matters for threading/participant metadata, but not as
-  routing/reachability auth. After `.3` approval, prioritize e2e rewrite/delete
-  first. Goal is fewer tests/e2e that prove only the new contract, plus stale
-  test deletion.
+  routing/reachability auth. Grace may continue inventory/planning, but broad
+  e2e/test assertion edits should wait for `.9` because the stored-route
+  current-key contract affects final continuation expectations. Goal is fewer
+  tests/e2e that prove only the new contract, plus stale test deletion.
 
 ## 2026-05-19 hosted identity routing/default release update
 
@@ -252,9 +261,9 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check whether Peter sent the patched `aweb-aapf.3` server
-   routing/federation review request. Scope must stay limited to aweb server
-   routing/federation; no CLI/channel/AC refactors until `.3` is approved.
+3. First check whether Peter sent the `aweb-aapf.9` server/schema review
+   request. `.4` CLI/channel and broad `.7` e2e/test edits are blocked until
+   `.9` lands. AC remains gated until `.4` is approved.
 4. Check Hestia's ship status for aweb `4c45619` as `server-v1.24.3` +
    `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 5. After AC deploy, coordinate scoped repair method with Grace and require
