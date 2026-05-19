@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 14:02 GMT
+Last updated: 2026-05-19 14:43 GMT
 
 ## Read this first
 
@@ -39,23 +39,25 @@ release mechanics; to them, Athena is the gate.
   and closed at Peter commit `4509c9f` (rebased on `origin/main` `5842eef`).
   Validation rerun by Athena: AWID tests 168, full Go `./...`, docs regression,
   diff-check clean.
-- `aweb-aapf.3` first review of Peter commit `0e06284` is not approved. Athena
-  found two blockers: (1) federated first-contact to an existing local `did:key`
-  can create a new mail conversation/chat session; local `did:key` targets must
-  require an existing participant conversation/session with sender+target; (2)
-  Peter initially planned a route-assertion/capability protocol, but Juan
-  pushed back that local agents are renamed ephemerals and already had outbound
-  + reply-in-established-context behavior. Athena tightened the gate: preserve
-  and simplify existing ephemeral/local reply behavior, do not grow a local
+- `aweb-aapf.3` first review of Peter commit `0e06284` was not approved.
+  Athena found two blockers: (1) federated first-contact to an existing local
+  `did:key` could create a new mail conversation/chat session; (2) Peter
+  initially planned a route-assertion/capability protocol, but Juan pushed back
+  that local agents are renamed ephemerals and already had outbound +
+  reply-in-established-context behavior. Athena tightened the gate: preserve and
+  simplify existing ephemeral/local reply behavior, do not grow a local
   mini-registry/protocol unless a concrete exploit requires it, and require a
   deletion/complexity note with the patched commit. Conversation_id may be an
-  index into local conversation/session state, but not routing authority or the
-  implementation center: sender must be authenticated/signed as a stored
-  participant, target must be the other stored participant, and route/identity
-  must come from stored participant/session state; guessed conversation_id,
-  non-participant, sender/target mismatch, missing/stale route, and federated
-  first-contact to local did:key must fail closed. Peter ACKed the pivot.
-  CLI/channel/AC work remains gated until `.3` approval.
+  index into local conversation/session state, but not routing authority.
+- `aweb-aapf.3` patched commit `97797af` was reviewed and validation rerun by
+  Athena: `git diff --check`, docs regression, server 531, AWID 168, Go `./...`
+  all green. Still not approved: one blocker remains. For local did:key inbound
+  chat replies, `_ensure_federated_chat_session()` checks existing active
+  conversation + `chat_sessions` row, but not that `chat_participants` contains
+  both sender and target. `send_in_session()` only requires sender, so a stale
+  session missing the target participant can accept a message. Peter ACKed and
+  will make the narrow fix + regression. CLI/channel/AC work remains gated until
+  `.3` approval.
 - `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass.
   Grace completed inventory-only with no edits. Stale clusters: OSS user-journey
   Phase 12e reachability/conversation-gate matrix; OSS federation Phase 5
