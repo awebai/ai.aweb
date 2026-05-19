@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 13:54 GMT
+Last updated: 2026-05-19 14:02 GMT
 
 ## Read this first
 
@@ -57,10 +57,16 @@ release mechanics; to them, Athena is the gate.
   first-contact to local did:key must fail closed. Peter ACKed the pivot.
   CLI/channel/AC work remains gated until `.3` approval.
 - `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass.
-  Grace ACKed. She may inventory stale reachability/private-address/team-cert/
-  conversation-auth expectations before `.3` approval, but should not change
-  assertions until `.3` is approved. Goal is fewer tests/e2e that prove only the
-  new contract, plus stale test deletion.
+  Grace completed inventory-only with no edits. Stale clusters: OSS user-journey
+  Phase 12e reachability/conversation-gate matrix; OSS federation Phase 5
+  private target authorization; federation envelope private reachability tests;
+  messages/chat/MCP private-address and conversation-auth tests; CLI
+  reachability/visible_to_team_id fixtures. Boundary: team certs still matter
+  for membership/trust, but team-cert-as-private-address-reachability is stale;
+  conversation_id still matters for threading/participant metadata, but not as
+  routing/reachability auth. After `.3` approval, prioritize e2e rewrite/delete
+  first. Goal is fewer tests/e2e that prove only the new contract, plus stale
+  test deletion.
 
 ## 2026-05-19 hosted identity routing/default release update
 
