@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 18:16 GMT
+Last updated: 2026-05-19 18:22 GMT
 
 ## Read this first
 
@@ -92,6 +92,14 @@ release mechanics; to them, Athena is the gate.
   and stays out of OAuth binding/probing/connect UI except explicit team-local
   bearer-token MCP. Peter ACKed he will stop `.5` at `173b9f7e` and not tag,
   deploy, or start `.6`/`.8`.
+- `aweb-aapf.6` is now opened/assigned/in progress with Peter. Athena briefed
+  dry-run/compat constraints by task comment + mail and released the initial
+  Athena hold so Peter could claim. Peter confirmed he claimed `.6` and created
+  AC branch `aweb-aapf-6` from approved `.5` head; he will state that base in
+  the review packet. Gate: no existing migration edits, no production mutation,
+  hidden reachability rows must be reported for explicit decision (not silently
+  exposed), legacy local stays out of AWID/OAuth/global IDs, dry-run output must
+  be exact/idempotent, and `.8` deletion stays out of `.6`.
 
 ## 2026-05-19 hosted identity routing/default release update
 
