@@ -1,9 +1,9 @@
 # Engineering Status
-Last updated: 2026-05-19 23:04 GMT
+Last updated: 2026-05-19 23:18 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is live at aweb `1.24.3` + AC `v0.5.44`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Hestia smoked live outbound routing post-deploy via verified mail + chat to Athena; Athena replied to the mail. Next release-adjacent check is scoped repair/matrix smoke for hosted `reachability=nobody` rows if Hestia/Grace proceed.
-1. **Global/local simplification is not ship-ready; new `aweb-aapg` P0 epic tracks making it actually simpler.** `aweb-aapf` landed on main (aweb `3550251`, AC `06364f1e`) but Juan rejected shipping the transition artifact. Grace's critique: target architecture can be simpler, current wave is halfway migration. Release blockers now tracked under `aweb-aapg`: federation v1 compatibility, real AWID hidden/limited-row policy, deterministic identity delivery-origin rollout, messaging-policy simplification decision, docs convergence, AC product cleanup, and final minimal e2e proof. Peter is assigned to implementation lanes but told to start only `aweb-aapg.1`; no tags/deploys.
+1. **Global/local simplification is not ship-ready; `aweb-aapg` P0 epic tracks making it actually simpler.** `aweb-aapf` landed on main (aweb `3550251`, AC `06364f1e`) but Juan rejected shipping the transition artifact. `aweb-aapg.1` federation v1 compatibility tolerance is approved/closed and landed at aweb `e4ff4e9`. Remaining release blockers: real AWID hidden/limited-row policy, route/delivery-origin model correction, messaging-policy removal, docs convergence, AC product cleanup, and final minimal e2e proof. Peter is assigned to implementation lanes but must wait for routed briefs; no tags/deploys.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
@@ -28,7 +28,7 @@ Last updated: 2026-05-19 23:04 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapg — ship-grade simplification epic**: open P0. Subtasks created from Grace specs: `.1` federation v1 compatibility tolerance (assigned Peter; start now), `.2` hidden/limited AWID row policy (unassigned/product+ops), `.3` identity delivery-origin rollout (assigned Peter; hold until routed), `.4` messaging-policy simplification decision (unassigned/architecture+product), `.5` docs convergence (unassigned), `.6` minimal e2e proof (assigned Peter; blocked on `.1-.5,.7`), `.7` AC local/global product cleanup (assigned Peter; blocked on `.3,.4`). Release remains held until epic closes or Juan chooses a different stance.
+- **aweb-aapg — ship-grade simplification epic**: open P0. `.1` federation v1 compatibility tolerance is closed/landed at aweb `e4ff4e9`; Athena validation: focused federation/messages/chat suite 177 passed, docs regression OK, diff-check clean. `.2` hidden/limited AWID row policy is unassigned/product+ops. `.3` delivery-origin rollout is assigned Peter but blocked on Juan's correction that one `did:aw` may have multiple address/routes at different origins; needs route-level design before implementation. `.4` is now messaging-policy removal (assigned Peter, not started): global inbound open; local inbound same-team or contacts; successful cross-team sends add recipient to sender contacts. `.5` docs convergence unassigned. `.6` minimal e2e proof assigned Peter but blocked on `.2-.5,.7`. `.7` AC product cleanup assigned Peter, blocked on `.3,.4`. Release remains held until epic closes or Juan chooses a different stance.
 - **aweb-aapf — global/local identity simplification**: epic closed but transition artifact only, not release-ready. Approved/closed: `.1` `4b51af1`; `.2` `4509c9f`; `.3` `103fa9e`; `.9` `eee1497`; `.4` `cd92f51`; `.7` `99d029d`; `.5` AC hosted global/local UX/backend at `173b9f7e` over `583970cf`; `.6` AC dry-run compatibility audit at `fb1dea3c` over `.5`; `.8` deletion/simplification proof landed on aweb main `3550251` and AC main `06364f1e`. Do not ship current heads as-is.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Hestia shipped aweb `1.24.3` + AC `v0.5.44` and smoked verified live mail/chat routing to Athena green.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
@@ -62,7 +62,7 @@ Last updated: 2026-05-19 23:04 GMT
   symptom, but the broader codebase grep has not been banked as done.
 
 ## Release-ready state (handoff to Hestia)
-- **Global/local simplification is release-blocked.** Prior handoff heads (aweb `3550251`, AC `06364f1e`) must not ship as-is. Blockers: old federation v1 senders can 422 against new receiver (`extra=forbid` with deleted fields); Hestia's real AWID audit found 43 hidden/limited rows and 0 persistent hosted agents using contacts policy; identity delivery-origin rollout/audit source is incomplete; `messaging_policy` may need deletion/no-op rather than becoming replacement reachability; docs still conflict. `aweb-aapg` is the new gate to turn the wave into ship-grade simplification.
+- **Global/local simplification is release-blocked.** aweb main is now `e4ff4e9` with old-v1 federation field tolerance, but AC remains `06364f1e` and the wave still must not ship. Remaining blockers: Hestia's real AWID audit found 43 hidden/limited rows; delivery-origin/route authority model needs correction because one `did:aw` may have multiple address routes/origins; `messaging_policy` must be removed/simplified per Juan; docs still conflict; AC product cleanup/e2e proof remain open.
 - **Hosted identity routing/default fix ship-clear for Hestia.** Initial handoff was aweb `8064558` + AC `bdfe5631`; Grace then added server verifier fixes `3198d6e`, `78482b9`, `d664988`, and CLI-side e2e fix `4c45619`. Hestia's real e2e failed at `d664988`; Grace's `4c45619` full `make ship` passed and Athena relayed to Hestia. Release head is aweb `4c45619`; server-v1.24.3 + aw-v1.24.3 is appropriate. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
 - **Trust/display fix set shipped/verified-live as aweb/aw 1.24.2.**
   Hestia smoke evidence: live `aw chat send-and-wait` against Athena
@@ -91,7 +91,7 @@ Last updated: 2026-05-19 23:04 GMT
 
 ## Risks
 - **Release-shape risk resolved for aweb 1.24.3**: the earlier no-server-tag correction applied only when release head was CLI-only `8064558`. With `3198d6e`/`78482b9`/`d664988` in `server/src`, server package bump/tag is justified. Keep release head at `4c45619`, not `8064558`, `3198d6e`, `78482b9`, or `d664988`.
-- **Global/local transition risk**: current main demotes reachability from resolver authority while production still has 43 hidden/limited AWID rows and no contacts-policy replacement in use. Current main also breaks old->new federation unless deprecated v1 fields are tolerated. Treat `aweb-aapf` heads as non-ship transition artifact until `aweb-aapg` closes or Juan chooses a different stance.
+- **Global/local transition risk**: current main demotes reachability from resolver authority while production still has 43 hidden/limited AWID rows. Old->new federation wire compatibility is fixed at aweb `e4ff4e9`, but privacy/migration, delivery-origin route model, messaging-policy removal, docs, AC cleanup, and e2e proof remain unresolved. Treat current heads as non-ship transition artifact until `aweb-aapg` closes or Juan chooses a different stance.
 - **Pi update/release risk (`aweb-aapb`)**: pi-extension source/dist now
   contains current channel-core behavior, but there is no verified user
   update path. `@awebai/claude-channel@1.4.3` and `@awebai/aw@1.24.2`
@@ -112,7 +112,7 @@ Last updated: 2026-05-19 23:04 GMT
   refresh.
 
 ## Next checks
-- Lead `aweb-aapg`: Peter starts `aweb-aapg.1` only; review federation v1 compatibility patch for deprecated-field tolerance/no-authority and tests. Do not let Hestia tag/deploy aweb `3550251` + AC `06364f1e` as-is. Pull Grace back for boundary review on compatibility/migration/simplification as needed.
+- Lead `aweb-aapg`: next tighten/route `.4` messaging-policy removal brief, then revisit `.3` delivery-origin/route model. Do not let Hestia tag/deploy current aweb/AC heads as-is. Pull Grace back for boundary review on compatibility/migration/simplification as needed.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow

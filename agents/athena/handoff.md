@@ -131,13 +131,17 @@ release mechanics; to them, Athena is the gate.
   hidden/limited rows and 0 persistent hosted agents on contacts policy. Grace
   also found old->new federation wire break: old v1 senders emit four fields
   current `FederationEnvelope` hard-rejects with `extra="forbid"`.
-- New P0 epic `aweb-aapg` tracks ship-grade simplification. Subtasks:
-  `.1` federation v1 compatibility tolerance (assigned Peter; started), `.2`
-  hidden/limited AWID row policy, `.3` identity delivery-origin rollout
-  (assigned Peter; hold until routed), `.4` messaging-policy simplification
-  decision, `.5` docs convergence, `.6` minimal e2e proof (assigned Peter;
-  blocked on `.1-.5,.7`), `.7` AC local/global product cleanup (assigned
-  Peter; blocked on `.3,.4`). Peter was told to start only `.1` for now.
+- New P0 epic `aweb-aapg` tracks ship-grade simplification. `.1` federation
+  v1 compatibility tolerance is now approved/closed and landed at aweb
+  `e4ff4e9`. Remaining subtasks: `.2` hidden/limited AWID row policy, `.3`
+  route/delivery-origin redesign, `.4` messaging-policy removal, `.5` docs
+  convergence, `.6` minimal e2e proof, `.7` AC cleanup. Juan updated the
+  target: first contact should use address, not bare `did:aw`; a `did:aw` may
+  have multiple address/routes at different origins; learned continuation can
+  deliver via stored `[key | did:aw], origin`. Juan also directed
+  `messaging_policy` removal/simplification: global inbound open; local inbound
+  shared-team or contacts; successful cross-team send adds recipient to sender
+  contacts for reply path. Peter is holding until routed except `.1` is done.
   Pull Grace back for boundary review on compatibility/migration/simplification
   decisions; she is not implementing unless asked.
 
