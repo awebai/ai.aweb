@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 14:58 GMT
+Last updated: 2026-05-19 15:04 GMT
 
 ## Read this first
 
@@ -66,6 +66,14 @@ release mechanics; to them, Athena is the gate.
   use stored did:aw/current did:key/delivery_origin for mail/chat continuation;
   missing/stale route fails distinctly. `.9` blocks `.4` and `.7`. Peter ACKed
   and paused `.4` to take `.9`; AC remains gated.
+- Grace also found `.7` e2e fails before rewritten Phase 5 on origin/peter:
+  first contact to `beta.test.local/bob` returns 424 no delivery origin. Cause:
+  supported setup only calls `aw id namespace set-delivery-origin`, but new AWID
+  address responses source `delivery.origin` from `did_aw_mappings.delivery_origin`.
+  Decision: do not inherit namespace default as routing authority and do not
+  DB-mutate DID delivery_origin in e2e. `.4` must add a supported CLI/setup path
+  that signs as the global identity and calls `/v1/did/<did_aw>/delivery-origin`;
+  hosted custodial equivalent belongs to `.5`.
 - `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass.
   Grace completed inventory-only with no edits. Stale clusters: OSS user-journey
   Phase 12e reachability/conversation-gate matrix; OSS federation Phase 5
@@ -75,9 +83,10 @@ release mechanics; to them, Athena is the gate.
   for membership/trust, but team-cert-as-private-address-reachability is stale;
   conversation_id still matters for threading/participant metadata, but not as
   routing/reachability auth. Grace may continue inventory/planning, but broad
-  e2e/test assertion edits should wait for `.9` because the stored-route
-  current-key contract affects final continuation expectations. Goal is fewer
-  tests/e2e that prove only the new contract, plus stale test deletion.
+  e2e/test assertion edits should wait for `.9` and the `.4` identity-delivery-
+  origin setup path because both affect final continuation/global-first-contact
+  expectations. Goal is fewer tests/e2e that prove only the new contract, plus
+  stale test deletion.
 
 ## 2026-05-19 hosted identity routing/default release update
 
