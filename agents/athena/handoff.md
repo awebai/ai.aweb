@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 15:04 GMT
+Last updated: 2026-05-19 16:07 GMT
 
 ## Read this first
 
@@ -58,35 +58,30 @@ release mechanics; to them, Athena is the gate.
   did:key inbound chat, with a stale/missing-target regression. Validation rerun
   by Athena: `git diff --check`, docs regression, server 532, AWID 168, Go
   `./...` all green.
-- Grace found a live 503 (`AWID registry unavailable`) on chat continuation:
-  stored participant route state lacks remote current did:key, so continuation
-  still calls AWID `resolve_key` on every send. Athena created `aweb-aapf.9` and
-  assigned it to Peter: persist remote current did:key in conversation/chat
-  participant route state at first contact/federated inbound/global resolution;
-  use stored did:aw/current did:key/delivery_origin for mail/chat continuation;
-  missing/stale route fails distinctly. `.9` blocks `.4` and `.7`. Peter ACKed
-  and paused `.4` to take `.9`; AC remains gated.
-- Grace also found `.7` e2e fails before rewritten Phase 5 on origin/peter:
-  first contact to `beta.test.local/bob` returns 424 no delivery origin. Cause:
-  supported setup only calls `aw id namespace set-delivery-origin`, but new AWID
-  address responses source `delivery.origin` from `did_aw_mappings.delivery_origin`.
-  Decision: do not inherit namespace default as routing authority and do not
-  DB-mutate DID delivery_origin in e2e. `.4` must add a supported CLI/setup path
-  that signs as the global identity and calls `/v1/did/<did_aw>/delivery-origin`;
-  hosted custodial equivalent belongs to `.5`.
-- `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass.
-  Grace completed inventory-only with no edits. Stale clusters: OSS user-journey
-  Phase 12e reachability/conversation-gate matrix; OSS federation Phase 5
-  private target authorization; federation envelope private reachability tests;
-  messages/chat/MCP private-address and conversation-auth tests; CLI
-  reachability/visible_to_team_id fixtures. Boundary: team certs still matter
-  for membership/trust, but team-cert-as-private-address-reachability is stale;
-  conversation_id still matters for threading/participant metadata, but not as
-  routing/reachability auth. Grace may continue inventory/planning, but broad
-  e2e/test assertion edits should wait for `.9` and the `.4` identity-delivery-
-  origin setup path because both affect final continuation/global-first-contact
-  expectations. Goal is fewer tests/e2e that prove only the new contract, plus
-  stale test deletion.
+- `aweb-aapf.9` is approved/closed at Peter commit `eee1497`. It persists remote
+  current did:key in conversation/chat participant route state so continuation no
+  longer depends on AWID `resolve_key` hot-path availability. Validation rerun by
+  Athena: diff-check, docs regression, server 532, AWID 168, Go `./...` green.
+- `aweb-aapf.4` is approved/closed at Peter commit `cd92f51` over base
+  `eee1497`. It adds supported self-custodial identity delivery-origin setup via
+  `aw id set-delivery-origin --origin ...`, signed by the current identity key
+  against `/v1/did/<did_aw>/delivery-origin`; keeps namespace default delivery
+  origin as legacy metadata, not routing authority; requires direct global
+  `did:aw` first contact to bind the current did:key; and for stored-route
+  continuations signs `to_did=<did:aw>` plus `to_stable_id=<did:aw>` when the
+  server participant/session route state supplies the current key. Validation by
+  Athena: diff-check, docs regression, Go `./...`, server 532, AWID 168, channel
+  89, channel-core build all green.
+- `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass and
+  is now unblocked. Grace ACKed she will rebase onto `cd92f51`, use
+  `aw id set-delivery-origin --origin <origin>` in e2e setup (no DB mutation),
+  and keep pruning narrow: remove old reachability/private-address/team-cert-as-
+  routing/conversation-auth assertions while preserving team membership/trust,
+  verification, delivery-origin, signed binding, participant-state routing, and
+  conversation UX/threading coverage. First targets remain
+  `scripts/e2e-oss-federation.sh` Phase 5 and `scripts/e2e-oss-user-journey.sh`
+  Phase 12e. Goal is fewer tests/e2e that prove only the new contract, plus stale
+  test deletion.
 
 ## 2026-05-19 hosted identity routing/default release update
 
@@ -270,9 +265,10 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check whether Peter sent the `aweb-aapf.9` server/schema review
-   request. `.4` CLI/channel and broad `.7` e2e/test edits are blocked until
-   `.9` lands. AC remains gated until `.4` is approved.
+3. First check whether Grace sent the `aweb-aapf.7` e2e/test-contract pruning
+   review request. `.7` should use supported `aw id set-delivery-origin` setup,
+   not DB mutation, and should delete old reachability/conversation-auth ballast
+   rather than preserve compatibility tests.
 4. Check Hestia's ship status for aweb `4c45619` as `server-v1.24.3` +
    `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 5. After AC deploy, coordinate scoped repair method with Grace and require
