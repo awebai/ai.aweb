@@ -1,9 +1,9 @@
 # Engineering Status
-Last updated: 2026-05-19 10:54 GMT
+Last updated: 2026-05-19 11:43 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is ship-clear at aweb `4c45619` + AC `bdfe5631`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Athena relayed ship-clear to Hestia; Hestia ACKed and is running canonical `make ship` before tagging `server-v1.24.3` + `aw-v1.24.3`. AC `v0.5.44` at `bdfe5631` follows after aweb publishes.
-1. **Global/local simplification epic is moving; `aweb-aapf.1` approved.** `aweb-aapf` captures Juan's target model: persistent→global (`did:aw`, globally reachable), ephemeral→local (`did:key`, no AWID row, replyable after outbound contact via learned route), no reachability resolver gates, and no conversation_id routing authority. Peter delivered SOT/design commits `25a290a` + `4b51af1`; Athena reviewed, requested two authority clarifications, approved `4b51af1`, and closed `aweb-aapf.1`. Peter is cleared for `aweb-aapf.2` only (AWID identity-level delivery origin/resolver model); server/CLI/AC remain gated.
+1. **Global/local simplification epic is moving; `aweb-aapf.2` approved.** `aweb-aapf` captures Juan's target model: persistent→global (`did:aw`, globally reachable), ephemeral→local (`did:key`, no AWID row, replyable after outbound contact via learned route), no reachability resolver gates, and no conversation_id routing authority. Peter delivered SOT/design (`aweb-aapf.1`) and AWID identity-level delivery origin/resolver model (`aweb-aapf.2` at commit `4509c9f` rebased on `5842eef`). Athena reviewed/approved/closed `.1` and `.2`. Peter is cleared for `aweb-aapf.3` only (aweb server routing/federation); CLI/channel/AC remain gated.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
@@ -28,7 +28,7 @@ Last updated: 2026-05-19 10:54 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight dependent subtasks. `aweb-aapf.1` SOT/design is approved/closed at Peter commit `4b51af1`. Next allowed work is `aweb-aapf.2` only: AWID identity-level delivery origin/resolver model and tests. Target deletes reachability and conversation-id-as-auth over the epic.
+- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight dependent subtasks. `aweb-aapf.1` SOT/design approved/closed at `4b51af1`; `aweb-aapf.2` AWID identity-level delivery origin/resolver model approved/closed at `4509c9f`. Next allowed work is `aweb-aapf.3` only: aweb server routing/federation. Target deletes reachability and conversation-id-as-auth over the epic.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Athena relayed ship-clear to Hestia. Release boundary is now `server-v1.24.3` + `aw-v1.24.3` at aweb `4c45619`, followed by AC `v0.5.44` at `bdfe5631`.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
@@ -110,7 +110,7 @@ Last updated: 2026-05-19 10:54 GMT
   refresh.
 
 ## Next checks
-- Watch for Peter's `aweb-aapf.2` review request. Scope must stay limited to AWID identity-level delivery origin/resolver model and tests; no server/CLI/AC refactors until `.2` is approved.
+- Watch for Peter's `aweb-aapf.3` review request. Scope must stay limited to aweb server routing/federation; no CLI/channel/AC refactors until `.3` is approved.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow

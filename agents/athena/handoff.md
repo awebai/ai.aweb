@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 10:54 GMT
+Last updated: 2026-05-19 11:46 GMT
 
 ## Read this first
 
@@ -34,9 +34,12 @@ release mechanics; to them, Athena is the gate.
     authority or authorization capability.
 - `aweb-aapf.1` SOT/design is approved and closed at Peter commit `4b51af1`
   (on top of `25a290a`). Athena requested/received clarifications on identity
-  delivery-origin write authority and learned local-route capabilities. Peter is
-  cleared for `aweb-aapf.2` only: AWID identity-level delivery origin/resolver
-  model and tests. Server/CLI/AC work remains gated until `.2` review.
+  delivery-origin write authority and learned local-route capabilities.
+- `aweb-aapf.2` AWID identity-level delivery origin/resolver model is approved
+  and closed at Peter commit `4509c9f` (rebased on `origin/main` `5842eef`).
+  Validation rerun by Athena: AWID tests 168, full Go `./...`, docs regression,
+  diff-check clean. Peter is cleared for `aweb-aapf.3` only: aweb server
+  routing/federation. CLI/channel/AC work remains gated until `.3` review.
 
 ## 2026-05-19 hosted identity routing/default release update
 
@@ -220,9 +223,9 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check whether Peter sent the `aweb-aapf.2` AWID review request.
-   Scope must stay limited to AWID identity-level delivery origin/resolver model
-   and tests; no server/CLI/AC refactors until `.2` is approved.
+3. First check whether Peter sent the `aweb-aapf.3` server routing/federation
+   review request. Scope must stay limited to aweb server routing/federation;
+   no CLI/channel/AC refactors until `.3` is approved.
 4. Check Hestia's ship status for aweb `4c45619` as `server-v1.24.3` +
    `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 5. After AC deploy, coordinate scoped repair method with Grace and require
