@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 16:22 GMT
+Last updated: 2026-05-19 16:46 GMT
 
 ## Read this first
 
@@ -81,6 +81,13 @@ release mechanics; to them, Athena is the gate.
   rotation continuation, and duplicate-alias active-team routing coverage. Grace's
   runtime evidence at `2d42d23`: federation 28 passed and OSS user journey 211
   passed; final `99d029d` is label-only and Athena static validation was green.
+- `aweb-aapf.5` is now assigned/in progress with Peter. Athena sent the AC brief
+  on 2026-05-19 16:46 GMT. Core reminder from Juan: **local is old ephemeral;
+  global is old persistent**. `.5` scope is AC hosted global/local identity
+  UX/backend only: hosted global registers DID/address and sets identity-level
+  `delivery_origin` with hosted custodial key; hosted local is did:key-only with
+  no AWID DID/address; remove user-facing reachability controls. Keep `.6`
+  migration and `.8` deletion out of `.5`.
 
 ## 2026-05-19 hosted identity routing/default release update
 
@@ -264,9 +271,11 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. Next global/local work is `aweb-aapf.5` AC hosted global/local identity
-   UX/backend. Keep it scoped to hosted custodial identity delivery-origin setup
-   and related UX/backend; do not blend `.6` migration or `.8` deletion.
+3. First check whether Peter sent the `aweb-aapf.5` AC review request. Review
+   against the brief: local == old ephemeral; global == old persistent; hosted
+   global sets identity-level delivery origin with custodial key; hosted local
+   creates no AWID DID/address; no user-facing reachability choices; no `.6` or
+   `.8` scope blended in.
 4. Check Hestia's ship status for aweb `4c45619` as `server-v1.24.3` +
    `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 5. After AC deploy, coordinate scoped repair method with Grace and require

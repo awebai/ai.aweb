@@ -1,9 +1,9 @@
 # Engineering Status
-Last updated: 2026-05-19 16:22 GMT
+Last updated: 2026-05-19 16:46 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is live at aweb `1.24.3` + AC `v0.5.44`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Hestia smoked live outbound routing post-deploy via verified mail + chat to Athena; Athena replied to the mail. Next release-adjacent check is scoped repair/matrix smoke for hosted `reachability=nobody` rows if Hestia/Grace proceed.
-1. **Global/local simplification epic: `.4` and `.7` are approved/closed; next is AC `.5`.** `aweb-aapf` target model: global = `did:aw` + AWID identity delivery origin; local = renamed ephemeral `did:key`, not globally first-contactable, replyable in established context. Athena approved/closed `.1`, `.2`, `.3`, `.9`, `.4` (`cd92f51`), and `.7` (`99d029d`). `.4` added the supported `aw id set-delivery-origin --origin ...` identity-signed setup path and fixed global signed bindings. `.7` pruned e2e/test-contract coverage to the new global/local contract using the supported setup path. AC `.5` may proceed only under its scoped hosted global/local identity brief; `.6` migration and `.8` deletion remain separate.
+1. **Global/local simplification epic: `.5` is opened/assigned to Peter.** `aweb-aapf` target model: global = old persistent = `did:aw` + AWID identity delivery origin; local = old ephemeral = `did:key`, no AWID row, not globally first-contactable, replyable in established context. Athena approved/closed `.1`, `.2`, `.3`, `.9`, `.4` (`cd92f51`), and `.7` (`99d029d`). Athena briefed/assigned `.5` to Peter for AC hosted global/local identity UX/backend only: hosted global registers DID/address and sets identity-level delivery origin with hosted custodial key; hosted local stays did:key-only/no AWID; remove reachability controls. `.6` migration and `.8` deletion remain separate.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
@@ -28,7 +28,7 @@ Last updated: 2026-05-19 16:22 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight original subtasks plus `.9`. Approved/closed: `.1` `4b51af1`; `.2` `4509c9f`; `.3` `103fa9e`; `.9` `eee1497`; `.4` `cd92f51`; `.7` `99d029d`. `.7` accepted Grace's prior runtime evidence (federation 28, OSS user journey 211) plus label-only final patch; static validation by Athena was green. Remaining work: `.5` AC hosted global/local identity UX/backend, `.6` migration/compat plan, `.8` deletion of reachability/conversation-auth dead code.
+- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight original subtasks plus `.9`. Approved/closed: `.1` `4b51af1`; `.2` `4509c9f`; `.3` `103fa9e`; `.9` `eee1497`; `.4` `cd92f51`; `.7` `99d029d`. `.5` is now assigned/in progress with Peter; brief sent 2026-05-19 16:46 GMT. Remaining after `.5`: `.6` migration/compat plan and `.8` deletion of reachability/conversation-auth dead code.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Hestia shipped aweb `1.24.3` + AC `v0.5.44` and smoked verified live mail/chat routing to Athena green.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
@@ -110,7 +110,7 @@ Last updated: 2026-05-19 16:22 GMT
   refresh.
 
 ## Next checks
-- Start/brief/review `aweb-aapf.5` AC hosted global/local identity UX/backend next. Keep `.5` scoped: hosted custodial equivalent for identity delivery-origin setup and related UX/backend only; do not blend `.6` migration or `.8` deletion.
+- Watch Peter's `.5` AC review request. Review against: local == old ephemeral; global == old persistent; hosted global must set identity-level delivery origin with custodial key; hosted local must not create AWID DID/address; no user-facing reachability choices; no `.6` migration or `.8` deletion blended into `.5`.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow
