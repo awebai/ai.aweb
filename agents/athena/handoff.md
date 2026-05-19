@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 20:13 GMT
+Last updated: 2026-05-19 21:07 GMT
 
 ## Read this first
 
@@ -98,19 +98,21 @@ release mechanics; to them, Athena is the gate.
   passed), `make test-backend-fast` (75 passed), and static grep confirming no
   `--apply` / write-SQL in the audit script. Peter ACKed he will stop `.6` at
   `fb1dea3c` and not add apply-path work.
-- `aweb-aapf.8` is in progress with Peter and currently blocked after Athena's
-  first review. Peter's first packet was aweb `3f2c451` over `.7` `99d029d` and
-  AC `55492666` over `.6` `fb1dea3c`. Good deletion direction: removed private
-  lookup forwarding, federation carried team-cert surface, and AC hosted
-  reachability editor. Blocker: reachability remained an active write
-  control-plane in AWID address register/update (`reachability` /
-  `visible_to_team_id` validation+mutation) and AC address reassignment/restore
-  preserved/wrote `current.reachability`. Peter ACKed and is patching narrowly:
-  AWID register/update force/retain neutral public,NULL metadata and ignore or
-  deprecate old fields without validation logic; client/CLI product write
-  surfaces stop sending reachability; AC reassignment/restore stops preserving
-  it. Re-review patched `.8` against this blocker plus remaining-hit
-  classification.
+- `aweb-aapf.8` is approved/closed and landed. Peter's first `.8` packet was
+  blocked because reachability remained an active write control-plane; patched
+  heads are aweb `3550251` and AC `06364f1e`. Athena fast-forwarded both repos'
+  `main` and pushed. Final proof: private address lookup forwarding removed;
+  federation carried team-cert routing removed; AWID resolver no longer gates on
+  reachability; AWID writes normalize/ignore legacy reachability fields; CLI/API
+  setup no longer sends reachability; AC hosted UI/API controls removed; AC
+  registry writes no longer preserve reachability/`visible_to_team_id`. Athena
+  validation: aweb diff-check, `make test-awid` 168, `make test-server` 529,
+  `make test-cli` Go `./...`; AC diff-check, focused backend 50,
+  `make test-backend-fast` 75, `make test-frontend` 195 + build. Docker e2e was
+  not runnable locally because Docker daemon unavailable.
+- `aweb-aapf` epic is closed. Peter ACKed he will stop further changes. Hestia
+  owns release gate/e2e before ship; Athena sent Hestia the release handoff and
+  Sofia a framing note. No tags/deploys by Athena.
 
 ## 2026-05-19 hosted identity routing/default release update
 
