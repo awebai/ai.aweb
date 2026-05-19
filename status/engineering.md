@@ -1,9 +1,9 @@
 # Engineering Status
-Last updated: 2026-05-19 13:24 GMT
+Last updated: 2026-05-19 13:38 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is ship-clear at aweb `4c45619` + AC `bdfe5631`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Athena relayed ship-clear to Hestia; Hestia ACKed and is running canonical `make ship` before tagging `server-v1.24.3` + `aw-v1.24.3`. AC `v0.5.44` at `bdfe5631` follows after aweb publishes.
-1. **Global/local simplification epic: `aweb-aapf.3` reviewed, not approved.** `aweb-aapf` captures Juan's target model: persistent→global (`did:aw`, globally reachable), ephemeral→local (`did:key`, no AWID row, replyable after outbound contact via learned route), no reachability resolver gates, and no conversation_id routing authority. Peter delivered SOT/design (`.1`) and AWID identity-level delivery origin/resolver model (`.2` at `4509c9f`); Athena approved/closed both. Athena reviewed Peter's `.3` server routing/federation commit `0e06284` and found two blockers: existing local `did:key` first-contact can create new conversation/session, and learned local return routes are self-asserted via `sender_delivery_origin` rather than vouched route capabilities. Peter needs to patch `.3`; CLI/channel/AC remain gated.
+1. **Global/local simplification epic: `aweb-aapf.3` reviewed, not approved; simplicity gate tightened.** `aweb-aapf` captures Juan's target model: global = `did:aw` + AWID identity delivery origin; local = renamed ephemeral `did:key`, not globally first-contactable, replyable in established context. Athena approved/closed `.1` and `.2`, then reviewed Peter's `.3` commit `0e06284` and blocked it. Juan pushed back that local agents already had ephemeral reply behavior; Athena tightened the gate: preserve/simplify that behavior, do not invent a local mini-registry/capability protocol unless a concrete exploit requires it, and prove the epic with deletion. `aweb-aapf.7` is now assigned to Grace as a separate test-contract/prune pass. CLI/channel/AC remain gated.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
@@ -28,7 +28,7 @@ Last updated: 2026-05-19 13:24 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight dependent subtasks. `aweb-aapf.1` SOT/design approved/closed at `4b51af1`; `aweb-aapf.2` AWID identity-level delivery origin/resolver model approved/closed at `4509c9f`. `aweb-aapf.3` commit `0e06284` reviewed/not approved: fix local did:key first-contact and vouched learned-route capability blockers. Target deletes reachability and conversation-id-as-auth over the epic.
+- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight dependent subtasks. `.1` approved/closed at `4b51af1`; `.2` approved/closed at `4509c9f`. `.3` commit `0e06284` reviewed/not approved; tightened direction is to preserve/simplify old ephemeral reply behavior, not grow a local route mini-protocol. `.7` assigned to Grace for second-developer test-contract/e2e pruning; `.8` deletion is the proof point.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Athena relayed ship-clear to Hestia. Release boundary is now `server-v1.24.3` + `aw-v1.24.3` at aweb `4c45619`, followed by AC `v0.5.44` at `bdfe5631`.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked

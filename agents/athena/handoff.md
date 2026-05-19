@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 13:26 GMT
+Last updated: 2026-05-19 13:41 GMT
 
 ## Read this first
 
@@ -42,11 +42,19 @@ release mechanics; to them, Athena is the gate.
 - `aweb-aapf.3` first review of Peter commit `0e06284` is not approved. Athena
   found two blockers: (1) federated first-contact to an existing local `did:key`
   can create a new mail conversation/chat session; local `did:key` targets must
-  require an existing learned conversation/session with sender+target
-  participants; (2) learned local return routes are self-asserted from
-  `sender_delivery_origin`, not vouched home-server/transport route
-  capabilities with expiry/scope/conversation binding. Peter ACKed and is
-  patching `.3` only. CLI/channel/AC work remains gated until `.3` approval.
+  require an existing participant conversation/session with sender+target; (2)
+  Peter initially planned a route-assertion/capability protocol, but Juan
+  pushed back that local agents are renamed ephemerals and already had outbound
+  + reply-in-established-context behavior. Athena tightened the gate: preserve
+  and simplify existing ephemeral/local reply behavior, do not grow a local
+  mini-registry/protocol unless a concrete exploit requires it, and require a
+  deletion/complexity note with the patched commit. Peter ACKed the pivot.
+  CLI/channel/AC work remains gated until `.3` approval.
+- `aweb-aapf.7` is assigned to Grace as a second-developer test-contract pass.
+  Grace ACKed. She may inventory stale reachability/private-address/team-cert/
+  conversation-auth expectations before `.3` approval, but should not change
+  assertions until `.3` is approved. Goal is fewer tests/e2e that prove only the
+  new contract, plus stale test deletion.
 
 ## 2026-05-19 hosted identity routing/default release update
 
