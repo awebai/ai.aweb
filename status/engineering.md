@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-19 21:07 GMT
+Last updated: 2026-05-19 21:14 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is live at aweb `1.24.3` + AC `v0.5.44`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Hestia smoked live outbound routing post-deploy via verified mail + chat to Athena; Athena replied to the mail. Next release-adjacent check is scoped repair/matrix smoke for hosted `reachability=nobody` rows if Hestia/Grace proceed.
@@ -61,7 +61,7 @@ Last updated: 2026-05-19 21:07 GMT
   symptom, but the broader codebase grep has not been banked as done.
 
 ## Release-ready state (handoff to Hestia)
-- **Global/local simplification release handoff sent to Hestia.** Release-gate inputs: aweb main `3550251`, AC main `06364f1e`. Local validation by Athena: aweb diff-check, `make test-awid` 168, `make test-server` 529, `make test-cli` Go `./...`; AC diff-check, focused backend 50, `make test-backend-fast` 75, `make test-frontend` 195 + build. Docker e2e was not runnable locally because Docker daemon is unavailable; Hestia should run release gate/e2e before shipping.
+- **Global/local simplification release handoff sent to Hestia with a correction.** Release-gate inputs: aweb main `3550251`, AC main `06364f1e`. Local validation by Athena: aweb diff-check, `make test-awid` 168, `make test-server` 529, `make test-cli` Go `./...`; AC diff-check, focused backend 50, `make test-backend-fast` 75, `make test-frontend` 195 + build. Docker e2e was not runnable locally because Docker daemon is unavailable. Hestia may run gates in parallel with Sofia framing, but should not tag/deploy until the `.6` compatibility audit identifies hidden/limited legacy global rows and the team makes an explicit decision; reachability metadata becomes ignored by resolver after deploy.
 - **Hosted identity routing/default fix ship-clear for Hestia.** Initial handoff was aweb `8064558` + AC `bdfe5631`; Grace then added server verifier fixes `3198d6e`, `78482b9`, `d664988`, and CLI-side e2e fix `4c45619`. Hestia's real e2e failed at `d664988`; Grace's `4c45619` full `make ship` passed and Athena relayed to Hestia. Release head is aweb `4c45619`; server-v1.24.3 + aw-v1.24.3 is appropriate. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
 - **Trust/display fix set shipped/verified-live as aweb/aw 1.24.2.**
   Hestia smoke evidence: live `aw chat send-and-wait` against Athena
@@ -90,7 +90,7 @@ Last updated: 2026-05-19 21:07 GMT
 
 ## Risks
 - **Release-shape risk resolved for aweb 1.24.3**: the earlier no-server-tag correction applied only when release head was CLI-only `8064558`. With `3198d6e`/`78482b9`/`d664988` in `server/src`, server package bump/tag is justified. Keep release head at `4c45619`, not `8064558`, `3198d6e`, `78482b9`, or `d664988`.
-- **Existing hosted identity repair risk**: the global/local simplification does not mutate existing legacy reachability rows. `.6` gives a dry-run audit; any production repair remains explicit/scoped/audited after release, with Hestia/Operations owning execution.
+- **Existing hosted identity exposure/repair risk**: the global/local simplification does not mutate existing legacy reachability rows, but it does demote reachability from resolver authority. Hestia must run the `.6` dry-run audit before deploy and surface any hidden/limited global rows (`nobody`, `team_members_only`, `org_only`, `visible_to_team_id`) for explicit decision; any production repair/mutation remains scoped/audited.
 - **Pi update/release risk (`aweb-aapb`)**: pi-extension source/dist now
   contains current channel-core behavior, but there is no verified user
   update path. `@awebai/claude-channel@1.4.3` and `@awebai/aw@1.24.2`
@@ -111,7 +111,7 @@ Last updated: 2026-05-19 21:07 GMT
   refresh.
 
 ## Next checks
-- Watch Hestia's release gate/e2e for aweb `3550251` + AC `06364f1e`; respond to failures. Do not make external claims until Hestia verifies live and Sofia approves framing.
+- Watch Hestia's release gate/e2e for aweb `3550251` + AC `06364f1e`; respond to failures. Also require `.6` audit output + hidden/limited-row decision before tag/deploy. Do not make external claims; Sofia says external posture is hold.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow

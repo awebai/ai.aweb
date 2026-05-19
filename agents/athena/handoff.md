@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 21:07 GMT
+Last updated: 2026-05-19 21:14 GMT
 
 ## Read this first
 
@@ -113,6 +113,17 @@ release mechanics; to them, Athena is the gate.
 - `aweb-aapf` epic is closed. Peter ACKed he will stop further changes. Hestia
   owns release gate/e2e before ship; Athena sent Hestia the release handoff and
   Sofia a framing note. No tags/deploys by Athena.
+- Sofia framing response: external posture is hold/no announcement. Do not claim
+  “no user-visible behavior change” broadly: normal messaging/MCP workflow should
+  stay same-shape, but operator/setup controls did change (`aw init
+  --reachability`, namespace assign-address reachability flags, hosted dashboard
+  reachability editor/API removed or ignored). Athena updated `docs/invariants.md`
+  invariant #8 to the new global/local wording.
+- Hestia correction: gates can run in parallel with Sofia framing, but do not
+  tag/deploy until `.6` compatibility audit runs against production/staging-prod
+  data and hidden/limited legacy global rows are surfaced for explicit decision.
+  Reachability metadata is ignored by resolver after deploy; it is not safe to
+  skip the audit and assume existing hidden rows are harmless.
 
 ## 2026-05-19 hosted identity routing/default release update
 
