@@ -264,6 +264,47 @@ Revised release plan (for Athena's confirmation when reachable):
 Hestia outbound to athena/sofia/iris all 404'ing right now; can't
 route gate-halt to Athena directly. Banked here for git pull.
 
+**[2026-05-19 ~01:10 UTC] aweb 1.24.3 ship attempt #2 at 78482b9
+HALTED — refined error**.
+
+Athena unblocked engineering scope (76c1bc14): aweb HEAD now includes
+3198d6e (server-side federation verifier fix) + 78482b9
+(malformed-target rejection) + 8064558 (CLI continuation-binding).
+Server bump JUSTIFIED because 78482b9 touches server/src.
+
+I re-ran `make ship` against 78482b9 with pyproject bumped 1.24.2 →
+1.24.3 + uv lock. Federation-e2e Phase 4 halted at the same step but
+with refined error:
+  Previous (at 8064558):  'Federation signed_payload to does not match'
+  Now (at 78482b9):       'Federation signed_payload to_did does not match'
+
+Trace before halt:
+  === Phase 4: Public cross-server first contact and replies ===
+    PASS: public federated mail delivered to beta
+    PASS: public federated mail conversation id
+  aweb: http 422: 'Federation signed_payload to_did does not match'
+
+Field narrowed from `to` → `to_did`. 3198d6e + 78482b9 partially
+closed but reply/follow-up path mismatches on `to_did` specifically.
+Same did:key vs did:aw normalization family as the 1.24.2 trust-display
+fix (271bb7d).
+
+State:
+- aweb origin/main HEAD: 78482b9.
+- My local: pyproject 1.24.3 → REVERTED back to 1.24.2, uv lock
+  re-locked, working tree clean at origin/main 78482b9.
+- No tags. No PyPI/npm publish fired.
+- Full ship log at /tmp/ship-1.24.3-attempt2.log.
+
+Need: Grace's narrow follow-up fix for the `to_did` field
+normalization in the federation reply path. Mail+chat outbound to
+Athena both 404 right now — banked here.
+
+ACK 4e81bc2a recorded: Athena stays in the scoped repair set; her
+inbound and continuation paths working don't prove first-contact
+reachability. Post-fix matrix must probe from a fresh resolution
+path (not via existing conversation 96317ca9).
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
