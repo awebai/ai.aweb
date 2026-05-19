@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 09:07 GMT
+Last updated: 2026-05-19 09:30 GMT
 
 ## Read this first
 
@@ -13,6 +13,27 @@ You are Athena. You bridge two teams:
 Default active team is `aweb:juan.aweb.ai`. Use `--team default:aweb.ai`
 for company-side mail/chat. Dev-team members do not need company-team
 release mechanics; to them, Athena is the gate.
+
+## 2026-05-19 global/local simplification epic
+
+- Juan asked Athena to lead a major architecture simplification: persistent →
+  global, ephemeral → local, remove reachability/access restrictions, and
+  eventually remove conversation_id as routing authority.
+- Athena created epic `aweb-aapf` and dependent subtasks `.1`-`.8`, assigned
+  to Peter. Peter ACKed and will pause his prior tutorial-validation task.
+- Target model:
+  - global = `did:aw`, AWID-registered, globally reachable, `did:aw <-> actual
+    agent`; addresses are aliases, not independently-routable principals;
+    delivery origin should be identity/agent-level or same-origin enforced
+    across aliases.
+  - local = `did:key` only, no AWID row/no `did:aw`, team-local; can write to
+    global and be replied to only via learned return route keyed by did:key.
+  - no reachability classes, no `visible_to_team_id`, no AWID team-cert address
+    visibility gates, no private address lookup auth.
+  - conversation/thread IDs may remain as UX/local metadata but not routing
+    authority or authorization capability.
+- Peter starts with `aweb-aapf.1` only: SOT/design, no production code. Athena
+  reviews branch/commit/docs and gates every dependent subtask.
 
 ## 2026-05-19 hosted identity routing/default release update
 
@@ -192,27 +213,29 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check Hestia's ship status for aweb `d664988` as
-   `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
-4. After AC deploy, coordinate scoped repair method with Grace and require
+3. First check whether Peter sent the `aweb-aapf.1` design/SOT review request.
+   Do not let implementation begin until Athena approves the architecture doc.
+4. Check Hestia's ship status for aweb `d664988` as `server-v1.24.3` +
+   `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
+5. After AC deploy, coordinate scoped repair method with Grace and require
    Hestia's post-repair hestia→{athena,sofia,iris,aida,metis,ama} matrix smoke.
-5. Confirm Sofia framing before any external trust-display claim. Narrow
+6. Confirm Sofia framing before any external trust-display claim. Narrow
    claim: aweb/aw 1.24.2 fixes CLI live chat trust-display for stable
    did:aw participant rows; Pi users are not covered until `aweb-aapb`.
-6. Track `aweb-aapb` (Pi update path) and `aweb-aapc` (Aida/Marvin mail
+7. Track `aweb-aapb` (Pi update path) and `aweb-aapc` (Aida/Marvin mail
    409) as separate P1s.
-7. Watch Hestia's revised MCP OAuth gate/deploy/live-verify. Expected
+8. Watch Hestia's revised MCP OAuth gate/deploy/live-verify. Expected
    release shape if she accepts Athena recommendation: aweb `1.24.1` or
    later containing `99cc2cb`, then AC `v0.5.43` with aweb pin updated
    beyond `5b44f724`.
-8. Loop Sofia for narrow OAuth claim-shape framing before any
+9. Loop Sofia for narrow OAuth claim-shape framing before any
    customer-facing OAuth claim. Precise claim: dashboard-targeted existing
    hosted identity preserves selected org/team; generic `/mcp/` uses
    explicit org-first / team-second selection when ambiguous; stale/invalid
    targeted links fail closed; cached legacy tool names are restored as
    aliases.
-9. Check whether Dave closed or handed off `aweb-aaov.12`.
-10. If any channel event wakes the session, inspect metadata and sender
+10. Check whether Dave closed or handed off `aweb-aaov.12`.
+11. If any channel event wakes the session, inspect metadata and sender
     verification before acting; reply in the existing thread/session.
 
 ## Old debt still not closed

@@ -1,9 +1,10 @@
 # Engineering Status
-Last updated: 2026-05-19 09:07 GMT
+Last updated: 2026-05-19 09:28 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is blessed at aweb `d664988` + AC `bdfe5631`.** Grace added server-side federation continuation verifier fixes (`3198d6e`, `78482b9`, `d664988`) after the CLI continuation binding (`8064558`). Athena found one malformed-target blocker in `3198d6e`; Grace fixed it in `78482b9`; `d664988` widened federation `to_did` to accept stable did:aw or current did:key while keeping `to_stable_id` strict. Mia approved; Athena reran validation and blessed release to Hestia. Release shape: `server-v1.24.3` + `aw-v1.24.3` at aweb `d664988`, then AC `v0.5.44` at `bdfe5631` after the aweb package is available.
-1. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
+1. **Global/local simplification epic created and assigned to Peter.** `aweb-aapf` captures Juan's target model: persistent→global (`did:aw`, globally reachable), ephemeral→local (`did:key`, no AWID row, replyable after outbound contact via learned route), no reachability resolver gates, and no conversation_id routing authority. Subtasks `aweb-aapf.1`-`.8` are fully specified/dependent; Peter was briefed by mail/chat to start only with `aweb-aapf.1` SOT/design in his branch. Athena gates every subtask review.
+2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
    `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
    `271bb7d` (Go/server stable-DID signed-payload coverage). Mia approved;
@@ -27,6 +28,7 @@ Last updated: 2026-05-19 09:07 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
+- **aweb-aapf — global/local identity simplification**: Peter assigned epic + eight dependent subtasks. First task `aweb-aapf.1` is SOT/design only; no production code until Athena reviews. Target deletes reachability and conversation-id-as-auth over the epic.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved; Athena reviewed in detached worktrees and handed/blessed to Hestia. Release boundary is now `server-v1.24.3` + `aw-v1.24.3` at aweb `d664988`, followed by AC `v0.5.44` at `bdfe5631`.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
   `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
@@ -108,6 +110,7 @@ Last updated: 2026-05-19 09:07 GMT
   refresh.
 
 ## Next checks
+- Watch for Peter's `aweb-aapf.1` SOT/design review request. Do not let implementation begin until the architecture doc lands and Athena approves.
 - Watch Hestia's release of aweb `d664988` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow
