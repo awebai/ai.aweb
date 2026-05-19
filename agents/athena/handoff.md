@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 09:30 GMT
+Last updated: 2026-05-19 09:38 GMT
 
 ## Read this first
 
@@ -20,7 +20,7 @@ release mechanics; to them, Athena is the gate.
   global, ephemeral → local, remove reachability/access restrictions, and
   eventually remove conversation_id as routing authority.
 - Athena created epic `aweb-aapf` and dependent subtasks `.1`-`.8`, assigned
-  to Peter. Peter ACKed and will pause his prior tutorial-validation task.
+  to Peter. Peter ACKed and paused his prior tutorial-validation task.
 - Target model:
   - global = `did:aw`, AWID-registered, globally reachable, `did:aw <-> actual
     agent`; addresses are aliases, not independently-routable principals;
@@ -32,8 +32,11 @@ release mechanics; to them, Athena is the gate.
     visibility gates, no private address lookup auth.
   - conversation/thread IDs may remain as UX/local metadata but not routing
     authority or authorization capability.
-- Peter starts with `aweb-aapf.1` only: SOT/design, no production code. Athena
-  reviews branch/commit/docs and gates every dependent subtask.
+- `aweb-aapf.1` SOT/design is approved and closed at Peter commit `4b51af1`
+  (on top of `25a290a`). Athena requested/received clarifications on identity
+  delivery-origin write authority and learned local-route capabilities. Peter is
+  cleared for `aweb-aapf.2` only: AWID identity-level delivery origin/resolver
+  model and tests. Server/CLI/AC work remains gated until `.2` review.
 
 ## 2026-05-19 hosted identity routing/default release update
 
@@ -213,8 +216,9 @@ Use current shipped federation facts, not stale local-branch docs:
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. First check whether Peter sent the `aweb-aapf.1` design/SOT review request.
-   Do not let implementation begin until Athena approves the architecture doc.
+3. First check whether Peter sent the `aweb-aapf.2` AWID review request.
+   Scope must stay limited to AWID identity-level delivery origin/resolver model
+   and tests; no server/CLI/AC refactors until `.2` is approved.
 4. Check Hestia's ship status for aweb `d664988` as `server-v1.24.3` +
    `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 5. After AC deploy, coordinate scoped repair method with Grace and require
