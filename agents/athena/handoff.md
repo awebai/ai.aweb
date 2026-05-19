@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 18:35 GMT
+Last updated: 2026-05-19 20:13 GMT
 
 ## Read this first
 
@@ -98,14 +98,19 @@ release mechanics; to them, Athena is the gate.
   passed), `make test-backend-fast` (75 passed), and static grep confirming no
   `--apply` / write-SQL in the audit script. Peter ACKed he will stop `.6` at
   `fb1dea3c` and not add apply-path work.
-- `aweb-aapf.8` is now opened/assigned/in progress with Peter. Athena briefed
-  deletion/simplification constraints by task comment + mail; Peter claimed and
-  ACKed. This is the proof point: delete reachability/conversation-auth dead code
-  and stale tests/docs; no new local routing subsystem, no feature broadening,
-  no tag/deploy. Gate `.8` against actual complexity reduction and require a
-  remaining-hit classification for `reachability`, `visible_to_team_id`,
-  `requires_team_certificate`, private address lookup/auth, and conversation-id
-  auth.
+- `aweb-aapf.8` is in progress with Peter and currently blocked after Athena's
+  first review. Peter's first packet was aweb `3f2c451` over `.7` `99d029d` and
+  AC `55492666` over `.6` `fb1dea3c`. Good deletion direction: removed private
+  lookup forwarding, federation carried team-cert surface, and AC hosted
+  reachability editor. Blocker: reachability remained an active write
+  control-plane in AWID address register/update (`reachability` /
+  `visible_to_team_id` validation+mutation) and AC address reassignment/restore
+  preserved/wrote `current.reachability`. Peter ACKed and is patching narrowly:
+  AWID register/update force/retain neutral public,NULL metadata and ignore or
+  deprecate old fields without validation logic; client/CLI product write
+  surfaces stop sending reachability; AC reassignment/restore stops preserving
+  it. Re-review patched `.8` against this blocker plus remaining-hit
+  classification.
 
 ## 2026-05-19 hosted identity routing/default release update
 
