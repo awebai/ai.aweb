@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-18 18:25 GMT
+Last updated: 2026-05-19 05:18 GMT
 
 ## Read this first
 
@@ -13,6 +13,59 @@ You are Athena. You bridge two teams:
 Default active team is `aweb:juan.aweb.ai`. Use `--team default:aweb.ai`
 for company-side mail/chat. Dev-team members do not need company-team
 release mechanics; to them, Athena is the gate.
+
+## 2026-05-19 hosted identity routing/default release update
+
+- Review cleared for aweb `8064558` + AC `bdfe5631`.
+  - Grace ACKed no blockers after Athena's detached-worktree review.
+  - Mia confirmed by chat that she approved `bdfe5631` too.
+  - Hestia has the release handoff.
+- Important cut-plan correction sent to Hestia: aweb `8064558` is **CLI-only**
+  (`cli/go/*`). Banked discipline 27a applies:
+  - tag/publish `aw-v1.24.3` only;
+  - do **not** bump aweb server/pyproject;
+  - do **not** tag `server-v1.24.3`;
+  - do **not** run AC `uv lock --upgrade-package aweb` merely to chase that
+    CLI tag.
+- AC `v0.5.44` should ship `bdfe5631` with its current valid Python aweb pin
+  unless `make release-ready` proves a real server-package dependency.
+- Post-deploy repair remains explicit/scoped/audited only. Known `nobody` rows
+  must not be blanket migrated; prefer controller-key/API repair over direct DB
+  unless Grace decides the API route is not viable. Require matrix smoke after
+  repair before any claim.
+
+## 2026-05-18 trust-display release update
+
+- aweb/aw 1.24.2 is verified-live for the CLI trust-display regression.
+  Fix set:
+  - `856a560` — live chat SSE now treats signed_payload `from_did` /
+    `to_did` as authoritative for verification when stream rows carry
+    stable `did:aw` participant IDs.
+  - `aa72312` — channel-core dispatch tests for stable-DID envelope +
+    signed-payload did:key, plus rebuilt `pi-extension/dist`.
+  - `271bb7d` — Go inbox/chat-history and server verification tests for
+    stable-row/signed-did:key normalization.
+- Mia approved; Athena reviewed in a clean detached worktree and validated
+  focused Go, server, channel, and Pi-extension build paths. Hestia cut
+  aweb/aw 1.24.2 and smoked live output: plain `aw chat send-and-wait`
+  showed `Chat from: aweb.ai/athena [not in contacts]` with no
+  `[unverified]`; JSON proof remained `verification_status=verified` with
+  did:key + did:aw distinct.
+- External claim still needs Sofia framing. Claim must exclude Pi users:
+  `aweb-aapb` remains open because `@awebai/claude-channel@1.4.3` and
+  `@awebai/aw@1.24.2` do not update Pi's bundled extension.
+- Separate follow-ups:
+  - `aweb-aapb` — define Pi extension update path for bundled
+    channel-core fixes.
+  - `aweb-aapc` — investigate Aida/Marvin mail continuation 409 after
+    identity rebind.
+  - Grace filed a separate P1 from Mia's outgoing mail
+    `identity_mismatch` observation.
+  - Ama dashboard omission remains likely AC/dashboard projection-side;
+    aw team-cert state was clean.
+- Scratch branch `athena/chat-sse-trust` is diagnostic only; Grace
+  cherry-picked/reworked the fix into `856a560` on main. Do not use the
+  scratch branch as release input.
 
 ## Wake-up state from 2026-05-18 Pi session
 
@@ -48,15 +101,11 @@ release mechanics; to them, Athena is the gate.
   channel-v1.4.1 tag exists but npm publish failed because GHA didn't
   install channel-core deps before building; npm may still show the
   package as Proprietary until this closes.
-- **P0 channel auto-ack/read bug identified.** Sofia missed Athena's
-  graph-brief mail because channel push auto-acked it as read; this now
-  matches Zeus + Hestia smoke symptoms. Code read: `aweb/channel-core/src/channel.ts`
-  and `aweb/channel/src/index.ts` call mail `ackMessage` and chat
-  `markRead` after delivery into the harness (`onAwakening`). That treats
-  delivered-to-channel as read/handled. Athena recommended removing
-  auto-ack/read from inbound channels, using local dedupe only, and later
-  splitting delivered/read/handled receipt semantics. Grace and Hestia
-  have been notified.
+- **Channel auto-ack/read bug is fixed for Claude channel and source Pi
+  dist, but Pi update path remains open.** `@awebai/claude-channel@1.4.3`
+  stopped inbound delivery from marking messages read; `aa72312` rebuilt
+  `pi-extension/dist` from current channel-core. Installed Pi users are
+  not covered until `aweb-aapb` defines and verifies an update path.
 - **MCP OAuth/reconnect release lane is still with Hestia.** Initial
   bless was AC `cb223c34` + aweb `03fe4bf`. Gate found stale AC alias
   test; Mia/Grace patched it (`bc2e48dd` / `5b44f724`). Grace also fixed
@@ -97,28 +146,73 @@ release mechanics; to them, Athena is the gate.
   and removed them afterwards.
 - Current local changes are `status/engineering.md` and this handoff.
 
+## Ben / Commando federation support context
+
+Juan flagged that Ben (Commando) may contact Athena for federation setup help.
+Use current shipped federation facts, not stale local-branch docs:
+
+- Federation v1 is **messaging-only**: mail + chat across aweb servers.
+  Tasks, work queues, presence, roles, manuals, and other team-scoped state
+  remain local to one aweb server.
+- Verified-live completion wave: awid-service/awid `0.5.6`, aweb `1.23.0`,
+  AC `v0.5.42`. Later aweb/aw `1.24.2` includes trust-display fixes but is
+  not a separate federation feature wave.
+- Core route: recipient address `domain/name` resolves at AWID to `did:aw`,
+  current `did:key`, reachability, and namespace `default_delivery_origin`;
+  sender aweb POSTs the preserved sender-signed payload to
+  `<delivery-origin>/v1/federation/messages`.
+- Receiver verifies: sender signature, sender current key, target address
+  binding, target delivery origin matches its configured public origin,
+  non-public reachability cert evidence, policy, timestamp skew, and idempotent
+  delivery.
+- Setup essentials for a self-hosted/BYOT namespace:
+  1. Run aweb with `AWEB_PUBLIC_ORIGIN=<public origin>` (origin only, no `/api`;
+     use external `https://` if TLS terminates at a proxy).
+  2. Namespace controller publishes delivery origin:
+     `aw id namespace set-delivery-origin --namespace <domain> --origin <origin>`.
+     This requires the local namespace controller key. Hosted aweb.ai repairs
+     only namespaces whose controller key hosted AC owns.
+  3. Persistent identities need public addresses; first-contact federation is
+     address-based, not bare `did:aw`-based.
+  4. For non-public addresses, the sender must present a valid persistent team
+     certificate satisfying AWID reachability (`org_only` or
+     `team_members_only`); `nobody` is owner-only and will 404 for teammates.
+- Strongest local proof is `scripts/e2e-oss-federation.sh` on origin/main: one
+  AWID registry + two isolated aweb servers, public mail/chat first contact,
+  replies, authorized/unauthorized private address cases, missing-origin
+  fail-closed, and replay idempotency.
+- Caveat: local aweb checkout may be on Dave's Pi branch; use `origin/main` or
+  tags containing `02a344f`/`449cb17` for current self-hosting docs and
+  `aw id namespace set-delivery-origin`.
+
 ## Things to check first next wake-up
 
 1. `git pull --ff-only`.
 2. Run the two-team coordination loop: dev + company inbox/chat,
    `aw work active`, `aw work ready`, and workspace status.
-3. Watch/support P0 channel auto-ack/read fix. Do not trust inbox-empty
-   or pending-empty as proof that no channel event arrived until this is
-   fixed; use conversation history by known IDs when diagnosing missed
-   direction work.
-4. Watch Hestia's revised gate/deploy/live-verify. Expected release
-   shape if she accepts Athena recommendation: aweb `1.24.1` containing
-   `99cc2cb`, then AC `v0.5.43` with aweb pin updated beyond `5b44f724`.
-5. Loop Sofia for narrow claim-shape framing before any customer-facing
-   claim. Precise claim: dashboard-targeted existing hosted identity
-   preserves selected org/team; generic `/mcp/` uses explicit org-first /
-   team-second selection when ambiguous; stale/invalid targeted links fail
-   closed; cached legacy tool names are restored as aliases.
-6. Check whether Dave closed or handed off `aweb-aaov.12`.
-7. Check whether Hestia closed `aweb-aaox.16` or needs engineering
-   review/tooling help for the channel publish failure.
-8. If any channel event wakes the session, inspect metadata and sender
-   verification before acting; reply in the existing thread/session.
+3. First check Hestia's ACK/status on the adjusted routing/default cut plan:
+   `aw-v1.24.3` only for aweb `8064558`; AC `v0.5.44` at `bdfe5631` without a
+   gratuitous Python aweb lock bump.
+4. After AC deploy, coordinate scoped repair method with Grace and require
+   Hestia's post-repair hestia→{athena,sofia,iris,aida,metis,ama} matrix smoke.
+5. Confirm Sofia framing before any external trust-display claim. Narrow
+   claim: aweb/aw 1.24.2 fixes CLI live chat trust-display for stable
+   did:aw participant rows; Pi users are not covered until `aweb-aapb`.
+6. Track `aweb-aapb` (Pi update path) and `aweb-aapc` (Aida/Marvin mail
+   409) as separate P1s.
+7. Watch Hestia's revised MCP OAuth gate/deploy/live-verify. Expected
+   release shape if she accepts Athena recommendation: aweb `1.24.1` or
+   later containing `99cc2cb`, then AC `v0.5.43` with aweb pin updated
+   beyond `5b44f724`.
+8. Loop Sofia for narrow OAuth claim-shape framing before any
+   customer-facing OAuth claim. Precise claim: dashboard-targeted existing
+   hosted identity preserves selected org/team; generic `/mcp/` uses
+   explicit org-first / team-second selection when ambiguous; stale/invalid
+   targeted links fail closed; cached legacy tool names are restored as
+   aliases.
+9. Check whether Dave closed or handed off `aweb-aaov.12`.
+10. If any channel event wakes the session, inspect metadata and sender
+    verification before acting; reply in the existing thread/session.
 
 ## Old debt still not closed
 

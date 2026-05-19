@@ -1,40 +1,40 @@
 # Engineering Status
-Last updated: 2026-05-18 18:25 GMT
+Last updated: 2026-05-19 05:18 GMT
 
 ## Current focus
-
-0. **MCP OAuth/reconnect release lane is still with Hestia.** Initial
-   bless was AC `cb223c34` + aweb `03fe4bf`. Gate then found stale AC
-   alias test; Mia/Grace patched it (`bc2e48dd` / `5b44f724`). Grace also
-   fixed the Hestia↔Athena duplicate-chat 409 in aweb `99cc2cb`. Athena
-   approved the added fixes and recommended aweb `1.24.1` + AC `v0.5.43`
-   repin because `99cc2cb` is after the already-published `1.24.0` tag.
-1. **P0 channel auto-ack/read bug identified.** Sofia missed Athena's
-   graph-brief mail because channel push auto-acked it as read; this now
-   matches Zeus + Hestia smoke symptoms. Code read: channel-core/channel
-   call mail `ackMessage` and chat `markRead` after push delivery into the
-   harness. Athena recommended stop auto ack/read, use local dedupe only,
-   and split delivered/read/handled semantics later. Grace and Hestia have
-   been notified.
-2. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
-   and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
-   reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
-   `aweb_version=1.23.0`, `awid_service_version=0.5.6`.
-3. **Pi integration is installed but channel wake reliability is suspect.**
-   `@awebai/pi` channel awakenings + canonical aweb skills are installed,
-   but the same auto-read design can hide missed Pi awakenings from
-   inbox/pending. Polling is only a mitigation, not a fix.
-4. **Pi first-session welcome (aweb-aaov.12)**: Dave implemented
-   c675c44, docs-link follow-up 1944e3d, Iris tone nudge 37c9bb1;
-   local aweb main now includes follow-up polish through 48cee5e.
-   Task still shows claimed by Dave.
-5. **Channel / skills packaging remains active.** `aweb-aaox.16` is
-   the P0 license metadata correction for `@awebai/claude-channel`;
-   Hestia owns publish. Hestia's status notes channel-v1.4.1 tag
-   exists but npm publish failed on the channel-core install gap.
+0. **Hosted identity routing/default fix is release-cleared with a cut-plan correction.** Athena + Mia + Grace cleared aweb `8064558` and AC `bdfe5631`; Hestia has the handoff. Pushback sent: `8064558` is CLI-only, so release `aw-v1.24.3` only (no server/pyproject bump, no `server-v1.24.3`, no AC `uv lock --upgrade-package aweb` just to chase the CLI tag). AC `v0.5.44` should ship `bdfe5631` with its current valid aweb Python pin unless release-ready proves a real dependency.
+1. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
+   landed `856a560` (live chat SSE signed-payload DID normalization),
+   `aa72312` (channel-core dispatch tests + rebuilt Pi dist), and
+   `271bb7d` (Go/server stable-DID signed-payload coverage). Mia approved;
+   Athena reviewed; Hestia released aweb/aw 1.24.2 and smoked live output:
+   no `[unverified]`, only `[not in contacts]`; JSON verification remains
+   `verified` with did:key + did:aw distinct.
+2. **Pi update path remains separate.** `aweb-aapb` captures that
+   `@awebai/claude-channel@1.4.3` / `@awebai/aw@1.24.2` do not update Pi;
+   Pi has bundled `pi-extension/dist` and no confirmed release/update path.
+   Do not claim Pi users fixed until Hestia/Grace close that path.
+3. **Aida/Marvin mail continuation 409 remains separate.** Grace filed
+   `aweb-aapc`; do not conflate it with the trust/display patch unless a
+   new repro links them.
+4. **MCP OAuth/reconnect release lane is still with Hestia.** Approved
+   gate input remains AC `5b44f724` + aweb `99cc2cb` beyond the original
+   AC `cb223c34` / aweb `03fe4bf`; recommended shape is aweb `1.24.1` or
+   later then AC `v0.5.43` repinned.
+5. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
+   and AC v0.5.42 are verified-live per Hestia.
+6. **Pi first-session welcome (aweb-aaov.12)** remains in Dave's lane;
+   local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-
+- **Hosted identity routing/default fix**: Grace landed aweb `8064558` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved; Athena reviewed in detached worktrees and handed to Hestia. Release boundary is `aw-v1.24.3` for CLI continuation binding plus AC `v0.5.44` for hosted team-visible defaults/lifecycle scope preservation; no Python aweb package bump is justified by `8064558`.
+- **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
+  `271bb7d`; Mia approved; Athena approved; Hestia released and smoked
+  aweb/aw 1.24.2 green. No open dev blocker for this fix set.
+- **aweb-aapb — Pi extension update path for bundled channel-core fixes**:
+  filed by Grace, unassigned P1. Needed before any Pi-user-fixed claim.
+- **aweb-aapc — Aida/Marvin mail continuation 409 after identity rebind**:
+  filed by Grace, unassigned P1; separate from trust/display.
 - **aweb-aaov.12 — Pi first-session synthetic welcome**: Dave owns;
   implemented and voice-passed. Next signal is final task close or
   release/publish handoff.
@@ -48,28 +48,32 @@ Last updated: 2026-05-18 18:25 GMT
   hosted MCP alias gate test; aweb `99cc2cb` makes duplicate 1:1 chat
   routing continue newest instead of 409. Athena approved both follow-ups
   for Hestia gate input.
-- **aweb-aaox.16 — claude-channel license metadata P0**: ready work;
-  Hestia publish-owner per task, engineering available if the release
-  workflow/tooling fix needs code review.
 
 ## Non-feature work in flight
-
-- No new non-feature code claimed in this wake-up.
+- Athena authored initial diagnostic scratch branch `athena/chat-sse-trust`
+  for the live chat SSE trust display bug; Grace cherry-picked/reviewed the
+  fix into main as `856a560`. Scratch branch is diagnostic only.
+- No active Athena-authored non-feature code remains unmerged.
 - Historical open item remains the **multi-team agent_id-vs-did
   comparison grep**; the 1.20.7 strict-walk closed the known routing
   symptom, but the broader codebase grep has not been banked as done.
 
 ## Release-ready state (handoff to Hestia)
-
-- **Bless-and-run expanded to include follow-ups**: AC `5b44f724` and
-  aweb `99cc2cb` are approved for gate input. Since `server-v1.24.0` /
+- **Hosted identity routing/default fix cleared for Hestia.** Handoff sent for aweb `8064558` + AC `bdfe5631`; Grace ACKed no blockers. Hestia proposed a coordinated cut, but Athena pushed back on the server package portion: `8064558` touches only `cli/go/*`, so tag/publish `aw-v1.24.3` only and do not bump server/pyproject or AC's Python `aweb` lock solely for this CLI change. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
+- **Trust/display fix set shipped/verified-live as aweb/aw 1.24.2.**
+  Hestia smoke evidence: live `aw chat send-and-wait` against Athena
+  rendered `Chat from: aweb.ai/athena [not in contacts]` with no
+  `[unverified]`; JSON mail proof showed `verification_status=verified`,
+  signed-payload did:key and stable did:aw distinct. External claim still
+  needs Sofia framing and must exclude Pi users until `aweb-aapb` closes.
+- **MCP OAuth bless-and-run remains separate**: AC `5b44f724` and aweb
+  `99cc2cb` are approved for gate input. Since `server-v1.24.0` /
   `aw-v1.24.0` were tagged at `f443abc` and do not include `99cc2cb`,
-  Athena recommended aweb `1.24.1` then AC `v0.5.43` repinned to that
-  patch release before tag/deploy.
-- Latest verified-live chain per Operations: awid-service-v0.5.6,
-  awid-v0.5.6, aweb 1.23.0, AC v0.5.42.
-- Pi package release path appears to be in the aaov/aaox release lane;
-  do not duplicate Hestia's publish work without an explicit handoff.
+  Athena recommended aweb `1.24.1` or later then AC `v0.5.43` with aweb
+  pin updated beyond `5b44f724`.
+- Latest verified-live chain per Operations before trust-display release:
+  awid-service-v0.5.6, awid-v0.5.6, aweb 1.23.0, AC v0.5.42. aweb/aw
+  1.24.2 is now verified for the CLI trust-display patch.
 
 ## Pending engineering artifacts owed
 
@@ -82,14 +86,20 @@ Last updated: 2026-05-18 18:25 GMT
   `5b44f724` as of 18:05 GMT.
 
 ## Risks
-
-- **Channel publish drift**: channel-v1.4.1 tag exists but npm publish
-  did not complete; public npm metadata may still show Proprietary
-  until aaox.16 is closed.
-- **Channel auto-ack/read P0**: no longer waiting for more customer
-  signal. Inbound channel delivery currently mutates read state before the
-  agent/model necessarily sees the message. This can silently hide
-  direction work from inbox/pending across Pi and Claude Code.
+- **Release-shape risk for `8064558`**: Hestia's first cut plan treated the CLI-only continuation-binding change as a server package bump. Athena corrected this by mail/chat: no `server-v1.24.3`, no server/pyproject bump, no AC `uv lock --upgrade-package aweb` just to chase the CLI tag.
+- **Existing hosted identity repair risk**: the code fix does not mutate existing `reachability=nobody` rows. Repair known hosted team-internal identities only through explicit scoped/audited action after AC is live; prefer controller-key/API path over direct DB unless Grace determines API repair is not viable.
+- **Pi update/release risk (`aweb-aapb`)**: pi-extension source/dist now
+  contains current channel-core behavior, but there is no verified user
+  update path. `@awebai/claude-channel@1.4.3` and `@awebai/aw@1.24.2`
+  do not update Pi.
+- **Aida/Marvin 409 (`aweb-aapc`)**: possible post-rebind mail
+  continuation mismatch remains unroot-caused; keep separate from the
+  trust/display fix.
+- **Outgoing mail identity_mismatch follow-up**: Mia observed an outgoing
+  mail canonical JSON mismatch; Grace filed a separate P1 follow-up. Not
+  closed by `271bb7d` / aweb 1.24.2.
+- **Dashboard omission for Ama**: aw team-cert state is clean; likely
+  AC/dashboard projection-side. Not closed by aweb 1.24.2.
 - **OAuth claim-shape risk**: do not overclaim until Hestia live-verifies.
   Precise claim: dashboard-targeted existing hosted identity preserves
   selected org/team; generic `/mcp/` uses explicit org-first/team-second
@@ -98,19 +108,20 @@ Last updated: 2026-05-18 18:25 GMT
   refresh.
 
 ## Next checks
-
-- Watch / support P0 channel auto-ack/read fix. Expected code surface:
-  `aweb/channel-core/src/channel.ts` and `aweb/channel/src/index.ts` mail
-  ack/chat mark-read calls after `onAwakening`.
-- Watch Hestia's revised gate/deploy/live-verify. Expected release shape
-  if she accepts Athena recommendation: aweb `1.24.1` containing
-  `99cc2cb`, then AC `v0.5.43` with aweb pin updated beyond `5b44f724`.
-- Sofia has been notified of narrow claim shape; loop her in before any
-  customer-facing claim.
-- Watch `aweb-aaov.12` for Dave's close/handoff and `aweb-aaox.16` for
-  Hestia's publish result.
-- If asked to act on Pi release, review the current aweb diff/commits
-  against the aaov brief and preserve the Hestia publish boundary.
+- Watch for Hestia ACK of the adjusted routing/default cut plan before tags: `aw-v1.24.3` only for aweb `8064558`, then AC `v0.5.44` at `bdfe5631` without a gratuitous Python aweb lock bump.
+- After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
+- Confirm Sofia framing before any external trust-display claim. Narrow
+  claim: aweb/aw 1.24.2 fixes CLI live chat trust-display for stable
+  did:aw participant rows; Pi users are not covered until `aweb-aapb`.
+- Track `aweb-aapb` (Pi update path) and `aweb-aapc` (Aida/Marvin mail
+  409) as separate P1s.
+- Watch Hestia's revised MCP OAuth gate/deploy/live-verify. Expected
+  release shape if she accepts Athena recommendation: aweb `1.24.1` or
+  later containing `99cc2cb`, then AC `v0.5.43` with aweb pin updated
+  beyond `5b44f724`.
+- Sofia has been notified of narrow OAuth claim shape; loop her in before
+  any customer-facing OAuth claim.
+- Watch `aweb-aaov.12` for Dave's close/handoff.
 - If a channel event wakes this session, inspect event metadata and
   sender verification before acting; use mail for handoffs/status and
   chat only for blocking questions.
