@@ -17,24 +17,19 @@ release mechanics; to them, Athena is the gate.
 ## 2026-05-20 immediate state
 
 - Ignore ontology/company-graph work unless Sofia asks a narrow engineering/context question; Juan asked Athena to focus on simplification.
-- `aweb-aapg` route-level release work is closed as engineering complete, but AC release recovery remains in progress.
-  - Previous release-gate heads: aweb main `ba3e5e5`, AC main `30b1b761`.
-  - Hestia `make ship` halted in Phase 11c because Carol/non-contact to Alice `contacts_only` timed out client-side instead of prompt 4xx.
-  - Root cause: global cached-body middleware replayed the POST body once, then waited on original ASGI receive; Uvicorn/error-response paths could hang until client deadline.
-  - New aweb main head: `16a062a` (`Return promptly after cached POST body replay`); AC unchanged `30b1b761`.
-  - Local validation on `16a062a`: focused 5 passed; full server suite `538 passed`. Docker/full-service e2e remains Hestia-side.
-  - Grace approved `16a062a` as safe release-gate head. Hestia gate at aweb `16a062a`/`1.24.4` went green; tags `server-v1.24.4` + `aw-v1.24.4` were pushed at release commit `22d3ccf`; PyPI `aweb==1.24.4` is live.
-  - npm `@awebai/aw` publish failed on first platform subpackage (`@awebai/aw-linux-x64`) with auth-like 404, so npm/CLI distribution remains `1.24.3`. Do not claim npm/CLI `1.24.4` until fixed.
-  - AC `v0.5.45` gate halted: full backend had `72 failed, 1362 passed`. Do not tag/deploy AC yet.
-  - Root read: AC `deec72c7` pins `aweb==1.24.4` but stale `awid-service==0.5.5`; aapg changed AWID shared/client/service code and we missed the awid-service release boundary. There is also one inverse AC mismatch: `services/permanent_addresses.py` still passes `reachability=` to new `register_address`.
-  - Athena pushed aweb main `2cd8082` (`Prepare awid-service 0.5.7 for aapg`): bumps awid-service to `0.5.7`, server dependency to `awid-service>=0.5.7`, validation `make test-awid` -> `167 passed`. Hestia has instructions to hold AC, not revert `deec72c7` yet, publish/release awid-service `0.5.7` (and normal awid service deploy path if needed), then fix/lock AC and rerun full backend/gates.
-  - AC release-compat WIP is now pushed as part of review branch `athena/aaph-1-2-review` in `awebai/ac`: commit `c86b956b` locks `awid-service==0.5.7`, removes remaining `reachability=` register-address caller, and accepts/deletes deprecated `address_reachability` helper inputs.
-- `aweb-aaph` is the P0 product-authority simplification epic. Juan clarified release is held until `aweb-aaph` is complete; do **not** wait for AC release recovery before driving it. Athena leads implementation to completion with Dave/Peter; Grace reviews/boundary-checks each slice. Active state:
-  - `.1/.2`: Athena driving directly. AC review branch pushed: `awebai/ac` `athena/aaph-1-2-review` head `862c7e33`; main deletion commit `159ddd7b` removes dashboard/browser hosted-local identity path and rejects hosted custodial `identity_type=local|ephemeral`; commit `c86b956b` is awid-service/release compatibility; commit `862c7e33` is Dave `.6` copy batch included because it was in validation tree. Validation on branch: backend focused `68 passed`, frontend focused `9 passed`, frontend build passed, diff-check passed, stale hosted-local grep no hits. Grace review requested; first attempt lacked a reachable ref and Grace blocked correctly, then Athena pushed branch and replied.
-  - `.3`: assigned to Peter with brief; base on `athena/aaph-1-2-review`; preserve/prove terminal self-custodial local/global paths.
-  - `.6`: Dave active on docs/copy, non-overlapping files; broad scope includes OSS aweb docs, AC site/static docs, hosted app/dashboard copy, agent-facing docs, tutorials, references, support docs, generated/static docs.
-  - `.4/.5/.7`: not yet routed; do after .1/.2/.3 shape stabilizes.
-- Mail/channel event delivery is currently replaying old messages repeatedly. Until fixed, do not trust pushed mail events as fresh signal. Manually check `aw chat pending`, `aw mail inbox --limit <n>`, task comments, and message IDs/timestamps before acting. Treat repeated `.4`/pre-pivot Grace briefs and ontology/company-graph mails as stale unless a new timestamp/message ID carries new `.3` content.
+- `aweb-aapg` is closed/released. Do not reopen stale `aapg` mail threads.
+  - aweb server `1.24.4` and awid-service/awid `0.5.7` are released.
+  - PyPI `aweb==1.24.4` is live.
+  - npm `@awebai/aw` remains `1.24.3` because `1.24.4` npm publish failed on `@awebai/aw-linux-x64` with auth-like 404. Do not claim npm/CLI `1.24.4` until fixed and verified.
+  - Production hidden/limited AWID rows remain fail-closed by released `.2` code until explicit owner/operator normalization; no row mutations without routed approval.
+- `aweb-aaph` product-authority simplification is the active release hold. Current state:
+  - `.1/.2` closed at AC `b1777bb0` (no hosted-local browser/MCP path; explicit custodial/addressed/global predicate; local/ephemeral hosted creation rejected).
+  - `.3` closed at AC `5426d91c` (team API-key CLI bootstrap is local self-custodial; persistent/global terminal path remains self-custodial).
+  - `.4/.5` closed at AC `284653e7` after Grace approval (BYOT custodial pending/import exact and fail-closed; aweb-managed Add existing preserves `custody=self` and no cloud key).
+  - `.6` closed and landed: aweb main `29023bd`; AC main `ecf28888` (Dave copy refs approved by Grace; AC commit is cherry-pick of `43cbf282` onto current main).
+  - `.7` is closed. Grace confirmed approval via chat after the channel replay check; approval mail message_id `9c522612-391a-4aad-819b-dc1485d52ad0`. Approved heads: aweb main `994972b` (CLI local/global/add-worktree test proof) and AC main `40e73eb4` (onboarding regression matrix aligned with current route/lifetime contract). No bespoke precheck required before Hestia beyond normal full release gates including Docker/full-service e2e where available.
+  - `aweb-aaph` implementation is complete. Next: prepare fresh Hestia release handoff with exact heads/caveats; do not tag/deploy from Athena.
+- Mail/channel replay appears drained (`aw mail inbox` and `aw chat pending` clean), but continue checking message IDs/timestamps/task comments before acting. Most incoming `aapg` and early `aaph` messages are stale.
 
 ## 2026-05-19 global/local simplification epic
 
