@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-20 22:31 GMT
+Last updated: 2026-05-20 22:43 GMT
 
 ## Current focus
 - `aweb-aaph` implementation is complete: `.1/.2/.3/.4/.5/.6/.7` are closed.
@@ -10,12 +10,12 @@ Last updated: 2026-05-20 22:31 GMT
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: assigned to Peter; ACKed. Scope: remove `messaging_policy` as active field, remove AWID reachability/visibility public authority, normalize old lifetime inputs at boundaries, add grep/allowlist tests.
-- **aweb-aapj.2 — aw CLI/docs global/local language**: assigned to Grace; ACKed. Scope: replace `--persistent`/persistent/ephemeral/reachability user-facing help/docs with global/local; preserve stale args as compatibility aliases where practical.
+- **aweb-aapj.2 — aw CLI/docs global/local language**: Grace pushed aweb `0eb4cc9` over Dave's `e248cd3`. Athena review validation passed (Go CLI, CLI reference, package-data, channel-core+Pi build, diff-check), but closure is waiting on a small follow-up to clean developer-facing test comments/failure messages that still teach old persistent/ephemeral language.
 - **aweb-aapj.3 — AC backend/schema/API cleanup**: assigned to Mia. Mia confirmed branch base AC `82ec0b8d`, reran survey, and is starting Phase A with a worked-example single-endpoint diff before broad sweep. DTO guidance sent: canonical `identity_scope=global|local`; stale fields input-only/backcompat; `address_reachability` deleted from normal output; `access_mode` fail-closed mapping to `inbound_mode`.
 - **aweb-aapj.4 — AC frontend/docs cleanup**: assigned to Olivia. Olivia reset branch to AC `82ec0b8d`, reran frontend survey, and is proceeding frontend-only; synced `site/content/docs` stays out of scope (Grace/aweb owns canonical docs).
 - **aweb-aapj.5 — cross-repo grep gate/release handoff**: Athena-owned and in progress after `.1`-`.4` land.
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
-- **aweb-aapj.7 — channel runtime lifetime cleanup**: assigned to Dave after aapj.6 exposed `lifetime`/`persistent`/`ephemeral` strings in channel-core/channel runtime and generated Pi dist. Scope: normalize runtime to identity_scope/global/local with legacy lifetime adapters; branch-ready to Athena.
+- **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
@@ -24,7 +24,7 @@ Last updated: 2026-05-20 22:31 GMT
 
 ## Release-ready state (handoff to Hestia)
 - Release is held pending `aweb-aapj` cleanup and final `aweb-aapj.5` grep gate.
-- Previous gate heads were aweb product-authority head `994972b` (current origin/main `fed2391` includes unrelated channel cleanup) and AC `40e73eb4`; AC main is now `82ec0b8d` with the aapi migration-drift fix. Heads will continue changing as `aweb-aapj` lands.
+- Previous gate heads were aweb product-authority head `994972b` and AC `40e73eb4`; current aweb main is `2e98603` with aapj.6/.7 plus Grace's aapj.2 pending follow-up at `0eb4cc9`, and AC main is `82ec0b8d` with the aapi migration-drift fix. Heads will continue changing as `aweb-aapj` lands.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`. Juan hard-hold remains: no deploy/tag/publish until explicit clearance.
 - Hestia was told no more release-ready runs until Athena says `aweb-aapj` cleanup is landed and ready for a no-deploy gate.
 
