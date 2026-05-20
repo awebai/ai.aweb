@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 00:06 GMT
+Last updated: 2026-05-20 12:26 GMT
 
 ## Read this first
 
@@ -22,7 +22,8 @@ release mechanics; to them, Athena is the gate.
   - AC main pushed to `ed2218ad3ed39e18022c52c8f1d19f6588a6d853`.
   - Scope: runtime delivery auth reads `inbound_mode=open|contacts_only`; legacy `messaging_policy` references are quarantined to migrations/tests; AC stale `access_mode` delivery UI/copy removed.
   - No tags/deploys. Hestia was explicitly told this is FYI only, not a release handoff.
-- `aweb-aapg` remains release-held. Next focus: `.2` hidden/limited AWID row disposition and `.3` route-level delivery-origin redesign. `.5/.6/.7` remain open behind those.
+- `aweb-aapg` remains release-held. Current active implementation is `.3` route-level delivery-origin redesign, claimed by Peter. Grace approved the architecture boundary; Peter sent a call-site inventory/design note and was cleared to implement under the approved gates. `.2` hidden/limited AWID row disposition is release-time policy work now (hidden/limited rows become private/blocked for first contact unless explicitly converted; no silent widening). `.5/.6/.7` remain open behind `.3/.2`.
+- Mail/channel event delivery is currently replaying old messages repeatedly. Until fixed, do not trust pushed mail events as fresh signal. Manually check `aw chat pending`, `aw mail inbox --limit <n>`, task comments, and message IDs/timestamps before acting. Treat repeated `.4`/pre-pivot Grace briefs and ontology/company-graph mails as stale unless a new timestamp/message ID carries new `.3` content.
 
 ## 2026-05-19 global/local simplification epic
 
