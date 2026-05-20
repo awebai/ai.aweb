@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-20 22:14 GMT
+Last updated: 2026-05-20 22:19 GMT
 
 ## Current focus
 - `aweb-aaph` implementation is complete: `.1/.2/.3/.4/.5/.6/.7` are closed.
@@ -11,9 +11,10 @@ Last updated: 2026-05-20 22:14 GMT
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: assigned to Peter; ACKed. Scope: remove `messaging_policy` as active field, remove AWID reachability/visibility public authority, normalize old lifetime inputs at boundaries, add grep/allowlist tests.
 - **aweb-aapj.2 — aw CLI/docs global/local language**: assigned to Grace; ACKed. Scope: replace `--persistent`/persistent/ephemeral/reachability user-facing help/docs with global/local; preserve stale args as compatibility aliases where practical.
-- **aweb-aapj.3 — AC backend/schema/API cleanup**: assigned to Mia. Scope: remove canonical `identity_type`, `lifetime`, `access_mode`, `address_reachability`, persistent/ephemeral API/schema surfaces. DTO guidance sent: canonical `identity_scope=global|local`; stale fields input-only/backcompat; `address_reachability` deleted from normal output; `access_mode` in scope unless renamed to a precise non-identity invite/token concept.
-- **aweb-aapj.4 — AC frontend/docs cleanup**: assigned to Olivia. Olivia confirmed fresh branch base AC `40e73eb4`; Athena confirmed proceed and coordinate TS/API names with Mia.
+- **aweb-aapj.3 — AC backend/schema/API cleanup**: assigned to Mia. Mia confirmed branch base AC `82ec0b8d`, reran survey, and is starting Phase A with a worked-example single-endpoint diff before broad sweep. DTO guidance sent: canonical `identity_scope=global|local`; stale fields input-only/backcompat; `address_reachability` deleted from normal output; `access_mode` fail-closed mapping to `inbound_mode`.
+- **aweb-aapj.4 — AC frontend/docs cleanup**: assigned to Olivia. Olivia reset branch to AC `82ec0b8d`, reran frontend survey, and is proceeding frontend-only; synced `site/content/docs` stays out of scope (Grace/aweb owns canonical docs).
 - **aweb-aapj.5 — cross-repo grep gate/release handoff**: Athena-owned and in progress after `.1`-`.4` land.
+- **aweb-aapj.6 — Pi/skills package copy cleanup**: assigned to Dave because he was idle; scope is aweb `skills/`, Pi package README/welcome, package-copy text; coordinate with Grace to avoid CLI/docs overlap.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
