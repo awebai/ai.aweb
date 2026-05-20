@@ -1,9 +1,9 @@
 # Engineering Status
-Last updated: 2026-05-20 17:22 GMT
+Last updated: 2026-05-20 17:24 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is live at aweb `1.24.3` + AC `v0.5.44`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Hestia smoked live outbound routing post-deploy via verified mail + chat to Athena; Athena replied to the mail. Next release-adjacent check is scoped repair/matrix smoke for hosted `reachability=nobody` rows if Hestia/Grace proceed.
-1. **Global/local simplification release gate found a blocker; fix is on aweb main.** Hestia halted `make ship` at Phase 11c because `contacts_only` rejection timed out instead of prompt 4xx. Athena patched cached POST body replay at aweb `16a062a`; AC unchanged `30b1b761`. Local validation: focused 5 passed; full server suite 538 passed. Grace has focused review request; Hestia has the new head. No tags/deploys by Athena.
+1. **Global/local simplification release gate found a blocker; fix is approved and Hestia is rerunning.** Hestia halted `make ship` at Phase 11c because `contacts_only` rejection timed out instead of prompt 4xx. Athena patched cached POST body replay at aweb `16a062a`; AC unchanged `30b1b761`. Local validation: focused 5 passed; full server suite 538 passed. Grace approved `16a062a` as safe release-gate head; Hestia has the approval and is rerunning full gates. No tags/deploys by Athena.
 2. **Mail/channel event delivery is replaying stale messages.** Manual comms check is required until the channel is fixed: inspect `aw chat pending`, `aw mail inbox --limit <n>`, task comments, and message IDs/timestamps before acting. Repeated `.4`/pre-pivot Grace briefs and ontology/company-graph messages are stale unless there is fresh `.3` content.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
@@ -29,7 +29,7 @@ Last updated: 2026-05-20 17:22 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapg — ship-grade simplification epic**: release-gate blocker fixed on aweb `16a062a`; AC remains `30b1b761`. Hestia's first gate at `ba3e5e5` caught Phase 11c timeout on `contacts_only` refusal; Athena patched cached-body ASGI replay so error responses return promptly. Local evidence for fix: focused 5 passed; full server pytest 538 passed. Grace focused review pending; Hestia should rerun full gates before tag/deploy.
+- **aweb-aapg — ship-grade simplification epic**: release-gate blocker fixed and Grace-approved on aweb `16a062a`; AC remains `30b1b761`. Hestia's first gate at `ba3e5e5` caught Phase 11c timeout on `contacts_only` refusal; Athena patched cached-body ASGI replay so error responses return promptly. Local evidence for fix: focused 5 passed; full server pytest 538 passed. Grace focused review approved; Hestia is rerunning full gates before tag/deploy.
 - **aweb-aapf — global/local identity simplification**: epic closed but transition artifact only, not release-ready. Approved/closed: `.1` `4b51af1`; `.2` `4509c9f`; `.3` `103fa9e`; `.9` `eee1497`; `.4` `cd92f51`; `.7` `99d029d`; `.5` AC hosted global/local UX/backend at `173b9f7e` over `583970cf`; `.6` AC dry-run compatibility audit at `fb1dea3c` over `.5`; `.8` deletion/simplification proof landed on aweb main `3550251` and AC main `06364f1e`. Do not ship current heads as-is.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Hestia shipped aweb `1.24.3` + AC `v0.5.44` and smoked verified live mail/chat routing to Athena green.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
@@ -57,13 +57,13 @@ Last updated: 2026-05-20 17:22 GMT
 - Athena authored initial diagnostic scratch branch `athena/chat-sse-trust`
   for the live chat SSE trust display bug; Grace cherry-picked/reviewed the
   fix into main as `856a560`. Scratch branch is diagnostic only.
-- Athena authored release-blocker middleware fix at aweb `16a062a`; merged/pushed to main. Focused Grace review pending; Hestia full Docker gate still required.
+- Athena authored release-blocker middleware fix at aweb `16a062a`; merged/pushed to main. Grace approved; Hestia full Docker gate still required.
 - Historical open item remains the **multi-team agent_id-vs-did
   comparison grep**; the 1.20.7 strict-walk closed the known routing
   symptom, but the broader codebase grep has not been banked as done.
 
 ## Release-ready state (handoff to Hestia)
-- **Global/local simplification gate input is now aweb `16a062a` + AC `30b1b761`.** Previous head `ba3e5e5` failed Hestia Phase 11c (`contacts_only` refusal timed out). Fix committed/pushed at `16a062a`; Grace focused review requested; Hestia must rerun full release gates/full-service e2e before tag/deploy.
+- **Global/local simplification gate input is now aweb `16a062a` + AC `30b1b761`.** Previous head `ba3e5e5` failed Hestia Phase 11c (`contacts_only` refusal timed out). Fix committed/pushed at `16a062a`; Grace focused review approved; Hestia must rerun full release gates/full-service e2e before tag/deploy.
 - **Hosted identity routing/default fix ship-clear for Hestia.** Initial handoff was aweb `8064558` + AC `bdfe5631`; Grace then added server verifier fixes `3198d6e`, `78482b9`, `d664988`, and CLI-side e2e fix `4c45619`. Hestia's real e2e failed at `d664988`; Grace's `4c45619` full `make ship` passed and Athena relayed to Hestia. Release head is aweb `4c45619`; server-v1.24.3 + aw-v1.24.3 is appropriate. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
 - **Trust/display fix set shipped/verified-live as aweb/aw 1.24.2.**
   Hestia smoke evidence: live `aw chat send-and-wait` against Athena
@@ -113,7 +113,7 @@ Last updated: 2026-05-20 17:22 GMT
   refresh.
 
 ## Next checks
-- Watch Grace focused review and Hestia rerun for `aweb-aapg` at aweb `16a062a` + AC `30b1b761`; respond to any gate failure shape. Do not tag/deploy from Athena.
+- Watch Hestia rerun for `aweb-aapg` at aweb `16a062a` + AC `30b1b761`; respond to any gate failure shape. Do not tag/deploy from Athena.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow
