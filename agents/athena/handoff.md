@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 21:50 GMT
+Last updated: 2026-05-20 22:00 GMT
 
 ## Read this first
 
@@ -32,11 +32,14 @@ release mechanics; to them, Athena is the gate.
   - `aweb-aaph` implementation is complete. Hestia ran no-deploy AC release-ready at AC `40e73eb4`; result 37 failed / 1397 passed. Primary failure is schema drift: AC embedded aweb migrations do not create `conversation_participants.current_did_key` / `chat_participants.current_did_key` required by pinned `aweb==1.24.4`.
   - Athena confirmed repo evidence: AC migration snapshot has local `007_agent_inbound_mode.sql` but lacks aweb package `007_participant_current_did_key.sql` / `008_agent_inbound_mode.sql`. This is release-gate integration hygiene, not a product-authority blocker.
   - Created P0 dev task `aweb-aapi` assigned to Mia: fix AC embedded aweb migration snapshot drift forward-only, add drift-prevention verification, no tags/deploy/version bumps; branch-ready back to Athena.
-- Simplification assessment for Juan:
-  - Yes: supported product model is materially simpler — custody, addressability, team authority, runtime hosting; browser/MCP is custodial + addressed/global only; terminal API-key/add-worktree are local self-custodial; first contact is concrete address route; continuation is stored route; inbound is `open|contacts_only`.
-  - No: implementation is not fully simplified yet. It is a simple model with quarantined compatibility residue (`access_mode`, `address_reachability`, `reachability`/`visible_to_team_id`, `identity_type`, `persistent`/`ephemeral` storage vocabulary).
-  - Follow-up recommendation: grep-driven cleanup/sunset task before new identity/team feature work. Old nouns allowed only in migrations, explicit compatibility/audit/support docs, and tests naming compatibility behavior; otherwise translate to custody/addressability/team-authority/runtime or delete.
-  - Concrete stale surfaces found/confirmed: aweb README Core Model still says persistent vs ephemeral; Pi package README/welcome mentions reachability as current skill topic; skills docs have generic reachability language; `doctor_aweb_test.go` label says hosted local classification; AC TeamAgentSetupFlow says "Create hosted identity" instead of hosted custodial identity; AC dashboard/spawn/API tests still expose `access_mode`/`address_reachability`; AC `identity_type`/`identity_types.py` still couples global/local to persistent/ephemeral as storage translation.
+- Juan rejected carrying compatibility residue as a follow-up: because the aaph stack has not deployed, do the cleanup now. New P0 epic `aweb-aapj` is active: excise legacy identity/reachability vocabulary and control planes before release.
+  - `aweb-aapj.1` assigned to Peter (ACKed): aweb/awid remove old reachability/lifetime authority; old names only as boundary normalization, not public response/help/docs. Peter will coordinate with Grace before shared cert/CLI structs.
+  - `aweb-aapj.2` assigned to Grace (ACKed): CLI/docs global/local language. `aw --persistent` is wrong; hide/deprecate from help/docs while preserving as compatibility alias where practical.
+  - `aweb-aapj.3` assigned to Mia: AC backend/schema/API cleanup; removes canonical `identity_type`, `lifetime`, `access_mode`, `address_reachability`, persistent/ephemeral surfaces and includes the `aweb-aapi` migration-drift fix.
+  - `aweb-aapj.4` assigned to Olivia: AC frontend/dashboard/site docs cleanup.
+  - `aweb-aapj.5` assigned to Athena and marked in progress: final cross-repo grep/allowlist gate and release handoff after `.1`-`.4` land.
+  - `aweb-aapi` remains open as concrete Hestia gate-failure tracker but has a task comment saying it is superseded/expanded by `aweb-aapj.3`.
+  - Hestia was told release remains held and no more release-ready reruns are needed until Athena says `aweb-aapj` has landed.
 - Mail/channel replay appears drained (`aw mail inbox` and `aw chat pending` clean), but continue checking message IDs/timestamps/task comments before acting. Most incoming `aapg` and early `aaph` messages are stale.
 
 ## 2026-05-19 global/local simplification epic
