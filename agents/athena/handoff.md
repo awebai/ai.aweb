@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 17:24 GMT
+Last updated: 2026-05-20 17:45 GMT
 
 ## Read this first
 
@@ -23,7 +23,9 @@ release mechanics; to them, Athena is the gate.
   - Root cause: global cached-body middleware replayed the POST body once, then waited on original ASGI receive; Uvicorn/error-response paths could hang until client deadline.
   - New aweb main head: `16a062a` (`Return promptly after cached POST body replay`); AC unchanged `30b1b761`.
   - Local validation on `16a062a`: focused 5 passed; full server suite `538 passed`. Docker/full-service e2e remains Hestia-side.
-  - Grace approved `16a062a` as safe release-gate head; Hestia was notified and is rerunning the gate. No tags/deploys by Athena.
+  - Grace approved `16a062a` as safe release-gate head. Hestia gate at aweb `16a062a`/`1.24.4` went green; tags `server-v1.24.4` + `aw-v1.24.4` were pushed at release commit `22d3ccf`; PyPI `aweb==1.24.4` is live.
+  - npm `@awebai/aw` publish failed on first platform subpackage (`@awebai/aw-linux-x64`) with auth-like 404, so npm/CLI distribution remains `1.24.3`. Do not claim npm/CLI `1.24.4` until fixed.
+  - Athena directed Hestia to proceed with AC `v0.5.45` if AC gate is green because AC uses PyPI `aweb` and the fix is server-side; required checks include uv.lock pins `aweb==1.24.4`, AC `make ship` green, `/health` shows `v0.5.45` + `aweb_version=1.24.4`, normal mail/chat smoke, and live `contacts_only` prompt-4xx/no-delivery proof. No tags/deploys by Athena.
 - Mail/channel event delivery is currently replaying old messages repeatedly. Until fixed, do not trust pushed mail events as fresh signal. Manually check `aw chat pending`, `aw mail inbox --limit <n>`, task comments, and message IDs/timestamps before acting. Treat repeated `.4`/pre-pivot Grace briefs and ontology/company-graph mails as stale unless a new timestamp/message ID carries new `.3` content.
 
 ## 2026-05-19 global/local simplification epic
