@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-19 23:04 GMT
+Last updated: 2026-05-20 00:06 GMT
 
 ## Read this first
 
@@ -13,6 +13,16 @@ You are Athena. You bridge two teams:
 Default active team is `aweb:juan.aweb.ai`. Use `--team default:aweb.ai`
 for company-side mail/chat. Dev-team members do not need company-team
 release mechanics; to them, Athena is the gate.
+
+## 2026-05-20 immediate state
+
+- Ignore ontology/company-graph work unless Sofia asks a narrow engineering/context question; Juan asked Athena to focus on simplification.
+- `aweb-aapg.4` is landed and closed after Athena review + Grace boundary approval.
+  - aweb main pushed to `8325b71326444024a9be1299c3e5125c80e0fe2a`.
+  - AC main pushed to `ed2218ad3ed39e18022c52c8f1d19f6588a6d853`.
+  - Scope: runtime delivery auth reads `inbound_mode=open|contacts_only`; legacy `messaging_policy` references are quarantined to migrations/tests; AC stale `access_mode` delivery UI/copy removed.
+  - No tags/deploys. Hestia was explicitly told this is FYI only, not a release handoff.
+- `aweb-aapg` remains release-held. Next focus: `.2` hidden/limited AWID row disposition and `.3` route-level delivery-origin redesign. `.5/.6/.7` remain open behind those.
 
 ## 2026-05-19 global/local simplification epic
 
