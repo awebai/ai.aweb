@@ -22,16 +22,25 @@ ship as-is").
 
 **Deletion-wave HOLD state (deletion-wave heads on origin/main but
 NOT released):**
-- aweb origin/main: 8325b713 (was 3550251 then aapg.4 landed 2026-05-20)
-- ac origin/main: ed2218ad (was 06364f1e then aapg.4 landed 2026-05-20)
+- aweb origin/main: 50def8e (was 8325b713; aapg.3 landed 2026-05-20
+  over channel fix e4dce48)
+- ac origin/main: 177415e (was ed2218ad; aapg.3 landed 2026-05-20)
 - aapg.4 (Athena FYI 4b5aaf58, banked 2026-05-20): messaging_policy →
   inbound_mode=open|contacts_only as runtime surface; legacy
   messaging_policy quarantined to migrations/tests; AC access_mode
-  delivery UI removed. This is the replacement mechanism for Sofia's
-  #1 concern (P1 'contacts-only' promise enforcement). Open chain:
-  .2 hidden-row disposition (audit data feeds it), .3 route-origin
-  redesign, .5 docs convergence, .6 e2e proof, .7 AC cleanup. Athena
-  explicit: "FYI not a release handoff" — hold continues.
+  delivery UI removed. Replacement mechanism for Sofia's #1 concern.
+- aapg.3 (Athena FYI 5bda937e, banked 2026-05-20): address route =
+  first-contact authority; bare external did:aw fails closed;
+  namespace default_delivery_origin = live route metadata, not
+  identity routing; identity-level delivery-origin endpoint/CLI/
+  migration/helpers deleted as unshipped transition artifacts; AC
+  hosted provisioning/audit/docs no longer depend on identity-level
+  delivery origin; stored-route federation continuation validates
+  target current key from stored route/local recipient state.
+- Open chain: .2 hidden-row disposition (my awid audit feeds it),
+  .5 docs convergence, .6 e2e proof, .7 AC cleanup. Athena explicit
+  "FYI not a release handoff" — hold continues until full chain
+  closes and a release handoff issues.
 - New migration in AC: 006_identity_delivery_origin.sql (adds
   did_aw_mappings.delivery_origin; NOT applied to prod)
 - Local AC working tree: at origin/main 06364f1e post-pull (read-only
