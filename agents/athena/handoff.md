@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 22:44 GMT
+Last updated: 2026-05-20 23:30 GMT
 
 ## Read this first
 
@@ -33,8 +33,8 @@ release mechanics; to them, Athena is the gate.
   - Athena confirmed repo evidence: AC migration snapshot has local `007_agent_inbound_mode.sql` but lacks aweb package `007_participant_current_did_key.sql` / `008_agent_inbound_mode.sql`. This is release-gate integration hygiene, not a product-authority blocker.
   - Created P0 dev task `aweb-aapi` assigned to Mia: fix AC embedded aweb migration snapshot drift forward-only, add drift-prevention verification, no tags/deploy/version bumps; branch-ready back to Athena.
 - Juan rejected carrying compatibility residue as a follow-up: because the aaph stack has not deployed, do the cleanup now. New P0 epic `aweb-aapj` is active: excise legacy identity/reachability vocabulary and control planes before release.
-  - `aweb-aapj.1` assigned to Peter (ACKed): aweb/awid remove old reachability/lifetime authority; old names only as boundary normalization, not public response/help/docs. Peter will coordinate with Grace before shared cert/CLI structs.
-  - `aweb-aapj.2` assigned to Grace: CLI/docs global/local language. Grace pushed aweb `0eb4cc9`; Athena validation passed (Go CLI, CLI reference, package-data, channel-core+Pi build, diff-check). Not closed yet: Athena requested follow-up to clean developer-facing test comments/failure messages that still teach old persistent/ephemeral phrases; Grace ACKed.
+  - `aweb-aapj.1` closed at aweb `8337af1`: Peter's aweb/awid old authority cleanup rebased over Grace plus Athena wording polish. Validation rerun: AWID full 167, server full 540, Go `./...` passed with longer timeout, focused lifecycle/team-auth 32, diff-check clean. Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents `lifetime` storage to `identity_scope`, keeps explicit boundary adapters.
+  - `aweb-aapj.2` closed at aweb `bfe822d`: CLI/docs global/local language; `aw init --global` canonical; old flags hidden as compatibility aliases; developer-facing test wording cleaned. Athena validation passed (Go CLI/awid, CLI reference, package-data, channel-core+Pi build, diff-check).
   - `aweb-aapj.3` assigned to Mia: AC backend/schema/API cleanup; removes canonical `identity_type`, `lifetime`, `access_mode`, `address_reachability`, persistent/ephemeral surfaces. Athena answered DTO questions: canonical `identity_scope=global|local`; `address_reachability` deleted from normal output; `access_mode` maps fail-closed to `inbound_mode` (`open`->`open`, `contacts_only`/`team_only`/`owner_only`->`contacts_only`); stale fields are input-only/backcompat and not returned in canonical responses; use forward migrations unless a migration is proven undeployed. Mia confirmed branch base AC `82ec0b8d` and is sending a worked-example endpoint diff before broad sweep.
   - `aweb-aapj.4` assigned to Olivia: AC frontend/dashboard cleanup. Olivia reset branch to AC `82ec0b8d`; frontend-only scope. Synced `ac/site/content/docs` and `site/static/docs` are out of scope because canonical docs live in aweb/docs (Grace/Dave lanes).
   - `aweb-aapj.5` assigned to Athena and marked in progress: final cross-repo grep/allowlist gate and release handoff after implementation lanes land.
