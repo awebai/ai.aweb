@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 22:00 GMT
+Last updated: 2026-05-20 22:14 GMT
 
 ## Read this first
 
@@ -35,10 +35,10 @@ release mechanics; to them, Athena is the gate.
 - Juan rejected carrying compatibility residue as a follow-up: because the aaph stack has not deployed, do the cleanup now. New P0 epic `aweb-aapj` is active: excise legacy identity/reachability vocabulary and control planes before release.
   - `aweb-aapj.1` assigned to Peter (ACKed): aweb/awid remove old reachability/lifetime authority; old names only as boundary normalization, not public response/help/docs. Peter will coordinate with Grace before shared cert/CLI structs.
   - `aweb-aapj.2` assigned to Grace (ACKed): CLI/docs global/local language. `aw --persistent` is wrong; hide/deprecate from help/docs while preserving as compatibility alias where practical.
-  - `aweb-aapj.3` assigned to Mia: AC backend/schema/API cleanup; removes canonical `identity_type`, `lifetime`, `access_mode`, `address_reachability`, persistent/ephemeral surfaces and includes the `aweb-aapi` migration-drift fix.
-  - `aweb-aapj.4` assigned to Olivia: AC frontend/dashboard/site docs cleanup.
+  - `aweb-aapj.3` assigned to Mia: AC backend/schema/API cleanup; removes canonical `identity_type`, `lifetime`, `access_mode`, `address_reachability`, persistent/ephemeral surfaces. Athena answered DTO questions: canonical `identity_scope=global|local`; `address_reachability` deleted from normal output; `access_mode` is in scope unless renamed to a precise non-identity invite/token concept; stale fields are input-only/backcompat and not returned in canonical responses; use forward migrations unless a migration is proven undeployed.
+  - `aweb-aapj.4` assigned to Olivia: AC frontend/dashboard/site docs cleanup. Olivia confirmed fresh branch base AC `40e73eb4`; Athena confirmed proceed and coordinate TS/API names with Mia.
   - `aweb-aapj.5` assigned to Athena and marked in progress: final cross-repo grep/allowlist gate and release handoff after `.1`-`.4` land.
-  - `aweb-aapi` remains open as concrete Hestia gate-failure tracker but has a task comment saying it is superseded/expanded by `aweb-aapj.3`.
+  - `aweb-aapi` was reviewed, merged, and closed: AC main fast-forwarded to `82ec0b8d` with `backend/src/aweb_cloud/migrations/aweb/006_participant_current_did_key.sql` and migration manifest tests. Clean-worktree validation: `uv run pytest -q tests/test_migration_paths.py` -> 17 passed. Broader cleanup remains `aweb-aapj.3`.
   - Hestia was told release remains held and no more release-ready reruns are needed until Athena says `aweb-aapj` has landed.
 - Mail/channel replay appears drained (`aw mail inbox` and `aw chat pending` clean), but continue checking message IDs/timestamps/task comments before acting. Most incoming `aapg` and early `aaph` messages are stale.
 
