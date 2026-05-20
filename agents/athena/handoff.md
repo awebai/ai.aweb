@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 14:08 GMT
+Last updated: 2026-05-20 16:50 GMT
 
 ## Read this first
 
@@ -17,16 +17,12 @@ release mechanics; to them, Athena is the gate.
 ## 2026-05-20 immediate state
 
 - Ignore ontology/company-graph work unless Sofia asks a narrow engineering/context question; Juan asked Athena to focus on simplification.
-- `aweb-aapg.4` is landed and closed after Athena review + Grace boundary approval.
-  - aweb main pushed to `8325b71326444024a9be1299c3e5125c80e0fe2a`.
-  - AC main pushed to `ed2218ad3ed39e18022c52c8f1d19f6588a6d853`.
-  - Scope: runtime delivery auth reads `inbound_mode=open|contacts_only`; legacy `messaging_policy` references are quarantined to migrations/tests; AC stale `access_mode` delivery UI/copy removed.
-  - No tags/deploys. Hestia was explicitly told this is FYI only, not a release handoff.
-- `aweb-aapg` remains release-held. `.3` route-level delivery-origin redesign is landed/closed:
-  - aweb main `50def8e` (Peter `.3` commits replayed over current channel-fix main `e4dce48`).
-  - AC main `177415e`.
-  - Scope: address route is first-contact authority; `did:aw` identity binding is not delivery route; bare external `did:aw` first-contact fails closed; namespace `default_delivery_origin` is live address-route inheritance; identity-level delivery-origin endpoint/CLI/migration/helpers deleted as unshipped transition artifacts; AC provisioning/audit/docs no longer depend on identity-level delivery origin; stored-route federation continuation validates target current key from stored route/local recipient state.
-- `.2` hidden/limited AWID row disposition is release-time policy work now (hidden/limited rows become private/blocked for first contact unless explicitly converted; no silent widening). `.5` docs convergence is assigned to Dave and in progress; `.6/.7` remain open behind `.2/.5` and any residual cleanup.
+- `aweb-aapg` implementation/proof chain is complete locally and remains release-held pending Grace final wide review + Hestia release gates.
+  - Current review heads: aweb main `ba3e5e5` (route-level docs + `.2` migration gate + final docs clarification), AC main `30b1b761` (`.7` cleanup + support-doc clarification).
+  - Closed subtasks: `.1` federation v1 compatibility; `.2` hidden/limited AWID migration-state fail-closed gate; `.3` route-level delivery-origin; `.4` `inbound_mode=open|contacts_only`; `.5` docs convergence; `.6` final local proof; `.7` AC cleanup.
+  - `.2` scope: public AWID address GET 409s for non-neutral legacy rows; namespace/DID lists omit them; controller update/reassign explicitly normalize approved rows. No production row mutation.
+  - `.6` evidence: Docker unavailable locally; substituted focused tests: AWID 167, server federation/mail/chat/MCP 221 plus targeted 31, AC backend 10, frontend typecheck + vitest 24, Go `./...`, diff/docs checks all green.
+  - Athena wide review found no current engineering blocker and asked Grace for final architecture/cleanness/correctness/simplicity review. Hestia has been told this is not release handoff yet; no tags/deploys.
 - Mail/channel event delivery is currently replaying old messages repeatedly. Until fixed, do not trust pushed mail events as fresh signal. Manually check `aw chat pending`, `aw mail inbox --limit <n>`, task comments, and message IDs/timestamps before acting. Treat repeated `.4`/pre-pivot Grace briefs and ontology/company-graph mails as stale unless a new timestamp/message ID carries new `.3` content.
 
 ## 2026-05-19 global/local simplification epic
