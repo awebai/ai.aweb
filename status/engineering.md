@@ -3,7 +3,7 @@ Last updated: 2026-05-20 16:50 GMT
 
 ## Current focus
 0. **Hosted identity routing/default fix is live at aweb `1.24.3` + AC `v0.5.44`.** Real e2e at `d664988` still failed conversation-only federation reply; Grace fixed CLI-side gaps in `4c45619` (did:aw resolver via fallback registry and full sender address for federated chat continuation). Grace's canonical `make ship` at `4c45619` passed: server 524, awid 160, Go `./...`, channel 89, release checks, federation e2e 27/27, OSS user journey 224, tree clean. Hestia smoked live outbound routing post-deploy via verified mail + chat to Athena; Athena replied to the mail. Next release-adjacent check is scoped repair/matrix smoke for hosted `reachability=nobody` rows if Hestia/Grace proceed.
-1. **Global/local simplification implementation/proof is complete locally; release still held for Grace final wide review + Hestia gates.** Current heads: aweb `ba3e5e5`, AC `30b1b761`. Closed `aweb-aapg` subtasks: `.1` v1 tolerance, `.2` hidden/limited AWID migration-state fail-closed gate, `.3` route-level delivery origin, `.4` `inbound_mode=open|contacts_only`, `.5` docs convergence, `.6` local final proof, `.7` AC cleanup. Athena wide review found no current engineering blocker and asked Grace for architecture/cleanness/correctness/simplicity review. No tags/deploys.
+1. **Global/local simplification engineering is complete; release-gate handoff is with Hestia.** Current heads: aweb `ba3e5e5`, AC `30b1b761`. Closed `aweb-aapg` subtasks: `.1` v1 tolerance, `.2` hidden/limited AWID migration-state fail-closed gate, `.3` route-level delivery origin, `.4` `inbound_mode=open|contacts_only`, `.5` docs convergence, `.6` local final proof, `.7` AC cleanup. Grace final wide review approved for Hestia release-gate handoff. Athena sent the formal handoff; Hestia owns gates/tags/deploy/live verification. No tags/deploys by Athena.
 2. **Mail/channel event delivery is replaying stale messages.** Manual comms check is required until the channel is fixed: inspect `aw chat pending`, `aw mail inbox --limit <n>`, task comments, and message IDs/timestamps before acting. Repeated `.4`/pre-pivot Grace briefs and ontology/company-graph messages are stale unless there is fresh `.3` content.
 2. **aweb 1.24.2 trust-display fix is verified-live for CLI.** Grace
    landed `856a560` (live chat SSE signed-payload DID normalization),
@@ -29,7 +29,7 @@ Last updated: 2026-05-20 16:50 GMT
    local aweb branch has polish through `48cee5e`, task still visible.
 
 ## Dev team work in flight
-- **aweb-aapg — ship-grade simplification epic**: implementation/proof chain closed locally. Heads: aweb `ba3e5e5`, AC `30b1b761`. `.2` now prevents silent widening by blocking non-neutral legacy AWID rows from public address get/list until explicit normalization; `.6` evidence recorded Docker unavailable locally and substitute focused tests passed (AWID 167, server 221 + targeted 31, AC backend 10, frontend 24 + typecheck, Go `./...`). Athena wide review sent to Grace; release remains held until Grace clears and Hestia runs formal gates/smokes.
+- **aweb-aapg — ship-grade simplification epic**: closed after Grace final wide review approval. Heads handed to Hestia: aweb `ba3e5e5`, AC `30b1b761`. `.2` prevents silent widening by blocking non-neutral legacy AWID rows from public address get/list until explicit normalization; `.6` evidence recorded Docker unavailable locally and substitute focused tests passed (AWID 167, server 221 + targeted 31, AC backend 10, frontend 24 + typecheck, Go `./...`). Hestia now owns formal gates/smokes/tag/deploy.
 - **aweb-aapf — global/local identity simplification**: epic closed but transition artifact only, not release-ready. Approved/closed: `.1` `4b51af1`; `.2` `4509c9f`; `.3` `103fa9e`; `.9` `eee1497`; `.4` `cd92f51`; `.7` `99d029d`; `.5` AC hosted global/local UX/backend at `173b9f7e` over `583970cf`; `.6` AC dry-run compatibility audit at `fb1dea3c` over `.5`; `.8` deletion/simplification proof landed on aweb main `3550251` and AC main `06364f1e`. Do not ship current heads as-is.
 - **Hosted identity routing/default fix**: Grace landed aweb `8064558` + `3198d6e` + `78482b9` + `d664988` + `4c45619` and AC `9f8eada5` + `59bd16f1` + `bdfe5631`; Mia approved through `d664988`; Grace's full canonical gate passed at `4c45619`; Hestia shipped aweb `1.24.3` + AC `v0.5.44` and smoked verified live mail/chat routing to Athena green.
 - **Trust/display fix set**: Grace landed `856a560` / `aa72312` /
@@ -63,7 +63,7 @@ Last updated: 2026-05-20 16:50 GMT
   symptom, but the broader codebase grep has not been banked as done.
 
 ## Release-ready state (handoff to Hestia)
-- **Global/local simplification is not a release handoff yet.** aweb main is `ba3e5e5`; AC main is `30b1b761`. Athena wide review is complete and Grace final review is pending. If Grace clears, send Hestia a formal release handoff; Hestia must run full release gates/full-service e2e because local Docker was unavailable.
+- **Global/local simplification release-gate handoff is with Hestia.** aweb main is `ba3e5e5`; AC main is `30b1b761`. Grace approved final wide review. Hestia must run full release gates/full-service e2e because local Docker was unavailable before tag/deploy.
 - **Hosted identity routing/default fix ship-clear for Hestia.** Initial handoff was aweb `8064558` + AC `bdfe5631`; Grace then added server verifier fixes `3198d6e`, `78482b9`, `d664988`, and CLI-side e2e fix `4c45619`. Hestia's real e2e failed at `d664988`; Grace's `4c45619` full `make ship` passed and Athena relayed to Hestia. Release head is aweb `4c45619`; server-v1.24.3 + aw-v1.24.3 is appropriate. After AC `v0.5.44` deploys, existing affected `reachability=nobody` rows still require explicit scoped/audited repair only.
 - **Trust/display fix set shipped/verified-live as aweb/aw 1.24.2.**
   Hestia smoke evidence: live `aw chat send-and-wait` against Athena
@@ -113,7 +113,7 @@ Last updated: 2026-05-20 16:50 GMT
   refresh.
 
 ## Next checks
-- Wait for Grace's final wide review of `aweb-aapg` at aweb `ba3e5e5` + AC `30b1b761`. If she clears, prepare formal release handoff for Hestia with the local Docker-unavailable caveat and required full gate/live verification. Do not tag/deploy from Athena.
+- Watch Hestia's `aweb-aapg` release gates for aweb `ba3e5e5` + AC `30b1b761`; respond to any gate failure shape. Do not tag/deploy from Athena.
 - Watch Hestia's release of aweb `4c45619` as `server-v1.24.3` + `aw-v1.24.3`, then AC `v0.5.44` at `bdfe5631`.
 - After AC deploy, verify scoped repair method with Grace and require post-repair Hestia matrix smoke for hestia→{athena,sofia,iris,aida,metis,ama} before any claim.
 - Confirm Sofia framing before any external trust-display claim. Narrow
