@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-20 22:19 GMT
+Last updated: 2026-05-20 22:31 GMT
 
 ## Current focus
 - `aweb-aaph` implementation is complete: `.1/.2/.3/.4/.5/.6/.7` are closed.
@@ -14,7 +14,8 @@ Last updated: 2026-05-20 22:19 GMT
 - **aweb-aapj.3 — AC backend/schema/API cleanup**: assigned to Mia. Mia confirmed branch base AC `82ec0b8d`, reran survey, and is starting Phase A with a worked-example single-endpoint diff before broad sweep. DTO guidance sent: canonical `identity_scope=global|local`; stale fields input-only/backcompat; `address_reachability` deleted from normal output; `access_mode` fail-closed mapping to `inbound_mode`.
 - **aweb-aapj.4 — AC frontend/docs cleanup**: assigned to Olivia. Olivia reset branch to AC `82ec0b8d`, reran frontend survey, and is proceeding frontend-only; synced `site/content/docs` stays out of scope (Grace/aweb owns canonical docs).
 - **aweb-aapj.5 — cross-repo grep gate/release handoff**: Athena-owned and in progress after `.1`-`.4` land.
-- **aweb-aapj.6 — Pi/skills package copy cleanup**: assigned to Dave because he was idle; scope is aweb `skills/`, Pi package README/welcome, package-copy text; coordinate with Grace to avoid CLI/docs overlap.
+- **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
+- **aweb-aapj.7 — channel runtime lifetime cleanup**: assigned to Dave after aapj.6 exposed `lifetime`/`persistent`/`ephemeral` strings in channel-core/channel runtime and generated Pi dist. Scope: normalize runtime to identity_scope/global/local with legacy lifetime adapters; branch-ready to Athena.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 

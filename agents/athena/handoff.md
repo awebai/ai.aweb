@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 22:20 GMT
+Last updated: 2026-05-20 22:31 GMT
 
 ## Read this first
 
@@ -38,7 +38,8 @@ release mechanics; to them, Athena is the gate.
   - `aweb-aapj.3` assigned to Mia: AC backend/schema/API cleanup; removes canonical `identity_type`, `lifetime`, `access_mode`, `address_reachability`, persistent/ephemeral surfaces. Athena answered DTO questions: canonical `identity_scope=global|local`; `address_reachability` deleted from normal output; `access_mode` maps fail-closed to `inbound_mode` (`open`->`open`, `contacts_only`/`team_only`/`owner_only`->`contacts_only`); stale fields are input-only/backcompat and not returned in canonical responses; use forward migrations unless a migration is proven undeployed. Mia confirmed branch base AC `82ec0b8d` and is sending a worked-example endpoint diff before broad sweep.
   - `aweb-aapj.4` assigned to Olivia: AC frontend/dashboard cleanup. Olivia reset branch to AC `82ec0b8d`; frontend-only scope. Synced `ac/site/content/docs` and `site/static/docs` are out of scope because canonical docs live in aweb/docs (Grace/Dave lanes).
   - `aweb-aapj.5` assigned to Athena and marked in progress: final cross-repo grep/allowlist gate and release handoff after implementation lanes land.
-  - `aweb-aapj.6` assigned to Dave (ACKed): Pi/skills/package-copy stale vocabulary cleanup from current aweb origin/main; coordinate with Grace; branch-ready must include source vs generated/package copy distinction.
+  - `aweb-aapj.6` closed at aweb `e248cd3`: Pi/skills/package-copy stale vocabulary cleanup. Athena reviewed/landed. Validation rerun: `git diff --check`; clean-worktree channel-core build then `pi-extension npm run build` passed after installing deps. Remaining scoped source hits are explicit legacy/audit notes; generated `pi-extension/dist` still had channel-core runtime lifetime strings.
+  - `aweb-aapj.7` assigned to Dave: channel/channel-core runtime cleanup to normalize `lifetime`/`persistent`/`ephemeral` to identity_scope/global/local with legacy adapters. This follows from the generated dist residue found during `aapj.6` review.
   - `aweb-aapi` was reviewed, merged, and closed: AC main fast-forwarded to `82ec0b8d` with `backend/src/aweb_cloud/migrations/aweb/006_participant_current_did_key.sql` and migration manifest tests. Clean-worktree validation: `uv run pytest -q tests/test_migration_paths.py` -> 17 passed. Broader cleanup remains `aweb-aapj.3`.
   - Hestia was told release remains held and no more release-ready reruns are needed until Athena says `aweb-aapj` has landed.
 - Mail/channel replay appears drained (`aw mail inbox` and `aw chat pending` clean), but continue checking message IDs/timestamps/task comments before acting. Most incoming `aapg` and early `aaph` messages are stale.
