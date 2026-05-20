@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 19:25 GMT
+Last updated: 2026-05-20 21:50 GMT
 
 ## Read this first
 
@@ -17,18 +17,26 @@ release mechanics; to them, Athena is the gate.
 ## 2026-05-20 immediate state
 
 - Ignore ontology/company-graph work unless Sofia asks a narrow engineering/context question; Juan asked Athena to focus on simplification.
+- Juan asked for a step-back assessment of whether aapg/aaph produced real simplification and for stale-code/debt findings; Athena relayed the request to Grace and Grace replied with the same bottom line: significant product-contract simplification, not a fully simplified implementation yet.
 - `aweb-aapg` is closed/released. Do not reopen stale `aapg` mail threads.
   - aweb server `1.24.4` and awid-service/awid `0.5.7` are released.
   - PyPI `aweb==1.24.4` is live.
   - npm `@awebai/aw` remains `1.24.3` because `1.24.4` npm publish failed on `@awebai/aw-linux-x64` with auth-like 404. Do not claim npm/CLI `1.24.4` until fixed and verified.
   - Production hidden/limited AWID rows remain fail-closed by released `.2` code until explicit owner/operator normalization; no row mutations without routed approval.
-- `aweb-aaph` product-authority simplification is the active release hold. Current state:
+- `aweb-aaph` product-authority simplification is feature-complete but release-gate blocked. Current state:
   - `.1/.2` closed at AC `b1777bb0` (no hosted-local browser/MCP path; explicit custodial/addressed/global predicate; local/ephemeral hosted creation rejected).
   - `.3` closed at AC `5426d91c` (team API-key CLI bootstrap is local self-custodial; persistent/global terminal path remains self-custodial).
   - `.4/.5` closed at AC `284653e7` after Grace approval (BYOT custodial pending/import exact and fail-closed; aweb-managed Add existing preserves `custody=self` and no cloud key).
   - `.6` closed and landed: aweb main `29023bd`; AC main `ecf28888` (Dave copy refs approved by Grace; AC commit is cherry-pick of `43cbf282` onto current main).
   - `.7` is closed. Grace confirmed approval via chat after the channel replay check; approval mail message_id `9c522612-391a-4aad-819b-dc1485d52ad0`. Approved heads: aweb main `994972b` (CLI local/global/add-worktree test proof) and AC main `40e73eb4` (onboarding regression matrix aligned with current route/lifetime contract). No bespoke precheck required before Hestia beyond normal full release gates including Docker/full-service e2e where available.
-  - `aweb-aaph` implementation is complete. Next: prepare fresh Hestia release handoff with exact heads/caveats; do not tag/deploy from Athena.
+  - `aweb-aaph` implementation is complete. Hestia ran no-deploy AC release-ready at AC `40e73eb4`; result 37 failed / 1397 passed. Primary failure is schema drift: AC embedded aweb migrations do not create `conversation_participants.current_did_key` / `chat_participants.current_did_key` required by pinned `aweb==1.24.4`.
+  - Athena confirmed repo evidence: AC migration snapshot has local `007_agent_inbound_mode.sql` but lacks aweb package `007_participant_current_did_key.sql` / `008_agent_inbound_mode.sql`. This is release-gate integration hygiene, not a product-authority blocker.
+  - Created P0 dev task `aweb-aapi` assigned to Mia: fix AC embedded aweb migration snapshot drift forward-only, add drift-prevention verification, no tags/deploy/version bumps; branch-ready back to Athena.
+- Simplification assessment for Juan:
+  - Yes: supported product model is materially simpler — custody, addressability, team authority, runtime hosting; browser/MCP is custodial + addressed/global only; terminal API-key/add-worktree are local self-custodial; first contact is concrete address route; continuation is stored route; inbound is `open|contacts_only`.
+  - No: implementation is not fully simplified yet. It is a simple model with quarantined compatibility residue (`access_mode`, `address_reachability`, `reachability`/`visible_to_team_id`, `identity_type`, `persistent`/`ephemeral` storage vocabulary).
+  - Follow-up recommendation: grep-driven cleanup/sunset task before new identity/team feature work. Old nouns allowed only in migrations, explicit compatibility/audit/support docs, and tests naming compatibility behavior; otherwise translate to custody/addressability/team-authority/runtime or delete.
+  - Concrete stale surfaces found/confirmed: aweb README Core Model still says persistent vs ephemeral; Pi package README/welcome mentions reachability as current skill topic; skills docs have generic reachability language; `doctor_aweb_test.go` label says hosted local classification; AC TeamAgentSetupFlow says "Create hosted identity" instead of hosted custodial identity; AC dashboard/spawn/API tests still expose `access_mode`/`address_reachability`; AC `identity_type`/`identity_types.py` still couples global/local to persistent/ephemeral as storage translation.
 - Mail/channel replay appears drained (`aw mail inbox` and `aw chat pending` clean), but continue checking message IDs/timestamps/task comments before acting. Most incoming `aapg` and early `aaph` messages are stale.
 
 ## 2026-05-19 global/local simplification epic
