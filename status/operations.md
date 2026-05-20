@@ -22,8 +22,16 @@ ship as-is").
 
 **Deletion-wave HOLD state (deletion-wave heads on origin/main but
 NOT released):**
-- aweb origin/main: 3550251 'Remove init reachability write surface'
-- ac origin/main: 06364f1e 'Neutralize hosted address reachability writes'
+- aweb origin/main: 8325b713 (was 3550251 then aapg.4 landed 2026-05-20)
+- ac origin/main: ed2218ad (was 06364f1e then aapg.4 landed 2026-05-20)
+- aapg.4 (Athena FYI 4b5aaf58, banked 2026-05-20): messaging_policy →
+  inbound_mode=open|contacts_only as runtime surface; legacy
+  messaging_policy quarantined to migrations/tests; AC access_mode
+  delivery UI removed. This is the replacement mechanism for Sofia's
+  #1 concern (P1 'contacts-only' promise enforcement). Open chain:
+  .2 hidden-row disposition (audit data feeds it), .3 route-origin
+  redesign, .5 docs convergence, .6 e2e proof, .7 AC cleanup. Athena
+  explicit: "FYI not a release handoff" — hold continues.
 - New migration in AC: 006_identity_delivery_origin.sql (adds
   did_aw_mappings.delivery_origin; NOT applied to prod)
 - Local AC working tree: at origin/main 06364f1e post-pull (read-only
