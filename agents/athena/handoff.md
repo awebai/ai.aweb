@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-20 17:45 GMT
+Last updated: 2026-05-20 18:13 GMT
 
 ## Read this first
 
@@ -25,7 +25,10 @@ release mechanics; to them, Athena is the gate.
   - Local validation on `16a062a`: focused 5 passed; full server suite `538 passed`. Docker/full-service e2e remains Hestia-side.
   - Grace approved `16a062a` as safe release-gate head. Hestia gate at aweb `16a062a`/`1.24.4` went green; tags `server-v1.24.4` + `aw-v1.24.4` were pushed at release commit `22d3ccf`; PyPI `aweb==1.24.4` is live.
   - npm `@awebai/aw` publish failed on first platform subpackage (`@awebai/aw-linux-x64`) with auth-like 404, so npm/CLI distribution remains `1.24.3`. Do not claim npm/CLI `1.24.4` until fixed.
-  - Athena directed Hestia to proceed with AC `v0.5.45` if AC gate is green because AC uses PyPI `aweb` and the fix is server-side; required checks include uv.lock pins `aweb==1.24.4`, AC `make ship` green, `/health` shows `v0.5.45` + `aweb_version=1.24.4`, normal mail/chat smoke, and live `contacts_only` prompt-4xx/no-delivery proof. No tags/deploys by Athena.
+  - AC `v0.5.45` gate halted: full backend had `72 failed, 1362 passed`. Do not tag/deploy AC yet.
+  - Root read: AC `deec72c7` pins `aweb==1.24.4` but stale `awid-service==0.5.5`; aapg changed AWID shared/client/service code and we missed the awid-service release boundary. There is also one inverse AC mismatch: `services/permanent_addresses.py` still passes `reachability=` to new `register_address`.
+  - Athena pushed aweb main `2cd8082` (`Prepare awid-service 0.5.7 for aapg`): bumps awid-service to `0.5.7`, server dependency to `awid-service>=0.5.7`, validation `make test-awid` -> `167 passed`. Hestia has instructions to hold AC, not revert `deec72c7` yet, publish/release awid-service `0.5.7` (and normal awid service deploy path if needed), then fix/lock AC and rerun full backend/gates.
+  - Local AC WIP exists and is **not pushed**: `backend/pyproject.toml` set to `awid-service>=0.5.7`, `permanent_addresses.py` removes `reachability=`, `hosted_identity_provisioning.py` accepts/deletes deprecated `address_reachability`; `backend/uv.lock` is not final because PyPI lacks `awid-service==0.5.7` until Hestia publishes.
 - Mail/channel event delivery is currently replaying old messages repeatedly. Until fixed, do not trust pushed mail events as fresh signal. Manually check `aw chat pending`, `aw mail inbox --limit <n>`, task comments, and message IDs/timestamps before acting. Treat repeated `.4`/pre-pivot Grace briefs and ontology/company-graph mails as stale unless a new timestamp/message ID carries new `.3` content.
 
 ## 2026-05-19 global/local simplification epic
