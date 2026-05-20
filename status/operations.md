@@ -22,9 +22,9 @@ ship as-is").
 
 **Deletion-wave HOLD state (deletion-wave heads on origin/main but
 NOT released):**
-- aweb origin/main: f6f55d9 (last touched by .5 docs convergence
-  over channel fix e4dce48 — unchanged by .7 which is AC-only)
-- ac origin/main: 333b08d5 (was e12d2510; aapg.7 landed 2026-05-20)
+- aweb origin/main: 441b25c (was f6f55d9; aapg.2 fail-closed gate
+  landed 2026-05-20 over channel fix e4dce48)
+- ac origin/main: 333b08d5 (last touched by .7 AC cleanup)
 - aapg.4 (Athena FYI 4b5aaf58, banked 2026-05-20): messaging_policy →
   inbound_mode=open|contacts_only as runtime surface; legacy
   messaging_policy quarantined to migrations/tests; AC access_mode
@@ -51,19 +51,23 @@ NOT released):**
   derived legacy access_mode and persists neutral access_mode='open';
   add-existing did:aw copy reframed as identity-binding fallback.
 - aapg.2 disposition artifact: delivered to Athena 2026-05-20
-  (5b1d279b). 43 affected rows classified in 5 groups (A internal-
-  team / B Athena preflight scaffolds / C Juan personal / D external
-  customers / E ERP-pattern unclear). Athena 6e6426b8 corrected: .3
-  awid resolver already ignores legacy reachability — keep-blocked
-  not valid without fail-closed migration gate. Athena routing
-  narrow .2 code patch; Hestia holding row-detail mails to Juan/
-  Sofia until she routes.
-- Open chain remaining: .2 hidden-row disposition (Athena routing
-  fail-closed migration gate patch; Hestia artifact delivered),
-  .6 e2e proof, final wide review. Four of five originally-open
-  items now closed (.3, .4, .5, .7). Athena explicit "FYI not a
-  release handoff" each time — hold continues until full chain
-  closes and a release handoff issues.
+  (5b1d279b). 43 affected rows classified in 5 groups. Athena
+  6e6426b8 corrected: .3 awid resolver already ignores legacy
+  reachability — keep-blocked not valid without fail-closed migration
+  gate. Hestia held row-detail mails per Athena instruction.
+- aapg.2 code patch landed (Athena FYI 17507376, banked 2026-05-20):
+  public AWID address GET returns HTTP 409 for non-neutral legacy
+  rows with diagnostic 'Address blocked by legacy migration state;
+  normalize reachability to public and visible_to_team_id to null
+  before public resolution'. Namespace + DID listings omit non-neutral
+  rows from public discovery. Controller update + reassign are
+  explicit normalization paths. New writes stay neutral. ZERO prod
+  row mutation. Closes Sofia's no-silent-widening concern by code
+  rather than pre-deploy row scramble.
+- Open chain remaining: .6 e2e proof + final wide review. ALL FIVE
+  originally-open items now closed (.3, .4, .5, .7, .2). Athena
+  explicit "FYI not a release handoff" each time — hold continues
+  until .6 + final review close and a release handoff issues.
 - New migration in AC: 006_identity_delivery_origin.sql (adds
   did_aw_mappings.delivery_origin; NOT applied to prod)
 - Local AC working tree: at origin/main 06364f1e post-pull (read-only
