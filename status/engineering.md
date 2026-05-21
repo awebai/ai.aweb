@@ -1,11 +1,11 @@
 # Engineering Status
-Last updated: 2026-05-21 14:02 GMT
+Last updated: 2026-05-21 14:12 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
 - Grace's narrow re-review passed for AC `0caaefc4`; the three `.5` AC cleanup blockers are closed.
-- aweb main is now `605f356`: AWID migration `003_drop_address_reachability.sql` fails closed if any active hidden/limited legacy address row remains before dropping `reachability`/`visible_to_team_id`. Asked Grace for narrow row-disposition review (message `e9e4a27a-cfdc-4645-8ca0-b8f3e7997210`).
-- Hestia's prior no-deploy release-ready gate failure at AC `40e73eb4` was fixed by `aweb-aapi` at AC `82ec0b8d`; do not ask Hestia to rerun release-ready until `.5` is clean and AWID row disposition is resolved.
+- aweb main is now `d300b33`: added Grace-requested migration regression proving AWID hidden/limited row disposition fails closed for active non-neutral rows and passes for deleted/neutral rows.
+- Per Juan, Hestia has been asked to run full validation/all tests for aweb `d300b33` + AC `0caaefc4`, with explicit no tag/deploy/publish/version-bump/prod-migration boundary (mail `75231d6a-bc88-4441-922f-50649c30e4bd`).
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
@@ -13,7 +13,7 @@ Last updated: 2026-05-21 14:02 GMT
 - **aweb-aapj.3 — AC backend/schema/API cleanup**: closed and landed on AC main at `b0e82553`. Athena review evidence: diff-check clean; focused sibling-source backend validation green (`118 passed`); Mia full-suite report was `1410 passed / 7 deselected`; direct run of ignored `auth_bridge_oss_cases.py` still fails but the representative failure reproduces on `origin/main`, so it is not a `.3` blocker.
 - **aweb-aapj.4 — AC frontend/docs cleanup**: closed earlier, now merged to AC main at `f52f5481`. Post-merge validation: diff-check clean, `frontend/scripts/check-aapj-vocabulary.sh` OK, frontend vitest green (`38 files / 194 tests passed`; existing jsdom `window.scrollTo` stderr only).
 - **aweb-aapj.5 — cross-repo grep gate/release handoff**: Grace found three final AC blockers on `d80fe410`; Athena patched and landed AC `0caaefc4`; Grace's narrow re-review passed. Validation: diff-check clean; frontend aapj vocab gate OK; hidden-import grep for deleted `identity_types.py` helpers clean; backend py_compile touched/related files green; frontend vitest 38/194 green; frontend build green. Reports: `/tmp/aapj5-gracefix-20260521134728/{raw.txt,strict.txt}`.
-- **AWID hidden/limited row disposition**: Athena landed aweb `605f356` so migration `003_drop_address_reachability.sql` refuses to drop legacy visibility columns while active non-neutral address rows exist. Validation: aweb diff-check clean; `make test-awid` 168 passed. Grace narrow review requested before Hestia handoff.
+- **AWID hidden/limited row disposition**: Athena landed aweb `605f356` so migration `003_drop_address_reachability.sql` refuses to drop legacy visibility columns while active non-neutral address rows exist. Grace said SQL shape was correct but required focused migration evidence. Athena landed aweb `d300b33` with that regression; validation: aweb diff-check clean; `uv --directory awid run pytest tests/test_schema.py -q` 8 passed; `make test-awid` 172 passed.
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
 - **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
 - **aweb-aapj.8 — public/static docs + doctor output cleanup**: closed at aweb `e332bf8`. Athena validated diff-check, targeted public/static docs grep clean, doctor stale phrase grep clean, Go cmd/aw+awid, server package-data, CLI reference check.
@@ -29,20 +29,19 @@ Last updated: 2026-05-21 14:02 GMT
 - Athena authored `aweb-aapj` breakdown/briefs and seeded initial grep inventories in `/tmp/aweb-legacy-hits.txt` and `/tmp/ac-legacy-hits.txt` (not authoritative yet; final gate is `aweb-aapj.5`).
 
 ## Release-ready state (handoff to Hestia)
-- Release is held pending Grace's narrow review of the AWID row-disposition migration gate.
-- Current heads: aweb main `605f356`; AC main `0caaefc4` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, and Grace-blocker patch `0caaefc4`).
-- Do not release yet: AWID hidden/limited row-disposition gate is patched but awaiting Grace review; Juan hard hold remains.
-- Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`. Juan hard-hold remains: no deploy/tag/publish until explicit clearance.
-- Hestia was told no more release-ready runs until Athena says `aweb-aapj` cleanup is landed and ready for a no-deploy gate.
+- Hestia has the no-publish validation request for aweb `d300b33` + AC `0caaefc4` (conversation `96317ca9-a823-40ad-8216-29670533d673`, message `75231d6a-bc88-4441-922f-50649c30e4bd`).
+- Current heads: aweb main `d300b33`; AC main `0caaefc4` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, and Grace-blocker patch `0caaefc4`).
+- Do not release yet: Juan asked for tests only; hard hold remains on tag/deploy/publish/version bump/prod migration.
+- Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`.
 
 ## Risks
-- **Review risk**: AC `.5` blockers are closed by Grace; remaining review is the new aweb `605f356` AWID migration fail-closed gate.
+- **Gate risk**: Hestia may find failures in full validation; stop on red and fix before any release discussion.
 - **Two-world dependency risk**: AC release validation must use sibling-source aweb/awid, not PyPI-only `aweb==1.24.4`; no Hestia tag/publish just to unblock local tests under Juan hold.
 - **Residual grep risk**: regenerated strict reports still contain compatibility/audit/history/storage hits; AC blocker classes are closed, but final Hestia gate may still surface release issues.
-- **AWID hidden/limited row-disposition risk**: deployment must not silently widen existing hidden/limited address rows. aweb `605f356` encodes fail-closed disposition in the migration; await Grace review before Hestia.
+- **AWID hidden/limited row-disposition risk**: deployment must not silently widen existing hidden/limited address rows. aweb `d300b33` encodes and tests fail-closed disposition; any live/prod action still needs explicit release clearance.
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Wait for Grace's narrow review of aweb `605f356` AWID migration gate; fix any blockers she finds.
-- If Grace accepts the fail-closed row-disposition gate, then ask Hestia for no-deploy release-ready with aweb `605f356` + AC `0caaefc4` and keep Juan's no tag/deploy/publish hold explicit.
-- Keep npm/CLI `1.24.4` caveat and Juan deploy hold explicit.
+- Wait for Hestia's no-publish validation results for aweb `d300b33` + AC `0caaefc4`.
+- If Hestia reports red, fix the failure shape before any release/deploy discussion.
+- Keep npm/CLI `1.24.4` caveat and Juan tag/deploy/publish hold explicit.
