@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-21 10:00 GMT
+Last updated: 2026-05-21 10:12 GMT
 
 ## Current focus
 - Step-back architecture read: not fully simplified yet. aweb-side authority is much cleaner at current aweb main `8337af1`, but AC main `82ec0b8d` and some aweb/AWID public/static docs still leak old product authority vocabulary.
@@ -16,7 +16,7 @@ Last updated: 2026-05-21 10:00 GMT
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
 - **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
 - **aweb-aapj.8 — public/static docs + doctor output cleanup**: closed at aweb `e332bf8`. Athena validated diff-check, targeted public/static docs grep clean, doctor stale phrase grep clean, Go cmd/aw+awid, server package-data, CLI reference check.
-- Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia added `test-backend-aweb-local` prerequisite at AC branch `e1e476ee`, Phase B (1/2) mirror migrations/tests at `a42ddd6c`, and Phase B 2/2 partial `4ea825c8` (dashboard + immediate_connect). Mia estimates 4-6h total and is continuing; Peter’s raw `.9` map was forwarded as checklist. AC editing remains with Mia while Peter focuses `.12`.
+- Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia added `test-backend-aweb-local` prerequisite at AC branch `e1e476ee`, Phase B (1/2) mirror migrations/tests at `a42ddd6c`, and Phase B 2/2 partials through `bf1215eb` (dashboard/immediate_connect, mcp_oauth/contact predicates, agent_lifecycle/identity_workspace, embedded bootstrap/scope_agents/onboarding/init slice, SQL SELECT sweep). AC editing remains with Mia while Peter focuses `.12`. Athena directed support/admin/audit old fields must move under nested `legacy:{...}` in `.3`, not follow-up.
 - `aweb-aapj.4` validation rerun by Athena: diff-check, aapj vocab gate, targeted greps, dashboard build, frontend tests (38 files / 194 tests), lint (0 errors; 2 unrelated warnings), and frontend build. Dave re-reviewed with no blockers.
 - New support tasks to keep idle agents applied: `aweb-aapj.9` assigned to Peter for AC Phase B 2/2 file-by-file rewrite map; `aweb-aapj.10` assigned to Dave for final `.5` grep-gate dry-run prep.
 - Dave’s `.10` dry-run surfaced two additional aweb blockers before final `.5`: `aweb-aapj.11` is closed at aweb `5f4dc04` (public CLI/SOT docs cleanup); `aweb-aapj.12` remains assigned to Peter for AWID team-certificate API/storage canonical `identity_scope` cleanup.
@@ -28,7 +28,7 @@ Last updated: 2026-05-21 10:00 GMT
 
 ## Release-ready state (handoff to Hestia)
 - Release is held pending `aweb-aapj` cleanup and final `aweb-aapj.5` grep gate.
-- Current heads: aweb main `5f4dc04`; AC main `82ec0b8d`; in-flight AC branches `origin/mia/aapj-3-phase-a` at `4ea825c8`, `origin/olivia-aapj-4` at `eec512d4`.
+- Current heads: aweb main `5f4dc04`; AC main `82ec0b8d`; in-flight AC branches `origin/mia/aapj-3-phase-a` at `bf1215eb`, `origin/olivia-aapj-4` at `eec512d4`.
 - Do not release aweb alone at `8337af1` while AC remains old-authority-shaped; that would split product authority across global/local aweb and lifetime/access/reachability AC.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`. Juan hard-hold remains: no deploy/tag/publish until explicit clearance.
 - Hestia was told no more release-ready runs until Athena says `aweb-aapj` cleanup is landed and ready for a no-deploy gate.
