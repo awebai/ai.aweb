@@ -1,12 +1,12 @@
 # Engineering Status
-Last updated: 2026-05-21 19:18 GMT
+Last updated: 2026-05-21 19:59 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
 - Grace's narrow re-review passed for AC `0caaefc4`; the three `.5` AC cleanup blockers are closed.
 - aweb main is now `b215d23`: Peter removed stale CLI `lifetime` request input for `/api/v1/workspaces/init` and sends canonical `identity_scope=local|global`; Grace reviewed and approved request-shape boundary.
 - Current heads: aweb `fa1041c` and AC `9104ffc2`. Hestia's validation-only sibling-source chain is green across all 6 phases; hard hold remains until Juan explicitly clears release actions.
-- New Juan direction via Olivia: drop post-signup first-team creation from onboarding; register should auto-provision a personal team from username/slug and land on that dashboard; username availability must include both AC account username and AWID team-namespace slug availability. Athena asked Sofia whether this is a pre-release blocker or next-scope work before routing implementation.
+- Juan clarified the onboarding auto-provision direction is a pre-release blocker. Athena created `aweb-aapk` and routed `.1` to Peter (AWID availability contract), `.2/.3` to Mia (AC backend/frontend), and `.4` to Grace (release-gate review). Olivia stays free for Juan walkthroughs.
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
@@ -24,7 +24,7 @@ Last updated: 2026-05-21 19:18 GMT
 - Dave’s `.10` dry-run surfaced two additional aweb blockers before final `.5`: `aweb-aapj.11` is closed at aweb `5f4dc04` (public CLI/SOT docs cleanup); `aweb-aapj.12` is closed at aweb `bdc39e4` (AWID team-certificate API/storage/cert JSON canonical `identity_scope`).
 - `aweb-aapj.13` is closed at aweb `bf8b4e4`: AWCO/BYOIDT team-certified signed request mode with verifier evidence. Athena reran diff-check, focused team-auth tests, and Go cmd/aw+awid tests.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
-- **Onboarding simplification — pending direction classification**: Olivia relayed Juan direction to remove the `/onboarding` first-team creation gate. Proposed split if approved to start: backend (auto-provision default personal team; remove team-creation-needed post-register state; widen username availability to include AWID slug), frontend (remove onboarding team-creation form; post-register route to team dashboard; combined username availability UI), AWID (stable read-only namespace slug availability probe), small dev-mode fixes (`make dev-awid` should set `ENVIRONMENT=development`; dev email reserved-TLD handling/UI copy). Athena asked Sofia whether this blocks the current green release or is next-scope.
+- **`aweb-aapk` — prerelease onboarding auto-provision blocker**: open P0 epic. `.1` assigned/claimed by Peter for AWID read-only namespace/team availability contract and dev-awid ENVIRONMENT check. `.2` assigned/claimed by Mia for AC backend register default personal team + combined AC/AWID username availability. `.3` assigned/claimed by Mia for frontend removal of signup first-team gate and routing/copy/tests. `.4` assigned to Grace for release-gate review once branches are ready. Dependencies: `.2` waits on `.1`; `.3` waits on `.2`; `.4` waits on `.1/.2/.3`. Olivia is intentionally not assigned because she is helping Juan check flows.
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
 ## Non-feature work in flight
@@ -45,6 +45,6 @@ Last updated: 2026-05-21 19:18 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Wait for Juan/Sofia direction on whether/when release actions may proceed, and whether the new onboarding auto-provision direction is a pre-release blocker or next-scope.
+- Drive `aweb-aapk`: wait for Peter's `.1` AWID availability contract, then unblock Mia `.2`; keep `.3` moving on frontend inspection; route all branch-ready packets to Grace `.4` review.
 - If release is cleared, keep caveats explicit: npm `@awebai/aw` is still `1.24.3`; live AWID still reports `0.5.6` until Task #201 is resolved/verified.
 - Keep hard hold explicit until clearance: no tag/deploy/publish/version bump/prod migration/prod row mutation.
