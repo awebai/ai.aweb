@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-21 08:45 GMT
+Last updated: 2026-05-21 09:03 GMT
 
 ## Read this first
 
@@ -43,8 +43,8 @@ release mechanics; to them, Athena is the gate.
   - `aweb-aapj.7` closed at aweb `2e98603`: channel/channel-core runtime cleanup normalizes `lifetime`/`persistent`/`ephemeral` to identity_scope/global/local with legacy adapters. Athena validation rerun: diff-check; channel focused 69; channel-core build; channel build; full channel tests 95; Pi build. Remaining lifetime/persistent/ephemeral hits are compatibility adapters/tests/generated equivalents.
   - `aweb-aapj.8` closed at aweb `e332bf8`: aweb/AWID public/static docs and doctor/support output cleanup. Athena validation rerun: diff-check; targeted public/static docs grep clean; doctor stale phrase grep clean; Go cmd/aw+awid; server package-data; CLI reference check.
 - Current heads for next review: aweb main `e332bf8`; AC main `82ec0b8d`; AC in-flight `origin/mia/aapj-3-phase-a` at `7093f693`; AC in-flight `origin/olivia-aapj-4` at `473f74f0`.
-- Peter was routed to help Mia with AC mirror/schema review (no edits unless asked). He found a real blocker: AC `dashboard.py` constructs `TeamIdentity(lifetime=...)`; current aweb source requires `identity_scope`. Mia confirmed default AC local tests still use PyPI `aweb==1.24.4`, so `.3` must add/use a sibling-source backend validation path; do not ask Hestia to tag/publish under Juan hold.
-- Dave was routed to help Olivia with frontend cleanup review (no edits unless asked). Olivia pushed Chunk A `b1d57605` switching generated CLI commands to canonical `--global`; Chunk B page vocabulary cleanup remains.
+- Peter was routed to help Mia with AC mirror/schema review (no edits unless asked). He found a real blocker: AC `dashboard.py` constructs `TeamIdentity(lifetime=...)`; current aweb source requires `identity_scope`. Mia confirmed default AC local tests still use PyPI `aweb==1.24.4`, so `.3` must add/use a sibling-source backend validation path; do not ask Hestia to tag/publish under Juan hold. Mia landed prerequisite `e1e476ee` and Phase B migration half `a42ddd6c`; branch is intentionally red under `test-backend-aweb-local` until Phase B 2/2 rewrites code/tests/gate path. Peter has been asked to re-review `a42ddd6c`.
+- Dave was routed to help Olivia with frontend cleanup review (no edits unless asked). Olivia pushed Chunk A `b1d57605` switching generated CLI commands to canonical `--global`, Chunk B `c1b06841` for AgentDetail/AgentsPage, Chunk C `7e8fb997` for Onboarding/remaining files, and comment tightening `33fbb799`. Dave re-reviewed `33fbb799` with no blocking findings (diff/grep only; no frontend suite). Waiting on Olivia final grep allowlist + branch-ready packet.
 - Important release blocker: aapj.1 drops AWID `reachability` / `visible_to_team_id`. Before release/deploy, verify production hidden/limited rows are explicitly disposed/normalized or get Juan/operator decision. Do not silently widen privacy.
   - `aweb-aapi` was reviewed, merged, and closed: AC main fast-forwarded to `82ec0b8d` with `backend/src/aweb_cloud/migrations/aweb/006_participant_current_did_key.sql` and migration manifest tests. Clean-worktree validation: `uv run pytest -q tests/test_migration_paths.py` -> 17 passed. Broader cleanup remains `aweb-aapj.3`.
   - Hestia was told release remains held and no more release-ready reruns are needed until Athena says `aweb-aapj` has landed.
