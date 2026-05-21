@@ -1,11 +1,11 @@
 # Engineering Status
-Last updated: 2026-05-21 14:12 GMT
+Last updated: 2026-05-21 14:22 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
 - Grace's narrow re-review passed for AC `0caaefc4`; the three `.5` AC cleanup blockers are closed.
 - aweb main is now `d300b33`: added Grace-requested migration regression proving AWID hidden/limited row disposition fails closed for active non-neutral rows and passes for deleted/neutral rows.
-- Per Juan, Hestia has been asked to run full validation/all tests for aweb `d300b33` + AC `0caaefc4`, with explicit no tag/deploy/publish/version-bump/prod-migration boundary (mail `75231d6a-bc88-4441-922f-50649c30e4bd`).
+- Hestia's validation: aweb `make ship` at `d300b33` is green; AC `make release-ready` at `0caaefc4` failed 226/1435 due stale PyPI `aweb==1.24.4` querying `agents.lifetime` against new AC schema plus old `resolve_identity_contract` signature. Athena sent sibling-source rerun instructions using `make test-backend-aweb-local` and manual release-ready-equivalent chain (mail `fd4958cb-30a8-48ab-a62a-50a76bef3f10`).
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
@@ -29,7 +29,7 @@ Last updated: 2026-05-21 14:12 GMT
 - Athena authored `aweb-aapj` breakdown/briefs and seeded initial grep inventories in `/tmp/aweb-legacy-hits.txt` and `/tmp/ac-legacy-hits.txt` (not authoritative yet; final gate is `aweb-aapj.5`).
 
 ## Release-ready state (handoff to Hestia)
-- Hestia has the no-publish validation request for aweb `d300b33` + AC `0caaefc4` (conversation `96317ca9-a823-40ad-8216-29670533d673`, message `75231d6a-bc88-4441-922f-50649c30e4bd`).
+- Hestia has sibling-source validation instructions for aweb `d300b33` + AC `0caaefc4` (conversation `96317ca9-a823-40ad-8216-29670533d673`, latest Athena message `fd4958cb-30a8-48ab-a62a-50a76bef3f10`).
 - Current heads: aweb main `d300b33`; AC main `0caaefc4` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, and Grace-blocker patch `0caaefc4`).
 - Do not release yet: Juan asked for tests only; hard hold remains on tag/deploy/publish/version bump/prod migration.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`.
@@ -42,6 +42,6 @@ Last updated: 2026-05-21 14:12 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Wait for Hestia's no-publish validation results for aweb `d300b33` + AC `0caaefc4`.
-- If Hestia reports red, fix the failure shape before any release/deploy discussion.
+- Wait for Hestia's sibling-source no-publish validation results for aweb `d300b33` + AC `0caaefc4`.
+- If Hestia reports red beyond the known stale-PyPI mismatch, fix the failure shape before any release/deploy discussion.
 - Keep npm/CLI `1.24.4` caveat and Juan tag/deploy/publish hold explicit.
