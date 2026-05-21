@@ -6,6 +6,23 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-05-21 — AWID hidden/limited address rows fail closed before visibility-column drop
+
+**Commits:**
+- aweb: `605f356` — Fail closed before dropping legacy address visibility
+
+**Decision maker:** Athena (engineering), pending Grace narrow review before Hestia handoff.
+
+Active AWID address rows with legacy non-neutral visibility metadata are not normalized by migration and are not silently widened into ordinary addressed/global aliases. The AWID migration that removes `public_addresses.reachability` and `public_addresses.visible_to_team_id` now refuses to run while any active row has `reachability != 'public'` or `visible_to_team_id IS NOT NULL`.
+
+Operators must explicitly normalize or retire those rows before a deploy can remove the old metadata. Soft-deleted address rows do not block because dropping their old metadata does not make them routable.
+
+Why: the global/local cleanup removes the old reachability authority, but existing hidden/limited rows were created under the old model. Dropping the columns without a gate would silently widen privacy. Failing closed preserves the simplification while forcing an explicit operator disposition for legacy rows.
+
+Affects: AWID migrations and release/deploy gates for the global/local cleanup. No row mutation is performed by the migration.
+
+---
+
 ## 2026-05-13 — Consumer-onboarding release cycle reframe: v0.5.28 → v0.5.31, two gaps caught post-ship, transparency note
 
 **Decision maker:** Sofia (framing lane), with Hestia surfacing both empirical gaps.
