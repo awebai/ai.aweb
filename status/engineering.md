@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-21 09:10 GMT
+Last updated: 2026-05-21 09:22 GMT
 
 ## Current focus
 - Step-back architecture read: not fully simplified yet. aweb-side authority is much cleaner at current aweb main `8337af1`, but AC main `82ec0b8d` and some aweb/AWID public/static docs still leak old product authority vocabulary.
@@ -11,13 +11,13 @@ Last updated: 2026-05-21 09:10 GMT
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
 - **aweb-aapj.2 — aw CLI/docs global/local language**: closed at aweb `bfe822d`. CLI/help/docs use global/local; old flags hidden as compatibility aliases; developer-facing test wording cleaned.
 - **aweb-aapj.3 — AC backend/schema/API cleanup**: assigned to Mia. Mia confirmed branch base AC `82ec0b8d`, reran survey, and is starting Phase A with a worked-example single-endpoint diff before broad sweep. DTO guidance sent: canonical `identity_scope=global|local`; stale fields input-only/backcompat; `address_reachability` deleted from normal output; `access_mode` fail-closed mapping to `inbound_mode`.
-- **aweb-aapj.4 — AC frontend/docs cleanup**: assigned to Olivia. Olivia reset branch to AC `82ec0b8d`, reran frontend survey, and is proceeding frontend-only; synced `site/content/docs` stays out of scope (Grace/aweb owns canonical docs).
+- **aweb-aapj.4 — AC frontend/docs cleanup**: approved branch-ready at `eec512d4`, but held for merge until `.3` lands because the frontend expects post-`.3` canonical wire shapes (`identity_scope`, removed old response fields).
 - **aweb-aapj.5 — cross-repo grep gate/release handoff**: Athena-owned and in progress after `.3`, `.4`, and `.8` land.
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
 - **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
 - **aweb-aapj.8 — public/static docs + doctor output cleanup**: closed at aweb `e332bf8`. Athena validated diff-check, targeted public/static docs grep clean, doctor stale phrase grep clean, Go cmd/aw+awid, server package-data, CLI reference check.
 - Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia added `test-backend-aweb-local` prerequisite at AC branch `e1e476ee`, then Phase B (1/2) mirror migrations/tests at `a42ddd6c`; Phase B (2/2) code rewrites + release-ready gate correction remain.
-- Dave support review found Olivia-cleanable frontend leaks. Olivia pushed Chunk A `b1d57605`, Chunk B `c1b06841`, Chunk C `7e8fb997`, and comment-tightening `33fbb799`. Dave re-reviewed with no blockers; waiting on Olivia final grep allowlist + branch-ready packet.
+- `aweb-aapj.4` validation rerun by Athena: diff-check, aapj vocab gate, targeted greps, dashboard build, frontend tests (38 files / 194 tests), lint (0 errors; 2 unrelated warnings), and frontend build. Dave re-reviewed with no blockers.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
@@ -26,7 +26,7 @@ Last updated: 2026-05-21 09:10 GMT
 
 ## Release-ready state (handoff to Hestia)
 - Release is held pending `aweb-aapj` cleanup and final `aweb-aapj.5` grep gate.
-- Current heads: aweb main `e332bf8`; AC main `82ec0b8d`; in-flight AC branches `origin/mia/aapj-3-phase-a` at `a42ddd6c`, `origin/olivia-aapj-4` at `33fbb799`.
+- Current heads: aweb main `e332bf8`; AC main `82ec0b8d`; in-flight AC branches `origin/mia/aapj-3-phase-a` at `a42ddd6c`, `origin/olivia-aapj-4` at `eec512d4`.
 - Do not release aweb alone at `8337af1` while AC remains old-authority-shaped; that would split product authority across global/local aweb and lifetime/access/reachability AC.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`. Juan hard-hold remains: no deploy/tag/publish until explicit clearance.
 - Hestia was told no more release-ready runs until Athena says `aweb-aapj` cleanup is landed and ready for a no-deploy gate.
@@ -39,7 +39,7 @@ Last updated: 2026-05-21 09:10 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Track branch-ready from Mia (`aweb-aapj.3`) and Olivia (`aweb-aapj.4`); use Peter/Dave support reviews to catch blockers earlier.
+- Track branch-ready from Mia (`aweb-aapj.3`); `.4` is ready but blocked on `.3` merge sequencing.
 - Review/land each branch against the briefs; require grep evidence and focused tests.
 - Run `aweb-aapj.5` final cross-repo legacy-residue gate after `.3`/`.4`/`.8` land, then ask Hestia for no-deploy release-ready.
 - Resolve AWID hidden/limited row disposition before any release/deploy.
