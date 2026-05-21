@@ -1,18 +1,18 @@
 # Engineering Status
-Last updated: 2026-05-21 16:44 GMT
+Last updated: 2026-05-21 17:19 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
 - Grace's narrow re-review passed for AC `0caaefc4`; the three `.5` AC cleanup blockers are closed.
 - aweb main is now `b215d23`: Peter removed stale CLI `lifetime` request input for `/api/v1/workspaces/init` and sends canonical `identity_scope=local|global`; Grace reviewed and approved request-shape boundary.
-- AC main is `74ab465c`: two-service e2e fixtures no longer send `address_reachability` to create-permanent-custodial. Hestia has rerun request for aweb `b215d23` + AC `74ab465c`.
+- AC main is `3c97b4d3`: aapj e2e contract cleanup after Hestia's latest red. Phase-5 stale team-cert `lifetime` assertions now use `identity_scope`; export script no longer reads AWID address `reachability`; cloud journey dashboard hosted creation now sends `identity_scope=global`; cross-team global address first-contact test now expects delivery. Mia review requested before Hestia rerun.
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
 - **aweb-aapj.2 — aw CLI/docs global/local language**: closed at aweb `bfe822d`. CLI/help/docs use global/local; old flags hidden as compatibility aliases; developer-facing test wording cleaned.
 - **aweb-aapj.3 — AC backend/schema/API cleanup**: closed and landed on AC main at `b0e82553`. Athena review evidence: diff-check clean; focused sibling-source backend validation green (`118 passed`); Mia full-suite report was `1410 passed / 7 deselected`; direct run of ignored `auth_bridge_oss_cases.py` still fails but the representative failure reproduces on `origin/main`, so it is not a `.3` blocker.
 - **aweb-aapj.4 — AC frontend/docs cleanup**: closed earlier, now merged to AC main at `f52f5481`. Post-merge validation: diff-check clean, `frontend/scripts/check-aapj-vocabulary.sh` OK, frontend vitest green (`38 files / 194 tests passed`; existing jsdom `window.scrollTo` stderr only).
-- **aweb-aapj.5 — cross-repo grep gate/release handoff**: Grace found three final AC blockers on `d80fe410`; Athena patched and landed AC `0caaefc4`; Grace's narrow re-review passed. Hestia's sibling-source chain exposed remaining AC validation failures. Athena landed AC `b1f6277e` (Phase 2 backend now green) and AC `74ab465c` (remove stale `address_reachability` from two-service e2e requests). Hestia then found CLI still sent stale `lifetime` to `/api/v1/workspaces/init`; Peter landed aweb `b215d23` sending canonical `identity_scope`, and Grace approved. Latest handoff to Hestia: rerun sibling-source chain on aweb `b215d23` + AC `74ab465c`.
+- **aweb-aapj.5 — cross-repo grep gate/release handoff**: Grace found three final AC blockers on `d80fe410`; Athena patched and landed AC `0caaefc4`; Grace's narrow re-review passed. Hestia's sibling-source chain exposed remaining AC validation failures. Athena landed AC `b1f6277e` (Phase 2 backend now green) and AC `74ab465c` (remove stale `address_reachability` from two-service e2e requests). Hestia then found CLI still sent stale `lifetime` to `/api/v1/workspaces/init`; Peter landed aweb `b215d23` sending canonical `identity_scope`, and Grace approved. Latest Hestia run: Phase 1/2/3/4 green, Phase 5 down to 4 fails, Phase 6 down to 45 fails. Athena patched AC `3c97b4d3` for remaining stale validation contracts and requested Mia review before rerun.
 - **AWID hidden/limited row disposition**: Athena landed aweb `605f356` so migration `003_drop_address_reachability.sql` refuses to drop legacy visibility columns while active non-neutral address rows exist. Grace said SQL shape was correct but required focused migration evidence. Athena landed aweb `d300b33` with that regression; validation: aweb diff-check clean; `uv --directory awid run pytest tests/test_schema.py -q` 8 passed; `make test-awid` 172 passed.
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
 - **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
@@ -29,8 +29,8 @@ Last updated: 2026-05-21 16:44 GMT
 - Athena authored `aweb-aapj` breakdown/briefs and seeded initial grep inventories in `/tmp/aweb-legacy-hits.txt` and `/tmp/ac-legacy-hits.txt` (not authoritative yet; final gate is `aweb-aapj.5`).
 
 ## Release-ready state (handoff to Hestia)
-- Hestia has rerun request for aweb `b215d23` + AC `74ab465c` (conversation `96317ca9-a823-40ad-8216-29670533d673`, latest Athena message `2bd6b590-241c-4daa-bf13-422e4a6a7b70`).
-- Current heads: aweb main `b215d23` (includes AWID row-disposition regression `d300b33` and CLI identity-scope request fix `b215d23`); AC main `74ab465c` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, Grace-blocker patch `0caaefc4`, validation patch `b1f6277e`, and two-service fixture patch `74ab465c`).
+- Mia has code-review request for AC `3c97b4d3` (conversation `288d6b29-7a28-47d9-8684-1376e0970958`, message `28a016f6-3714-4bee-a884-e268aae86a8a`). Hestia has been told AC `3c97b4d3` is patched but review pending before rerun (company conversation `96317ca9-a823-40ad-8216-29670533d673`, message `089a75fe-cf47-43ce-a5d5-492cd45314e9`).
+- Current heads: aweb main `b215d23` (includes AWID row-disposition regression `d300b33` and CLI identity-scope request fix `b215d23`); AC main `3c97b4d3` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, Grace-blocker patch `0caaefc4`, validation patch `b1f6277e`, two-service fixture patch `74ab465c`, and e2e contract cleanup `3c97b4d3`).
 - Do not release yet: Juan asked for tests only; hard hold remains on tag/deploy/publish/version bump/prod migration.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`.
 
@@ -42,6 +42,6 @@ Last updated: 2026-05-21 16:44 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Wait for Hestia's sibling-source no-publish validation rerun for aweb `b215d23` + AC `74ab465c`.
+- Wait for Mia review of AC `3c97b4d3`; if passed, ask Hestia to rerun sibling-source no-publish validation for aweb `b215d23` + AC `3c97b4d3`.
 - If Hestia reports red, fix the failure shape before any release/deploy discussion.
 - Keep npm/CLI `1.24.4` caveat and Juan tag/deploy/publish hold explicit.
