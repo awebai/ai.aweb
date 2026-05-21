@@ -1,11 +1,11 @@
 # Engineering Status
-Last updated: 2026-05-21 17:39 GMT
+Last updated: 2026-05-21 17:51 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
 - Grace's narrow re-review passed for AC `0caaefc4`; the three `.5` AC cleanup blockers are closed.
 - aweb main is now `b215d23`: Peter removed stale CLI `lifetime` request input for `/api/v1/workspaces/init` and sends canonical `identity_scope=local|global`; Grace reviewed and approved request-shape boundary.
-- AC main is `4034f044`: Mia correctly blocked `bf9206b5` because plain `uv run` would re-sync away the sibling overlay before pytest. `4034f044` keeps `test-two-service-up` on `use-aweb-local` and changes both host bootstrap calls plus pytest to `uv run --no-sync ...`. Mia reviewed and passed; Hestia rerun requested.
+- AC main is `492b3d33`: after Hestia got Phase 5 green and Phase 6 down to one Playwright selector, Athena patched `dccfc8d0` to use current `Set up CLI workspace` label and add `scripts/check-aapj-e2e-contract.sh` wired into `release-verify-model`. Olivia approved and suggested a TS-unquoted identity_scope guard; Athena applied it as `492b3d33`. Olivia quick re-review pending before Hestia rerun.
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
@@ -29,8 +29,8 @@ Last updated: 2026-05-21 17:39 GMT
 - Athena authored `aweb-aapj` breakdown/briefs and seeded initial grep inventories in `/tmp/aweb-legacy-hits.txt` and `/tmp/ac-legacy-hits.txt` (not authoritative yet; final gate is `aweb-aapj.5`).
 
 ## Release-ready state (handoff to Hestia)
-- Mia reviewed AC `4034f044` and passed (conversation `288d6b29-7a28-47d9-8684-1376e0970958`, Athena ACK `5efbedf1-0821-40f6-a512-7d53f0026251`). Hestia has rerun request for aweb `b215d23` + AC `4034f044` (company conversation `96317ca9-a823-40ad-8216-29670533d673`, latest Athena message `dcfc67e4-34e0-4d5b-b783-e0f6a840785d`).
-- Current heads: aweb main `b215d23` (includes AWID row-disposition regression `d300b33` and CLI identity-scope request fix `b215d23`); AC main `4034f044` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, Grace-blocker patch `0caaefc4`, validation patch `b1f6277e`, two-service fixture patch `74ab465c`, e2e contract cleanup `3c97b4d3`, two-service sibling-source boundary fix `bf9206b5`, and no-sync preservation fix `4034f044`).
+- Olivia has quick re-review request for AC `492b3d33` (conversation `a3e9c853-7359-4b20-9a5b-26680cf40816`, message `f37b099f-1acc-44ec-9b08-85397c111abc`). Hestia has been told AC `492b3d33` is patched but review pending (company conversation `96317ca9-a823-40ad-8216-29670533d673`, message `d7495e6b-958f-41e2-945d-0597fe1438dd`).
+- Current heads: aweb main `b215d23` (includes AWID row-disposition regression `d300b33` and CLI identity-scope request fix `b215d23`); AC main `492b3d33` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, Grace-blocker patch `0caaefc4`, validation patch `b1f6277e`, two-service fixture patch `74ab465c`, e2e contract cleanup `3c97b4d3`, two-service sibling-source boundary fix `bf9206b5`, no-sync preservation fix `4034f044`, browser selector/guard `dccfc8d0`, and TS guard tightening `492b3d33`).
 - Do not release yet: Juan asked for tests only; hard hold remains on tag/deploy/publish/version bump/prod migration.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`.
 
@@ -42,6 +42,6 @@ Last updated: 2026-05-21 17:39 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Wait for Hestia's sibling-source no-publish validation rerun for aweb `b215d23` + AC `4034f044`.
+- Wait for Olivia quick review of AC `492b3d33`; if passed, ask Hestia to rerun sibling-source no-publish validation for aweb `b215d23` + AC `492b3d33`.
 - If Hestia reports red, fix the failure shape before any release/deploy discussion.
 - Keep npm/CLI `1.24.4` caveat and Juan tag/deploy/publish hold explicit.
