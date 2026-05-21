@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-21 08:15 GMT
+Last updated: 2026-05-21 08:45 GMT
 
 ## Current focus
 - Step-back architecture read: not fully simplified yet. aweb-side authority is much cleaner at current aweb main `8337af1`, but AC main `82ec0b8d` and some aweb/AWID public/static docs still leak old product authority vocabulary.
@@ -16,8 +16,8 @@ Last updated: 2026-05-21 08:15 GMT
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
 - **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
 - **aweb-aapj.8 — public/static docs + doctor output cleanup**: closed at aweb `e332bf8`. Athena validated diff-check, targeted public/static docs grep clean, doctor stale phrase grep clean, Go cmd/aw+awid, server package-data, CLI reference check.
-- Peter is now routed to support/review AC mirror/schema implications for Mia (no implementation unless asked).
-- Dave is now routed to support/review Olivia's frontend cleanup branch (no implementation unless asked).
+- Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia confirmed PyPI aweb `1.24.4` still has the old signature, so `.3` needs a committed sibling-source backend validation path rather than waiting for an aweb tag.
+- Dave support review found Olivia-cleanable frontend leaks in AgentDetail/AgentsPage and generated CLI commands. Olivia pushed Chunk A `b1d57605` switching generated CLI flags to `--global`; Chunk B UI vocabulary cleanup remains.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
@@ -33,6 +33,7 @@ Last updated: 2026-05-21 08:15 GMT
 
 ## Risks
 - **Split-authority risk**: aweb main is mostly global/local while AC main still exposes/uses lifetime/access_mode/address_reachability/reachability in canonical areas. Release must wait for AC cleanup.
+- **Two-world dependency risk**: AC local tests currently use PyPI `aweb==1.24.4` while release image uses sibling aweb source. For aapj Phase B, test/release validation must use sibling aweb `e332bf8+`; no Hestia tag/publish just to unblock local tests under Juan hold.
 - **Public-doc risk**: `awid/site/static` and some doctor/support output still teach persistent/ephemeral unless `.8` cleans them.
 - **AWID hidden/limited row-disposition risk**: aapj.1 drops reachability/visible columns. Before release, verify hidden/limited production row disposition or get explicit Juan/operator decision; do not silently widen privacy.
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
