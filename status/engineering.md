@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-21 19:59 GMT
+Last updated: 2026-05-21 20:10 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
@@ -24,7 +24,7 @@ Last updated: 2026-05-21 19:59 GMT
 - Dave’s `.10` dry-run surfaced two additional aweb blockers before final `.5`: `aweb-aapj.11` is closed at aweb `5f4dc04` (public CLI/SOT docs cleanup); `aweb-aapj.12` is closed at aweb `bdc39e4` (AWID team-certificate API/storage/cert JSON canonical `identity_scope`).
 - `aweb-aapj.13` is closed at aweb `bf8b4e4`: AWCO/BYOIDT team-certified signed request mode with verifier evidence. Athena reran diff-check, focused team-auth tests, and Go cmd/aw+awid tests.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
-- **`aweb-aapk` — prerelease onboarding auto-provision blocker**: open P0 epic. `.1` assigned/claimed by Peter for AWID read-only namespace/team availability contract and dev-awid ENVIRONMENT check. `.2` assigned/claimed by Mia for AC backend register default personal team + combined AC/AWID username availability. `.3` assigned/claimed by Mia for frontend removal of signup first-team gate and routing/copy/tests. `.4` assigned to Grace for release-gate review once branches are ready. Dependencies: `.2` waits on `.1`; `.3` waits on `.2`; `.4` waits on `.1/.2/.3`. Olivia is intentionally not assigned because she is helping Juan check flows.
+- **`aweb-aapk` — prerelease onboarding auto-provision blocker**: open P0 epic. `.1` closed at aweb `b7e2192`: AC should call unauthenticated/read-only `GET /v1/namespaces/{domain}/teams/{name}`; 404 means free/deleted, 200 means active/taken, 422 invalid. Intended personal team shape is `default:{username}.{managed_namespace_base_domain}`. Peter flagged AC web register drift: current `/register` appears to create `{username}:{username}.{base}` by deriving AWID team name from OSS team slug=username; Mia must align to `default`. `.2` assigned/claimed by Mia for AC backend register default personal team + combined AC/AWID username availability; Athena pushed back against soft/hard delete after AWID namespace registration and directed idempotent preserve+recover helper. `.3` assigned/claimed by Mia for frontend removal of signup first-team gate and routing/copy/tests. `.4` assigned to Grace for release-gate review once branches are ready. Olivia stays free.
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
 ## Non-feature work in flight
