@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-21 09:22 GMT
+Last updated: 2026-05-21 09:32 GMT
 
 ## Current focus
 - Step-back architecture read: not fully simplified yet. aweb-side authority is much cleaner at current aweb main `8337af1`, but AC main `82ec0b8d` and some aweb/AWID public/static docs still leak old product authority vocabulary.
@@ -16,8 +16,9 @@ Last updated: 2026-05-21 09:22 GMT
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
 - **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
 - **aweb-aapj.8 — public/static docs + doctor output cleanup**: closed at aweb `e332bf8`. Athena validated diff-check, targeted public/static docs grep clean, doctor stale phrase grep clean, Go cmd/aw+awid, server package-data, CLI reference check.
-- Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia added `test-backend-aweb-local` prerequisite at AC branch `e1e476ee`, then Phase B (1/2) mirror migrations/tests at `a42ddd6c`; Phase B (2/2) code rewrites + release-ready gate correction remain.
+- Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia added `test-backend-aweb-local` prerequisite at AC branch `e1e476ee`, then Phase B (1/2) mirror migrations/tests at `a42ddd6c`; Phase B (2/2) code rewrites + release-ready gate correction remain. Athena pinged Mia to take Phase B 2/2 now or say blocked.
 - `aweb-aapj.4` validation rerun by Athena: diff-check, aapj vocab gate, targeted greps, dashboard build, frontend tests (38 files / 194 tests), lint (0 errors; 2 unrelated warnings), and frontend build. Dave re-reviewed with no blockers.
+- New support tasks to keep idle agents applied: `aweb-aapj.9` assigned to Peter for AC Phase B 2/2 file-by-file rewrite map; `aweb-aapj.10` assigned to Dave for final `.5` grep-gate dry-run prep.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
@@ -39,7 +40,8 @@ Last updated: 2026-05-21 09:22 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Track branch-ready from Mia (`aweb-aapj.3`); `.4` is ready but blocked on `.3` merge sequencing.
+- Track Mia’s immediate ACK/progress on `.3` Phase B 2/2; if she cannot take it now, reroute implementation rather than waiting.
+- Track Peter `.9` rewrite map and Dave `.10` gate dry-run; fold their findings into `.3` review and `.5`.
 - Review/land each branch against the briefs; require grep evidence and focused tests.
 - Run `aweb-aapj.5` final cross-repo legacy-residue gate after `.3`/`.4`/`.8` land, then ask Hestia for no-deploy release-ready.
 - Resolve AWID hidden/limited row disposition before any release/deploy.
