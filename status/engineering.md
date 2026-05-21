@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-21 12:28 GMT
+Last updated: 2026-05-21 13:06 GMT
 
 ## Current focus
 - Step-back architecture read: not fully simplified yet. aweb-side authority is much cleaner at current aweb main `8337af1`, but AC main `82ec0b8d` and some aweb/AWID public/static docs still leak old product authority vocabulary.
@@ -10,7 +10,7 @@ Last updated: 2026-05-21 12:28 GMT
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
 - **aweb-aapj.2 — aw CLI/docs global/local language**: closed at aweb `bfe822d`. CLI/help/docs use global/local; old flags hidden as compatibility aliases; developer-facing test wording cleaned.
-- **aweb-aapj.3 — AC backend/schema/API cleanup**: assigned to Mia and actively driven. Latest fetched branch `origin/mia/aapj-3-phase-a` at `1a6e04f5`. Mia has removed several derived-lifetime/control-plane blockers: CloudTeamIdentity and hosted provisioning use identity_scope; team_cert_mint emits identity_scope and fail-closes legacy lifetime alias; agent_addressing/scope_agents/spawn/add-existing/BYOIDT/member DTOs are partly canonicalized; agent_lifecycle access_mode/address_reachability DTOs are dropped. Peter's docs/support wording slice was reviewed and merged into Mia branch at `53fb4d87`. Remaining live blockers are concentrated in `init.py`, `spawn.py`, `teams.py`/`awid_member_projection.py`, and residual `access_mode`/reachability in agent-addressing/scope paths.
+- **aweb-aapj.3 — AC backend/schema/API cleanup**: assigned to Mia and actively driven. Latest fetched branch `origin/mia/aapj-3-phase-a` at `972382aa` after Athena merged Peter's reviewed teams/projection slice. Fixed blockers now include CloudTeamIdentity/hosted provisioning identity_scope, team_cert_mint canonical identity_scope + fail-closed lifetime alias, agent_lifecycle DTO removals, agent_addressing reachability/access_mode removals, scope_agents canonical input/access_mode output cleanup, init request DTO cleanup, and teams/projection AWID member canonicalization. Remaining live blockers are concentrated in `init.py` residual compatibility/internal lifetime/address_reachability/logging audit and `spawn.py` service boundary canonicalization.
 - **aweb-aapj.4 — AC frontend/docs cleanup**: approved branch-ready at `eec512d4`, but held for merge until `.3` lands because the frontend expects post-`.3` canonical wire shapes (`identity_scope`, removed old response fields).
 - **aweb-aapj.5 — cross-repo grep gate/release handoff**: Athena-owned and in progress after `.3`, `.4`, and `.8` land.
 - **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
@@ -44,7 +44,7 @@ Last updated: 2026-05-21 12:28 GMT
 ## Next checks
 - Track Mia’s immediate ACK/progress on `.3` Phase B 2/2; if she cannot take it now, reroute implementation rather than waiting.
 - Track Peter `.9` rewrite map and Dave `.10` gate dry-run; fold their findings into `.3` review and `.5`.
-- Track Mia `.3` to branch-ready; final `.5` criteria are tightened: no derived old fields from canonical state, even under support/audit legacy names. Dave `.10` full packet is banked; Peter `.9` docs/support slice has landed on `.3`.
+- Track Mia `.3` to branch-ready; final `.5` criteria are tightened: no derived old fields from canonical state, even under support/audit legacy names. Dave `.10` full packet is banked; Peter `.9` docs/support and teams/projection slices have landed on `.3`.
 - Track Mia `.3` to branch-ready; once `.3` lands, merge `.4`, run Dave-assisted final `.5`, then ask Hestia for no-deploy release-ready.
 - Track Grace `.13` as parallel AWCO/BYOIDT support lane; confirm with Juan/Sofia whether it gates the immediate aaph/aapj release or follows after `.5` cleanup gate.
 - Review/land each branch against the briefs; require grep evidence and focused tests.
