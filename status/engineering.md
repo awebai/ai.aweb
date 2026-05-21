@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-21 10:18 GMT
+Last updated: 2026-05-21 10:31 GMT
 
 ## Current focus
 - Step-back architecture read: not fully simplified yet. aweb-side authority is much cleaner at current aweb main `8337af1`, but AC main `82ec0b8d` and some aweb/AWID public/static docs still leak old product authority vocabulary.
@@ -19,8 +19,8 @@ Last updated: 2026-05-21 10:18 GMT
 - Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia added `test-backend-aweb-local` prerequisite at AC branch `e1e476ee`, Phase B (1/2) mirror migrations/tests at `a42ddd6c`, and Phase B 2/2 partials through `bf1215eb` (dashboard/immediate_connect, mcp_oauth/contact predicates, agent_lifecycle/identity_workspace, embedded bootstrap/scope_agents/onboarding/init slice, SQL SELECT sweep). AC editing remains with Mia while Peter focuses `.12`. Athena directed support/admin/audit old fields must move under nested `legacy:{...}` in `.3`, not follow-up.
 - `aweb-aapj.4` validation rerun by Athena: diff-check, aapj vocab gate, targeted greps, dashboard build, frontend tests (38 files / 194 tests), lint (0 errors; 2 unrelated warnings), and frontend build. Dave re-reviewed with no blockers.
 - New support tasks to keep idle agents applied: `aweb-aapj.9` assigned to Peter for AC Phase B 2/2 file-by-file rewrite map; `aweb-aapj.10` assigned to Dave for final `.5` grep-gate dry-run prep.
-- Dave’s `.10` dry-run surfaced two additional aweb blockers before final `.5`: `aweb-aapj.11` is closed at aweb `5f4dc04` (public CLI/SOT docs cleanup); `aweb-aapj.12` remains assigned to Peter for AWID team-certificate API/storage canonical `identity_scope` cleanup.
-- Grace created `aweb-aapj.13` for AWCO/BYOIDT team-certified signed request mode. Athena assigned it to Grace, marked it in progress, and added dependency on `.12`; it supports external services validating local CLI agents via DIDKey + team cert without `did:aw`/AWID identity row.
+- Dave’s `.10` dry-run surfaced two additional aweb blockers before final `.5`: `aweb-aapj.11` is closed at aweb `5f4dc04` (public CLI/SOT docs cleanup); `aweb-aapj.12` is closed at aweb `bdc39e4` (AWID team-certificate API/storage/cert JSON canonical `identity_scope`).
+- Grace created `aweb-aapj.13` for AWCO/BYOIDT team-certified signed request mode. Athena assigned it to Grace and marked it in progress; `.12` dependency is now satisfied, so `.13` can use canonical team-cert `identity_scope`.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
@@ -29,7 +29,7 @@ Last updated: 2026-05-21 10:18 GMT
 
 ## Release-ready state (handoff to Hestia)
 - Release is held pending `aweb-aapj` cleanup and final `aweb-aapj.5` grep gate.
-- Current heads: aweb main `5f4dc04`; AC main `82ec0b8d`; in-flight AC branches `origin/mia/aapj-3-phase-a` at `bf1215eb`, `origin/olivia-aapj-4` at `eec512d4`.
+- Current heads: aweb main `bdc39e4`; AC main `82ec0b8d`; in-flight AC branches `origin/mia/aapj-3-phase-a` at `bf1215eb`, `origin/olivia-aapj-4` at `eec512d4`.
 - Do not release aweb alone at `8337af1` while AC remains old-authority-shaped; that would split product authority across global/local aweb and lifetime/access/reachability AC.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`. Juan hard-hold remains: no deploy/tag/publish until explicit clearance.
 - Hestia was told no more release-ready runs until Athena says `aweb-aapj` cleanup is landed and ready for a no-deploy gate.
@@ -44,7 +44,7 @@ Last updated: 2026-05-21 10:18 GMT
 ## Next checks
 - Track Mia’s immediate ACK/progress on `.3` Phase B 2/2; if she cannot take it now, reroute implementation rather than waiting.
 - Track Peter `.9` rewrite map and Dave `.10` gate dry-run; fold their findings into `.3` review and `.5`.
-- Track Peter `.12` AWID team-cert cleanup; it now gates final `.5` along with AC `.3`.
+- Track Mia `.3` to branch-ready; remaining final `.5` blocker is AC cleanup plus `.13` if Juan/Sofia declare it release-gating.
 - Track Grace `.13` as parallel AWCO/BYOIDT support lane; confirm with Juan/Sofia whether it gates the immediate aaph/aapj release or follows after `.5` cleanup gate.
 - Review/land each branch against the briefs; require grep evidence and focused tests.
 - Run `aweb-aapj.5` final cross-repo legacy-residue gate after `.3`/`.4`/`.8` land, then ask Hestia for no-deploy release-ready.
