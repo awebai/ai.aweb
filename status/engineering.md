@@ -1,12 +1,12 @@
 # Engineering Status
-Last updated: 2026-05-21 20:16 GMT
+Last updated: 2026-05-21 22:59 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
 - Grace's narrow re-review passed for AC `0caaefc4`; the three `.5` AC cleanup blockers are closed.
 - aweb main is now `b215d23`: Peter removed stale CLI `lifetime` request input for `/api/v1/workspaces/init` and sends canonical `identity_scope=local|global`; Grace reviewed and approved request-shape boundary.
 - Current heads: aweb `fa1041c` and AC `9104ffc2`. Hestia's validation-only sibling-source chain is green across all 6 phases; hard hold remains until Juan explicitly clears release actions.
-- Juan clarified the onboarding auto-provision direction is a pre-release blocker. Athena created `aweb-aapk` and routed `.1` to Peter (AWID availability contract), `.2/.3` to Mia (AC backend/frontend), and `.4` to Grace (release-gate review). Olivia stays free for Juan walkthroughs.
+- `aweb-aapk` is the active pre-release blocker. `.1` is closed at aweb `b7e2192`; `.2` backend is on AC main `737ecf89` and Athena re-review passed; Grace has been asked to start the backend release-gate slice. `.3` frontend remains with Mia; Olivia's `origin/olivia-aapk-3` is Juan-walked input only, not a landing branch.
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
@@ -24,7 +24,7 @@ Last updated: 2026-05-21 20:16 GMT
 - Dave’s `.10` dry-run surfaced two additional aweb blockers before final `.5`: `aweb-aapj.11` is closed at aweb `5f4dc04` (public CLI/SOT docs cleanup); `aweb-aapj.12` is closed at aweb `bdc39e4` (AWID team-certificate API/storage/cert JSON canonical `identity_scope`).
 - `aweb-aapj.13` is closed at aweb `bf8b4e4`: AWCO/BYOIDT team-certified signed request mode with verifier evidence. Athena reran diff-check, focused team-auth tests, and Go cmd/aw+awid tests.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
-- **`aweb-aapk` — prerelease onboarding auto-provision blocker**: open P0 epic. `.1` closed at aweb `b7e2192`: AC should call unauthenticated/read-only `GET /v1/namespaces/{domain}/teams/{name}`; 404 means free/deleted, 200 means active/taken, 422 invalid. Intended personal team shape is `default:{username}.{managed_namespace_base_domain}`. Peter flagged AC web register drift: current `/register` appears to create `{username}:{username}.{base}` by deriving AWID team name from OSS team slug=username; Mia must align to `default`. `.2` assigned/claimed by Mia for AC backend register default personal team + combined AC/AWID username availability; Athena pushed back against soft/hard delete after AWID namespace registration and directed idempotent preserve+recover helper. `.3` assigned/claimed by Mia for frontend removal of signup first-team gate and routing/copy/tests. Juan added a setup-progress-log requirement: show running/completed steps like creating organization, creating namespace, registering team in AWID using actual canonical values, then offer first CLI workspace or hosted MCP identity without reintroducing team creation. `.4` assigned to Grace for release-gate review once branches are ready. Olivia stays free.
+- **`aweb-aapk` — prerelease onboarding auto-provision blocker**: open P0 epic. `.1` closed at aweb `b7e2192`: AC should call unauthenticated/read-only AWID namespace/team availability; intended personal team shape is `default:{username}.{managed_namespace_base_domain}`. `.2` backend is on AC main `737ecf89` after three Athena review rounds: `/register` provisions canonical personal default team; `/auth/username-available` checks AC user + AWID namespace + `teams/default` and fails closed on registry errors/missing client; `ensure_personal_default_team` preserves user/org state and repairs missing, blank/partial, and old noncanonical `<username>:<username>.<base>` rows via `/auth/me`. Mia reported sibling-source backend sweep `1446 passed, 15 deselected`; Athena re-review passed and routed the backend slice to Grace. `.3` remains with Mia for frontend: remove signup first-team gate, route to auto-provisioned dashboard, setup-progress checklist from canonical `/auth/me` fields, and first self-custodial CLI / custodial MCP offers. Olivia's `origin/olivia-aapk-3` commits are Juan-walked product input only; Mia must fold relevant UI/copy changes and tests. If Mia folds Olivia's Makefile editable sibling overlay, it must include guardrails: `release-verify-model` fails on editable `aweb`/`awid-service` overlays and `dev-backend` warns when overlay is active.
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
 ## Non-feature work in flight
@@ -45,6 +45,6 @@ Last updated: 2026-05-21 20:16 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Drive `aweb-aapk`: wait for Peter's `.1` AWID availability contract, then unblock Mia `.2`; keep `.3` moving on frontend inspection; route all branch-ready packets to Grace `.4` review.
+- Drive `aweb-aapk`: wait for Grace's backend `.2` release-gate slice; wait for Mia's `.3` frontend branch-ready packet; then route full `.4` review and ask Hestia for a new sibling-source validation chain at the new aweb + AC heads.
 - If release is cleared, keep caveats explicit: npm `@awebai/aw` is still `1.24.3`; live AWID still reports `0.5.6` until Task #201 is resolved/verified.
 - Keep hard hold explicit until clearance: no tag/deploy/publish/version bump/prod migration/prod row mutation.
