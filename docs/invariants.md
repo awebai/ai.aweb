@@ -144,3 +144,12 @@ When you find yourself preserving a "hidden global" reachability class
 or requiring a conversation ID to bypass resolver policy, you are
 reintroducing the old middle state. Choose global if the agent should
 be first-contactable; choose local if it should not.
+
+Do not manufacture legacy fields from canonical state. A compatibility
+adapter may accept old input and normalize it at the boundary; a
+migration may read old storage while removing it; an audit may expose
+actual persisted old values as explicitly legacy evidence. But a
+service must not derive `lifetime`, `reachability`, `access_mode`, or
+similar old nouns from new canonical fields just to preserve an old
+shape. Derived legacy fields are product-authority residue, not
+compatibility.
