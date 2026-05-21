@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-21 08:07 GMT
+Last updated: 2026-05-21 08:15 GMT
 
 ## Read this first
 
@@ -41,8 +41,9 @@ release mechanics; to them, Athena is the gate.
   - `aweb-aapj.5` assigned to Athena and marked in progress: final cross-repo grep/allowlist gate and release handoff after `.3`, `.4`, `.8` land.
   - `aweb-aapj.6` closed at aweb `e248cd3`: Pi/skills/package-copy stale vocabulary cleanup. Athena reviewed/landed. Validation rerun: `git diff --check`; clean-worktree channel-core build then `pi-extension npm run build` passed after installing deps. Remaining scoped source hits are explicit legacy/audit notes.
   - `aweb-aapj.7` closed at aweb `2e98603`: channel/channel-core runtime cleanup normalizes `lifetime`/`persistent`/`ephemeral` to identity_scope/global/local with legacy adapters. Athena validation rerun: diff-check; channel focused 69; channel-core build; channel build; full channel tests 95; Pi build. Remaining lifetime/persistent/ephemeral hits are compatibility adapters/tests/generated equivalents.
-  - `aweb-aapj.8` newly created/assigned to Grace after reassessment: clean aweb/AWID public/static docs (`awid/site/static/*`, `awid/site/layouts/index.html`) and doctor/support output that still teaches persistent/ephemeral as normal product language. Grace ACKed availability.
-- Current heads for next review: aweb main `8337af1`; AC main `82ec0b8d`; AC in-flight `origin/mia/aapj-3-phase-a` at `7093f693`; AC in-flight `origin/olivia-aapj-4` at `473f74f0`.
+  - `aweb-aapj.8` closed at aweb `e332bf8`: aweb/AWID public/static docs and doctor/support output cleanup. Athena validation rerun: diff-check; targeted public/static docs grep clean; doctor stale phrase grep clean; Go cmd/aw+awid; server package-data; CLI reference check.
+- Current heads for next review: aweb main `e332bf8`; AC main `82ec0b8d`; AC in-flight `origin/mia/aapj-3-phase-a` at `7093f693`; AC in-flight `origin/olivia-aapj-4` at `473f74f0`.
+- Peter was routed to help Mia with AC mirror/schema review (no edits unless asked). Dave was routed to help Olivia with frontend cleanup review (no edits unless asked).
 - Important release blocker: aapj.1 drops AWID `reachability` / `visible_to_team_id`. Before release/deploy, verify production hidden/limited rows are explicitly disposed/normalized or get Juan/operator decision. Do not silently widen privacy.
   - `aweb-aapi` was reviewed, merged, and closed: AC main fast-forwarded to `82ec0b8d` with `backend/src/aweb_cloud/migrations/aweb/006_participant_current_did_key.sql` and migration manifest tests. Clean-worktree validation: `uv run pytest -q tests/test_migration_paths.py` -> 17 passed. Broader cleanup remains `aweb-aapj.3`.
   - Hestia was told release remains held and no more release-ready reruns are needed until Athena says `aweb-aapj` has landed.
