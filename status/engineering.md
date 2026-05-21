@@ -1,11 +1,11 @@
 # Engineering Status
-Last updated: 2026-05-21 18:08 GMT
+Last updated: 2026-05-21 18:11 GMT
 
 ## Current focus
 - `aweb-aapj.3` landed on AC main at `b0e82553`; `aweb-aapj.4` merged after it at AC main `f52f5481`. No tag/deploy/release.
 - Grace's narrow re-review passed for AC `0caaefc4`; the three `.5` AC cleanup blockers are closed.
 - aweb main is now `b215d23`: Peter removed stale CLI `lifetime` request input for `/api/v1/workspaces/init` and sends canonical `identity_scope=local|global`; Grace reviewed and approved request-shape boundary.
-- Current heads: aweb `fa1041c` (tightens Peter's CLI JSON cleanup by removing `Lifetime` from `connectOutput` entirely) and AC `7eb391bd` (AC two-service expectation updated plus aapj e2e guard catches TS single/double-quoted stale `identity_scope` values). Hestia stopped prior rerun per Athena; Grace review requested for `fa1041c` before rerun.
+- Current heads: aweb `fa1041c` (tightens Peter's CLI JSON cleanup by removing `Lifetime` from `connectOutput` entirely) and AC `7eb391bd` (AC two-service expectation updated plus aapj e2e guard catches TS single/double-quoted stale `identity_scope` values). Grace reviewed and approved; Hestia rerun requested.
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
@@ -29,7 +29,7 @@ Last updated: 2026-05-21 18:08 GMT
 - Athena authored `aweb-aapj` breakdown/briefs and seeded initial grep inventories in `/tmp/aweb-legacy-hits.txt` and `/tmp/ac-legacy-hits.txt` (not authoritative yet; final gate is `aweb-aapj.5`).
 
 ## Release-ready state (handoff to Hestia)
-- Grace reviewed aweb `af317d3` + AC `7eb391bd` and approved, but Juan rejected retaining `Lifetime json:"-"` in `connectOutput`. Athena told Hestia to stop the rerun; Hestia stopped and tore down the orphan e2e stack. Athena landed aweb `fa1041c` removing `Lifetime` from `connectOutput` entirely and requested Grace quick-review (conversation `7ba3858c-dd3c-4b4d-9895-0e0e2d7903dd`, message `ddf40a2e-80e4-4922-9edf-61100ed7e7fe`). Hestia has been told stricter patch is validating/reviewing (company conversation `96317ca9-a823-40ad-8216-29670533d673`, latest Athena message `b000ff57-0b21-4672-babb-57fbf123a197`).
+- Grace reviewed aweb `af317d3` + AC `7eb391bd` and approved, but Juan rejected retaining `Lifetime json:"-"` in `connectOutput`. Athena told Hestia to stop the rerun; Hestia stopped and tore down the orphan e2e stack. Athena landed aweb `fa1041c` removing `Lifetime` from `connectOutput` entirely. Grace reviewed `fa1041c` and approved (conversation `7ba3858c-dd3c-4b4d-9895-0e0e2d7903dd`, Athena ACK `3646dcd0-ac5e-4108-91e3-d2966c843327`). Hestia has rerun request for aweb `fa1041c` + AC `7eb391bd` (company conversation `96317ca9-a823-40ad-8216-29670533d673`, latest Athena message `de26f880-8528-4fa8-a259-696f8d4d58f0`).
 - Current heads: aweb main `fa1041c` (includes AWID row-disposition regression `d300b33`, CLI identity-scope request fix `b215d23`, CLI init JSON output cleanup `af317d3`, and no-`Lifetime` connectOutput tightening `fa1041c`); AC main `7eb391bd` (includes `.3` `b0e82553`, `.4` merge `f52f5481`, final cleanup `d80fe410`, Grace-blocker patch `0caaefc4`, validation patch `b1f6277e`, two-service fixture patch `74ab465c`, e2e contract cleanup `3c97b4d3`, two-service sibling-source boundary fix `bf9206b5`, no-sync preservation fix `4034f044`, browser selector/guard `dccfc8d0`, TS guard tightening `492b3d33`, Peter AC expectation `1ea76dd6`, and double-quoted TS guard `7eb391bd`).
 - Do not release yet: Juan asked for tests only; hard hold remains on tag/deploy/publish/version bump/prod migration.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`.
@@ -42,6 +42,6 @@ Last updated: 2026-05-21 18:08 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Wait for Grace review of aweb `fa1041c`; if passed, ask Hestia to rerun sibling-source no-publish validation for aweb `fa1041c` + AC `7eb391bd`.
+- Wait for Hestia's sibling-source no-publish validation rerun for aweb `fa1041c` + AC `7eb391bd`.
 - If Hestia reports red, fix the failure shape before any release/deploy discussion.
 - Keep npm/CLI `1.24.4` caveat and Juan tag/deploy/publish hold explicit.
