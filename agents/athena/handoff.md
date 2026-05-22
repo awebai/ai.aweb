@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-22 18:08 GMT
+Last updated: 2026-05-22 18:24 GMT
 
 ## Read this first
 
@@ -25,6 +25,7 @@ release mechanics; to them, Athena is the gate.
   - Scope: normative docs/CLI README now show only `open|contacts_only`; AC aapm cutover docs validate only `{open, contacts_only}` and fail closed on stale `contacts_or_teammates` unless Juan directs a one-time mapping. The only retained `contacts_or_teammates` text is explicitly historical/non-normative aapm6 audit evidence.
   - Peter reran docs/user-facing grep against these refs and passed docs lane; he is standing by for Mia `.4` and Olivia `.6` implementation refs.
 - Grace landed Olivia's aapl.6 backend dependency on AC main `ee045916` (`Accept inbound mode during identity creation`): creation models accept optional canonical `inbound_mode`, global CLI self-custodial and hosted custodial/MCP creation store it, explicit local workspace `inbound_mode` is rejected with 422, default remains `open`, valid set is only `open|contacts_only`. Athena ACKed and notified Olivia. Grace explicitly confirmed this is only a `.6` backend dependency, not full aapl closure.
+- Task hygiene was stale and Athena corrected it: aapl root and `.3` retitled/rewritten to the two-state reversal, `.2` closed as superseded by Juan reversal, `.6` annotated that AC `ee045916` is backend-dependency-only. Grace ACKed she will report to Juan: task hygiene fixed, but aapl genuinely not done; remaining work is Mia `.4`, Olivia `.6` final surfaces, Peter `.5` final rerun, Grace `.3` review.
 - Release/deploy/tag/publish/version bump/prod migration/prod row mutation remain hard-held until `.4/.5/.6/.3` close, Hestia validates current heads, and Juan explicitly clears release actions.
 
 ## 2026-05-20 immediate state
