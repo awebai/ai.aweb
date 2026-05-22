@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-22 21:13 GMT
+Last updated: 2026-05-22 21:26 GMT
 
 ## Read this first
 
@@ -32,6 +32,7 @@ release mechanics; to them, Athena is the gate.
 - Olivia merged hosted ID-space epic + consent picker directly to AC main per Juan override; AC main is `7365cc03`. Grace reviewed/cleared the ID-space fixes on main: create/connect, pending connect storage, Manage identity link, BYOT pending response, dashboard replace navigation, and `admin_support.py` now sourcing `replacement_agent_id` from `replacement.agent_id` with support audit `agent_id` explicit and `identity_id` compatibility-only. Remaining caveat: two-service e2e is still gate evidence before release closure. Athena fetched/fast-forwarded local AC main and told Olivia no backout.
 - Combined aapl integration pushed to main: aweb `03f1963` (Mia `.4/.7` + Athena docs) and AC `e5c25c7b` (Mia `.4` restore cleanup + `.7` cli-signup companion + Athena docs + Olivia `.6`). Peter `.5` found one blocker: ContactsTab copy implied team/namespace/whole-team incoming deliverability. Athena patched AC main `8d3832b1` (`aapl: make contacts copy exact-address only`): Contacts only now says exact saved agent addresses; team membership/certs/namespaces do not bypass saved-contact check. Validation so far: aweb focused server messaging/package tests `193 passed`; aweb CLI focused inbound-mode tests passed; AC backend focused tests under `make use-aweb-local`/`uv --no-sync` `8 passed`; AC frontend focused tests incl. ContactsTab + `.6` surfaces `31 passed`; diff-check clean. `aweb-aapl.7` closed. Peter was asked to rerun `.5` against aweb `03f1963` + AC `8d3832b1`; Olivia was asked to live-verify `.6`; Grace preliminary `.3` says aweb side green and will gate final pass on Peter `.5`, Hestia/two-service gates, and old-installed-aw customer-impact decision (upgrade guardrail/messaging or deliberate legacy adapter).
 - Release/deploy/tag/publish/version bump/prod migration/prod row mutation remain hard-held until `.4/.5/.6/.7/.3` close, Hestia validates current heads, and Juan explicitly clears release actions.
+- Packaging correction: Dave's `fc9e8d0` made `@awebai/channel-core` a separate runtime dependency/artifact for `@awebai/claude-channel` and `@awebai/pi`; Juan decided that was a release-risk mistake. Athena reverted it on aweb main `65c3cbf`, so channel and pi bundle channel-core again and no separate `@awebai/channel-core` npm publish is required. Validation: channel build, pi-extension build, both `npm pack --dry-run`, and no external `@awebai/channel-core` import in built dist. Hestia + Dave notified; previous channel-core-publish-order warning is superseded.
 
 ## 2026-05-20 immediate state
 
