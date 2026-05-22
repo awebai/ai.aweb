@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-22 20:16 GMT
+Last updated: 2026-05-22 20:45 GMT
 
 ## Read this first
 
@@ -29,6 +29,7 @@ release mechanics; to them, Athena is the gate.
 - Juan/Grace then flagged that `.4` was not actively claimed and Olivia had no visible `.6` claim. Athena corrected ownership hygiene: `aweb-aapl.4` assigned/status in_progress to Mia, `aweb-aapl.6` assigned/status in_progress to Olivia, comments added to both, and direct chats sent requiring immediate claim/work or immediate refusal. Grace was told: if either declines or stays inactive, Athena will reassign rather than leave the work implied.
 - Olivia `.6` branch `olivia-aapk-3` reached `2daf7688` with AgentDetail/global picker, hosted MCP picker, CLI picker, deps fix, and Juan-approved spacing. Athena initially picked a split path, but Juan overruled it: do **not** hide/remove the CLI picker and do **not** merge partial AC to main. The whole AC branch stays unmerged until `aweb-aapl.7` lands and CLI global creation works end-to-end. Athena created P0 `aweb-aapl.7` assigned to Mia for Go CLI `aw init --inbound-mode <open|contacts_only>` support. Mia's `.7` branch pair is now ACKed for Olivia re-verification: aweb `origin/mia/aapl4-remove-third-mode @ 6a5f1d0` + AC `origin/mia/aapl7-ac-cli-signup-inbound-mode @ 1fb14129`. aweb CLI accepts user-facing hyphen spelling `--inbound-mode contacts-only`; wire/API remains `contacts_only`; AC cli-signup accepts/validates/persists it; BYOD fails fast with real follow-up paths. Olivia was told to update/re-verify generated commands with hyphen spelling and prove persisted `inbound_mode='contacts_only'` before final `.6` packet.
 - Independent AC copy fix landed: `olivia-aanp-7-consent-copy` fast-forwarded AC main to `7f2485eb` (`aanp-7: tighten OAuth consent aside copy`), diff-check passed, Olivia notified. This is unrelated to aapl and is not release clearance.
+- Hosted-create/replace ID-space branch state from Grace: not passed yet if/when Olivia merges. Remaining narrow blocker is `backend/src/aweb_cloud/routers/admin_support.py` populating `replacement_agent_id` from `replacement.identity_id`; patch forward on main to use `replacement.agent_id`, make support audit state/tests explicit about `agent_id`, keep `identity_id` only for compatibility, and include two-service e2e evidence. Grace ACKed this is the correct state and wants the forward patch/review routed after Olivia's merges land.
 - Release/deploy/tag/publish/version bump/prod migration/prod row mutation remain hard-held until `.4/.5/.6/.7/.3` close, Hestia validates current heads, and Juan explicitly clears release actions.
 
 ## 2026-05-20 immediate state

@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-22 20:16 GMT
+Last updated: 2026-05-22 20:45 GMT
 
 ## Current focus
 - **P0 stop-the-line: `aweb-aapl` two-state reversal before release.** Juan reversed `contacts_or_teammates`; global incoming-message behavior is only `open` (**All**) or `contacts_only` (**Contacts only**), with exact active contacts only and no same-team/team-cert delivery exception.
@@ -51,6 +51,7 @@ Last updated: 2026-05-22 20:16 GMT
 - Watch for Mia's immediate ACK/branch packet for `aweb-aapl.4`; if she declines or stays inactive, reassign instead of leaving `.4` implied. Required output: two-state backend/schema/code and stale `contacts_or_teammates` restore data fail-closed unless Juan directs mapping.
 - `aweb-aapl.7` is branch-ready/ACKed for Olivia re-verification: aweb `origin/mia/aapl4-remove-third-mode @ 6a5f1d0` + AC `origin/mia/aapl7-ac-cli-signup-inbound-mode @ 1fb14129`. aweb CLI supports `--inbound-mode contacts-only`; AC cli-signup accepts/validates/persists canonical `contacts_only`; BYOD fails fast with real follow-up paths. Olivia was told to re-verify `.6` end-to-end before final packet.
 - Independent Juan-approved copy fix landed to AC main `7f2485eb` (`aanp-7: tighten OAuth consent aside copy`); diff-check passed; no release actions.
+- Grace flagged hosted-create/replace ID-space branch review is still not closed if Olivia merges it: `backend/src/aweb_cloud/routers/admin_support.py` must stop populating `replacement_agent_id` from `replacement.identity_id` and use `replacement.agent_id`; support audit state/tests should make `agent_id` explicit and keep `identity_id` only for compatibility. Two-service e2e remains a gate.
 - After `.7` lands, watch for Olivia `.6` re-verification packet: AgentDetail PATCH, hosted MCP creation, and CLI global `aw init --global --name <x> --inbound-mode contacts_only` must all work end-to-end before AC branch merges.
 - Route combined Mia/Olivia/docs refs to Peter for `aweb-aapl.5` grep review, then Grace for `.3` structural review.
 - After aapl passes and merges, notify Hestia to rerun validation at current aweb + AC heads.
