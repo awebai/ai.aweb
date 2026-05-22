@@ -1,13 +1,12 @@
 # Engineering Status
-Last updated: 2026-05-22 10:10 GMT
+Last updated: 2026-05-22 18:02 GMT
 
 ## Current focus
-- **P0 stop-the-line: `aweb-aapm` migration composition repair.** Grace relayed Juan's release decision: stop all release-forward movement until AC stops carrying forked/copy canonical aweb migration chains and returns to composing canonical OSS aweb migrations with AC-owned overlays under separate module names.
-- Athena created `aweb-aapm` plus `.1` design, `.2` implementation, `.3` Grace review, `.4` Peter package-provenance verification, and `.5` Dave operator/cutover clarity review. Grace approved `.1` direction with amendments; Athena folded them into `.2` and routed Mia to start with durable overlay inventory/restore mapping artifacts.
-- Juan asked for all ready contributions in main and all agent copies up to date. Athena landed Olivia's final aapk.3 polish to AC main `707b698a` and validated focused frontend 11 passed + diff-check pass. aweb main and Peter's copy are at `f31ffcb`; AC main is at `707b698a`; Mia/Dave/Peter were told to sync before further work.
-- `aweb-aapk` is closed after Grace passed current AC `0941ee42` + aweb current main/aapk.1 context; post-close polish is now AC `707b698a`. This does **not** unblock release while `aweb-aapm` is open.
-- `aweb-aapl` is paused behind `aweb-aapm`. Mia parked unpushed `.2` work in stash and filed `aweb-aapn` for the dashboard-user → same-team delivery gap; no AC mirror-chain extension, no aapl pushes, and no mass delivery-test rewrites until migration composition is fixed.
-- No tag/deploy/release gates/publish/version bump/prod migration/prod row mutation. Hestia validation is not sufficient until aapm is resolved and Juan clears release actions.
+- **P0 stop-the-line: `aweb-aapl` two-state reversal before release.** Juan reversed `contacts_or_teammates`; global incoming-message behavior is only `open` (**All**) or `contacts_only` (**Contacts only**), with exact active contacts only and no same-team/team-cert delivery exception.
+- `aweb-aapm` composition/consolidation work is closed/merged (`aapm.2`, `.6`, `.7`); release remains blocked because `aweb-aapl` is not closed and Hestia has not rerun validation at current heads.
+- `aweb-aapk` is closed after Grace review and Olivia polish; not release-sufficient alone.
+- Athena pushed docs-lane branches for aapl.6 cleanup: aweb `athena/aapl-two-state-docs` @ `d0d34d3`; AC `athena/aapl-two-state-docs` @ `8b6eb114`. Olivia and Peter were notified.
+- No tag/deploy/release gates/publish/version bump/prod migration/prod row mutation. Hestia validation and Juan explicit clearance are required after aapl closes.
 
 ## Dev team work in flight
 - **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
@@ -26,7 +25,7 @@ Last updated: 2026-05-22 10:10 GMT
 - `aweb-aapj.13` is closed at aweb `bf8b4e4`: AWCO/BYOIDT team-certified signed request mode with verifier evidence. Athena reran diff-check, focused team-auth tests, and Go cmd/aw+awid tests.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **`aweb-aapk` — prerelease onboarding auto-provision blocker**: closed. `.1` closed at aweb `b7e2192`; `.2` backend closed at AC `737ecf89`; `.3` setup-progress/UI closed at AC `0941ee42`; `.4` Grace release-gate review passed against current AC `0941ee42` and aweb current main containing aapk.1. Post-close polish from Olivia (`f058d711`, `707b698a`) was landed after Juan's "all contributions in main" instruction; validation focused frontend 11 passed and diff-check passed. This clears aapk as an implementation/review blocker only; it does not clear release while `aweb-aapm` is open.
-- **`aweb-aapl` — prerelease contacts-or-teammates inbound mode blocker**: paused behind `aweb-aapm`. `.1` is closed at aweb `f31ffcb`: explicit `inbound_mode=open|contacts_or_teammates|contacts_only`; `contacts_only` stays strict; same-team allowance uses verified team-certificate auth (`MessagingAuth.verified_team_id`) only; mail/chat regressions and docs updated. Mia's `.2` AC work is parked unpushed in stash; the broad default change exposed a real dashboard-user → same-team-agent delivery gap when new global identities default to `contacts_or_teammates`. Mia filed this as P0 `aweb-aapn`, blocked behind aapm. Do not push `.2`, extend AC mirror migrations, or mass-update tests until aapm resolves migration ownership. `.3` Grace review waits.
+- **`aweb-aapl` — prerelease inbound mode blocker**: active, not closed. Juan reversed the earlier `contacts_or_teammates` direction. Required final contract is two-state only: `open` (**All**) and `contacts_only` (**Contacts only**); `contacts_only` means exact active contacts only, with no same-team/team-cert exception. Mia owns `.4` backend/schema/code cleanup; Olivia owns `.6` UI/docs surfaces; Peter owns `.5` grep/docs review support; Grace owns `.3` final structural review. Athena pushed docs-lane branches for Peter/Olivia input: aweb `d0d34d3`, AC `8b6eb114`.
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
 ## Non-feature work in flight
@@ -36,12 +35,12 @@ Last updated: 2026-05-22 10:10 GMT
 ## Release-ready state (handoff to Hestia)
 - Grace reviewed aweb `fa1041c` and approved. Hestia reran aweb `fa1041c` + AC `7eb391bd`: Phase 1/2/3/4/5 green; Phase 6 had one failure where hosted identity creation succeeded but returning to hosted-connect roster did not show the new `hosted-identity-row`. Athena first patched AC `d77e0934` to force hosted roster refetch on mount, and Olivia approved. Hestia's rerun still failed the same roster row. Athena then found the data-contract root cause: `TeamAgentSetupFlow` filters for `hosted_mcp` + active + custodial/global + address, but `apiClient.listTeamAgents` still called OSS `/api/v1/agents`, whose response lacks Cloud enrichment fields such as `custody` and `identity_status`. AC `9104ffc2` now calls Cloud `/api/v1/dashboard/agents?team_id=...`, adds api-client unit coverage for enriched hosted fields, and keeps CLI alias availability safe because that caller only reads aliases. Grace reviewed AC `9104ffc2` and passed.
 - Hestia's validation-only rerun for aweb `fa1041c` + AC `9104ffc2` is green across all 6 phases: release-verify-* PASS; `test-backend-aweb-local` PASS 1435/1435; `test-frontend` PASS 195/195; `release-build-image` PASS; `test-two-service` PASS 15/15; `test-cloud-user-journeys` PASS 11/11 browser tests + ALL PASSED 263 tests + PASS browser journey. Full log: `/tmp/ac-aapj-sibling-chain-9104ffc2.log`. Boundary preserved: no tags, pushes, deploys, bumps, migrations, or row mutations.
-- Last fully validated release-chain heads remain aweb `fa1041c` + AC `9104ffc2`, but that validation is no longer release-sufficient because `aweb-aapm` exposed an architectural migration ownership problem. Current implementation heads include aweb main `f31ffcb` (aapk.1 + aapl.1) and AC main `707b698a` (aapk.2 + aapk.3 + final polish); aapk is Grace-passed, aapl is paused, and aapm is the active P0 blocker.
-- Do not release or ask Hestia for release gates yet: Juan/Grace explicitly stopped all forward release movement until migration composition/cutover is fixed and reviewed. Hard hold remains on tag/deploy/publish/version bump/prod migration/prod row mutation until explicit clearance.
+- Last fully validated release-chain heads remain aweb `fa1041c` + AC `9104ffc2`, but that validation is no longer release-sufficient. Current post-aapm/aapk heads are newer, and `aweb-aapl` is still open under the two-state reversal. Hestia should not rerun release validation until `.4`, `.5`, `.6`, and `.3` close.
+- Do not release or ask Hestia for release gates yet: hard hold remains on tag/deploy/publish/version bump/prod migration/prod row mutation until aapl closes, Hestia validates current heads, and Juan explicitly clears release actions.
 - Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`.
 
 ## Risks
-- **Migration ownership risk (current P0)**: AC copied/forked canonical aweb migrations under AC paths while preserving `aweb-server`/`aweb-aweb` module names. This creates checksum/provenance and schema-authority risk. Fix must restore canonical aweb package migration composition and move AC-only additions to overlay modules; production needs explicit dump/rebuild/restore validation.
+- **Two-state reversal risk (current P0)**: any remaining `contacts_or_teammates`, same-team delivery exception, or team-cert shortcut in code/schema/docs/tests would violate Juan's current inbound-message contract. Historical audit mentions may remain only when explicitly marked non-normative.
 - **Release-clearance risk**: prior validation was green, but release actions and even release-forward gates are now blocked until `aweb-aapm` is fixed, Grace approves cleanliness, Hestia validates the cutover plan, and Juan explicitly clears.
 - **Two-world dependency risk**: AC release validation must use sibling-source aweb/awid where appropriate, not PyPI-only `aweb==1.24.4`; no Hestia tag/publish just to unblock local tests under Juan hold. AC `0941ee42` intentionally makes `release-verify-model` fail if the backend venv still has editable aweb/awid overlays, so Hestia's chain must clean/re-sync before release-build-style gates after sibling-source test phases.
 - **Residual grep risk**: regenerated strict reports still contain compatibility/audit/history/storage hits; AC blocker classes are closed, but final Hestia gate may still surface release issues.
@@ -49,9 +48,9 @@ Last updated: 2026-05-22 10:10 GMT
 - **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-- Wait for Mia's Phase 1 durable overlay inventory on `aweb-aapm.2`; review before broad code if it shows ambiguous keep/drop/move/transform decisions.
-- Coordinate Peter `aweb-aapm.4` package-provenance evidence and Dave `aweb-aapm.5` operator/cutover clarity review before routing Grace `.3` final cleanliness pass.
-- Keep `aweb-aapl.2` paused and unpushed; keep `aweb-aapn` blocked behind aapm.
-- Olivia's extra `olivia-aapk-3` polish commits (`f058d711`, `707b698a`) are now landed on AC main per Juan's instruction; do not reland/review them again.
+- Wait for Mia's `aweb-aapl.4` branch packet restoring two-state backend/schema/code and handling stale `contacts_or_teammates` restore data fail-closed unless Juan directs mapping.
+- Wait for Olivia's `aweb-aapl.6` UI/docs packet; Athena docs branches are already pushed for her/Peter to incorporate or review.
+- Route combined Mia/Olivia/docs refs to Peter for `aweb-aapl.5` grep review, then Grace for `.3` structural review.
+- After aapl passes and merges, notify Hestia to rerun validation at current aweb + AC heads.
 - If release is eventually cleared, keep caveats explicit: npm `@awebai/aw` is still `1.24.3`; live AWID still reports `0.5.6` until Task #201 is resolved/verified.
 - Keep hard hold explicit until clearance: no tag/deploy/publish/version bump/prod migration/prod row mutation.

@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-22 10:12 GMT
+Last updated: 2026-05-22 18:02 GMT
 
 ## Read this first
 
@@ -13,6 +13,17 @@ You are Athena. You bridge two teams:
 Default active team is `aweb:juan.aweb.ai`. Use `--team default:aweb.ai`
 for company-side mail/chat. Dev-team members do not need company-team
 release mechanics; to them, Athena is the gate.
+
+## 2026-05-22 immediate state
+
+- Current prerelease blocker is `aweb-aapl`, not `aweb-aapm`: aapm composition/consolidation work is closed/merged, but Juan reversed `contacts_or_teammates` before release.
+- Required inbound-message contract: only `open` (**All**) and `contacts_only` (**Contacts only**). `contacts_only` means exact active contacts only; no same-team/team-cert/team-row delivery exception.
+- Active aapl split: Mia `.4` backend/schema/code cleanup; Olivia `.6` UI/docs; Peter `.5` grep/docs review support; Grace `.3` final structural review. Dave stays out unless explicitly requested.
+- Athena pushed docs-lane branches and notified Olivia + Peter:
+  - aweb `athena/aapl-two-state-docs` @ `d0d34d3`
+  - AC `athena/aapl-two-state-docs` @ `8b6eb114`
+  - Scope: normative docs/CLI README now show only `open|contacts_only`; AC aapm cutover docs validate only `{open, contacts_only}` and fail closed on stale `contacts_or_teammates` unless Juan directs a one-time mapping. The only retained `contacts_or_teammates` text is explicitly historical/non-normative aapm6 audit evidence.
+- Release/deploy/tag/publish/version bump/prod migration/prod row mutation remain hard-held until `.4/.5/.6/.3` close, Hestia validates current heads, and Juan explicitly clears release actions.
 
 ## 2026-05-20 immediate state
 
