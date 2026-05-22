@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-22 18:29 GMT
+Last updated: 2026-05-22 18:52 GMT
 
 ## Read this first
 
@@ -27,6 +27,7 @@ release mechanics; to them, Athena is the gate.
 - Grace landed Olivia's aapl.6 backend dependency on AC main `ee045916` (`Accept inbound mode during identity creation`): creation models accept optional canonical `inbound_mode`, global CLI self-custodial and hosted custodial/MCP creation store it, explicit local workspace `inbound_mode` is rejected with 422, default remains `open`, valid set is only `open|contacts_only`. Athena ACKed and notified Olivia. Grace explicitly confirmed this is only a `.6` backend dependency, not full aapl closure.
 - Task hygiene was stale and Athena corrected it: aapl root and `.3` retitled/rewritten to the two-state reversal, `.2` closed as superseded by Juan reversal, `.6` annotated that AC `ee045916` is backend-dependency-only. Grace ACKed she will report to Juan: task hygiene fixed, but aapl genuinely not done; remaining work is Mia `.4`, Olivia `.6` final surfaces, Peter `.5` final rerun, Grace `.3` review.
 - Juan/Grace then flagged that `.4` was not actively claimed and Olivia had no visible `.6` claim. Athena corrected ownership hygiene: `aweb-aapl.4` assigned/status in_progress to Mia, `aweb-aapl.6` assigned/status in_progress to Olivia, comments added to both, and direct chats sent requiring immediate claim/work or immediate refusal. Grace was told: if either declines or stays inactive, Athena will reassign rather than leave the work implied.
+- Olivia `.6` branch `olivia-aapk-3` reached `2daf7688` with AgentDetail/global picker, hosted MCP picker, CLI picker, deps fix, and Juan-approved spacing. Athena review: do not merge as-is because CLI picker emits unsupported `aw init --inbound-mode`; picked Olivia option (a). Olivia should push follow-up holding/removing CLI creation picker/flag while keeping AgentDetail picker, hosted MCP picker, deps fix, and spacing so AC can merge safely. Athena created P0 `aweb-aapl.7` assigned to Mia for Go CLI `aw init --inbound-mode <open|contacts_only>` support.
 - Release/deploy/tag/publish/version bump/prod migration/prod row mutation remain hard-held until `.4/.5/.6/.3` close, Hestia validates current heads, and Juan explicitly clears release actions.
 
 ## 2026-05-20 immediate state
