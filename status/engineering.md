@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-22 21:03 GMT
+Last updated: 2026-05-22 21:04 GMT
 
 ## Current focus
 - **P0 stop-the-line: `aweb-aapl` two-state reversal before release.** Juan reversed `contacts_or_teammates`; global incoming-message behavior is only `open` (**All**) or `contacts_only` (**Contacts only**), with exact active contacts only and no same-team/team-cert delivery exception.
@@ -50,7 +50,7 @@ Last updated: 2026-05-22 21:03 GMT
 ## Next checks
 - Watch for Mia's immediate ACK/branch packet for `aweb-aapl.4`; if she declines or stays inactive, reassign instead of leaving `.4` implied. Required output: two-state backend/schema/code and stale `contacts_or_teammates` restore data fail-closed unless Juan directs mapping.
 - `aweb-aapl.7` is branch-ready/ACKed for Olivia re-verification: aweb `origin/mia/aapl4-remove-third-mode @ 6a5f1d0` + AC `origin/mia/aapl7-ac-cli-signup-inbound-mode @ 1fb14129`. aweb CLI supports `--inbound-mode contacts-only`; AC cli-signup accepts/validates/persists canonical `contacts_only`; BYOD fails fast with real follow-up paths. Olivia was told to re-verify `.6` end-to-end before final packet.
-- Peter reran `.5` and explicitly says it is **not ship-clear**: current mains are stale; isolated branches are incomplete; need a combined final ref/main with aweb `.4 + .7 + docs` and AC `.4 + .7 + .6 + docs/UI` before final grep/review. Athena asked Olivia for the current `.6` ref/status because Peter did not see a final explicit ref.
+- Peter reran `.5` and explicitly says it is **not ship-clear**: current mains are stale; isolated branches are incomplete; need a combined final ref/main with aweb `.4 + .7 + docs` and AC `.4 + .7 + .6 + docs/UI` before final grep/review. Olivia confirmed `.6` is in-flight at `olivia-aapk-3 @ 3a683844`, not on main, not rebased onto AC `7365cc03`, and not live-verified end-to-end; it waits for `.7` to reach AC/aweb main before she rebases and verifies CLI creation persists `contacts_only`.
 - Independent Juan-approved copy fix landed to AC main `7f2485eb` (`aanp-7: tighten OAuth consent aside copy`); diff-check passed; no release actions.
 - Olivia merged hosted ID-space epic + consent picker to AC main `7365cc03` per Juan override. Grace reviewed/cleared the ID-space forward patches on main, including `admin_support.py` sourcing `replacement_agent_id` from `replacement.agent_id` and explicit support audit `agent_id` with `identity_id` compatibility. Remaining caveat: two-service e2e is still gate evidence before release closure.
 - After `.7` lands, watch for Olivia `.6` re-verification packet: AgentDetail PATCH, hosted MCP creation, and CLI global `aw init --global --name <x> --inbound-mode contacts_only` must all work end-to-end before AC branch merges.
