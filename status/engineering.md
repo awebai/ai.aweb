@@ -1,11 +1,11 @@
 # Engineering Status
-Last updated: 2026-05-22 18:02 GMT
+Last updated: 2026-05-22 18:03 GMT
 
 ## Current focus
 - **P0 stop-the-line: `aweb-aapl` two-state reversal before release.** Juan reversed `contacts_or_teammates`; global incoming-message behavior is only `open` (**All**) or `contacts_only` (**Contacts only**), with exact active contacts only and no same-team/team-cert delivery exception.
 - `aweb-aapm` composition/consolidation work is closed/merged (`aapm.2`, `.6`, `.7`); release remains blocked because `aweb-aapl` is not closed and Hestia has not rerun validation at current heads.
 - `aweb-aapk` is closed after Grace review and Olivia polish; not release-sufficient alone.
-- Athena pushed docs-lane branches for aapl.6 cleanup: aweb `athena/aapl-two-state-docs` @ `d0d34d3`; AC `athena/aapl-two-state-docs` @ `8b6eb114`. Olivia and Peter were notified.
+- Athena pushed docs-lane branches for aapl.6 cleanup: aweb `athena/aapl-two-state-docs` @ `d0d34d3`; AC `athena/aapl-two-state-docs` @ `8b6eb114`. Peter reran docs/user-facing grep and passed the docs lane; Olivia was notified.
 - No tag/deploy/release gates/publish/version bump/prod migration/prod row mutation. Hestia validation and Juan explicit clearance are required after aapl closes.
 
 ## Dev team work in flight
@@ -25,7 +25,7 @@ Last updated: 2026-05-22 18:02 GMT
 - `aweb-aapj.13` is closed at aweb `bf8b4e4`: AWCO/BYOIDT team-certified signed request mode with verifier evidence. Athena reran diff-check, focused team-auth tests, and Go cmd/aw+awid tests.
 - **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
 - **`aweb-aapk` — prerelease onboarding auto-provision blocker**: closed. `.1` closed at aweb `b7e2192`; `.2` backend closed at AC `737ecf89`; `.3` setup-progress/UI closed at AC `0941ee42`; `.4` Grace release-gate review passed against current AC `0941ee42` and aweb current main containing aapk.1. Post-close polish from Olivia (`f058d711`, `707b698a`) was landed after Juan's "all contributions in main" instruction; validation focused frontend 11 passed and diff-check passed. This clears aapk as an implementation/review blocker only; it does not clear release while `aweb-aapm` is open.
-- **`aweb-aapl` — prerelease inbound mode blocker**: active, not closed. Juan reversed the earlier `contacts_or_teammates` direction. Required final contract is two-state only: `open` (**All**) and `contacts_only` (**Contacts only**); `contacts_only` means exact active contacts only, with no same-team/team-cert exception. Mia owns `.4` backend/schema/code cleanup; Olivia owns `.6` UI/docs surfaces; Peter owns `.5` grep/docs review support; Grace owns `.3` final structural review. Athena pushed docs-lane branches for Peter/Olivia input: aweb `d0d34d3`, AC `8b6eb114`.
+- **`aweb-aapl` — prerelease inbound mode blocker**: active, not closed. Juan reversed the earlier `contacts_or_teammates` direction. Required final contract is two-state only: `open` (**All**) and `contacts_only` (**Contacts only**); `contacts_only` means exact active contacts only, with no same-team/team-cert exception. Mia owns `.4` backend/schema/code cleanup; Olivia owns `.6` UI/docs surfaces; Peter owns `.5` grep/docs review support; Grace owns `.3` final structural review. Athena pushed docs-lane branches for Peter/Olivia input: aweb `d0d34d3`, AC `8b6eb114`; Peter passed docs-lane grep and will rerun against implementation branches.
 - **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
 ## Non-feature work in flight
