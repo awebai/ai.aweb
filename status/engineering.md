@@ -1,5 +1,5 @@
 # Engineering Status
-Last updated: 2026-05-22 19:06 GMT
+Last updated: 2026-05-22 19:18 GMT
 
 ## Current focus
 - **P0 stop-the-line: `aweb-aapl` two-state reversal before release.** Juan reversed `contacts_or_teammates`; global incoming-message behavior is only `open` (**All**) or `contacts_only` (**Contacts only**), with exact active contacts only and no same-team/team-cert delivery exception.
@@ -49,7 +49,7 @@ Last updated: 2026-05-22 19:06 GMT
 
 ## Next checks
 - Watch for Mia's immediate ACK/branch packet for `aweb-aapl.4`; if she declines or stays inactive, reassign instead of leaving `.4` implied. Required output: two-state backend/schema/code and stale `contacts_or_teammates` restore data fail-closed unless Juan directs mapping.
-- Watch for Mia `aweb-aapl.7` amendment after Athena review of `c2164667`: API-key path passed shape, but non-API-key guided hosted/BYOD paths must either thread inbound mode through or fail fast when `--inbound-mode` is set; no silent ignore. Main must not contain a broken or silently ignored generated `aw init --inbound-mode` command.
+- Watch for Mia `aweb-aapl.7` companion AC patch after Athena review of aweb `6f990e16`: aweb/CLI v2 fixes the silent-ignore issue, but AC main `ee045916` still rejects `inbound_mode` on `/api/v1/onboarding/cli-signup` (`CliSignupRequest` extra=forbid and no field). Need AC accept/validate/pass-through tests before Olivia can live-verify.
 - After `.7` lands, watch for Olivia `.6` re-verification packet: AgentDetail PATCH, hosted MCP creation, and CLI global `aw init --global --name <x> --inbound-mode contacts_only` must all work end-to-end before AC branch merges.
 - Route combined Mia/Olivia/docs refs to Peter for `aweb-aapl.5` grep review, then Grace for `.3` structural review.
 - After aapl passes and merges, notify Hestia to rerun validation at current aweb + AC heads.
