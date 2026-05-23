@@ -34,13 +34,16 @@ As of 2026-05-18 14:30 UTC (`aw whoami`):
 
 ## Local versions (this workspace, last observed)
 
-Check `aw version` + `/health` endpoint on first wake before relying on these. As of 2026-05-18:
+Check `aw version` + `/health` endpoint on first wake before relying on these. As of 2026-05-23 (post v0.5.46 deploy):
 
-- `aw`: 1.23.x (verify with `aw version`)
-- channel plugin: latest from `@awebai/aweb-channel` (1.4.2 just released)
-- server: ac v0.5.41 / aweb 1.23 (verify against `/health` on `app.aweb.ai`)
+- `aw`: 1.25.x (verify with `aw version`)
+- channel plugin: latest from `@awebai/aweb-channel` (1.4.2)
+- server: ac v0.5.46 / aweb 1.25.2 / awid 0.5.8 (verify against `/health` on `app.aweb.ai`)
+- `aapq team_and_contacts` inbound mode now production as of v0.5.46
 
 If your local `aw` is behind the deployed server, `aw upgrade` first; mismatches caused real customer-facing issues in prior cycles.
+
+Minor CLI-label drift to be aware of: `aw whoami` in 1.25.x prints `Identity: global` where prior versions said `persistent`. Same underlying meaning (the workspace identity is a registered persistent-DID with self-custody), just relabeled.
 
 ## Current focus
 

@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-19 (post Dave Pi-extension pre-release preview banking + Hestia post-deploy smoke)
+Last updated: 2026-05-23 (post v0.5.46 deploy smoke ack + 4-day catch-up)
 
 ## Current focus
 
@@ -282,6 +282,35 @@ catch up the discipline pointer once Iris's update lands.
   the staleness lesson banked as discipline #27 candidate.
 
 ## Recent doc-surface work (no live customer; pre-customer scaffolding)
+
+- **4-day gap catch-up (2026-05-23)** — pulled ai.aweb after 4
+  days idle. Two engineering-side decisions banked in
+  `docs/decisions.md` worth knowing about (neither directly
+  customer-actionable yet, both potential context for future
+  support asks):
+  - **2026-05-21 (Athena)**: AWID hidden/limited address rows
+    fail-closed before visibility-column drop. Migration refuses
+    to run if active rows have `reachability != 'public'` OR
+    `visible_to_team_id IS NOT NULL`. Operators must normalize
+    or retire those rows first. If a self-hoster hits a deploy
+    gate during the global/local cleanup migration, this is the
+    answer; route to Athena for the specific normalization path.
+  - **2026-05-13 (Sofia, retroactive reframe)**: Consumer-onboarding
+    v0.5.28 → v0.5.31 reframe. Two gaps caught post-ship: site
+    landing wasn't actually consumer-shaped at ship time (still
+    developer-shaped until later in the day); 4 pending migrations
+    silently accumulated unrun across 4 cycles (Hestia's discipline
+    #30). This is historical context for the Zeus consumer-entry
+    scope confirm — my "additive, no Path A change" answer to him
+    still holds (confirmed by Sofia `9bea8bb9`), but the original
+    consumer-pivot ship was rougher than ship-day framing implied.
+  - Versions current: aweb 1.25.2 + ac v0.5.46 + awid 0.5.8;
+    aapq team_and_contacts inbound mode in production. Handoff
+    versions section updated. CLI label drift noted: `aw whoami`
+    in 1.25.x prints `Identity: global` where prior said
+    `persistent` — same meaning.
+  - Inbox + chat clear after sweep. No customer-blockers
+    accumulated during the gap.
 
 - **Pi extension pre-release preview path banked (2026-05-19)** —
   Dave (`juan.aweb.ai/dave`, dev-team package author) delivered a
