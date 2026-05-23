@@ -1,7 +1,10 @@
 # Hestia Handoff
 
-Last updated: 2026-05-24 00:25 CEST (22:25 UTC) — **AC v0.5.47 +
-aweb 1.25.3 destructive-cutover verified live**. Closes aapq wave.
+Last updated: 2026-05-24 01:25 CEST (23:25 UTC) — **AC v0.5.48
+hotfix verified-live, fully closes the v0.5.47 cluster**. v0.5.47
+destructive-cutover landed clean; post-cutover live-test surfaced
+P0 `aw inbound-mode` 401 (wrong auth dependency); Grace fixed
+at 2682eade; v0.5.48 deploys it; CLI matrix all green.
 
 ## Current state
 

@@ -1,10 +1,66 @@
 # Operations Status
 
-Last updated: 2026-05-24 00:25 CEST (22:25 UTC) — **AC v0.5.47 +
-aweb 1.25.3 destructive cutover SHIPPED VERIFIED LIVE**. Closes
-the aapq wave: consolidated 001 rebaseline now the canonical aweb
-migration line in prod; original 001 + bridge 002 history wiped via
-3-schema DROP + re-migrate + data-only restore.
+Last updated: 2026-05-24 01:25 CEST (23:25 UTC) — **AC v0.5.48
+hotfix SHIPPED VERIFIED LIVE** (closes the v0.5.47 cluster).
+The v0.5.47 destructive cutover landed clean; post-cutover live
+test surfaced a P0 (aw inbound-mode 401 — wrong auth dependency
+on the endpoint) which Grace fixed at AC main 2682eade. v0.5.48
+deploys Option B (sibling `/api/v1/agents/me/inbound-mode` using
+`get_namespace_auth_context`, dashboard endpoint preserved).
+
+**v0.5.48 verified-live evidence (2026-05-23 23:08:38Z /health
+flip)**:
+- /health: release_tag=v0.5.48, git_sha=60819eca (merge commit
+  at tag including Grace's 2682eade + Hestia's 7606382f bump +
+  intervening homepage cosmetic merges), aweb_version=1.25.3,
+  awid_service_version=0.5.8, all green
+- Hestia full 5-step CLI matrix: show → open (no-op) → show →
+  team_and_contacts → show → restore → final show — all green,
+  end-state restored
+- Show-step from aida, iris, metis, ama identities: all green
+- DB before/after diff for 7 default:aweb.ai agents: empty
+  (round-trip clean — Hestia's intermediate flip restored)
+- Athena independent re-run from her own identity: green, end-
+  state restored (mail 0323d5cc/ee7ace12)
+- Grace acks fix as verified-live (mail 2635d8c3)
+- Sofia closes hold-item 1 on external-claim derivation (mail
+  6fdec860 in conversation 878c06b1)
+- Local-identity 422 path covered by Grace's backend regression
+  tests (test_agent_messaging_policy.py 7 passed at 2682eade);
+  not live-exercised because all accessible identities are global
+
+**v0.5.47 destructive cutover (preserved, still verified-live)**:
+- aweb consolidated 001 rebaseline live (was: original 001 +
+  bridge 002; now: single 001 with final state CHECK constraint)
+- Sprint Phase 2 DROP → /health flip: 7m05s within 10-min SLO
+- 3-schema scope expansion (aweb + aweb_cloud + server) handled
+  the cross-schema FK foot-gun (runbook line 1402); 7 FKs reborn
+
+**inbound_mode product fact (banked through Sofia + Aida read)**:
+- Two modes only: `open` (customer-facing label: "All") and
+  `team_and_contacts` (label: "Team and contacts")
+- Default for new global agents: open
+- contacts_only is legacy; LEGACY_INBOUND_MODE_ALIASES silently
+  normalizes to team_and_contacts; 0 affected customers
+- Picker visible only on global identities; local-only aliases
+  don't see the control (PATCH on local returns 422)
+- Customer-facing labels always — slugs only on CLI surface
+- Production distribution: 301 open / 46 team_and_contacts /
+  0 contacts_only (0 is structural — value not accepted post-aapq)
+
+**Follow-ups carried forward**:
+- AC Makefile gate `release-verify-migration-immutability`
+  restored post-cutover (53215c09); standing gate is back live
+- `prod_db_reset.py` argv-echo prints full DATABASE_URL to stdout
+  during dump — Juan acknowledged in-session; patch needed in
+  `_run` to mask the URL
+- Task #209: team_and_contacts BLOCKING-path live test still
+  pending — requires sender outside athena's teams AND not in
+  her contacts (a third-team identity)
+- Task #204: post-cutover to_did drop in chat history records —
+  unchanged by v0.5.48
+- Task #182: cross-namespace federation smoke post v0.5.41 —
+  still pending
 
 **v0.5.47 verified-live evidence (2026-05-23 22:17:18Z /health
 flip)**:
