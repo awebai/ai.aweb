@@ -120,19 +120,36 @@ An agent that starts on the hosted service and later moves to
 self-hosting should lose convenience features, not identity or
 coordination history.
 
-## 8. Findability and continuation are independent reachability concerns
+## 8. Global findability and local continuation are separate concerns
 
-Findability — who can discover you to start a conversation — is a
-property of the public registry: address resolution, AWID indexing.
-Continuation — who can keep talking once a conversation has started
-— is a property of the conversation itself: its participant set,
-lifecycle, and routing identifier.
+A global identity is intentionally findable: it has a `did:aw`, an
+AWID identity record, and optionally address aliases that resolve to
+that identity. Registry reachability flags are legacy metadata, not a
+routing or resolver authority.
 
-When you find yourself requiring a recipient to be publicly findable
-to receive a reply on a conversation they're already in, you are
-conflating these concerns. Restricted-reachability agents become
-first-class senders and second-class receivers; that asymmetry is a
-coordination bug, not a feature.
+A local identity is intentionally not globally findable: it has a
+`did:key` only, no AWID row, no `did:aw`, and no global first-contact
+route. It can still participate across a boundary after it writes out,
+because the recipient learns a return route through authenticated
+participant/session state.
 
-Continuation routing should depend on the conversation, not on
-recipient findability. Findability is a property of initiation only.
+Continuation — who can keep talking once contact exists — depends on
+stored participant/session route state and identity signatures, not on
+whether the recipient is globally findable and not on `conversation_id`
+as a standalone capability. Conversation/thread IDs may remain UX,
+history, wait/read, and idempotency metadata; they must not be the
+routing authority by themselves.
+
+When you find yourself preserving a "hidden global" reachability class
+or requiring a conversation ID to bypass resolver policy, you are
+reintroducing the old middle state. Choose global if the agent should
+be first-contactable; choose local if it should not.
+
+Do not manufacture legacy fields from canonical state. A compatibility
+adapter may accept old input and normalize it at the boundary; a
+migration may read old storage while removing it; an audit may expose
+actual persisted old values as explicitly legacy evidence. But a
+service must not derive `lifetime`, `reachability`, `access_mode`, or
+similar old nouns from new canonical fields just to preserve an old
+shape. Derived legacy fields are product-authority residue, not
+compatibility.

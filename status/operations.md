@@ -1,7 +1,146 @@
 # Operations Status
 
-Last updated: 2026-05-18 14:05 CEST (12:05 UTC) — **Federation
-completion wave aaou.15-18 in flight**. awid 0.5.6 shipped FIRST per
+Last updated: 2026-05-19 16:10 CEST (14:10 UTC) — **aweb 1.24.3 + ac
+v0.5.44 BOTH SHIPPED VERIFIED LIVE**. Next wave (aweb 1.24.4 + ac
+v0.5.45 global/local deletion) on **HARD HOLD pending Juan direction
+call** (Sofia 9fa07306 + Athena 514675d1 + bb55efda agreement: "do not
+ship as-is").
+
+**v0.5.44 verified-live evidence**:
+- /health: release_tag=v0.5.44, git_sha=583970cf, aweb_version=1.24.3,
+  awid_service_version=0.5.6
+- Smoke matrix 4/4 mail green (athena existing-conv 67f89848 +
+  sofia/iris/aida via FRESH conversation IDs 0daa2599/5872ec1b/
+  0c4fd9b7) — all 4 replied verified=true confirming bidirectional
+  reachability
+- Smoke matrix 4/4 chat green (2 first-try, 2 retried after transient
+  awid 503)
+- Local aw upgraded clean 1.24.2 → 1.24.3 (commit 40cd86f); routing
+  404 P1 (task #194) empirically resolved — Grace's 4c45619
+  RegistryResolver did:aw→did:key fallback covers both federation
+  reply path AND first-contact resolution.
+
+**Deletion-wave HOLD state (deletion-wave heads on origin/main but
+NOT released):**
+- aweb origin/main: 441b25c (was f6f55d9; aapg.2 fail-closed gate
+  landed 2026-05-20 over channel fix e4dce48)
+- ac origin/main: 333b08d5 (last touched by .7 AC cleanup)
+- aapg.4 (Athena FYI 4b5aaf58, banked 2026-05-20): messaging_policy →
+  inbound_mode=open|contacts_only as runtime surface; legacy
+  messaging_policy quarantined to migrations/tests; AC access_mode
+  delivery UI removed. Replacement mechanism for Sofia's #1 concern.
+- aapg.3 (Athena FYI 5bda937e, banked 2026-05-20): address route =
+  first-contact authority; bare external did:aw fails closed;
+  namespace default_delivery_origin = live route metadata, not
+  identity routing; identity-level delivery-origin endpoint/CLI/
+  migration/helpers deleted as unshipped transition artifacts; AC
+  hosted provisioning/audit/docs no longer depend on identity-level
+  delivery origin; stored-route federation continuation validates
+  target current key from stored route/local recipient state.
+- aapg.5 (Athena FYI a4e27eb1, banked 2026-05-20): docs convergence
+  landed. Docs now consistently teach .3/.4 contract as live:
+  concrete address route for first contact, did:aw as identity
+  binding not delivery route, namespace default_delivery_origin as
+  inheritance metadata, continuation through stored participant/
+  session route state, inbound_mode=open|contacts_only, legacy
+  reachability/messaging_policy/team-cert private lookup as
+  compatibility/audit/history only.
+- aapg.7 (Athena FYI 663e4baa, banked 2026-05-20): AC-only — removed
+  hidden access_mode product controls/forwarding from hosted/BYOT/
+  team-key/spawn/dashboard flows; backend ignores/rejects request-
+  derived legacy access_mode and persists neutral access_mode='open';
+  add-existing did:aw copy reframed as identity-binding fallback.
+- aapg.2 disposition artifact: delivered to Athena 2026-05-20
+  (5b1d279b). 43 affected rows classified in 5 groups. Athena
+  6e6426b8 corrected: .3 awid resolver already ignores legacy
+  reachability — keep-blocked not valid without fail-closed migration
+  gate. Hestia held row-detail mails per Athena instruction.
+- aapg.2 code patch landed (Athena FYI 17507376, banked 2026-05-20):
+  public AWID address GET returns HTTP 409 for non-neutral legacy
+  rows with diagnostic 'Address blocked by legacy migration state;
+  normalize reachability to public and visible_to_team_id to null
+  before public resolution'. Namespace + DID listings omit non-neutral
+  rows from public discovery. Controller update + reassign are
+  explicit normalization paths. New writes stay neutral. ZERO prod
+  row mutation. Closes Sofia's no-silent-widening concern by code
+  rather than pre-deploy row scramble.
+- Open chain remaining: .6 e2e proof + final wide review. ALL FIVE
+  originally-open items now closed (.3, .4, .5, .7, .2). Athena
+  explicit "FYI not a release handoff" each time — hold continues
+  until .6 + final review close and a release handoff issues.
+- New migration in AC: 006_identity_delivery_origin.sql (adds
+  did_aw_mappings.delivery_origin; NOT applied to prod)
+- Local AC working tree: at origin/main 06364f1e post-pull (read-only
+  inspection of audit script); pyproject still at 0.5.44, no bump.
+- Local aweb working tree: at 1.24.3 release commit 5842eef on
+  origin/main 3550251 = 4 commits ahead of release tag; not bumped.
+- No tags pushed. No gates run on deletion-wave HEAD.
+
+**HOLD reasons (Sofia 9fa07306):**
+1. P1 voice.md promise '2026-05-13: Only the AIs of people I've added
+   can reach me' may have been enforced by reachability=nobody at
+   AWID resolver. Removing it without replacement breaks the promise.
+2. Existing reachability=nobody users lose privacy affordance they
+   chose. 'Inert metadata' is not 'privacy preserved.'
+3. Federation envelope API surface change: Pydantic extra='forbid'
+   means 3rd-party builders using removed fields (sender_team_certificate,
+   target_address_lookup_*) get 422.
+4. Process: substantial direction change should have come through
+   direction first, not framing-review-before-tag.
+
+**Audit data delivered for direction call:**
+- 43 affected AWID prod rows (19 nobody / 18 org_only / 6 team_members_only)
+  would become globally resolvable after .8 demotes reachability
+- 4 of the 19 nobody rows are our internal aweb.ai team rows
+  (sofia/athena/hestia/iris); 4 are Athena preflight/wt scaffolds;
+  remaining ~11 mix Juan-personal-namespace + likely external customers
+- 99 persistent agents in aweb_cloud: messaging_policy 'everyone'=96,
+  'org'=3, **'contacts'=0** — NO fallback enforcement of P1 contacts-only
+  via messaging_policy is currently active.
+- Full report at /tmp/identity-compat-audit-2026-05-19-v2.txt
+
+**Tool bug banked**: audit_identity_compat.py reads aweb_cloud's
+aweb.public_addresses (empty in prod). Real data lives in awid-service
+separate DB. Athena agreed to bank as tool bug.
+
+**Athena next**: analyzing main-vs-pre-wave code/test deletion + API-surface
+deltas for Juan's direction call. Sofia estimated within-the-hour for
+Juan's call.
+
+**Branches to handle on revert path** (if Juan calls revert):
+- ac local: reset to 583970cf (v0.5.44 commit); origin/main has 3 new
+  commits (06364f1e + 59bd16f1 + 9f8eada5) over 583970cf that would
+  need revert PRs from Athena.
+- aweb local: still at 5842eef (release tag commit); origin/main has
+  4 commits ahead (3550251 + 133ab05 + 3f2c451 + 99d029d + cd92f51
+  + 19f2f4c + eee1497) that would need revert.
+
+Previous federation wave (v0.5.44 lead):
+
+**aweb 1.24.3 VERIFIED LIVE**. Grace's CLI-side fix (4c45619 "Fix
+federated continuation signing from stable DID") closes the
+conversation-only reply path: RegistryResolver did:aw→did:key
+fallback + ChatSendMessage signs full from-address for in-session
+federated targets. After 3 prior halts (#1 8064558 generic 'to', #2
+78482b9 narrowed 'to_did', #3 d664988 widened acceptance still
+mismatched), attempt #4 at 4c45619 GREEN end-to-end:
+- make ship (pipefail set): federation e2e Phase 4 reply PASS both
+  mail + chat directions; OSS user journey 224 tests ALL PASSED
+- server-v1.24.3 + aw-v1.24.3 tagged + pushed individually (3
+  separate git push commands per discipline 7)
+- GHA: Server Release (PyPI) 26091884490 + aw Sync 26091890177 +
+  awebai/aw Release 26091900560 all success
+- PyPI simple index: aweb-1.24.3.tar.gz + aweb-1.24.3-py3-none-any.whl
+- npm: @awebai/aw@1.24.3
+
+Discipline lesson banked from attempt #1: `make X 2>&1 | tee log`
+returns tee's exit code (0) unless pipefail set. Attempt #1 reported
+exit 0 but actually halted at Phase 4. Use `set -o pipefail` before
+make-and-tee, or check log tail for FAIL/ALL PASSED. Wrapping make
+ship in subshell with pipefail caught attempt #4's real green
+properly.
+
+Previous federation completion wave (aaou.15-18): awid 0.5.6 shipped FIRST per
 Juan's standing policy ('in case of doubt always ship awid service
 and awid first'): commit dad937a on aweb main, tags awid-service-v0.5.6
 (PyPI workflow 26031767028 success) + awid-v0.5.6 (GHCR workflow
@@ -124,6 +263,187 @@ OAuth smoke per Athena's 5-item checklist (Phase 3 of bless):
 External claim (Sofia framing + Iris distribution) gated on remaining
 smoke items.
 
+**[2026-05-18 ~20:50 UTC] aweb 1.24.2 trust-display regression fix
+VERIFIED LIVE**. Athena bless 96aa3b2a → ACK eb4f0431 → ACK 59a7f294
+(boundary noted: do not claim Pi until aweb-aapb closes).
+- PyPI aweb@1.24.2 + npm @awebai/aw@1.24.2 + local aw upgrade 1.23.0
+  → 1.24.2 clean (commit d522f67).
+- Smoke green both halves:
+  (i) Plain output: aw chat send-and-wait athena shows '[not in
+      contacts]' only, NO '[unverified]' on stable-DID reply. Earlier
+      today on 1.23.0 the same agent's reply rendered as '[unverified]
+      [not in contacts]' — empirical regression confirmation + fix.
+  (ii) JSON: POST-1.4.3-INBOX-PROOF-MARKER mail in aw mail inbox --json
+       shows verification_status=verified, from_did=did:key
+       (signed_payload DID) + from_stable_id=did:aw distinct, signature
+       and signed_payload present.
+
+**Sofia direction-framing handoff** (Sofia routing 404'd from me both
+mail and chat; banked here for git-pull visibility + relayed via
+Athena 7453a580):
+
+Today's verified-live cuts ready for claim shape:
+- (A) Trust-display fix aweb 1.24.2 — cleanest customer-facing story
+  this cycle. Regression that hosted users would see in plain output
+  ('why does this say [unverified]?'). Doesn't require Pi update or
+  commando coord. Decoupled, ready.
+- (B) Channel auto-ack 1.4.3 — internal correctness. Suggest
+  'recommended upgrade via marketplace pin' note (auto-prompts on next
+  /plugin update) rather than external announcement.
+- (C) MCP OAuth selected-org hardening ac v0.5.43 — customer-facing
+  potential but waits on browser smoke items 1-3+5 (need claude.ai
+  bearer from Juan's session).
+- (D) Federation completion wave aaou.15-18 — still gated on commando
+  coord per Sofia's earlier 1-2-3 sequencing.
+
+Sofia framing call: which subset (A/B/C/D) becomes external this cycle?
+Which distribution lane (Iris / Bertha-via-Eugenie / release-notes
+post on aweb.ai)?
+
+Also Sofia channel-upgrade reminder: her installed channel likely
+still 1.4.2 (auto-ack bug — why direction mail was silently disappearing
+in her inbox earlier). Run /plugin marketplace update awebai-marketplace
+&& /plugin update aweb-channel@awebai-marketplace + relaunch to pick
+up 1.4.3.
+
+**P1 production routing bug ROOT CAUSE FOUND (Task #194)**:
+hestia → sofia + hestia → iris persistently 404 with
+'resolve recipient "aweb.ai/<alias>" for signed mail: aweb: http 404'.
+Matrix probe (2026-05-18 21:14 UTC) showed 2 of 6 peer targets fail:
+hestia→athena ✓, hestia→aida ✓, hestia→metis ✓, hestia→ama ✓,
+hestia→sofia ✗ 404, hestia→iris ✗ 404. Asymmetric: sofia → hestia
+works (her chats arrive verified=true).
+
+**Tightened diagnosis (Athena a545a0cf + 59f78f4b)**: root cause
+is the AWID address rows / provisioning. Dashboard-created
+team-internal agents were registered with
+`address_reachability='nobody'`. Confirmed rows in awid.public_addresses
+(joined to dns_namespaces, domain=aweb.ai):
+  athena=nobody, sofia=nobody, hestia=nobody, iris=nobody (all 404 via
+  direct address lookup); aida=public, ama=public, metis=org_only
+  (resolve cleanly via the public/org bypass).
+
+Per AWID `_address_visibility_sql`, `nobody` is OWNER-ONLY, not
+team-visible. Sofia/iris direct-address 404s are fully explained by
+this when recipient binding uses AWID address lookup.
+
+NOT banked: a mechanism for why hestia→athena works despite athena
+also being reachability=nobody. That path needs exact command trace +
+pin/conversation state before naming. Not needed for the
+sofia/iris-404 root cause.
+
+Fix paths (Grace engineering): (1) change provisioning default from
+`nobody` to `team_members_only` with `visible_to_team_id` in
+`TeamAgentSetupFlow.tsx` + backend fallback; (2) backfill affected
+hosted agents in default/aweb.ai. DO NOT run team_cert backfill
+(Athena explicit).
+
+Discipline lesson from this thread: my initial team_cert theory
+(mailed f8604517) was pattern-match on the matrix without reading
+`_address_visibility_sql`. Grace pushed back via Athena. Banking:
+hypothesis-with-falsifying-test before routing as conclusion;
+do not name a mechanism for a separate observation while answering
+the primary question — keep the conclusion tight to evidence.
+
+**[2026-05-19 ~00:30 UTC] Coordinated cut HALTED + matrix degraded**.
+
+Engineering release handoff received (Athena b879302c): aweb HEAD
+8064558 + ac HEAD bdfe5631. Started Phase 1 aweb 1.24.3 ship. Two
+issues:
+
+1. **make ship halted at test-federation-e2e Phase 4** with
+   `aweb: http 422: {"detail":"Federation signed_payload to does not
+   match"}` after 18 phase-4 PASS. The new continuation-binding logic
+   in 8064558 (CLI-only) is producing a 'to' field cross-server
+   federation receiver doesn't accept on reply/follow-up. Needs Grace's
+   CLI-side fix before aw-v1.24.3 can tag.
+
+2. **Athena discipline 27a pushback (chat 13813d66)**: 8064558 is
+   CLI-only (cli/go/*). Banked rule: CLI-only releases tag `aw-v1.24.3`
+   ONLY; do not bump server/pyproject or tag server-v1.24.3 for it.
+   Also do not `uv lock --upgrade-package aweb` in AC to chase the CLI
+   tag — ac v0.5.44 can ship bdfe5631 without an aweb pin bump unless
+   release-ready exposes a real server-pkg dep.
+
+   I had bumped server/pyproject 1.24.2 → 1.24.3 + locked before her
+   pushback arrived. Reverted both immediately; working tree clean at
+   origin/main f4d13f4. No PyPI/npm publish would have fired (gate
+   halted first).
+
+3. **Matrix degraded after my 1.24.2 client upgrade**: hestia→athena
+   now ALSO 404s. Earlier today athena worked (the continuation-binding
+   masking path that Athena scoped out of the root-cause conclusion).
+   Upgrading my local aw to 1.24.2 (the trust-display fix) likely
+   disabled that masking path, so hestia→athena now hits the same
+   reachability=nobody 404 as hestia→sofia/iris. This validates
+   Athena's framing that the athena-success path was a separate
+   masking mechanism, not part of the root cause.
+
+   Current matrix (re-probed):
+     hestia → athena ✗ 404
+     hestia → sofia  ✗ 404
+     hestia → iris   ✗ 404
+     hestia → aida   ✓ (reachability=public)
+     hestia → ama    ✓ (reachability=public)
+     hestia → metis  ✓ (reachability=org_only)
+
+Revised release plan (for Athena's confirmation when reachable):
+- Wait for Grace's CLI-side fix to 8064558 federation-reply path.
+- Once on origin/main: tag `aw-v1.24.3` ONLY at that commit (no
+  server-v1.24.3). aweb 1.24.3 is a CLI-only release.
+- ac v0.5.44 ships bdfe5631 without aweb pin bump. Bump
+  ac/backend/pyproject 0.5.43 → 0.5.44, uv lock (no
+  --upgrade-package aweb), run release-ready, tag v0.5.44, push,
+  watch Render.
+- Then scoped audited repair for the 4 affected nobody rows
+  (hestia, athena, sofia, iris in default/aweb.ai) — method TBD,
+  routed to Grace before applying. No blanket migration.
+- Matrix re-probe expectation: all 6 peers reachable.
+
+Hestia outbound to athena/sofia/iris all 404'ing right now; can't
+route gate-halt to Athena directly. Banked here for git pull.
+
+**[2026-05-19 ~01:10 UTC] aweb 1.24.3 ship attempt #2 at 78482b9
+HALTED — refined error**.
+
+Athena unblocked engineering scope (76c1bc14): aweb HEAD now includes
+3198d6e (server-side federation verifier fix) + 78482b9
+(malformed-target rejection) + 8064558 (CLI continuation-binding).
+Server bump JUSTIFIED because 78482b9 touches server/src.
+
+I re-ran `make ship` against 78482b9 with pyproject bumped 1.24.2 →
+1.24.3 + uv lock. Federation-e2e Phase 4 halted at the same step but
+with refined error:
+  Previous (at 8064558):  'Federation signed_payload to does not match'
+  Now (at 78482b9):       'Federation signed_payload to_did does not match'
+
+Trace before halt:
+  === Phase 4: Public cross-server first contact and replies ===
+    PASS: public federated mail delivered to beta
+    PASS: public federated mail conversation id
+  aweb: http 422: 'Federation signed_payload to_did does not match'
+
+Field narrowed from `to` → `to_did`. 3198d6e + 78482b9 partially
+closed but reply/follow-up path mismatches on `to_did` specifically.
+Same did:key vs did:aw normalization family as the 1.24.2 trust-display
+fix (271bb7d).
+
+State:
+- aweb origin/main HEAD: 78482b9.
+- My local: pyproject 1.24.3 → REVERTED back to 1.24.2, uv lock
+  re-locked, working tree clean at origin/main 78482b9.
+- No tags. No PyPI/npm publish fired.
+- Full ship log at /tmp/ship-1.24.3-attempt2.log.
+
+Need: Grace's narrow follow-up fix for the `to_did` field
+normalization in the federation reply path. Mail+chat outbound to
+Athena both 404 right now — banked here.
+
+ACK 4e81bc2a recorded: Athena stays in the scoped repair set; her
+inbound and continuation paths working don't prove first-contact
+reachability. Post-fix matrix must probe from a fresh resolution
+path (not via existing conversation 96317ca9).
+
 Smoke-walk shape (per Athena e39c743e + Sofia framing): hosted ↔
 self-hosted user, mail AND chat both directions, message-ids + envelope
 verification receipts. Preferred peer: commando (aweb.missionctrl.dev)
@@ -135,6 +455,61 @@ Ops discrepancy flagged: sofia awid address resolves 404 from hestia
 cross-team mail-resolution skew Grace diagnosed — and ac v0.5.42 itself
 closes it (per Grace's diagnosis). Workaround: `aw chat-with --start-conversation`
 goes through. Mailed Juan + Athena flagged.
+
+**[2026-05-19 ~13:30 UTC] aweb 1.24.3 ship attempt #3 at d664988
+HALTED — SAME Phase 4 reply path 422 'to_did does not match'**.
+
+Athena blessed (e1a2e3b1 in conversation 96317ca9): aweb HEAD now
+includes d664988 ("Accept stable recipient DID in federation
+payloads") on top of 78482b9 + 3198d6e + 8064558. d664988 widens
+signed_payload.to_did acceptance from only target_current_did_key to
+either target_current_did_key OR target_did_aw. Her bless validation
+at d664988: server focused envelope + continuation route 15 passed,
+selected federat/continuation sweep 30 passed, cli/go pass, py_compile
+clean.
+
+I bumped server/pyproject 1.24.2 → 1.24.3 + re-locked, ran
+`make test-federation-e2e` directly (not full `make ship` — I
+verified the Makefile has individual targets, no `release-ready`
+umbrella). Halted at SAME step as attempt #2 with SAME refined
+error:
+
+  === Phase 4: Public cross-server first contact and replies ===
+    PASS: public federated mail delivered to beta
+    PASS: public federated mail conversation id
+  aweb: http 422: 'Federation signed_payload to_did does not match'
+
+18 prior assertions passed. The failing CLI call is at
+scripts/e2e-oss-federation.sh:477:
+  bob mail send --conversation-id $public_conversation_id \
+    --subject "Public federated reply" \
+    --body "reply from beta bob"
+
+So: alice→bob FIRST CONTACT works (Phase 4 first 2 asserts pass).
+bob's REPLY via --conversation-id back to alice still 422s on
+to_did. d664988 did NOT close this. Her pytest 15-pass continuation
+route set must exercise a different code path than the shell
+e2e:477 hits via the real aw CLI.
+
+State:
+- aweb origin/main HEAD: d664988 (no new commits, no new tags).
+- My local: pyproject 1.24.3 → REVERTED back to 1.24.2, uv lock
+  re-locked, working tree clean at origin/main d664988.
+- No tags. No PyPI/npm publish fired.
+- Full gate log at /tmp/test-fed-e2e-1.24.3-attempt3.log.
+- Halt mail sent to Athena 0651e0af in conversation 96317ca9
+  (delivered — same routable conversation as her bless e1a2e3b1 +
+  ACK bdf1abde).
+
+Hypothesis (not verified, athena-territory): the reply path's
+signed_payload.to_did is NEITHER target_current_did_key NOR
+target_did_aw — possibly built from a different source (cached
+from inbound first-contact, or resolved via a different awid
+lookup branch). The widening in d664988 won't help if the actual
+to_did is some third identifier.
+
+Next: standing by for Athena's narrower diagnosis. AC v0.5.44
+remains blocked behind aweb 1.24.3 landing.
 
 Previous lead:
 Last updated: 2026-05-18 12:20 CEST (10:20 UTC) — **Federation 1.23.0

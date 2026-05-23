@@ -1,173 +1,63 @@
 # Engineering Status
-Last updated: 2026-05-18 18:25 GMT
+Last updated: 2026-05-23 20:28 GMT
 
 ## Current focus
-
-0. **MCP OAuth/reconnect release lane is still with Hestia.** Initial
-   bless was AC `cb223c34` + aweb `03fe4bf`. Gate then found stale AC
-   alias test; Mia/Grace patched it (`bc2e48dd` / `5b44f724`). Grace also
-   fixed the Hestia↔Athena duplicate-chat 409 in aweb `99cc2cb`. Athena
-   approved the added fixes and recommended aweb `1.24.1` + AC `v0.5.43`
-   repin because `99cc2cb` is after the already-published `1.24.0` tag.
-1. **P0 channel auto-ack/read bug identified.** Sofia missed Athena's
-   graph-brief mail because channel push auto-acked it as read; this now
-   matches Zeus + Hestia smoke symptoms. Code read: channel-core/channel
-   call mail `ackMessage` and chat `markRead` after push delivery into the
-   harness. Athena recommended stop auto ack/read, use local dedupe only,
-   and split delivered/read/handled semantics later. Grace and Hestia have
-   been notified.
-2. **Federation completion wave shipped.** aweb 1.23.0, awid 0.5.6,
-   and AC v0.5.42 are verified-live per Hestia: app.aweb.ai
-   reports `release_tag=v0.5.42`, `git_sha=7ca6ce62`,
-   `aweb_version=1.23.0`, `awid_service_version=0.5.6`.
-3. **Pi integration is installed but channel wake reliability is suspect.**
-   `@awebai/pi` channel awakenings + canonical aweb skills are installed,
-   but the same auto-read design can hide missed Pi awakenings from
-   inbox/pending. Polling is only a mitigation, not a fix.
-4. **Pi first-session welcome (aweb-aaov.12)**: Dave implemented
-   c675c44, docs-link follow-up 1944e3d, Iris tone nudge 37c9bb1;
-   local aweb main now includes follow-up polish through 48cee5e.
-   Task still shows claimed by Dave.
-5. **Channel / skills packaging remains active.** `aweb-aaox.16` is
-   the P0 license metadata correction for `@awebai/claude-channel`;
-   Hestia owns publish. Hestia's status notes channel-v1.4.1 tag
-   exists but npm publish failed on the channel-core install gap.
+- **aapj/aapk/aapl/aapm consolidated release wave is verified-live.** Hestia reported verified-live from a message that displayed `identity_mismatch`, but independent public checks line up: `app.aweb.ai/health` reports `v0.5.45` / git `fe364950` / aweb `1.25.0` / awid_service `0.5.8`; `api.awid.ai/health` reports `0.5.8`; npm reports `@awebai/aw=1.25.0`; channel/pi have since advanced to `@awebai/claude-channel=1.4.5` and `@awebai/pi=0.1.2` at aweb `2007106` to carry the verification fixes.
+- **Prod DB reset/restore completed.** AC prod was rebuilt clean and restored; AWID 003/004 applied after the approved disposition. Boundary note: no checksum bypass markers or `schema_migrations` edits; only approved disposition row mutations.
+- **AWID/AC disposition landed.** Active legacy AWID non-neutral public addresses were normalized public/null in AWID; corresponding AC/aweb agents were set `contacts_only` to preserve old non-public delivery intent at the delivery layer. Historical soft-deleted AWID rows were left as-is.
+- **Banked fast-follows:** redact `ac/scripts/prod_db_reset.py` DATABASE_URL logging; investigate Render auto-deploy behavior before next cutover; investigate historical AWID public-address soft-delete paths; bank npm token/`gh secret set` syntax lesson; scrub `/tmp/aweb-db-reset-*` and `/tmp/awid-db-snapshot-*` PII evidence when wave is fully closed.
+- **P0 post-release bug opened:** Grace found `contacts_only` blocks new chat but mail continuation can bypass exact-contact policy via `deliver_message(... skip_policy_check=True)`. Athena created dev task `aweb-aapo` assigned to Grace to enforce `contacts_only` on HTTP/MCP mail continuations unless Juan explicitly redefines the rule. Athena's contacts list is empty, and Grace is not an exact active contact here.
+- **P0 verification bug opened:** Athena upgraded local CLI to `aw 1.25.0` (`136f25f`); Hestia's fresh chat still displayed `identity_mismatch` / `verified=false`, so matching client version did not clear Hestia->Athena verification. CLI history for the same Hestia messages reports `verification_status=verified` with `to_did` and `to_stable_id` both set to Athena did:aw; live Pi/channel metadata still showed mismatch. Grace initially proposed a guarded `current_did_key` participant backfill, but then held it as primary fix: CLI history verifies the same Hestia messages while live Pi/channel metadata reports mismatch, so stored message/participant state is probably not the live-event cause. `aweb-aapp` root cause now appears operational: live event process is stale Claude plugin cache `~/.claude/plugins/cache/awebai-marketplace/aweb-channel/1.4.0/dist/index.js` (started May 20), while CLI history verifies green and current code has fixes through aweb `41fe766`. Plugin restart/cache update happened; live process is now `aweb-channel/1.4.5/dist/index.js`, but Hestia's post-upgrade live event `742fa79b-6539-4769-9aee-ded61647faf2` still showed `identity_mismatch` while CLI history for the exact message reports `verification_status=verified`, `to_did=None`, `to_stable_id=Athena did:aw`. Dave and Athena confirmed the published `@awebai/claude-channel@1.4.5` tarball is stale (pre-fix stable-id priority and old did:aw recipient branch) despite aweb `origin/main` source having the fix. Dave prepared aweb `1e22965` for `@awebai/claude-channel@1.4.6`; Athena locally packed it and confirmed fixed dist. Dave then added docs `3266125` clarifying official Pi npm install/update path. Grace then pinned the actual Pi root: published `@awebai/pi@0.1.2` is also stale; Juan pushed for hardened artifacts rather than one-off Pi fix. aweb `bff1d65` publishes/guards `@awebai/claude-channel@1.4.7` and `@awebai/pi@0.1.4`; Athena packed both from npm and confirmed certificate-first stable_id resolution is present, stale identity-first absent, and channel plugin manifest is 1.4.7. Pi/plugin was updated to 0.1.4/1.4.7 and Hestia live smoke still showed `identity_mismatch` while CLI history verified. Dave landed candidate `50cd7a6` (treat did:aw in `to_did` as stable recipient binding when selfStableID matches) plus vector cleanup `bce55ff`. Juan asked to hold release/package/publish steps because Grace is still studying and may have a different root cause. Athena captured raw fetchHistory for failing `aa98381c`: top-level raw `from_did` is Hestia did:aw and no top-level `to_did/to_stable_id`; signed_payload has `from_did` Hestia did:key, `to_did` empty, `to_stable_id` Athena did:aw. This does not match the candidate legacy `to_did=did:aw`/missing `to_stable_id` shape. Dave reproduced the actual downgrade: JS `verifyDidKeyResolution` rejected AWID `log_head` seq=1 operation `register_did` (expected only `create`), so `verifyStableIdentity` returned `HARD_ERROR` and `SenderTrustManager` mapped it to `identity_mismatch` after crypto/recipient binding passed. Dave landed `70410c3` accepting seq=1 `create` or `register_did` while preserving hash/signature/null-prev checks. Athena validation: channel focused registry/trust/dispatch tests 33 passed, pi-extension `test:package` pass, channel `test:package` pass. `aweb-aapp` is closed. Grace RCA/review green and Athena gate agreed `70410c3` is final root-cause fix. Hestia published `@awebai/claude-channel@1.4.8` + `@awebai/pi@0.1.5`; Athena installed/restarted Pi 0.1.5. Hestia existing-session smoke `6fa9406d-02a2-4c4e-a4b5-6a02ee0aabc0` came through live with `trust_status=verified`, `verified=true`, and CLI history also reports `verification_status=verified`. Root cause: JS stable identity verifier rejected AWID seq=1 `register_did`; fixed by accepting seq=1 `create` or `register_did`. No DB backfill needed for this symptom. Backfill remains hygiene only unless Juan separately directs it. Hestia also reported duplicate `aweb.agents` rows for Athena; bank as separate restore/data-integrity follow-up, no prod row mutation without runbook.
+- **New P0 policy epic:** Grace created `aweb-aapq` to restore restricted team-scoped delivery for global agents. Correction from Juan/Grace supersedes the earlier three-state freeze: `aweb-aapq.1` contract is two-state only. Canonical product/API/UI modes are `open` (all valid routed senders) and `team_and_contacts` (verified same-team members plus exact active contacts). Team reachability is baseline team membership behavior, not an optional third mode. `contacts_only` is compatibility-only stale input that may normalize to `team_and_contacts`; it must not appear in normal output/docs/UI or survive as product authority. Same-team proof must come from trusted server/auth context (team cert or unambiguous DB-verified authenticated sender identity), never sender-declared team id, namespace/address suffix, or address coincidence. Multi-team globals evaluate active shared team membership between authenticated sender and recipient identities. Local identity behavior still needs explicit implementation/test review. Continuations re-run the same predicate and cannot bypass. Grace pushed first aweb implementation slice at `6bcaf67` against this corrected freeze. Athena fetched/reviewed with no blocker: migration normalizes `contacts_only -> team_and_contacts` and tightens CHECK to `open|team_and_contacts`; runtime/API canonicalizes stale input; global delivery allows exact active contact or verified same-team membership; sender-declared `team_id` alone does not authorize; multi-team overlap uses active sender/recipient DID memberships; local mail/chat continuations re-run policy. Athena validation: server focused tests `202 passed`; Go `./cmd/aw` passed; diff-check clean. Grace then pushed aweb docs-only `c185c42`, which Athena read as aligned. AC slice advanced to `48374c2d`: backend/frontend app surfaces inspected normalize `contacts_only -> team_and_contacts`, reject `contacts_or_teammates`, and show Team and contacts; the previous AC public/site docs blocker is cleared. Athena read patched `site/static/docs/teams.md`, `site/content/docs/communication.md`, `site/static/docs/communication.md`, `site/layouts/index.html`, and `site/layouts/index.llms.txt`; `rg 'contacts_only|Contacts only|contacts-only|contacts_or_teammates' ac/site` has no hits; AC diff-check clean; Hugo site build passed (only `languageCode` deprecation warning). Mia reviewer pass is now green on combined heads `aweb c185c42` + `AC 48374c2d` (via chat): no blocking issues under corrected two-state contract. Her only note is optional/non-blocking: add an HTTP-boundary cli-signup legacy `contacts_only` -> `team_and_contacts` persistence test; shared helper/restore/agent_messaging validator tests already cover the behavior. Hestia full all-tests validation was green on sibling-source heads `aweb c185c42` + `AC 48374c2d`: release-verify targets green with no bypass; backend sibling-source `1498/1498`; frontend `217/217`; image build pass; two-service `15/15`; cloud journeys/browser pass; channel/pi pack dry-runs pass; no channel-core runtime import; nothing skipped; log `/tmp/aapq-chain-c185c42-48374c2d.log`. Still **not ship-clear**. First blocker: AC `48374c2d` pins `aweb==1.25.0`, while aapq migration `002_team_and_contacts_inbound_mode.sql` exists only in source after aweb `c185c42`; deploying AC alone would not apply 002. Second update: Olivia/Juan-directed main merges advanced heads to `aweb 0ef4a3e` and `AC 2e6c8c60` (orchestration/team-bootstrap docs and `aw workspace add-worktree` work). Prior validation remains aapq evidence but is no longer current-main ship validation. aweb `1.25.2` was published from aweb `0ef4a3e`; Hestia reported wheel proof includes `001_initial.sql` and `002_team_and_contacts_inbound_mode.sql`. Mia bumped AC pin/lock to `aweb>=1.25.2` on top of latest AC main and provided packaged-shape evidence: site-packages resolver includes 001+002, schema_migrations records `('aweb-aweb','002_team_and_contacts_inbound_mode.sql')`, CHECK accepts `team_and_contacts`/rejects `contacts_only`, focused packaged suites `123 passed`, full packaged backend `1498 passed / 15 deselected`. Athena reviewed/fast-forwarded and pushed AC main `a3da5027`. Hestia's full packaged-shape validation on AC `a3da5027` + `aweb==1.25.2` was green, and Athena greenlit AC `v0.5.46`, but deploy is now held: Hestia tagged/built the image, then `prod-migrate-direct` failed before deploy. Root cause: published 1.25.2 migration `002_team_and_contacts_inbound_mode.sql` updates `contacts_only -> team_and_contacts` before dropping the old 001 CHECK (`open|contacts_only`), so prod's 45 `contacts_only` rows reject the UPDATE. Prod schema_migrations is unchanged (`aweb-aweb` only 001); rows remain unchanged; Render did not auto-deploy. Athena pushed aweb `73e005a` as a forward repair without mutating published 002: new `001_post_initial_team_and_contacts_inbound_mode_transition.sql` sorts after 001 and before 002, conditionally widens the old CHECK to `open|contacts_only|team_and_contacts`, and no-ops if 002 already applied; existing 002 then rewrites rows and installs final CHECK. Server version bumped to `1.25.3`. Validation: `uv --directory aweb/server run pytest -q tests/test_package_data.py` -> 10 passed, including prod-like seeded `contacts_only` regression; diff-check clean. Override update: Juan clicked Render and `v0.5.46` is live despite Athena's earlier hold. Athena independently checked `/health`: `release_tag=v0.5.46`, git `302e5b1f22f0d691ab0cd02d5baeec45e7314993`, `aweb_version=1.25.2`, healthy. Hestia reports prod DB is post-002 with rows `open=256`, `team_and_contacts=45`, final CHECK `open|team_and_contacts`, and 002 recorded at `2026-05-23 20:24:09.096151`; this mail smoke arrived verified=true. Accept live state as Juan-overridden/verified-live, but still close clean migration line: Hestia publishes aweb `1.25.3` from `73e005a`, Mia bumps AC lock to 1.25.3, Hestia validates both seeded old-001 `contacts_only` conversion and post-002 bridge no-op, then cuts/deploys `v0.5.47` or hotfix unless Juan cancels. Manual workaround evidence must stay in final release report.
+- **Stale replay control:** Peter replay/stand-down mails have been drained repeatedly; check `aw mail inbox` before acting, but ignore stale aapf/aapg/aaph/aapm/aapl replay ACKs unless a current verified task is routed.
 
 ## Dev team work in flight
-
-- **aweb-aaov.12 — Pi first-session synthetic welcome**: Dave owns;
-  implemented and voice-passed. Next signal is final task close or
-  release/publish handoff.
-- **aweb-aaou.13 — messaging federation e2e matrix**: Grace owns;
-  federation completion shipped through v0.5.42, but the active claim
-  remains visible.
-- **aweb-aalr.2 — AWID ensure-team endpoint + AC persist refactor**:
-  Mia still has a stale claim from the older readiness epic.
-- **MCP OAuth selected-org/reconnect fix**: base reviewed set is AC
-  `cb223c34` + aweb `03fe4bf`. Follow-ups: AC `5b44f724` aligns stale
-  hosted MCP alias gate test; aweb `99cc2cb` makes duplicate 1:1 chat
-  routing continue newest instead of 409. Athena approved both follow-ups
-  for Hestia gate input.
-- **aweb-aaox.16 — claude-channel license metadata P0**: ready work;
-  Hestia publish-owner per task, engineering available if the release
-  workflow/tooling fix needs code review.
+- **aweb-aapj.1 — aweb/awid old reachability/lifetime authority removal**: closed at aweb `8337af1` (Peter `e48b46c` rebased over Grace `bfe822d` plus Athena wording polish). Removes AWID address reachability/visibility authority, drops aweb `messaging_policy`, migrates aweb agents storage from lifetime to `identity_scope`, and leaves explicit boundary adapters only.
+- **aweb-aapj.2 — aw CLI/docs global/local language**: closed at aweb `bfe822d`. CLI/help/docs use global/local; old flags hidden as compatibility aliases; developer-facing test wording cleaned.
+- **aweb-aapj.3 — AC backend/schema/API cleanup**: closed and landed on AC main at `b0e82553`. Athena review evidence: diff-check clean; focused sibling-source backend validation green (`118 passed`); Mia full-suite report was `1410 passed / 7 deselected`; direct run of ignored `auth_bridge_oss_cases.py` still fails but the representative failure reproduces on `origin/main`, so it is not a `.3` blocker.
+- **aweb-aapj.4 — AC frontend/docs cleanup**: closed earlier, now merged to AC main at `f52f5481`. Post-merge validation: diff-check clean, `frontend/scripts/check-aapj-vocabulary.sh` OK, frontend vitest green (`38 files / 194 tests passed`; existing jsdom `window.scrollTo` stderr only).
+- **aweb-aapj.5 — cross-repo grep gate/release handoff**: Grace found three final AC blockers on `d80fe410`; Athena patched and landed AC `0caaefc4`; Grace's narrow re-review passed. Hestia's sibling-source chain then exposed remaining AC/aweb validation failures. Those are closed through aweb `fa1041c` and AC `9104ffc2`; Hestia's validation-only all-phase rerun is green.
+- **AWID hidden/limited row disposition**: Athena landed aweb `605f356` so migration `003_drop_address_reachability.sql` refuses to drop legacy visibility columns while active non-neutral address rows exist. Grace said SQL shape was correct but required focused migration evidence. Athena landed aweb `d300b33` with that regression; validation: aweb diff-check clean; `uv --directory awid run pytest tests/test_schema.py -q` 8 passed; `make test-awid` 172 passed.
+- **aweb-aapj.6 — Pi/skills package copy cleanup**: closed at aweb `e248cd3`. Athena reviewed/landed; Pi/skills instructional copy now uses addressability/inbound mode/global/local, with only explicit legacy/audit notes left in scoped skill source.
+- **aweb-aapj.7 — channel runtime lifetime cleanup**: closed at aweb `2e98603`. Athena reviewed/landed; channel/channel-core runtime now canonicalizes identity_scope=global|local with legacy lifetime adapters. Validation rerun: focused channel 69, channel-core build, channel build, full channel tests 95, Pi build, diff-check clean.
+- **aweb-aapj.8 — public/static docs + doctor output cleanup**: closed at aweb `e332bf8`. Athena validated diff-check, targeted public/static docs grep clean, doctor stale phrase grep clean, Go cmd/aw+awid, server package-data, CLI reference check.
+- Peter support review found a real AC/aweb two-world blocker: AC dashboard constructs `TeamIdentity(lifetime=...)`, while current aweb source requires `identity_scope`. Mia added `test-backend-aweb-local` prerequisite at AC branch `e1e476ee`, Phase B (1/2) mirror migrations/tests at `a42ddd6c`, and Phase B 2/2 partials through `78eefd02`. AC editing remains with Mia. Athena directed support/admin/audit old fields must move under nested `legacy:{...}` in `.3`; Mia applied this to archive/replace/replacement audit envelopes and was told to rename internal SQL aliases to `legacy_lifetime`.
+- `aweb-aapj.4` validation rerun by Athena: diff-check, aapj vocab gate, targeted greps, dashboard build, frontend tests (38 files / 194 tests), lint (0 errors; 2 unrelated warnings), and frontend build. Dave re-reviewed with no blockers.
+- New support tasks to keep idle agents applied: `aweb-aapj.9` assigned to Peter for AC Phase B 2/2 file-by-file rewrite map; `aweb-aapj.10` assigned to Dave for final `.5` grep-gate dry-run prep.
+- Dave’s `.10` dry-run surfaced two additional aweb blockers before final `.5`: `aweb-aapj.11` is closed at aweb `5f4dc04` (public CLI/SOT docs cleanup); `aweb-aapj.12` is closed at aweb `bdc39e4` (AWID team-certificate API/storage/cert JSON canonical `identity_scope`).
+- `aweb-aapj.13` is closed at aweb `bf8b4e4`: AWCO/BYOIDT team-certified signed request mode with verifier evidence. Athena reran diff-check, focused team-auth tests, and Go cmd/aw+awid tests.
+- **aweb-aapi — AC embedded aweb migration snapshot drift**: closed at AC `82ec0b8d` (new mirrored migration `006_participant_current_did_key.sql` + manifest tests).
+- **`aweb-aapk` — prerelease onboarding auto-provision blocker**: closed. `.1` closed at aweb `b7e2192`; `.2` backend closed at AC `737ecf89`; `.3` setup-progress/UI closed at AC `0941ee42`; `.4` Grace release-gate review passed against current AC `0941ee42` and aweb current main containing aapk.1. Post-close polish from Olivia (`f058d711`, `707b698a`) was landed after Juan's "all contributions in main" instruction; validation focused frontend 11 passed and diff-check passed. This clears aapk as an implementation/review blocker only; it does not clear release while `aweb-aapm` is open.
+- **`aweb-aapl` — prerelease inbound mode blocker**: active, not closed. Juan reversed the earlier `contacts_or_teammates` direction. Required final contract is two-state only: `open` (**All**) and `contacts_only` (**Contacts only**); `contacts_only` means exact active contacts only, with no same-team/team-cert exception. Mia owns `.4` backend/schema/code cleanup; Olivia owns `.6` UI/docs surfaces; Peter owns `.5` grep/docs review support; Grace owns `.3` final structural review. Athena pushed docs-lane branches for Peter/Olivia input: aweb `d0d34d3`, AC `8b6eb114`; Peter passed docs-lane grep and will rerun against implementation branches. Grace landed `.6` backend creation dependency on AC main `ee045916`; Athena ACKed and notified Olivia. Task hygiene corrected: root and `.3` now describe the two-state reversal, `.2` is closed superseded, `.6` notes `ee045916` as dependency only. Ownership hygiene corrected after Juan/Grace challenge: `.4` is assigned/in-progress to Mia; `.6` assigned/in-progress to Olivia. New `.7` is assigned to Mia for Go CLI `aw init --inbound-mode`; Juan says `.6` AC branch must wait for `.7`, not hide the CLI picker or merge partial paths. Athena reviewed `.7` at aweb `c2164667`: API-key path is right, but requested one amendment so non-API-key guided hosted/BYOD paths cannot silently accept and ignore `--inbound-mode`.
+- **Stale replay control**: channel backlog appears drained (`aw mail inbox` and `aw chat pending` clean). Continue checking current task comments/message IDs before acting.
 
 ## Non-feature work in flight
-
-- No new non-feature code claimed in this wake-up.
-- Historical open item remains the **multi-team agent_id-vs-did
-  comparison grep**; the 1.20.7 strict-walk closed the known routing
-  symptom, but the broader codebase grep has not been banked as done.
+- **`aweb-aapm.1` — AC/aweb migration composition repair design**: Grace approved direction with amendments. Approved model: canonical `aweb-aweb` migrations resolve from installed/sibling aweb package; AC `server` schema remains named `server` but uses AC-owned provenance/module like `aweb-cloud-server`; AC aweb additions move to `aweb-cloud-aweb-overlay`; apply order is canonical aweb → AC server → AC aweb overlay → `aweb_cloud`; AC-local copied canonical `migrations/aweb` must not be manager authority, ideally removed. Final packet must directly attach/link table/column overlay inventory and prod restore mapping.
+- Athena authored `aweb-aapj` breakdown/briefs and seeded initial grep inventories in `/tmp/aweb-legacy-hits.txt` and `/tmp/ac-legacy-hits.txt` (historical; aapj gate closed).
 
 ## Release-ready state (handoff to Hestia)
-
-- **Bless-and-run expanded to include follow-ups**: AC `5b44f724` and
-  aweb `99cc2cb` are approved for gate input. Since `server-v1.24.0` /
-  `aw-v1.24.0` were tagged at `f443abc` and do not include `99cc2cb`,
-  Athena recommended aweb `1.24.1` then AC `v0.5.43` repinned to that
-  patch release before tag/deploy.
-- Latest verified-live chain per Operations: awid-service-v0.5.6,
-  awid-v0.5.6, aweb 1.23.0, AC v0.5.42.
-- Pi package release path appears to be in the aaov/aaox release lane;
-  do not duplicate Hestia's publish work without an explicit handoff.
-
-## Pending engineering artifacts owed
-
-- **KI#1 closure decision record technical content** remains old debt
-  unless Sofia has superseded it. Source:
-  `agents/athena/aale-trust-contract.md` + aweb commit `7759abc`.
-- **Playwright-MCP reproducer for Add-Existing dialog** remains old
-  non-feature backlog. AC checkout is available at
-  `/Users/juanre/prj/awebai/ac` (symlink to aweb-cloud), main is at
-  `5b44f724` as of 18:05 GMT.
+- Grace reviewed aweb `fa1041c` and approved. Hestia reran aweb `fa1041c` + AC `7eb391bd`: Phase 1/2/3/4/5 green; Phase 6 had one failure where hosted identity creation succeeded but returning to hosted-connect roster did not show the new `hosted-identity-row`. Athena first patched AC `d77e0934` to force hosted roster refetch on mount, and Olivia approved. Hestia's rerun still failed the same roster row. Athena then found the data-contract root cause: `TeamAgentSetupFlow` filters for `hosted_mcp` + active + custodial/global + address, but `apiClient.listTeamAgents` still called OSS `/api/v1/agents`, whose response lacks Cloud enrichment fields such as `custody` and `identity_status`. AC `9104ffc2` now calls Cloud `/api/v1/dashboard/agents?team_id=...`, adds api-client unit coverage for enriched hosted fields, and keeps CLI alias availability safe because that caller only reads aliases. Grace reviewed AC `9104ffc2` and passed.
+- Hestia's validation-only rerun for aweb `fa1041c` + AC `9104ffc2` is green across all 6 phases: release-verify-* PASS; `test-backend-aweb-local` PASS 1435/1435; `test-frontend` PASS 195/195; `release-build-image` PASS; `test-two-service` PASS 15/15; `test-cloud-user-journeys` PASS 11/11 browser tests + ALL PASSED 263 tests + PASS browser journey. Full log: `/tmp/ac-aapj-sibling-chain-9104ffc2.log`. Boundary preserved: no tags, pushes, deploys, bumps, migrations, or row mutations.
+- Last fully validated release-chain heads remain aweb `fa1041c` + AC `9104ffc2`, but that validation is no longer release-sufficient. Current post-aapm/aapk heads are newer, and `aweb-aapl` is still open under the two-state reversal. Hestia should not rerun release validation until `.4`, `.5`, `.6`, and `.3` close.
+- Do not release or ask Hestia for release gates yet: hard hold remains on tag/deploy/publish/version bump/prod migration/prod row mutation until aapl closes, Hestia validates current heads, and Juan explicitly clears release actions.
+- Known release caveats: npm `@awebai/aw` remains `1.24.3`; do not claim npm/CLI `1.24.4`. AWID health still needs observed `0.5.7`.
 
 ## Risks
-
-- **Channel publish drift**: channel-v1.4.1 tag exists but npm publish
-  did not complete; public npm metadata may still show Proprietary
-  until aaox.16 is closed.
-- **Channel auto-ack/read P0**: no longer waiting for more customer
-  signal. Inbound channel delivery currently mutates read state before the
-  agent/model necessarily sees the message. This can silently hide
-  direction work from inbox/pending across Pi and Claude Code.
-- **OAuth claim-shape risk**: do not overclaim until Hestia live-verifies.
-  Precise claim: dashboard-targeted existing hosted identity preserves
-  selected org/team; generic `/mcp/` uses explicit org-first/team-second
-  selection when ambiguous; invalid/stale targeted links fail closed;
-  legacy aliases help cached clients but do not force client-side tool
-  refresh.
+- **Two-state reversal risk (current P0)**: any remaining `contacts_or_teammates`, same-team delivery exception, or team-cert shortcut in code/schema/docs/tests would violate Juan's current inbound-message contract. Historical audit mentions may remain only when explicitly marked non-normative.
+- **Release-clearance risk**: prior validation was green, but release actions and even release-forward gates are now blocked until `aweb-aapm` is fixed, Grace approves cleanliness, Hestia validates the cutover plan, and Juan explicitly clears.
+- **Two-world dependency risk**: AC release validation must use sibling-source aweb/awid where appropriate, not PyPI-only `aweb==1.24.4`; no Hestia tag/publish just to unblock local tests under Juan hold. AC `0941ee42` intentionally makes `release-verify-model` fail if the backend venv still has editable aweb/awid overlays, so Hestia's chain must clean/re-sync before release-build-style gates after sibling-source test phases.
+- **Residual grep risk**: regenerated strict reports still contain compatibility/audit/history/storage hits; AC blocker classes are closed, but final Hestia gate may still surface release issues.
+- **AWID hidden/limited row-disposition risk**: deployment must not silently widen existing hidden/limited address rows. aweb `d300b33` encodes and tests fail-closed disposition; any live/prod action still needs explicit release clearance.
+- **Backcompat risk**: current `aw` users may use stale args/files; edge adapters should normalize where practical, but old names must not remain canonical help/API/output.
 
 ## Next checks
-
-- Watch / support P0 channel auto-ack/read fix. Expected code surface:
-  `aweb/channel-core/src/channel.ts` and `aweb/channel/src/index.ts` mail
-  ack/chat mark-read calls after `onAwakening`.
-- Watch Hestia's revised gate/deploy/live-verify. Expected release shape
-  if she accepts Athena recommendation: aweb `1.24.1` containing
-  `99cc2cb`, then AC `v0.5.43` with aweb pin updated beyond `5b44f724`.
-- Sofia has been notified of narrow claim shape; loop her in before any
-  customer-facing claim.
-- Watch `aweb-aaov.12` for Dave's close/handoff and `aweb-aaox.16` for
-  Hestia's publish result.
-- If asked to act on Pi release, review the current aweb diff/commits
-  against the aaov brief and preserve the Hestia publish boundary.
-- If a channel event wakes this session, inspect event metadata and
-  sender verification before acting; use mail for handoffs/status and
-  chat only for blocking questions.
-
-## Banked release-discipline (through 2026-05-07)
-
-1. Release gate = full e2e + SOT + peer-review approval (mailed)
-2. Review via shared working tree (not chat-pasted diffs)
-3. Route work through the right peer
-4. Trust the Makefile's release-ready chain
-5. Written approval / decisions via mail
-6. Use prohibition language explicitly when blocking a lane
-7. Push release tags individually, never batched
-8. Tracker audit needs symptom-check, not commit-message grep
-9. Published artifact ≠ deployed service
-10. Browser-verify UI-surface releases
-11. Closure framing rests on empirical attestation
-12. Reproducer-as-gate
-13. Code-reviewer subagent for gate-input commits BEFORE
-    bless-and-run mail to Hestia
-14. Migration files are immutable post-deploy. Recovery is additive.
-15. Equivalence-test policy: non-trivial diff = reject the
-    consolidation, even if functionally invisible.
-16. Cross-schema FK audit before any DROP SCHEMA cutover.
-17. Pre-deploy gates that depend on env-specific prerequisites
-    must fail-closed with explicit bypass signal, not skip-on-missing.
-18. Verified-live evidence cites actually-committed SHA.
-19. Don't bless-and-run with a work-in-flight branch.
-20. Code-correctness review before re-running e2e.
-21. Bless-and-run validation MUST run the FULL release-ready chain
-    end-to-end at the gate-input SHA (on the same machine as the
-    deploy will run from), not a curated subset.
-22. Code-reviewer subagent flagging silent-fall-through gap +
-    relevant-scale realistic for production trajectory ⇒ blocker,
-    not follow-up. (>100 conversations is realistic almost
-    immediately for active agent teams.)
-23. Test failures recurring at specific clock windows + reruns clean
-    later are date/timezone-math signals, NOT transient-flake signals.
-    "It passed on rerun" is not a diagnosis. Check whether the rerun
-    delay corresponds to a UTC-vs-local-midnight crossing or other
-    clock-based window before declaring transient.
-24. Documented workarounds must be empirically attested against the
-    actual customer surface AND the predecessor states they apply on
-    top of, not just the surface they claim to work around.
-25. When the empirical surface contradicts a hypothesis, that's a
-    refutation, not a "transient." Don't double down on the
-    hypothesis. Test against a known-OK case before narrowing scope.
-26. "Affects only one customer in current base" is not a scope claim
-    about the bug class — it's an observation about THIS customer base
-    AT THIS MOMENT. Reproduce against an internal pair you control to
-    distinguish customer-data class from product class.
-27. Cut-the-deploy-only-if-functional-change. Don't cut a deploy
-    release purely to keep a pin-in-tagged-release synced. Pin bump on
-    main is valid state; tags should track functional changes.
-27a. For CLI-only releases, don't bump server/pyproject.toml. The tag
-    carries the CLI version (goreleaser uses GITHUB_REF_NAME). Source
-    pkg state stays aligned with what's on PyPI for the server.
-28. Tool-driven destructive git-state mutation is never acceptable as
-    a side effect of a non-git-management command, even with loud
-    warnings. Refuse + remediate, don't auto-fix the customer's repo.
+- Watch for Mia's immediate ACK/branch packet for `aweb-aapl.4`; if she declines or stays inactive, reassign instead of leaving `.4` implied. Required output: two-state backend/schema/code and stale `contacts_or_teammates` restore data fail-closed unless Juan directs mapping.
+- `aweb-aapl.7` is branch-ready/ACKed for Olivia re-verification: aweb `origin/mia/aapl4-remove-third-mode @ 6a5f1d0` + AC `origin/mia/aapl7-ac-cli-signup-inbound-mode @ 1fb14129`. aweb CLI supports `--inbound-mode contacts-only`; AC cli-signup accepts/validates/persists canonical `contacts_only`; BYOD fails fast with real follow-up paths. Olivia was told to re-verify `.6` end-to-end before final packet.
+- Combined aapl integration pushed: aweb main `03f1963` and AC main `e5c25c7b`; then Peter found a `.5` blocker in AC ContactsTab copy implying team/namespace deliverability. Athena patched AC main `8d3832b1` (`aapl: make contacts copy exact-address only`): Contacts only now says exact saved agent addresses; team membership/certs/namespaces do not bypass. Validation: aweb focused server messaging/package tests `193 passed`; aweb CLI focused inbound-mode tests passed; AC backend focused tests under `make use-aweb-local`/`uv --no-sync` `8 passed`; AC frontend focused tests incl. ContactsTab `.6` surfaces `31 passed`; diff-check clean. `aweb-aapl.7` closed. Still not ship-clear until Olivia live-verifies `.6`, Peter reruns `.5` on aweb `03f1963` + AC `8d3832b1`, Grace passes `.3`, Hestia validates, and old-installed-aw customer-impact decision lands.
+- Independent Juan-approved copy fix landed to AC main `7f2485eb` (`aanp-7: tighten OAuth consent aside copy`); diff-check passed; no release actions.
+- Olivia merged hosted ID-space epic + consent picker to AC main `7365cc03` per Juan override. Grace reviewed/cleared the ID-space forward patches on main, including `admin_support.py` sourcing `replacement_agent_id` from `replacement.agent_id` and explicit support audit `agent_id` with `identity_id` compatibility. Remaining caveat: two-service e2e is still gate evidence before release closure.
+- After `.7` lands, watch for Olivia `.6` re-verification packet: AgentDetail PATCH, hosted MCP creation, and CLI global `aw init --global --name <x> --inbound-mode contacts_only` must all work end-to-end before AC branch merges.
+- Route combined Mia/Olivia/docs refs to Peter for `aweb-aapl.5` grep review, then Grace for `.3` structural review.
+- After aapl passes and merges, notify Hestia to rerun validation at current aweb + AC heads.
+- If release is eventually cleared, keep caveats explicit: npm `@awebai/aw` is still `1.24.3`; live AWID still reports `0.5.6` until Task #201 is resolved/verified.
+- Keep hard hold explicit until clearance: no tag/deploy/publish/version bump/prod migration/prod row mutation.
