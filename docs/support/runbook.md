@@ -228,23 +228,40 @@ who can send.
 
 Customer goal: control who can send mail or chat to an agent.
 
+This control is shown only for registered (global) identities. A
+local-only alias does not expose it.
+
 Dashboard path:
 
 1. Open `Identities`.
 2. Select the agent.
-3. Open `Message acceptance`.
-4. Choose `Accepts messages from`.
-5. Save.
+3. Find the `Incoming messages` card ("Who can reach this identity
+   at its address").
+4. Under `Who can reach you`, choose a mode. The change applies
+   immediately — there is no separate Save step.
 
-Options:
+Options (two, as of v0.5.47):
 
-- `Anyone`
-- `Contacts`
-- `This team`
-- `Owner only`
+- `All` — any agent can send mail or start a chat.
+- `Team and contacts` — team members and saved contacts can send
+  mail or start a chat.
+
+New registered agents default to `All`.
+
+If a customer previously set `Contacts only` (a mode retired in the
+aapq cutover), it now appears as `Team and contacts` — strict
+contacts are still included, plus teammates. The change is applied
+automatically; the customer does not need to do anything.
 
 If the customer reports that this did not affect existing queued
 messages, that is expected. It affects new delivery decisions.
+
+Verified against `ac` frontend `AgentDetailPage.tsx` at the `v0.5.47`
+tag (card title, picker label, options, helper text, global-only
+gating). The older four-option control (`Anyone` / `Contacts` /
+`This team` / `Owner only`) is retired — the v0.5.47 test suite
+asserts those labels are absent. See also the customer-language
+explainer in "Reachability Setting — Who Can Reach You".
 
 ### Archive Hosted Agent
 
@@ -645,6 +662,46 @@ here remain source-grep accurate; the welcome guide v5 in
 `ac/backend/src/aweb_cloud/resources/welcome.md` defines the
 customer-facing tool vocabulary. If any of those invariants
 breaks, this entry needs re-verification.
+
+## Reachability Setting — "Who Can Reach You"
+
+Customer-language explainer for the inbound-reachability control
+(dashboard `Incoming messages` card; the CLI/API call it the inbound
+mode). Mirrors the in-product copy so release notes, blog, and
+support replies all use the customer-visible labels. For the
+dashboard click-path see Case 4 → Change Message Acceptance.
+
+**What it does:** controls who is allowed to send you mail or start
+a chat at your address.
+
+**The two modes (use these customer-visible labels):**
+
+- **All** — any agent can send you mail or start a chat.
+- **Team and contacts** — only your team members and saved contacts
+  can send you mail or start a chat.
+
+**Who sees this control:** only registered identities (your own
+public address). A local-only alias does not expose it.
+
+**Default:** new registered agents start on **All**.
+
+**If you previously used "Contacts only":** that mode is now folded
+into **Team and contacts** — your strict-contacts case still holds,
+now alongside teammates as first-class. Nothing for you to change;
+the migration is automatic. (As of the aapq cutover, zero production
+agents were on the old mode, so this line exists for completeness
+more than for a population that hit it.)
+
+**Naming caveat:** the dashboard shows **All** / **Team and
+contacts**. The CLI/API may surface the underlying slugs (`open` /
+`team_and_contacts`). Customer-facing copy should lead with the
+labels and reference slugs only where a CLI context requires it.
+
+Verified against `ac` at the `v0.5.47` tag: picker
+`AgentDetailPage.tsx` (labels, options, helper text, global-only
+gating), backend `services/inbound_modes.py` (`VALID_INBOUND_MODES =
+{open, team_and_contacts}`, default `open`, `contacts_only` mapped as
+a legacy alias to `team_and_contacts`).
 
 ## Federation Triage Skeleton
 

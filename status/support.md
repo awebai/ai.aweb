@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-23 (post v0.5.46 deploy smoke ack + 4-day catch-up)
+Last updated: 2026-05-23 (dashboard inbound-mode source-verify for Sofia + Case 4 staleness fix + runbook reachability section)
 
 ## Current focus
 
@@ -162,13 +162,25 @@ catch up the discipline pointer once Iris's update lands.
   deniability hedge. The source-grep IS the work; if the work
   has not been done, the support reply has not been delivered.
   Originating moment: I shipped marvin a MCP tool list with
-  the hedge — including `send_message_to_contact` which
-  doesn't exist in the canonical reference (the correct shape
-  uses `send_mail` or `send_chat`). Juan caught it via marvin
-  relay; corrected reply sent via chat with verified names
-  from `aweb/docs/mcp-tools-reference.md`. Per Athena prior
-  guidance on catalog hygiene: refinement to #27 rather than
-  new discipline #29 — same root rule, sharper edge.
+  the hedge — including `send_message_to_contact`, which the
+  canonical reference says docs/new clients should NOT use
+  (canonical shape is `send_mail` / `send_chat` with the
+  contact address). Juan caught it via marvin relay; corrected
+  reply sent via chat with verified names from
+  `aweb/docs/mcp-tools-reference.md`. Per Athena prior guidance
+  on catalog hygiene: refinement to #27 rather than new
+  discipline #29 — same root rule, sharper edge.
+  **Precision correction (2026-05-23):** `send_message_to_contact`
+  does NOT "not exist" — it is a **registered Legacy Compatibility
+  Alias** (`mcp-tools-reference.md` §"Legacy Compatibility Aliases",
+  origin/main + v0.5.47; also present in `aweb/server/src/aweb/mcp/
+  server.py` + `tools/contacts.py`). The server still registers it
+  so cached clients don't break; the reference directs new
+  clients/docs to `send_mail`/`send_chat`. So the support rule
+  ("recommend the canonical name, not the alias") is unchanged, but
+  the factual claim is: it's deprecated-but-working, not absent.
+  Telling a customer a working tool "doesn't exist" would itself be
+  an error — verify the alias table before asserting non-existence.
 - **Workspace identity-verify on wake-up** (caught while
   diagnosing mail-409 to marvin, 2026-05-18) — handoff identity
   section can be stale even after a refresh if the rewriter
@@ -208,6 +220,60 @@ catch up the discipline pointer once Iris's update lands.
   entry's correctness to docs-inventory currency + welcome-guide-v5
   vocabulary canon. First template; future entries land as real
   customer seed examples accumulate.
+
+## Recent peer / verification work (live evidence base)
+
+- **Dashboard inbound-mode source-verify for Sofia (2026-05-23)** —
+  Sofia (mail `96d85669`) gated a v0.5.47/v0.5.48 external-claim
+  derivation on what the dashboard inbound-mode picker actually
+  shows. No browser session, so verified from `ac` source at the
+  deployed `v0.5.47` tag. **Verified facts (held evidence for any
+  future reachability question):**
+  - Picker `AgentDetailPage.tsx`: card "Incoming messages", label
+    **"Who can reach you"**, two options only — `open` shown as
+    **"All"**, `team_and_contacts` shown as **"Team and contacts"**.
+    Auto-saves on selection. Gated to global/registered identities
+    (`isGlobalIdentity`); local aliases don't expose it.
+  - Backend `services/inbound_modes.py`: `VALID_INBOUND_MODES =
+    {open, team_and_contacts}`, `DEFAULT_INBOUND_MODE = "open"`,
+    `contacts_only` is a legacy alias normalized to
+    `team_and_contacts` (non-breaking; no 422).
+  - **No hidden-422 UX issue** (Sofia's worry): dashboard matches the
+    data-layer CHECK constraint Hestia found. `contacts_only` is not
+    surfaced.
+  - **Customer-visible names are "All" / "Team and contacts"**, NOT
+    the slugs. Sofia adopted this into the external-claim hold posture.
+  Sofia closed the 2nd hold-list item on this; only task #208
+  (Grace's CLI fix in v0.5.48) remains before v0.5.47/v0.5.48 clears.
+  Sofia requested + approved a customer-facing runbook section
+  (authoring sanctioned by Direction, not preemptive).
+
+- **Runbook Case 4 staleness fix (2026-05-23)** — while verifying the
+  above, found the existing "Change Message Acceptance" entry listed
+  FOUR options (`Anyone`/`Contacts`/`This team`/`Owner only`) under a
+  "Message acceptance / Accepts messages from" label — a UI retired
+  before aapl. The v0.5.47 test suite asserts those labels are absent
+  (`AgentDetailPage.test.tsx:336,338`). Corrected to the verified
+  two-option surface + added dedicated "Reachability Setting — Who
+  Can Reach You" customer-language section per Sofia's spec. Both
+  held in the unpushed stack. **Open Athena tech-accuracy question**:
+  does hosted-custodial agent reachability use this SAME
+  `isGlobalIdentity`-gated picker, or a different surface? Case 4
+  covers hosted-custodial flows and I only verified the global-identity
+  path. Routed to Athena.
+
+- **`send_message_to_contact` mislabeled in customer-facing docs
+  (found 2026-05-23)** — the consumer welcome guide draft
+  (`publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`) and site
+  docs (`ac/site/static/docs/mcp-tools-reference.md` + site content)
+  reference `send_message_to_contact` as a current contact-tool. It's
+  a deprecated **Legacy Compatibility Alias** (works, but canonical =
+  `send_mail`/`send_chat`). Also propagated to Zeus via mail
+  `fd65ae2c` (low harm — alias resolves; not worth a standalone
+  correction, fold into next Zeus contact). Flagged to Sofia
+  (external-claim framing owner) for the doc-fix decision; not editing
+  publishing/ or site docs myself (not my files). Original source of
+  the name was Sofia's mail `aa9d70de`.
 
 ## Recent customer interactions (live evidence base)
 
