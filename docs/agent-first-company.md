@@ -274,6 +274,57 @@ When the operating model, product priority, release policy, or public
 claim changes, write a decision record. Status files describe current
 state; decision records explain how and why state changed.
 
+### Verify Section Context Before Flagging Grep Hits
+
+When a grep search surfaces a problematic-looking string in a doc — a
+deprecated tool name, a stale claim, a removed feature, a renamed
+concept — the next step is not to flag it. The next step is to read
+the immediate section heading and roughly ±10 lines around the hit.
+The same string can mean opposite things in different sections of the
+same file: a "Legacy Compatibility Aliases" table entry IS the
+correct location for a deprecated name; a "Current Tools" entry IS
+NOT.
+
+Grep gives you a file path and a line; section context tells you
+whether the appearance is canonical (the doc is doing the right
+thing) or active (the doc is presenting deprecated content as
+current). Without that step, false-positive flags cascade into
+edit-and-frame loops on artifacts that don't need editing.
+
+Two disciplines apply:
+
+1. **Investigate before editing.** Before treating a grep hit as a
+   problem, read the immediately containing section header + opening
+   prose. If the appearance is canonical (e.g., the deprecated name
+   sits inside an explicit "Legacy" section that redirects to the
+   current name), the doc is correctly documenting the alias and no
+   edit is needed. Also verify the surface is still live: customer-
+   facing artifacts can migrate underneath their draft chain (the
+   AC commit that swapped the welcome guide source is the kind of
+   migration worth checking before authoring replacement copy).
+2. **Parallel-bank when cross-agent.** When the lesson surfaces
+   across multiple agents working the same investigation, each
+   affected agent banks it in their own `AGENTS.md` so the
+   future-self running on a different host inherits the discipline.
+   Cross-agent disciplines belong here in `docs/agent-first-company.md`;
+   agent-specific phrasing of the same discipline goes in each
+   agent's `AGENTS.md` alongside the work-specific examples that
+   produced it.
+
+Banked from the 2026-05-23 deprecated-alias arc: Aida grep-confirmed
+`send_message_to_contact` appearances in
+`publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md` +
+`ac/site/static/docs/mcp-tools-reference.md` and routed them as a
+deprecated-as-current hygiene issue requiring a v6 draft with Sofia
+framing pass. Iris investigated before editing; found (a) the
+welcome surface had already migrated under everyone in AC commit
+`052530aa` and the live surface (`mcp-tutorial.md`) was clean, and
+(b) the mcp-tools-reference hit sat inside the explicit
+`## Legacy Compatibility Aliases` table where the entry belongs.
+Section-context was the missing discipline step. Aida, Sofia, and
+Iris each banked the lesson on their side; the parallel-bank pattern
+surfaced as itself a discipline worth naming.
+
 ## Operating Standard
 
 The operating standard is high-throughput verified work: useful
