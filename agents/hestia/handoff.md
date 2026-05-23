@@ -1,5 +1,87 @@
 # Hestia Handoff
 
+Last updated: 2026-05-24 00:25 CEST (22:25 UTC) — **AC v0.5.47 +
+aweb 1.25.3 destructive-cutover verified live**. Closes aapq wave.
+
+## Current state
+
+- prod /health: release_tag=v0.5.47, git_sha=9d39f579,
+  aweb_version=1.25.3, awid_service_version=0.5.8, all green
+- aweb consolidated 001 rebaseline live (was: original 001 + bridge
+  002; now: single 001 with final state baked into CHECK)
+- Athena formal ack 0323d5cc/4704b86b; Iris ack b21e1511; Sofia
+  ack-pending
+- Sprint Phase 2 DROP → /health flip: 7m05s within 10-min SLO
+- Cutover dump preserved at /tmp/aweb-cutover-20260523T220920Z/ ;
+  safety-net dump at /tmp/aweb-safety-net-20260523T220642Z/ (both
+  ~56MB / 71 COPY blocks / 23599 rows; sha256 logged in operations.md)
+
+## Immediate follow-ups (small, in-lane)
+
+1. **`prod_db_reset.py` argv leak**: `_run` helper prints full
+   pg_dump argv to stdout including DATABASE_URL with Neon password.
+   Standing rule "never echo DATABASE_URL". Scrub the print path
+   (mask URL with `***` while keeping flags visible). Juan acknowledged
+   in-session ("that's fine as long as the dump is complete and
+   correct, do not worry about neon").
+2. **`aw whoami` 401**: `aw whoami` reports
+   `Inbound: unknown (aweb: http 401: Invalid authorization header format)`
+   on hestia identity post-cutover. Other surfaces (workspace, mail,
+   chat, contacts) all work. Likely an AC endpoint expecting a
+   different auth header shape than the inbound-mode probe sends.
+   Not blocking; worth a routing-side investigation when Athena or
+   Grace has cycles.
+3. **`aw mail send --to juan` returns "agent not found: juan"**: the
+   juan alias doesn't resolve. Per CLAUDE.md `aw mail send --to juan`
+   is the documented escalation path for production incidents. Verify
+   contacts list / alias setup so the escalation path is live.
+4. **Runbook lesson to bank**: do the constraint-diff audit BEFORE
+   entering the sprint window, not during. Today's scope expansion
+   (aweb only → all 3 schemas) was decided mid-sprint at the FK
+   foot-gun moment. Stayed within SLO but cost ~1 min of mid-sprint
+   scrambling. Pre-sprint audit per runbook line 1430-1438 should
+   be enforced.
+
+## What just landed (today, 2026-05-23 — full chronology)
+
+Morning (Juan-watching, Grace's translator):
+- Destructive cutover for aapj/k/l/m consolidation
+- aweb 1.25.0 + awid-service 0.5.8 + AC v0.5.45 verified-live
+
+Mid-day:
+- aweb-aapp identity_mismatch debug: closed at aweb 70410c3
+  (Dave's JS verifyDidKeyResolution accepting seq=1 register_did)
+- AC v0.5.46 (aapq feature: team_and_contacts inbound mode)
+  shipped with aweb 1.25.2 + bridge 002 migration
+- aw CLI 1.25.2 released
+
+Evening (this session):
+- aweb 1.25.3 consolidated rebaseline shipped to PyPI
+- AC v0.5.47 destructive cutover: drop 3 schemas, full re-migrate,
+  data-only restore, Render-click, /health flip — 7m05s sprint
+- Gate `release-verify-migration-immutability` restored in 53215c09
+
+## Next-Hestia start point
+
+- Sofia ack on v0.5.47 verified-live (if not received: mail her with
+  evidence summary)
+- Address the 3 follow-ups above (each is small, fits between waves)
+- Stale items still on operations.md tail: #89 Neon timeouts,
+  #104 OIDC npm migration, #109 Render startup migration check,
+  #110 release-verify-live schema gate, #125 backfill predicate,
+  #132 scheduler worker provision, #169 render orphan-purge,
+  #182 federation smoke, #190 MCP OAuth smoke, #191 Sofia loop,
+  #203 hestia aw_sk 409 gap, #204 post-cutover to_did history drop
+- Tomorrow morning routine: `git pull`, read docs/team.md +
+  docs/agent-first-company.md + docs/invariants.md, read
+  status/operations.md (this file's parent), curl
+  https://app.aweb.ai/health + https://api.awid.ai/health, then
+  `aw chat pending` + `aw mail inbox`
+
+---
+
+**Historical:**
+
 Last updated: 2026-05-18 15:25 CEST (13:25 UTC) — **Federation
 completion wave aaou.15-18 internally verified live; commando-coord
 pending for external claim**. v0.5.42 deployed at 7ca6ce62 with

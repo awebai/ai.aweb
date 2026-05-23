@@ -1,5 +1,78 @@
 # Operations Status
 
+Last updated: 2026-05-24 00:25 CEST (22:25 UTC) — **AC v0.5.47 +
+aweb 1.25.3 destructive cutover SHIPPED VERIFIED LIVE**. Closes
+the aapq wave: consolidated 001 rebaseline now the canonical aweb
+migration line in prod; original 001 + bridge 002 history wiped via
+3-schema DROP + re-migrate + data-only restore.
+
+**v0.5.47 verified-live evidence (2026-05-23 22:17:18Z /health
+flip)**:
+- /health: release_tag=v0.5.47, git_sha=9d39f579,
+  aweb_version=1.25.3, awid_service_version=0.5.8 (untouched)
+- DB / Redis / awid_registry: connected; coordination_api: mounted
+- Sprint timing Phase 2 DROP → /health flip: **7m05s within
+  10-min SLO** (drop 22:10:13Z, restore-verified 22:15:54Z,
+  flip 22:17:18Z)
+- Cutover dump /tmp/aweb-cutover-20260523T220920Z/full-data-dump.sql:
+  56MB, sha256 a79e0c26..., 71 COPY blocks, 23599 rows; restore
+  loaded 68 tables with row-count verifier green
+- Safety-net dump /tmp/aweb-safety-net-20260523T220642Z/full-data-dump.sql
+  (sha256 164aaad1...) held as rollback artifact; 0 row-count delta
+  vs cutover dump
+- Constraint state post-cutover: aweb_cloud FKs 51 pre-drop +
+  7 cross-schema reborn = 58 (got 56 aweb_cloud + 2 server)
+- inbound_mode distribution: 301 open / 46 team_and_contacts /
+  0 contacts_only — final state baked into consolidated 001 CHECK
+- Mail+chat round-trip Athena verified=true (mail 5cc7e2da↔5b937066,
+  chat session 269be02f↔0a556f81); row-count delta on
+  aweb.messages and aweb.chat_messages confirms write-path
+- Athena formal ack 0323d5cc/4704b86b accepts v0.5.47 verified-live
+  with independent /health check; Iris ack b21e1511; Sofia
+  ack-pending (not yet replied on this conversation)
+
+**Scope-expansion during cutover (banked)**: Phase 2 was intended
+as `DROP SCHEMA aweb CASCADE` per pre-flight summary; mid-sprint the
+cross-schema FK foot-gun (runbook line 1402) fired — 7 FKs from
+aweb_cloud → aweb were cascade-dropped. Juan approved extending to
+all 3 schemas (aweb + aweb_cloud + server) so the full migration
+chain re-applies fresh, which is the runbook's "strictly correct"
+shape from the 2026-05-05 cutover-#2 case study. This added scope
+late but stayed within sprint SLO. **Bank as runbook lesson**: do
+constraint-diff audit BEFORE DROP, not during, so scope is settled
+pre-sprint.
+
+**Follow-ups from this cutover**:
+- AC Makefile gate `release-verify-migration-immutability`
+  restored in 53215c09 (was commented out for the destructive
+  cutover in 9d39f579). Standing gate is back live.
+- `aw whoami` returns "Inbound: unknown (http 401: Invalid
+  authorization header format)" — sidecar 401 on inbound-mode
+  endpoint, separate from mail/chat/workspace surfaces which all
+  work. Worth a routing investigation; not blocking.
+- `prod_db_reset.py` argv-echo prints full DATABASE_URL including
+  Neon password to stdout. Banked policy says "never echo
+  DATABASE_URL". Patch needed: scrub URL from `_run` argv print
+  in scripts/prod_db_reset.py.
+- `aw mail send --to juan` returns "agent not found: juan" —
+  Juan-alias contact lookup needs verification; flagged in
+  follow-up task list.
+
+**Earlier today (2026-05-23) — completed waves**:
+- Morning: aweb 1.25.0 + awid-service 0.5.8 + AC v0.5.45 (aapj/k/l/m
+  consolidation) — full destructive cutover with Grace's translator;
+  verified-live early afternoon
+- aapq feature wave: AC v0.5.46 (team_and_contacts inbound mode)
+  shipped + aweb 1.25.2 with bridge 002 migration
+- aw CLI 1.25.2 released (Go binary via npm + GoReleaser)
+- aweb 1.25.3 PyPI publish (consolidated 001 rebaseline at aweb
+  00b2746); wheel sha256 5ee80f94..., sdist sha256 5fbacc5b...
+- AC v0.5.47 destructive cutover (this entry's main subject)
+
+---
+
+**Historical: 2026-05-19 16:10 CEST entry preserved below for context.**
+
 Last updated: 2026-05-19 16:10 CEST (14:10 UTC) — **aweb 1.24.3 + ac
 v0.5.44 BOTH SHIPPED VERIFIED LIVE**. Next wave (aweb 1.24.4 + ac
 v0.5.45 global/local deletion) on **HARD HOLD pending Juan direction
