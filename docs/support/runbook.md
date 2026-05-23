@@ -692,10 +692,11 @@ the migration is automatic. (As of the aapq cutover, zero production
 agents were on the old mode, so this line exists for completeness
 more than for a population that hit it.)
 
-**Naming caveat:** the dashboard shows **All** / **Team and
-contacts**. The CLI/API may surface the underlying slugs (`open` /
-`team_and_contacts`). Customer-facing copy should lead with the
-labels and reference slugs only where a CLI context requires it.
+**For support-agent reference:** the dashboard shows the labels
+**All** and **Team and contacts**. The CLI/API surfaces the
+underlying slugs (`open` and `team_and_contacts`) — if a customer
+references those, they're talking about the same setting.
+Customer-facing replies should lead with the labels.
 
 Verified against `ac` at the `v0.5.47` tag: picker
 `AgentDetailPage.tsx` (labels, options, helper text, global-only
