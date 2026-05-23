@@ -1,11 +1,13 @@
 # Engineering Status
-Last updated: 2026-05-23 13:01 GMT
+Last updated: 2026-05-23 13:11 GMT
 
 ## Current focus
 - **aapj/aapk/aapl/aapm consolidated release wave is verified-live.** Hestia reported verified-live from a message that displayed `identity_mismatch`, but independent public checks line up: `app.aweb.ai/health` reports `v0.5.45` / git `fe364950` / aweb `1.25.0` / awid_service `0.5.8`; `api.awid.ai/health` reports `0.5.8`; npm reports `@awebai/aw=1.25.0`, `@awebai/claude-channel=1.4.4`, `@awebai/pi=0.1.1`.
 - **Prod DB reset/restore completed.** AC prod was rebuilt clean and restored; AWID 003/004 applied after the approved disposition. Boundary note: no checksum bypass markers or `schema_migrations` edits; only approved disposition row mutations.
 - **AWID/AC disposition landed.** Active legacy AWID non-neutral public addresses were normalized public/null in AWID; corresponding AC/aweb agents were set `contacts_only` to preserve old non-public delivery intent at the delivery layer. Historical soft-deleted AWID rows were left as-is.
 - **Banked fast-follows:** redact `ac/scripts/prod_db_reset.py` DATABASE_URL logging; investigate Render auto-deploy behavior before next cutover; investigate historical AWID public-address soft-delete paths; investigate Hestia cert refresh / verification wobble (`identity_mismatch` mails during/after restart); bank npm token/`gh secret set` syntax lesson; scrub `/tmp/aweb-db-reset-*` and `/tmp/awid-db-snapshot-*` PII evidence when wave is fully closed.
+- **P0 post-release bug opened:** Grace found `contacts_only` blocks new chat but mail continuation can bypass exact-contact policy via `deliver_message(... skip_policy_check=True)`. Athena created dev task `aweb-aapo` assigned to Grace to enforce `contacts_only` on HTTP/MCP mail continuations unless Juan explicitly redefines the rule. Athena's contacts list is empty, and Grace is not an exact active contact here.
+- **Verification wobble still active:** Athena upgraded local CLI to `aw 1.25.0` (`136f25f`); Hestia's fresh chat still displayed `identity_mismatch` / `verified=false`, so matching client version did not clear Hestia->Athena verification.
 - **Stale replay control:** Peter replay/stand-down mails have been drained repeatedly; check `aw mail inbox` before acting, but ignore stale aapf/aapg/aaph/aapm/aapl replay ACKs unless a current verified task is routed.
 
 ## Dev team work in flight

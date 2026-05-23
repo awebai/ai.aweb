@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-23 13:01 GMT
+Last updated: 2026-05-23 13:11 GMT
 
 ## Read this first
 
@@ -21,6 +21,8 @@ release mechanics; to them, Athena is the gate.
 - **AWID/AC disposition landed.** Juan/Grace clarified the architecture: AWID addresses are public/global; old non-public delivery intent belongs in AC/aweb `inbound_mode`. Active legacy AWID non-neutral `public_addresses` rows were normalized to public/null in AWID, and corresponding AC/aweb agents were set `contacts_only`. Historical soft-deleted AWID rows were left as-is.
 - **Published artifacts:** aweb `1.25.0` (PyPI + npm `@awebai/aw`), awid-service `0.5.8`, awid `0.5.8` (GHCR + api.awid.ai), AC `v0.5.45`, `@awebai/claude-channel 1.4.4`, `@awebai/pi 0.1.1`. `@awebai/channel-core` is bundled into channel/pi, not a separate runtime dependency.
 - **Banked fast-follows:** redact `ac/scripts/prod_db_reset.py` DATABASE_URL logging; investigate Render auto-deploy behavior before next cutover; investigate historical AWID public-address soft-delete paths; investigate Hestia cert refresh / verification wobble (`identity_mismatch` mails during/after restart); bank npm token/`gh secret set` syntax lesson; scrub `/tmp/aweb-db-reset-*` and `/tmp/awid-db-snapshot-*` PII evidence when wave is fully closed.
+- **P0 post-release bug opened:** Grace found `contacts_only` blocks new chat but mail continuation can bypass exact-contact policy via `deliver_message(... skip_policy_check=True)`. Athena created dev task `aweb-aapo` assigned to Grace to enforce `contacts_only` on HTTP/MCP mail continuations unless Juan explicitly redefines the rule. Athena's contacts list is empty, and Grace is not an exact active contact here. Athena could not directly read prod inbound_mode via API key, but Grace's new-chat 403 is strong evidence `aweb.ai/athena` is `contacts_only`.
+- **Verification wobble still active:** Athena upgraded local CLI to `aw 1.25.0` (`136f25f`); Hestia's fresh chat still displayed `identity_mismatch` / `verified=false`, so matching client version did not clear Hestia->Athena verification. Grace's upgraded mails still display verified.
 - **Stale replay control:** Peter replay/stand-down mails have been drained repeatedly; check `aw mail inbox` before acting, but ignore stale aapf/aapg/aaph/aapm/aapl replay ACKs unless a current verified task is routed.
 
 ## 2026-05-20 immediate state
