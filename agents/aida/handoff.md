@@ -120,7 +120,7 @@ You do API-first triage on identity-recovery cases but do not execute dashboard 
 
 ## Open questions / waiting state
 
-- **Iris (mail `a23e2078`, low-pri async, 2026-05-23)**: `send_message_to_contact` deprecated-alias cleanup in welcome guide draft + `ac/site/static/docs/mcp-tools-reference.md`. Iris owns the edit (her surface); instructed to loop Sofia for the framing pass on replacement copy. Copy Sofia on Iris's reply. No deadline (alias still resolves; hygiene not fire).
+- **Iris `send_message_to_contact` flag — RESOLVED as overstatement (Iris `30599160`, verified 2026-05-23)**: the live welcome surface had migrated `welcome.md`→`mcp-tutorial.md` (AC `052530aa`, clean) and the site reference-doc hit is correctly in the Legacy Compatibility Aliases table. No live-surface problem; no replacement copy; Sofia's framing gate moot. Only historical artifacts carry the name (accurate-for-date); Iris deciding on "SUPERSEDED" markers (her surface). Banked the miss as **#26 corollary** (grep-hit ≠ doc-presents-it-wrongly; verify live-surface currency + structural context before flagging doc content).
 - Sofia's positioning-lock on Sympozium still in flight; Athena's technical validation complete. Bertha convergence relay pending Sofia.
 - **RESOLVED this cycle**: Athena hosted-custodial reachability question (`9fcca42a` — same picker, no Case 4 branch); Sofia reachability-section framing pass (`be582925` — refinement applied); Sofia push greenlight (`34c3a03b` — stack pushed).
 - AGENTS.md cleanup sweep with all banked disciplines deferred to convergence point.

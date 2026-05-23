@@ -135,6 +135,23 @@ catch up the discipline pointer once Iris's update lands.
   applies to in-support-response state-attestation; it is NOT a
   license to walk sibling repos beyond what a specific support
   question needs.
+- **Discipline #26 corollary** (2026-05-23) — a grep-hit on a string
+  is NOT evidence a doc presents that string wrongly. Before flagging
+  "doc X references deprecated/wrong term Y as if current," verify
+  TWO things: (1) **X is still a live surface** — not migrated or
+  superseded (check the loader/route/SOT, not just that the file
+  exists; surfaces move under their filenames). (2) **Y's structural
+  context within X** — a `Legacy Compatibility Aliases` / `Deprecated`
+  section is the CORRECT location for a deprecated name, not a
+  problem. Originating moment: I flagged `send_message_to_contact` as
+  "woven through customer-facing docs as a current tool"; Iris
+  checked and the live welcome surface had migrated `welcome.md` →
+  `mcp-tutorial.md` (AC `052530aa`, clean), and the reference-doc hit
+  was correctly inside the legacy-alias table. The flag cost Iris
+  real investigation time. Same root as #26/#27 (verify before
+  asserting); the new edge is doc-CONTENT claims, not just
+  existence: read the surrounding structure and confirm live-surface
+  currency before characterizing a doc as wrong.
 - **Discipline #27** (narrowly scoped) — before recommending any
   role-bearing or behavior-altering CLI command IN A SUPPORT
   RESPONSE, source-grep `aweb/cli/go/cmd/aw/` to verify the
@@ -266,24 +283,34 @@ catch up the discipline pointer once Iris's update lands.
   closed**: Athena (tech-accuracy) + Sofia (framing, mail `be582925`,
   one naming-caveat refinement applied at `9392957`).
 
-- **`send_message_to_contact` mislabeled in customer-facing docs
-  (found 2026-05-23)** — the consumer welcome guide draft
-  (`publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md`) and site
-  docs (`ac/site/static/docs/mcp-tools-reference.md` + site content)
-  reference `send_message_to_contact` as a current contact-tool. It's
-  a deprecated **Legacy Compatibility Alias** (works, but canonical =
-  `send_mail`/`send_chat`). Also propagated to Zeus via mail
-  `fd65ae2c` (low harm — alias resolves; not worth a standalone
-  correction, fold into next Zeus contact). Flagged to Sofia
-  (external-claim framing owner) for the doc-fix decision; not editing
-  publishing/ or site docs myself (not my files). Original source of
-  the name was Sofia's mail `aa9d70de`. **Routing settled** (Sofia
-  `be582925`): customer-facing edits (welcome guide +
-  `mcp-tools-reference.md`) → Iris when active (low-pri async mail
-  sent `a23e2078`, with instruction to loop Sofia for the framing
-  pass on Iris's replacement copy); Sofia's historical UX snapshots
-  stay as archaeology; canonical `send_mail`/`send_chat` going
-  forward.
+- **`send_message_to_contact` — my doc-hygiene flag was an
+  overstatement; live surfaces were already clean (found + corrected
+  2026-05-23)** — I flagged that the consumer welcome guide draft +
+  site docs "reference `send_message_to_contact` as a current
+  contact-tool." Iris (mail `30599160`) checked and pushed back; I
+  verified her findings against `ac` origin/main and she is right:
+  - The **live customer-facing welcome surface is no longer
+    `welcome.md`** — AC `052530aa` deleted it and migrated to
+    `mcp-tutorial.md` (`load_welcome_guide()` reads it now); the live
+    `mcp-tutorial.md` and `AWEB_HOSTED_MCP_INSTRUCTIONS` are **clean**
+    (zero `send_message_to_contact`).
+  - The site `mcp-tools-reference.md` hit (line 120) is **inside the
+    `## Legacy Compatibility Aliases` table** (line 104), NOT the
+    `## Contacts` section (line 94) — i.e. it's documented in the
+    correct place, directing readers to `send_mail`/`send_chat`. Not
+    a problem.
+  - Only **historical artifacts** still carry the name (the
+    2026-05-14 welcome-guide v1 draft, `history.md` v5 entry) and
+    those are accurate-for-their-date. Iris is deciding whether to
+    add "SUPERSEDED by 052530aa" markers (her surface; record-keeping
+    hygiene, no replacement copy so Sofia's framing gate is moot).
+  - It IS still a deprecated alias (works; canonical
+    `send_mail`/`send_chat`) and I should not recommend it — that
+    part stands, and my Zeus note (`fd65ae2c`) still gets folded into
+    next contact. But "woven through customer-facing docs as current"
+    was wrong.
+  **Lesson banked as #26 corollary below.** Original source of the
+  name was Sofia's mail `aa9d70de`.
 
 ## Recent customer interactions (live evidence base)
 
