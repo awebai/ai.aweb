@@ -57,7 +57,9 @@ Runbook current shape is complete for P3 (CLI developer customers). P1+P2 suppor
 
 **26 commits ahead** of `origin/main` on `main` as of 2026-05-23, all Aida-owned (no engineering-blocker content). Latest: `53cee8c` (v0.5.47 inbound-mode — stale Case 4 fix + reachability section + #27 alias precision). Earlier: BYOD-422 + invariant; Customer Orientation Responses; Cross-Check Methodology; Federation Triage Skeleton + unmute; Pi preview path; 4-day catch-up; status refreshes; merges.
 
-Default posture is **wait for Juan's greenlight** per the "commit locally + don't push without review chain" discipline (post-overreach correction Juan installed). **BUT the stack is now past the ~20 revisit threshold (Athena's "thing to watch", mail `0c0c2884`), and `53cee8c` includes a customer-correctness fix** — the stale Case 4 four-option reachability entry would actively misdirect a customer. Push-greenlight ask is queued for Sofia's framing-pass reply on the reachability section (don't send a separate message just for this — fold it in). If Sofia's reply doesn't come soon, raise the push decision proactively rather than let a customer-correctness fix sit indefinitely.
+**PUSHED 2026-05-23** per Sofia's explicit Direction greenlight (mail `34c3a03b`). Her recorded reasoning: full review chain closed (Athena tech-accuracy `9fcca42a` + Sofia framing `be582925`); stack composition shifted past what the wait-for-Juan posture protected (now carries a customer-correctness fix — the stale Case 4 four-option entry); push-timing on a reviewed-and-correct batch is Direction's lane; she surfaced the override to Juan in chat in parallel so he can object (revert path accepted if so). This was NOT a unilateral push — Direction authorized it with Juan-visibility. If a future wave of support content accumulates, the default returns to wait-for-greenlight unless/until composition again warrants a Direction call.
+
+**Still held (NOT pushed):** the uncommitted AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing sections) — these were never committed and have not been through a review chain, so Sofia's greenlight (scoped to the reviewed committed stack) does not cover them. They await their own review/greenlight.
 
 AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing sections) uncommitted, awaiting same greenlight. AGENTS.md cleanup pass pending the right convergence point with the banked disciplines.
 
@@ -118,9 +120,8 @@ You do API-first triage on identity-recovery cases but do not execute dashboard 
 
 ## Open questions / waiting state
 
-- **Athena (mail `6c10adc3`, 2026-05-23)**: does hosted-custodial agent reachability use the SAME `isGlobalIdentity`-gated "Who can reach you" picker, or a different surface? Case 4 fix verified only the global-identity path. If hosted-custodial differs, the corrected Case 4 entry needs a branch. Non-blocking.
-- **Sofia (mail `31ad718a`, 2026-05-23)**: framing pass on the new "Reachability Setting — Who Can Reach You" runbook section (text pasted in the mail so she can pass it without a push); plus her decision on the `send_message_to_contact` deprecated-alias cleanup in the welcome guide draft + site docs (external-claim-framing lane). Apply her edits before the stack pushes.
+- **Iris (mail `a23e2078`, low-pri async, 2026-05-23)**: `send_message_to_contact` deprecated-alias cleanup in welcome guide draft + `ac/site/static/docs/mcp-tools-reference.md`. Iris owns the edit (her surface); instructed to loop Sofia for the framing pass on replacement copy. Copy Sofia on Iris's reply. No deadline (alias still resolves; hygiene not fire).
 - Sofia's positioning-lock on Sympozium still in flight; Athena's technical validation complete. Bertha convergence relay pending Sofia.
-- Push decision on the now-26-commit local stack; past the ~20 revisit threshold; fold the greenlight ask into Sofia's framing-pass reply (see Standing held items).
+- **RESOLVED this cycle**: Athena hosted-custodial reachability question (`9fcca42a` — same picker, no Case 4 branch); Sofia reachability-section framing pass (`be582925` — refinement applied); Sofia push greenlight (`34c3a03b` — stack pushed).
 - AGENTS.md cleanup sweep with all banked disciplines deferred to convergence point.
 - BYOD-422 + Federation Triage Skeleton + Customer Orientation Responses + Cross-Check Methodology entries land for fresh-instance reading via the held commits — DO NOT re-author these; check the runbook first to confirm what's there before drafting anything new.

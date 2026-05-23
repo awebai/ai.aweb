@@ -256,11 +256,15 @@ catch up the discipline pointer once Iris's update lands.
   (`AgentDetailPage.test.tsx:336,338`). Corrected to the verified
   two-option surface + added dedicated "Reachability Setting — Who
   Can Reach You" customer-language section per Sofia's spec. Both
-  held in the unpushed stack. **Open Athena tech-accuracy question**:
-  does hosted-custodial agent reachability use this SAME
-  `isGlobalIdentity`-gated picker, or a different surface? Case 4
-  covers hosted-custodial flows and I only verified the global-identity
-  path. Routed to Athena.
+  held in the unpushed stack. **Athena tech-accuracy question
+  RESOLVED** (mail `9fcca42a`): hosted-custodial global agents see
+  the SAME `isGlobalIdentity`-gated "Who can reach you" picker — no
+  branch needed. Hosted-custodial agents carry
+  `identity_scope='global'`; the hosted MCP role/OAuth card is
+  separate and doesn't replace the picker. Local identities don't
+  expose it (v0.5.48 rejects PATCH on local). **Full review chain
+  closed**: Athena (tech-accuracy) + Sofia (framing, mail `be582925`,
+  one naming-caveat refinement applied at `9392957`).
 
 - **`send_message_to_contact` mislabeled in customer-facing docs
   (found 2026-05-23)** — the consumer welcome guide draft
@@ -273,7 +277,13 @@ catch up the discipline pointer once Iris's update lands.
   correction, fold into next Zeus contact). Flagged to Sofia
   (external-claim framing owner) for the doc-fix decision; not editing
   publishing/ or site docs myself (not my files). Original source of
-  the name was Sofia's mail `aa9d70de`.
+  the name was Sofia's mail `aa9d70de`. **Routing settled** (Sofia
+  `be582925`): customer-facing edits (welcome guide +
+  `mcp-tools-reference.md`) → Iris when active (low-pri async mail
+  sent `a23e2078`, with instruction to loop Sofia for the framing
+  pass on Iris's replacement copy); Sofia's historical UX snapshots
+  stay as archaeology; canonical `send_mail`/`send_chat` going
+  forward.
 
 ## Recent customer interactions (live evidence base)
 
