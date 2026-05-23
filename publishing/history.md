@@ -10,10 +10,12 @@ signal, attribution caveat.
 
 ## 2026-05-14 · aweb welcome guide v5 — committed to AC-canonical path (Juan blessed)
 
+> **SUPERSEDED 2026-05-16 by AC commit `052530aa`** (aaoq + aaor paired wave). `welcome.md` deleted; customer-facing surface migrated to `ac/backend/src/aweb_cloud/resources/mcp-tutorial.md` (aweb-canonical, synced via Makefile). `load_welcome_guide()` in `hosted_mcp.py` reads `mcp-tutorial.md` from that commit forward. `AWEB_HOSTED_MCP_INSTRUCTIONS` rewritten in the same wave; the v5 serverInfo string quoted below was replaced. Both live surfaces are free of the deprecated `send_message_to_contact` / `read_messages_from_contact` aliases referenced in the v5 tools list. This entry stands as accurate-for-its-date record of what shipped 2026-05-14; do not treat it as current customer surface.
+
 **Channel**: `aweb_welcome_guide` MCP tool + `aweb://welcome` MCP resource (hosted MCP server at app.aweb.ai/mcp/)
 **Public link**: returned at runtime by the MCP tool; not a public URL
-**Artifact**: `ac/backend/src/aweb_cloud/resources/welcome.md` (ac commit `95481339`, main)
-**Source draft**: `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md` (ai.aweb commit `80cb00d`)
+**Artifact**: `ac/backend/src/aweb_cloud/resources/welcome.md` (ac commit `95481339`, main; **deleted 2026-05-16 by `052530aa`**)
+**Source draft**: `publishing/drafts/2026-05-14-aweb-welcome-guide-v1.md` (ai.aweb commit `80cb00d`; superseded marker added 2026-05-23)
 **Audience**: AI clients on first connection (ChatGPT / Claude Desktop / claude.ai) — semi-spec, AI-facing
 **Word count**: ~440 (within Athena's 200-500 target)
 
