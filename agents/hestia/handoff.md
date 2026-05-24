@@ -1,7 +1,16 @@
 # Hestia Handoff
 
-Last updated: 2026-05-24 01:25 CEST (23:25 UTC) — **AC v0.5.48
-hotfix verified-live, fully closes the v0.5.47 cluster**. v0.5.47
+Last updated: 2026-05-24 20:35 CEST (18:35 UTC) — **aapr BYOT
+cluster + skill-content ripple shipped**. AC v0.5.49 + v0.5.50
+live; aw 1.25.3 + Pi 0.1.7 + claude-skills 0.2.1 + skills-v0.2.1
+ZIPs verified-published. Cross-harness state table now in
+operations.md as the durable reference (Grace ask, 63cc381d).
+
+Pending: Juan's browser smokes (2)-(4) on live v0.5.50 dashboard
+to close v0.5.49+v0.5.50 verified-live mail; server-side smoke
+(1) bridge no-mint already green from both my side and Grace's.
+
+Historical: 2026-05-24 01:25 v0.5.48 — left below for context. v0.5.47
 destructive-cutover landed clean; post-cutover live-test surfaced
 P0 `aw inbound-mode` 401 (wrong auth dependency); Grace fixed
 at 2682eade; v0.5.48 deploys it; CLI matrix all green.

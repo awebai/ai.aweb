@@ -1,7 +1,42 @@
 # Operations Status
 
-Last updated: 2026-05-24 01:25 CEST (23:25 UTC) — **AC v0.5.48
-hotfix SHIPPED VERIFIED LIVE** (closes the v0.5.47 cluster).
+Last updated: 2026-05-24 20:35 CEST (18:35 UTC) — **aapr BYOT
+cluster + skill-content ripple SHIPPED**. AC v0.5.49 + v0.5.50
+live; aw CLI 1.25.3 + Pi 0.1.7 + claude-skills 0.2.1 + skills-v0.2.1
+ZIPs all verified-published with corrected `team_and_contacts`
+guidance and access_mode-free CLI import-request shape.
+
+## Published-state table (cross-harness, aapr.22 + 61c15ae ripple)
+
+This is the single point of reference for what's live across the
+distribution surfaces after today's BYOT/skill-content cluster:
+
+| Harness | Source | Version | BYOT state |
+|---------|--------|---------|------------|
+| Installed aw CLI | @awebai/aw npm + binaries | 1.25.3 | no --access-mode in `aw id team import-request`; signing verified against AC canonical_json_bytes |
+| Claude Code | @awebai/claude-skills@0.2.1 (marketplace 0.2.1) | 0.2.1 | corrected SKILL.md (team_and_contacts, no contacts_only/access-mode) |
+| Claude.ai web | skills-v0.2.1 GH Release ZIPs | 0.2.1 | corrected, 4 ZIPs (aweb-bootstrap/coordination/messaging/team-membership) |
+| Codex | awebai/codex-plugins git-subdir | aweb main | corrected (auto-updates with main) |
+| Pi | @awebai/pi@0.1.7 npm | 0.1.7 | corrected SKILL.md (11278 bytes) |
+| AC backend | release_tag=v0.5.50, git_sha=3af8dbb4 | v0.5.50 | aapr.14 bridge no-mint + aapr.15-17 colon-URL route + aapr.4 BYOT e2e gate + aapr.18-20 identities-page action split |
+
+## v0.5.49 + v0.5.50 verified-live evidence summary
+
+- /health: release_tag=v0.5.50, git_sha=3af8dbb4cbd9, aweb=1.25.3, awid=0.5.8, all checks connected, started_at 2026-05-24T17:55:16Z (5/5 stability probes consistent)
+- Server-side smoke (1): unauth GET /api/v1/dashboard/agents on imported BYOT team (id 7eb51ab1-...) → HTTP 401 "Authentication required" (was 500 pre-c3b83290; bridge no-mint live for BYOT teams without cloud-held controller keys)
+- Pre-deploy gate (Mia clearance + 263-test cloud journey green at 91110d3b for v0.5.49, and at 253123f2 for v0.5.50, including BYOT e2e using test.juanreyero.com)
+- Browser smokes (2)-(4) (BYOT redirect, navigation, custodial activation) pending Juan's drive against the live v0.5.50 dashboard
+- Athena formal ack on prior bridge-fix-only release pattern; Grace cluster-close ack 63cc381d on aapr.22 + skill ripple
+
+## Earlier today (2026-05-24)
+
+- Morning: AC v0.5.48 hotfix shipped + verified-live (Grace's inbound-mode P0 fix; closed v0.5.47 cluster)
+- @awebai/claude-skills 0.1.0 → 0.2.0 (aweb-bootstrap added; Olivia aaps.1)
+- @awebai/pi 0.1.5 → 0.1.6 → 0.1.7 (aweb-bootstrap; then BYOT inbound-mode body correction)
+
+## Earlier ship discipline banked
+
+**v0.5.47 destructive cutover (2026-05-23 verified-live)**:
 The v0.5.47 destructive cutover landed clean; post-cutover live
 test surfaced a P0 (aw inbound-mode 401 — wrong auth dependency
 on the endpoint) which Grace fixed at AC main 2682eade. v0.5.48
