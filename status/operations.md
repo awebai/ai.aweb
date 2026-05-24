@@ -14,10 +14,10 @@ distribution surfaces after today's BYOT/skill-content cluster:
 | Harness | Source | Version | BYOT state |
 |---------|--------|---------|------------|
 | Installed aw CLI | @awebai/aw npm + binaries | 1.25.3 | no --access-mode in `aw id team import-request`; signing verified against AC canonical_json_bytes |
-| Claude Code | @awebai/claude-skills@0.2.1 (marketplace 0.2.1) | 0.2.1 | corrected SKILL.md (team_and_contacts, no contacts_only/access-mode) |
-| Claude.ai web | skills-v0.2.1 GH Release ZIPs | 0.2.1 | corrected, 4 ZIPs (aweb-bootstrap/coordination/messaging/team-membership) |
-| Codex | awebai/codex-plugins git-subdir | aweb main | corrected (auto-updates with main) |
-| Pi | @awebai/pi@0.1.7 npm | 0.1.7 | corrected SKILL.md (11278 bytes) |
+| Claude Code | @awebai/claude-skills@0.2.2 (marketplace 0.2.2) | 0.2.2 | fresh-BYOT walkthrough body (Grace a796a73) |
+| Claude.ai web | skills-v0.2.2 GH Release ZIPs | 0.2.2 | fresh-BYOT walkthrough, 4 ZIPs |
+| Codex | awebai/codex-plugins git-subdir | aweb main (a796a73+) | fresh-BYOT walkthrough (auto-updates with main) |
+| Pi | @awebai/pi@0.1.8 npm | 0.1.8 | fresh-BYOT walkthrough (14570 bytes SKILL.md, 7 keyword hits) |
 | AC backend | release_tag=v0.5.50, git_sha=3af8dbb4 | v0.5.50 | aapr.14 bridge no-mint + aapr.15-17 colon-URL route + aapr.4 BYOT e2e gate + aapr.18-20 identities-page action split |
 
 ## v0.5.49 + v0.5.50 verified-live evidence summary
