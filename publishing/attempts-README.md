@@ -34,13 +34,31 @@ complete record; never edited after capture except for `capture_2` and
 |---|---|---|---|
 | `id` | string | `2026-05-26-rclaudecode-two-agents-not-one` | YYYY-MM-DD-channelslug-titleslug; unique |
 | `date_utc` | ISO 8601 string | `2026-05-26T15:23:00Z` | When the attempt was posted/sent (UTC, not local) |
-| `channel` | enum | `hn`, `reddit-r-claudecode`, `reddit-r-cursorai`, `reddit-r-chatgptcoding`, `twitter`, `devto`, `github-discussion`, `direct-mail`, `dev-to-comment`, `hn-comment` | Lowercase, hyphen-separated; pick from canonical set, add new with a decision note |
+| `channel` | enum | see "Canonical channel set" below | Lowercase, hyphen-separated; pick from canonical set, add new with a decision note |
 | `channel_url` | string | `https://www.reddit.com/r/ClaudeCode/comments/abc123/...` | Post/thread URL |
 | `submitter` | string | `juanre`, `eugenie`, `juanre+eugenie` | Who pressed send |
 | `title_or_subject` | string | `"Running two Claude Code agents on the same codebase..."` | Post title or mail subject |
 | `content_path` | string | `publishing/drafts/2026-05-26-rclaudecode-two-agents-pair.md` | Path to the source draft of the content; commit it before posting so the snapshot is durable |
 
-### Result fields (initial capture — 24h after post)
+### Canonical channel set
+
+**Community-engagement** (post / comment / reply → reaction-in-hours feedback loop):
+
+`hn`, `reddit-r-claudecode`, `reddit-r-cursorai`, `reddit-r-chatgptcoding`, `twitter`, `devto`, `github-discussion`, `direct-mail`, `dev-to-comment`, `hn-comment`
+
+**Submission-surface** (submit metadata to registry → approval-in-days + ongoing-discoverability feedback loop):
+
+`claude-plugin-marketplace`, `mcp-registry-official`, `mcp-registry-mcp-so`, `mcp-registry-smithery`, `mcp-registry-glama`, `awesome-mcp-servers`, `clawhub`, `nanoclaw-channel`
+
+Pi listings (pi.dev/packages/@awebai/pi) are automatic via the `pi-package` npm keyword and are not attempts to log. Pi promotion goes through community-engagement channels (DEV.to article, GitHub Show & Tell, etc.).
+
+### Result variant selection
+
+Each row uses one of two result variants depending on the channel: community-engagement channels use `result_24h` (and optional `result_7d` / `result_30d`); submission-surface channels use `result_submission` (and optional `result_7d` / `result_30d` with the submission-shape fields).
+
+### Result fields — community-engagement variant (initial capture — 24h after post)
+
+For channels like `hn`, `reddit-*`, `twitter`, `devto`, `direct-mail`, etc. The feedback shape is post → reaction-in-hours.
 
 | Field | Type | Example | Notes |
 |---|---|---|---|
@@ -51,20 +69,40 @@ complete record; never edited after capture except for `capture_2` and
 | `result_24h.ref_traffic_observed` | boolean | `true` | Did Plausible/analytics show a referral spike attributable to this post? |
 | `result_24h.captured_at_utc` | ISO 8601 | `2026-05-27T15:23:00Z` | When the result row was recorded |
 
+### Result fields — submission-surface variant (initial capture — at submit + later check passes)
+
+For channels like `claude-plugin-marketplace`, `mcp-registry-*`, `clawhub`, `nanoclaw-channel`, `awesome-mcp-servers`. The feedback shape is submit → approval-in-days → ongoing-discoverability.
+
+| Field | Type | Example | Notes |
+|---|---|---|---|
+| `result_submission.status` | enum | `submitted`, `under-review`, `approved`, `rejected`, `withdrawn`, `silence`, `pending` | Submission lifecycle state; `silence` if no signal returned and we're past the surface's typical response window |
+| `result_submission.listing_url` | string | `https://mcp.so/server/aweb` | Where the listing landed; null if rejected or pending |
+| `result_submission.discoverability` | enum | `top-of-search`, `paginated`, `search-only`, `hidden` | Capture-time judgment, not a metric the surface reports. Explain in `notes` when it's borderline (e.g., visible-but-buried-on-page-3) |
+| `result_submission.ref_traffic_observed` | boolean | `true` | Did Plausible/analytics show a referral spike attributable to this listing? |
+| `result_submission.captured_at_utc` | ISO 8601 | `2026-05-30T15:23:00Z` | When the result row was recorded |
+
 ### Optional fields
 
 | Field | Notes |
 |---|---|
-| `result_7d`, `result_30d` | Same shape as `result_24h`; capture at 7d and 30d if signal is non-zero |
+| `result_7d`, `result_30d` | Same shape as `result_24h` (community-engagement) or `result_submission` (submission-surface) — match the variant used for the initial capture. Capture at 7d/30d if signal is non-zero or if the submission status is still in motion |
 | `notes` | Free-form. What you noticed, what surprised you, any context that the metrics miss |
 | `cross_links` | Array of other attempt IDs this links to (e.g., a Twitter tweet that referenced this Reddit post) |
 | `attribution_caveats` | Free-form. Concurrent factors that could explain any uptick |
 | `learnings` | Free-form. After the dust settles. What you'd do differently next time |
 
-## Example entry
+## Example entries
+
+### Community-engagement (HN)
 
 ```json
 {"id":"2026-05-07-hn-aweb-launch","date_utc":"2026-05-07T15:00:00Z","channel":"hn","channel_url":"https://news.ycombinator.com/item?id=XXXX","submitter":"juanre","title_or_subject":"Show HN: aweb — coordination layer for AI coding agents","content_path":"publishing/drafts/2026-05-07-show-hn-attempt.md","result_24h":{"outcome":"sank","upvotes":3,"comments":0,"front_page_or_top":false,"ref_traffic_observed":false,"captured_at_utc":"2026-05-08T15:00:00Z"},"notes":"Pre-fold framing. Submitted Tue 8am PT. Three upvotes in first hour then dropped off. No comments at all.","learnings":"HN doesn't surface a sinking submission; once it falls off the new page the recovery is essentially zero."}
+```
+
+### Submission-surface (MCP registry)
+
+```json
+{"id":"2026-05-27-mcp-so-aweb-channel","date_utc":"2026-05-27T15:00:00Z","channel":"mcp-registry-mcp-so","channel_url":"https://mcp.so/submit/aweb-channel","submitter":"sofia","title_or_subject":"aweb-channel — agent coordination over signed messaging","content_path":"co.aweb/outreach/submissions/mcp-so-aweb-channel.md","result_submission":{"status":"submitted","listing_url":null,"discoverability":null,"ref_traffic_observed":false,"captured_at_utc":"2026-05-27T15:00:00Z"},"notes":"Initial submit. Approval window per mcp.so is typically 3-5 days; check back at 7d."}
 ```
 
 ## How to append a row
@@ -77,9 +115,7 @@ cat >> publishing/attempts.jsonl <<'EOF'
 EOF
 ```
 
-Initial row should have `result_24h.outcome: "pending"`. Update later by
-finding the row, editing in place, and committing the change. Don't
-duplicate-append — the `id` is the unique key.
+Initial row should have either `result_24h.outcome: "pending"` (community-engagement) or `result_submission.status: "submitted"` (submission-surface). Update later by finding the row, editing in place, and committing the change. Don't duplicate-append — the `id` is the unique key.
 
 For the captured-later passes (`result_7d`, `result_30d`), edit the
 existing line to add those keys. Each edit is a commit so git history
