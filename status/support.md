@@ -288,6 +288,25 @@ catch up the discipline pointer once Iris's update lands.
   trigger to re-check that section — version progression silently
   invalidates "not yet published" claims.
 
+- **Claude Code channel-plugin Client Install Paths entry — LANDED
+  (2026-05-26)** — follow-on from the Pi arc. Sofia greenlit a
+  parallel Claude Code entry to balance the section. Athena cleared
+  the verified shape (`5acc6ec4`, marketplace + tarball inspected:
+  install via `awebai/claude-plugins` marketplace → `aweb-channel@
+  awebai-marketplace`; skills are a SEPARATE plugin `aweb-skills@
+  awebai-marketplace`, unlike Pi which bundles them; `aw init
+  --setup-channel` server path is a non-default fallback). Sofia
+  framing-passed (`3b99c07b`/`843904d1`) with two applied edits: a
+  both-required clarification (plugin-for-wakeups + `aw` CLI for
+  sending) and a neutral trust-boundary callout for the
+  `--dangerously-load-development-channels` flag (sourced to Claude
+  Code's plugin-loading mode, not aweb; trust boundary = the
+  marketplace source). "Client Install Paths" now has two
+  release-shaped, owner-verified client entries (Claude Code +
+  Pi), Claude Code first. Full review chain on both halves
+  (Athena tech + Sofia framing). `aw run claude` confirmed
+  legacy/deprecated, current as of 2026-05-26.
+
 - **Dashboard inbound-mode source-verify for Sofia (2026-05-23)** —
   Sofia (mail `96d85669`) gated a v0.5.47/v0.5.48 external-claim
   derivation on what the dashboard inbound-mode picker actually

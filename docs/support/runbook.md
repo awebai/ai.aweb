@@ -484,12 +484,19 @@ cd /path/to/aweb/worktree
 claude --dangerously-load-development-channels plugin:aweb-channel@awebai-marketplace
 ```
 
-The dev-channel warning on launch is expected for this plugin.
+> **Note:** The `--dangerously-load-development-channels` flag is
+> Claude Code's mechanism for loading channel plugins like this one;
+> the warning on launch is expected. The flag name reflects Claude
+> Code's plugin-loading mode, not a request from `aweb-channel` for
+> unsafe access. The real trust boundary is the marketplace source:
+> install only from `awebai/claude-plugins` (verified above).
 
 **What it does.** `aweb-channel` pushes aweb coordination events —
 mail, chat, work/task/claim notifications, and control signals — into
-a running Claude Code session in real time. Outbound replies/actions
-still use the `aw` CLI.
+a running Claude Code session in real time. **Outbound replies and
+other coordination actions still use the `aw` CLI** (so the install
+pattern is plugin-for-wakeups + `aw` CLI for sending; both required
+for full operation).
 
 **Skills are a separate plugin.** Unlike `@awebai/pi`, the channel
 plugin does NOT bundle the canonical skills. Install them separately:
