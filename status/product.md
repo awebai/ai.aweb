@@ -1,8 +1,46 @@
 # Product Status
 
-Last updated: 2026-05-13 22:30Z (Sofia, consumer-onboarding v1 cycle closed: site live + holds released)
+Last updated: 2026-05-26 21:00Z (Sofia, long-fruit submission cluster drafts landed)
 
 ## Current focus
+
+**Long-fruit submission cluster active (2026-05-26).** Eight-item
+submission package drafted at `agents/sofia/.aw/drafts/submission-drafts-v0.md`
+(commit `a005fbf` on ai.aweb main):
+
+- B.1: Claude Code official marketplace, aweb-channel plugin — READY
+- B.2: Claude Code official marketplace, aweb-skills plugin — READY
+- B.3: Official MCP Registry (registry.modelcontextprotocol.io) —
+  source-ready; Hestia npm-publishing `@awebai/claude-channel@1.4.9`
+  now (~20 min ETA per her plan)
+- B.4: mcp.so — submit after B.3
+- B.5: smithery.ai — shape mismatch (stdio vs hosted-URL); three
+  documented options
+- B.6: glama.ai/mcp — submit after B.3
+- B.7: punkpeye/awesome-mcp-servers PR — READY (one-line under
+  Communication category)
+- B.8: ClawHub variant SKILL.md — drafted; needs to land in aweb
+  repo before `clawhub skill publish`
+
+Engineering prep landed same-session via Athena (`f32393a` =
+LICENSE files + skills plugin.json metadata; `db9a492` =
+`@awebai/claude-channel 1.4.9` with `mcpName: "io.github.awebai/channel"`).
+Each submission produces one `attempts.jsonl` row at submission
+time (submission-surface variant per Iris's schema-extensions PR).
+
+Iris voice-pass routed (msg `2e0054ec` in conv `345f95bb`):
+long-form descriptions, ClawHub variant body, smithery shape-mismatch
+framing. Hestia owns the npm-publish gate (msg `3bd13257` in conv
+`878c06b1`; her plan confirmed).
+
+**The pivot context this fits inside:** Juan called outreach the
+priority on 2026-05-26 ("we need to start seriously doing outreach"),
+narrowed to the long-fruit cluster on direction "the ones that
+will take the longer to bear fruit (Anthropic and OpenAI submissions)."
+Iris parallel work on community-engagement loop continues; the
+long-fruit cluster IS the first wave.
+
+## Earlier focus (banked)
 
 **Consumer-onboarding v1 cycle closed (2026-05-13 22:28Z).**
 ac v0.5.31 backend + aweb.ai pain-narrative homepage + /developers
@@ -10,14 +48,8 @@ landing all live in production. Headline customer outcome arc
 (P1 lands at aweb.ai → clicks "Connect your AI" → picks client
 → paste instructions → OAuth consent → handle pick → adds
 contact by @handle → messages friend's AI) plausibly complete
-end-to-end. Walked the deployed surface; vocabulary is
-consumer-shaped above the fold; no developer-vocabulary leaks.
-
-The cycle had two gaps caught post-ship and reframed: (1) site
-landing deployed late behind the backend, (2) schema-migration
-drift across v0.5.25 → v0.5.29 ran v0.5.28's contact ingestion
-against an old schema for ~1 hour. Both resolved; transparency
-reframe captured in `docs/decisions.md` 2026-05-13 entry.
+end-to-end. Cycle had two gaps caught post-ship and reframed in
+`docs/decisions.md` 2026-05-13.
 
 Sofia banked framing-review discipline (`feedback_framing_review_requires_deployed_spot_check.md`):
 release-claim framing must spot-check the deployed surface, not
@@ -25,36 +57,16 @@ trust the release-notes description. Hestia banked her side as
 runbook discipline #30 (schema-migration verification in
 verify-live, not /health).
 
-**Holds released**:
-- Iris: moved to (a) Twitter/X thread shape we converged on. Deployed
-  product gives her something to demonstrate. No deadline.
-- Aida: P1+P2 watch list of expected support shapes (handle-discovery,
-  OAuth confusion, pending vs active contacts, vocabulary, observability,
-  block-someone privacy default). Standing posture: collect 2-3 real
-  seed examples before runbook section authoring.
-
-**What remains pending after the close**:
-- Bertha/Eugenie sign-off chain — separate process; deploy happened on
-  what was ready; their resolution is independent of this cycle.
-- aweb-aanp.6.1 email-typed contacts — backlog (Grace, P2).
-- aweb-aanp.10 OpenAI App Directory submission — pending Juan
-  screenshots + help-center paste.
-- FUT-1 Anthropic Connectors Directory submission — Iris queue.
-- UX simplification follow-ups (next priority): the REFRAME_FOR P1
-  list from the scoring model (Tasks/Identities/Roles tabs +
-  Create Team/Org dialogs) sits in the next consumer-v1-dashboard
-  reframe scope Athena is sequencing.
-
 **Persona model and UX scoring** (ongoing reference work):
 `docs/audiences.md` carries the four personas + tier model
 (rewritten 2026-05-12 with Personas 1+2 added per the priority
 reorder). `agents/sofia/ux/` carries the role_for-based UX scoring
 system: personas.yaml + surfaces.yaml + score.py generate
 ux-surface-report.md. The persona-aware visibility patterns
-(HIDE_FOR / REFRAME_FOR / NEVER_CUT) are now the model the
+(HIDE_FOR / REFRAME_FOR / NEVER_CUT) are the model the
 simplification work runs through.
 
-## Earlier focus (banked)
+## Earlier focus (deeper banked)
 
 Day-2 of team-genesis closes with the build/ship boundary now real,
 not theoretical. **First end-to-end Hestia gate run completed today**

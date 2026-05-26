@@ -1,33 +1,59 @@
 # Sofia Handoff
 
-Last updated: 2026-05-26 (pivot to outreach; corpus / aweave-fold work paused safely)
+Last updated: 2026-05-26 (long-fruit submission cluster active; drafts landed)
 
 ## Check first on next wake-up
 
 1. **`aw mail inbox`** — primary signal. Specifically watch for:
-   - Iris reply to the outreach-pivot ramp-up (msg `e1b6c7d0` in conv `345f95bb`). She is the lead on the outreach lane now; her read of the priorities shapes Sofia's next moves.
-   - Marvin reaction (if any) to the fold + corpus rename direction mail (msg `4f55b529` in conv `adb6cc44`) and/or the courtesy "paused" follow-up (msg `352e5921` same conv). If he replies, the corpus arc may surface back to active.
-   - Hestia reactions on anything operational from a new release.
+   - Iris voice-pass return on the submission drafts (msg `2e0054ec` in conv `345f95bb`). Her read on B.1, B.2, B.3, B.7, B.8 long-form copy shapes whether Juan submits as-drafted or with edits.
+   - Hestia ack on the npm-publish ask (msg `3bd13257` in conv `878c06b1`) — gates B.3. Without `@awebai/claude-channel@1.4.9` on npm, the official MCP registry submission validates fail.
+   - Marvin reaction (if any) to the fold + corpus rename direction mail (msg `4f55b529` in conv `adb6cc44`). If he replies, the corpus arc may surface back to active.
 2. **`aw chat pending`** — sync-blocked peers.
 3. **Live state**: `curl https://app.aweb.ai/health` and `curl https://api.awid.ai/health`. Last verified-live 2026-05-23 22:17 (v0.5.47 → v0.5.48 cluster framing-acked in conv `878c06b1`); the cluster is fully cleared for external derivation with the `"All"` / `"Team and contacts"` customer-label naming.
 4. **`docs/decisions.md` tail** — any entries newer than this handoff.
-5. **`status/outreach.md`** — Iris's current focus signal. As of 2026-05-16 her status was post-ship monitoring on a homepage bundle; the pivot will move that forward.
+5. **`status/outreach.md`** — Iris's current focus signal.
 
-## Active arc: pivot to outreach (2026-05-26)
+## Active arc: long-fruit submission cluster (2026-05-26)
 
-**Triggered by**: Juan, citing an advisor he respects who said no startup succeeds with more than one site to develop and promote, then escalating to "we need to start seriously doing outreach" with the Pi extension as a key promotion target.
+**Triggered by**: Juan, "the ones that will take the longer to bear fruit (anthropic and openai submissions)" — clarified focus inside the broader outreach pivot.
 
-**My posture**: stand back, bring Iris in, scope opportunities + reorganize past work both in `ai.aweb/publishing/` and in `~/prj/beadhub-all/`.
+**Driving directly per Juan**: "as you wish, she seems free but you can also do it, just drive this" (re Iris involvement) + "please talk to athena directly not via iris."
 
 **Done this turn**:
-- Surveyed Iris's surface (`agents/iris/AGENTS.md`, `handoff.md`, `publishing/voice.md`, `publishing/plan.md`, `publishing/history.md`, `status/outreach.md`). She's been productive on authoring — homepage Pass-3 → pain-narrative live, welcome guide v5 shipped, AI-first-company blog post landed 2026-05-15 — but community presence on the active platforms (Reddit, HN, Twitter) is zero. The pattern is: content production is healthy; ship-and-promote is parked.
-- Surveyed `~/prj/beadhub-all/` via Explore agent. Rich find: a fully-articulated outreach strategy doc at `~/prj/beadhub-all/beadhub-outreach/docs/outreach-strategy.md` (2026-02-18, BeadHub-branded). Concrete platform targets (r/ClaudeCode 395K weekly, r/CursorAI, r/ChatGPTCoding, Twitter/X, GitHub Discussions, HN read-only). Detailed daily agent loop design. Voice principles directly portable to aweb. Also `~/prj/beadhub-all/aweb-a2a-interop.md` as positioning material for the OpenClaw/A2A ecosystem.
-- Surveyed the Pi extension at `~/prj/awebai/aweb/pi-extension/`. It's `@awebai/pi` on npm — already built, packaged, shippable. Wakes Pi (pi.dev) sessions on aweb channel events. New Persona 3 distribution channel that's NOT in `publishing/plan.md` today.
-- Sent Iris a substantive ramp-up mail (msg `e1b6c7d0`, conv `345f95bb`) covering the pivot, the beadhub-all material, the Pi extension, and six questions for her read on priorities and the daily-loop shape.
+- Routed engineering blockers to Athena directly (conv `70f1c868`). Both cleared same-session:
+  - `f32393a`: LICENSE files in both plugin dirs + skills plugin.json metadata (now on plugin version `0.2.9`, rebased over a Hestia/Dave release)
+  - `db9a492`: `@awebai/claude-channel 1.4.9` with `mcpName: "io.github.awebai/channel"` (source-only; npm publish pending)
+- Athena framing-confirm on B.3 description ("pairs with the aw CLI for the action surface") — accurate for current shape, no pre-baked future-shape claim needed.
+- Drafted full B.1–B.8 submission script at `agents/sofia/.aw/drafts/submission-drafts-v0.md` (commit `a005fbf`). Each section: where to go, exact form fields / file content, verification step. Includes execution-order recommendation (Day 1 B.3+B.1+B.2+B.7, Day 2 B.4+B.6+B.5, Day 3+ B.8) and open questions for Juan/Hestia/Iris.
+- Routed Iris (msg `2e0054ec` in conv `345f95bb`) with voice-pass scope: long-form descriptions, ClawHub variant body, smithery shape-mismatch framing.
+- Routed Hestia (msg `3bd13257` in conv `878c06b1`) with the npm-publish gating ask.
+- aw epic `default-aaai` state comment landed.
+
+**Submission readiness state:**
+- B.1 (Claude Code marketplace, aweb-channel): READY
+- B.2 (Claude Code marketplace, aweb-skills): READY
+- B.3 (official MCP registry): waiting on npm publish of `@awebai/claude-channel@1.4.9`
+- B.4 (mcp.so): submit after B.3 lands; form-investigation at submission time
+- B.5 (smithery.ai): shape mismatch — stdio vs hosted-URL; three options documented
+- B.6 (glama.ai): submit after B.3; form-investigation at submission time
+- B.7 (awesome-mcp-servers PR): READY, line drafted, alphabetical placement identified
+- B.8 (ClawHub variant SKILL.md): drafted; needs to land in aweb repo before `clawhub skill publish`
 
 **Waiting on**:
-- Iris's reply to shape the first wave of concrete outreach actions.
-- Juan greenlight on whatever first wave Iris and I converge on.
+- Iris voice-pass return (primary).
+- Hestia npm-publish of 1.4.9 (gates B.3).
+- Juan greenlight to execute Day 1 submissions.
+
+## Paused arc: outreach pivot scoping (2026-05-26 morning)
+
+Iris ramp-up mail (msg `e1b6c7d0`, conv `345f95bb`) sent earlier; her reply hadn't landed when Juan re-scoped to "the ones that will take the longer to bear fruit." The long-fruit cluster IS the first wave; the broader outreach loop design (community-engagement actions, daily-loop integration with attempts.jsonl) sits beside this.
+
+Iris parallel work that's already landed (per her schema-PR shipit drafts):
+- `publishing/attempts-README.md` schema extensions (community-engagement + submission-surface variants, channel enum updated)
+- `publishing/attempts.jsonl` empty append-only log
+- `publishing/past-attempts-template.md` backfill template for Juan
+
+Each long-fruit submission produces one `attempts.jsonl` row at submission time (submission-surface variant). Schema is locked.
 
 ## Paused arc: corpus / aweave-fold (safe in git history)
 
@@ -86,10 +112,11 @@ In `.aw/drafts/`:
 
 ## What's open right now
 
-- **Iris pivot ramp-up**: awaiting her reply to msg `e1b6c7d0`. Six questions in there shape the first wave.
-- **Pi extension promotion plan**: not yet in `publishing/plan.md`; needs Iris's read on whether it's its own promotion arc or folded into a broader multi-agent piece.
-- **5 queued direct-outreach drafts** at `co.aweb/outreach/daily/2026-05-07-direct-outreach-post-show-hn.md`: still pending human send three weeks after draft; Iris needs to confirm whether current product state still supports them or whether they need re-drafting.
-- **"Two Agents Not One" article** on juanreyero.com: Juan voice-passed per Iris's last handoff; awaits his commit/push. Re-prompt if it's stalled.
+- **Long-fruit submission cluster**: B.1-B.8 drafts at `agents/sofia/.aw/drafts/submission-drafts-v0.md`. Iris voice-pass pending; Hestia npm-publish gates B.3. See active arc above.
+- **Iris pivot ramp-up**: original mail `e1b6c7d0` still open; the long-fruit drafts are a partial answer but the broader community-engagement loop questions (which platforms, daily cadence, BeadHub material reuse) are still on her plate.
+- **Pi extension promotion plan**: not yet in `publishing/plan.md`; lower priority than the long-fruit cluster but worth surfacing if Iris asks.
+- **5 queued direct-outreach drafts** at `co.aweb/outreach/daily/2026-05-07-direct-outreach-post-show-hn.md`: still pending human send three weeks after draft; Iris confirms product-state fit.
+- **"Two Agents Not One" article** on juanreyero.com: Juan voice-passed per Iris's last handoff; awaits his commit/push.
 - **Twitter thread P1 launch**: drafted, voice-passed; awaits Juan/Eugenie post timing.
 - **Marvin loop**: paused; will surface back if/when he reacts or if the corpus arc becomes pressing again.
 
