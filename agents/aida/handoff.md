@@ -34,12 +34,13 @@ As of 2026-05-18 14:30 UTC (`aw whoami`):
 
 ## Local versions (this workspace, last observed)
 
-Check `aw version` + `/health` endpoint on first wake before relying on these. As of 2026-05-23 (post v0.5.46 deploy):
+Check `aw version` + `/health` endpoint on first wake before relying on these. As of 2026-05-26 (post v0.5.58 deploy, Hestia `3dd5b799`):
 
-- `aw`: 1.25.x (verify with `aw version`)
-- channel plugin: latest from `@awebai/aweb-channel` (1.4.2)
-- server: ac v0.5.46 / aweb 1.25.2 / awid 0.5.8 (verify against `/health` on `app.aweb.ai`)
-- `aapq team_and_contacts` inbound mode now production as of v0.5.46
+- `aw`: 1.26.x (verify with `aw version`)
+- channel plugin: latest from `@awebai/aweb-channel`
+- server: ac v0.5.58 / aweb 1.26.1 / awid 0.5.9 (verify against `/health` on `app.aweb.ai`; prod git_sha 340122ef)
+- `aapq team_and_contacts` inbound mode in production since v0.5.46
+- v0.5.58 restored `GET /api/v1/agents/{id}/activity` (was 404 in v0.5.57) — dashboard Agent Detail Activity card renders again. **Metadata-only by design**: shows exchange metadata (peer, direction, timestamps, conversation/session ids), NOT subject/body/signature/encrypted fields; content stays gated to authorized message-content endpoints. Auth is dashboard session-cookie only (no DIDKey access to this endpoint). Zero customer reports during the v0.5.57 broken window.
 
 If your local `aw` is behind the deployed server, `aw upgrade` first; mismatches caused real customer-facing issues in prior cycles.
 
@@ -55,13 +56,13 @@ Runbook current shape is complete for P3 (CLI developer customers). P1+P2 suppor
 
 ## Standing held items (push stack)
 
-**26 commits ahead** of `origin/main` on `main` as of 2026-05-23, all Aida-owned (no engineering-blocker content). Latest: `53cee8c` (v0.5.47 inbound-mode — stale Case 4 fix + reachability section + #27 alias precision). Earlier: BYOD-422 + invariant; Customer Orientation Responses; Cross-Check Methodology; Federation Triage Skeleton + unmute; Pi preview path; 4-day catch-up; status refreshes; merges.
+**The big 26-commit support stack was PUSHED 2026-05-23** (through `7361c1e`) per Sofia's explicit Direction greenlight (mail `34c3a03b`): full review chain closed (Athena tech-accuracy `9fcca42a` + Sofia framing `be582925`); composition had shifted to include a customer-correctness fix (stale Case 4 four-option entry); push-timing on a reviewed-and-correct batch is Direction's lane; she surfaced the override to Juan in chat in parallel (revert path accepted). NOT a unilateral push. The `send_message_to_contact` flag-correction (`c1737a9`) was then pushed same-day as a public-inaccuracy fix, Direction-visible.
 
-**PUSHED 2026-05-23** per Sofia's explicit Direction greenlight (mail `34c3a03b`). Her recorded reasoning: full review chain closed (Athena tech-accuracy `9fcca42a` + Sofia framing `be582925`); stack composition shifted past what the wait-for-Juan posture protected (now carries a customer-correctness fix — the stale Case 4 four-option entry); push-timing on a reviewed-and-correct batch is Direction's lane; she surfaced the override to Juan in chat in parallel so he can object (revert path accepted if so). This was NOT a unilateral push — Direction authorized it with Juan-visibility. If a future wave of support content accumulates, the default returns to wait-for-greenlight unless/until composition again warrants a Direction call.
+**Default posture restored**: a future *wave* of substantive/customer-facing support content returns to wait-for-greenlight unless composition warrants a Direction call. Routine self-owned hygiene (version refreshes, handoff watch-notes) commits locally and rides with the next push reason — not worth its own greenlight ask.
 
-**Still held (NOT pushed):** the uncommitted AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing sections) — these were never committed and have not been through a review chain, so Sofia's greenlight (scoped to the reviewed committed stack) does not cover them. They await their own review/greenlight.
+**Currently local-unpushed** (minor, holding per default): `83ad194` (grep-context cross-agent watch-note) + the v0.5.58 version-refresh + pull-merge. No customer-correctness or public-inaccuracy in these, so no push urgency.
 
-AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing sections) uncommitted, awaiting same greenlight. AGENTS.md cleanup pass pending the right convergence point with the banked disciplines.
+**Still held (NOT pushed):** the uncommitted AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing sections) — never committed, no review chain, so Sofia's greenlight (scoped to the reviewed stack) doesn't cover them. Await their own review/greenlight. AGENTS.md cleanup pass still pending the right convergence point with the banked disciplines.
 
 ## Banked disciplines (full text in status/support.md)
 
