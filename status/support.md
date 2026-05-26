@@ -226,6 +226,23 @@ catch up the discipline pointer once Iris's update lands.
   the Juan escalation pending 2nd attestation. Applies to any
   customer-signal-to-Juan routing question, not just
   channel-plugin.
+- **Discipline #29** (Sofia `6d7a5794`, 2026-05-26) —
+  verify-the-assumed-structure-before-acting. When direction or
+  guidance assumes a structural home that doesn't exist (a section,
+  file, config, or doc location), SURFACE the gap and create the
+  right home — do not crowbar the content into a wrong or
+  non-existent place, and do not silently abandon the intent because
+  the assumed home is missing. Same root family as the #26 corollary
+  and the customer-shape-verification lesson: verify the structure
+  your action assumes is real before acting on it. Originating
+  moment: Sofia said "graduate the Pi entry into the normal
+  client-install section" — there was no such section (channel-plugin
+  guidance was only a scattered mention). I created a "Client Install
+  Paths" section, landed Pi there, and surfaced the deviation to
+  Sofia rather than forcing Pi under a wrong header or leaving it in
+  the pre-release section. Sofia confirmed the surface-and-create
+  move was right and asked it be banked. To fold into AGENTS.md at
+  the next banked-disciplines cleanup pass.
 - **"What next" support response** — full runbook entry landed
   at commit `9537fe8` (2026-05-16) under a new "Customer
   Orientation Responses" section in `docs/support/runbook.md`.
