@@ -243,6 +243,18 @@ catch up the discipline pointer once Iris's update lands.
   the pre-release section. Sofia confirmed the surface-and-create
   move was right and asked it be banked. To fold into AGENTS.md at
   the next banked-disciplines cleanup pass.
+- **Citation placement in runbook entries** (Sofia `fec4cfba`,
+  2026-05-26) — customer-facing entry copy (blockquotes, "short
+  version for customer reply") defaults to **internal-cite-free**
+  (no mail-ids / commit hashes); support-agent operational portions
+  (Source lines, verification trails) CAN carry internal cites,
+  since git log / the mail archive is the reader's adjacent surface.
+  Test: "if this line gets quoted to a customer, does the cite still
+  make sense?" Originating moment: I nearly put Athena's mail-id into
+  the customer-facing `--dangerously`-flag reassurance copy; Sofia's
+  framing pass stripped it to a clean trust-boundary statement with
+  provenance left in the Source line. Light bank; fold with #29 at
+  the AGENTS.md pass.
 - **"What next" support response** — full runbook entry landed
   at commit `9537fe8` (2026-05-16) under a new "Customer
   Orientation Responses" section in `docs/support/runbook.md`.
