@@ -49,10 +49,12 @@ anthropics/claude-plugins-official).
 **Submission fields:**
 
 - Plugin name: `aweb-channel`
-- Plugin description: `aweb agent coordination channel — receive mail,
+- Plugin description: `aweb agent coordination channel: receive mail,
   chat, tasks, and control signals from your agent team in real time.`
-  (matches `plugin.json` description verbatim; do not paraphrase —
-  Anthropic reviewers cross-check)
+  (matches `plugin.json` description verbatim; do not paraphrase;
+  Anthropic reviewers cross-check). **Note:** `plugin.json` currently
+  carries an em-dash in this field; Athena round-trip needed to swap
+  to a colon before submission so the verbatim-match holds.
 - Repository URL: https://github.com/awebai/aweb
 - Path to plugin in repo: `/channel/.claude-plugin/`
 - License: MIT
@@ -64,7 +66,7 @@ anthropics/claude-plugins-official).
 plugin" field):**
 
 > aweb-channel is a Claude Code plugin that delivers real-time
-> coordination events from other AI agents on your team — mail, chat
+> coordination events from other AI agents on your team: mail, chat
 > messages, task updates, and control signals (pause/resume/interrupt).
 > It pairs with the `aw` CLI for the action surface: send messages,
 > claim tasks, manage shared roles and instructions, take locks on
@@ -95,9 +97,11 @@ time.
 **Submission fields:**
 
 - Plugin name: `aweb-skills`
-- Plugin description: `aweb agent coordination skills — teach your
+- Plugin description: `aweb agent coordination skills: teach your
   Claude Code agent how to use the aw CLI for mail, chat, tasks, and
-  team coordination.`
+  team coordination.` **Note:** `plugin.json` currently carries an
+  em-dash in this field; Athena round-trip needed to swap to a colon
+  before submission so the verbatim-match holds.
 - Repository URL: https://github.com/awebai/aweb
 - Path to plugin in repo: `/packages/claude-skills/.claude-plugin/`
 - License: MIT
@@ -113,10 +117,9 @@ time.
 > certificates, multi-team membership), `aweb-bootstrap` (creating new
 > aweb teams from templates), and `aweb-identity` (key custody and
 > verifiable identity). Together they teach a Claude Code agent the
-> judgment calls behind the `aw` CLI surface — when to inspect shared
+> judgment calls behind the `aw` CLI surface: when to inspect shared
 > state, when to claim work, when to take a lock, how to read the
-> team's operating rules. Complements aweb-channel; install both for
-> the full coordination experience.
+> team's operating rules. Complements aweb-channel.
 
 **Verification:** Same as B.1.
 
@@ -232,7 +235,7 @@ table above):
 - npm package: `@awebai/claude-channel`
 - Repository: https://github.com/awebai/aweb
 - Description (one-line): Real-time agent-team coordination for AI
-  coding agents — mail, chat, tasks, presence across teammates.
+  coding agents: mail, chat, tasks, presence across teammates.
 - Categories: Communication, Coordination, Developer Tools,
   Multi-Agent (pick whichever subset the form offers)
 - License: MIT
@@ -256,16 +259,21 @@ upload. aweb-channel is stdio-only; doesn't match either shape today.
 1. **Skip** until aweb publishes a hosted streamable-http MCP endpoint
    (no plan today; would need ac-side work). Cost: smithery
    discoverability foregone.
-2. **Build .mcpb bundle** — wrap the npm package as an .mcpb
+2. **Build .mcpb bundle**: wrap the npm package as an .mcpb
    container. Engineering scope: small (Athena would know). Cost: one
    small engineering item.
-3. **Investigate URL-mode submission** at https://smithery.ai/new —
+3. **Investigate URL-mode submission** at https://smithery.ai/new:
    maybe smithery accepts npm-package metadata even if their docs
    emphasize hosted. Cost: 10 min of exploration at submission time.
+4. **Ask Smithery directly**: if option 3 confirms shape-mismatch,
+   mail their team (link or contact channel on smithery.ai) to confirm
+   stdio is unsupported before committing to .mcpb engineering. Cost:
+   one mail.
 
-**Recommendation:** Try option 3 first (cheap), fall back to option 2
-if it doesn't work, accept option 1 only if Juan deprioritizes
-smithery.
+**Recommendation:** Try option 3 first (cheap), then option 4 (also
+cheap) if option 3 inconclusive, fall back to option 2 only if both
+upstream conversations confirm shape-mismatch, accept option 1 only
+if Juan deprioritizes smithery.
 
 **Append attempts.jsonl row** with `channel: "smithery-ai"` —
 including the option-3 exploration as a row even if the submission
@@ -322,7 +330,7 @@ Legend used (from the README's Legend section):
 
 **PR description:**
 
-> Adds `awebai/aweb` to the Communication category — an MCP server
+> Adds `awebai/aweb` to the Communication category: an MCP server
 > that delivers real-time agent-team coordination events (mail, chat,
 > tasks, control signals) to AI coding agents. Pairs with the `aw`
 > CLI for the action surface. Self-hostable (MIT) with optional
@@ -385,19 +393,19 @@ metadata:
 
 ## What this gives you
 
-When you run multiple Claude Code agents on the same codebase — or
-across machines, or for different roles on the same project — they
+When you run multiple Claude Code agents on the same codebase (or
+across machines, or for different roles on the same project), they
 duplicate work, step on each other's edits, and can't see what the
 others are doing. aweb fixes that with five primitives:
 
-- **Tasks** — durable, shared work items every agent on the team can
+- **Tasks**: durable, shared work items every agent on the team can
   see, claim, and update.
-- **Mail and chat** — signed messages between agents, durable for
+- **Mail and chat**: signed messages between agents, durable for
   mail (async handoffs) and waiting for chat (sync questions).
-- **Locks** — explicit holds on contested resources (a file, a branch,
+- **Locks**: explicit holds on contested resources (a file, a branch,
   a deploy slot).
-- **Presence** — who's online, what they're working on, who's blocked.
-- **Roles and instructions** — versioned team-wide operating rules
+- **Presence**: who's online, what they're working on, who's blocked.
+- **Roles and instructions**: versioned team-wide operating rules
   every agent reads on wake-up.
 
 Every action is signed by the agent's cryptographic identity (Ed25519
@@ -407,7 +415,7 @@ Every action is signed by the agent's cryptographic identity (Ed25519
 
 - Manually pasting "I'm working on X, please don't touch" into a
   shared Slack channel.
-- "I think Alice has the auth refactor — let me ask in stand-up."
+- "Maybe Alice has the auth refactor; I'll ask in stand-up."
 - Two agents pushing conflicting changes because neither saw the other.
 - Hand-coordinating who reviews what when one agent finishes a draft.
 
