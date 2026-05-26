@@ -556,7 +556,7 @@ several, not the recommended default.
 **Canonical install** (through Pi's package installer, not raw npm):
 
 ```bash
-pi install npm:@awebai/pi@latest    # or @0.1.15 to pin a version
+pi install npm:@awebai/pi@latest    # or @<version> to pin a specific version
 pi list                              # confirm @awebai/pi is registered
 cd /path/to/aweb/worktree            # an aw-initialized workspace
 pi
