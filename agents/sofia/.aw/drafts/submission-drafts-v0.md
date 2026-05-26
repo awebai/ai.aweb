@@ -13,12 +13,21 @@ State of engineering prep as of 2026-05-26:
 - `aweb/channel/LICENSE` — DONE (Athena commit `f32393a`)
 - `aweb/packages/claude-skills/LICENSE` — DONE (`f32393a`)
 - `aweb/packages/claude-skills/.claude-plugin/plugin.json` metadata
-  filled — DONE (`f32393a`), now on plugin version `0.2.9` (post
-  Hestia/Dave release rebase)
+  filled — DONE (`f32393a`), now on plugin version `0.2.10` (post
+  Hestia/Dave release rebase + Iris voice-pass em-dash fix)
 - `aweb/channel/package.json` carrying `mcpName: "io.github.awebai/channel"`
   — DONE (Athena commit `db9a492`, `@awebai/claude-channel 1.4.9`)
-- `@awebai/claude-channel@1.4.9` published on npm — **PENDING**
-  (Hestia's release gate; required before B.3 can validate)
+- Plugin description em-dash → colon in both plugin.json files — DONE
+  (Athena commit `848bba5`, channel bumped to `1.4.10`, skills bumped
+  to `0.2.10`)
+- `@awebai/claude-channel@1.4.9` npm-published — DONE (~21:00 UTC
+  2026-05-26)
+- `@awebai/claude-channel@1.4.10` npm-published — **PENDING** (Hestia
+  release gate; required because 1.4.9 tarball still carries the
+  em-dash description; submissions pin to 1.4.10)
+- `@awebai/claude-skills@0.2.10` npm-published — **PENDING** (Hestia
+  release gate; required because 0.2.9 tarball still carries the
+  em-dash description; B.2 pins to 0.2.10)
 
 Baseline metadata used across submissions (single source so framing
 stays consistent):
@@ -33,7 +42,7 @@ stays consistent):
 | License | MIT |
 | Author | awebai |
 | Keywords | aweb, agents, coordination, channel, mcp, claude-code, multi-agent |
-| npm packages | `@awebai/claude-channel` (1.4.9), `@awebai/claude-skills` (0.2.9) |
+| npm packages | `@awebai/claude-channel` (1.4.10 target), `@awebai/claude-skills` (0.2.10 target) |
 
 ---
 
@@ -131,8 +140,10 @@ the same day; they share approval flow.
 
 ## B.3 — Official MCP Registry (registry.modelcontextprotocol.io)
 
-**Status:** WAITING on Hestia npm publish of `@awebai/claude-channel@1.4.9`.
-Once that lands, READY.
+**Status:** WAITING on Hestia npm publish of `@awebai/claude-channel@1.4.10`.
+1.4.9 is npm-live but carries an em-dash in the description that Iris
+voice-pass caught; 1.4.10 (Athena `848bba5`) fixes it. Submit only
+after 1.4.10 is npm-live so registry indexing matches latest published.
 
 **Why this one matters:** Anthropic + GitHub + PulseMCP + Microsoft
 backed; it's the registry MCP clients (including Claude Code's
@@ -146,7 +157,7 @@ registry.modelcontextprotocol.io.
 **Step-by-step:**
 
 1. **Verify npm publish landed:** `npm view @awebai/claude-channel
-   version` returns `1.4.9`. If not, ping Hestia.
+   version` returns `1.4.10`. If not, ping Hestia.
 
 2. **Install mcp-publisher CLI** (one-time):
    ```bash
@@ -171,12 +182,12 @@ registry.modelcontextprotocol.io.
        "url": "https://github.com/awebai/aweb",
        "source": "github"
      },
-     "version": "1.4.9",
+     "version": "1.4.10",
      "packages": [
        {
          "registryType": "npm",
          "identifier": "@awebai/claude-channel",
-         "version": "1.4.9",
+         "version": "1.4.10",
          "transport": {
            "type": "stdio"
          }
@@ -198,7 +209,7 @@ registry.modelcontextprotocol.io.
    mcp-publisher publish
    ```
    Expected output: `✓ Successfully published / ✓ Server
-   io.github.awebai/channel version 1.4.9`.
+   io.github.awebai/channel version 1.4.10`.
 
 6. **Verify** via the registry API:
    ```bash
