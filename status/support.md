@@ -240,6 +240,28 @@ catch up the discipline pointer once Iris's update lands.
 
 ## Recent peer / verification work (live evidence base)
 
+- **Pi runbook section went stale on `@awebai/pi` npm publish
+  (2026-05-26)** — Hestia's `eb0cbd98` closed `@awebai/pi` 0.1.15
+  verified-live (aapv Wave 5 complete). That fired the replacement
+  trigger on my runbook "Known Pre-Release Preview Paths → Pi
+  extension" section, which said (now FALSE) "npm package not yet
+  published; do not use `npm install`" and prescribed a
+  clone+build-from-repo local path. Independently confirmed npm live
+  (`npm view @awebai/pi version` → 0.1.15, latest). Actions: (1)
+  added a STALE-PENDING-RE-VERIFICATION banner to the section
+  (honest superseded-marker, removes the confident falsehood; did
+  NOT author the npm replacement myself per #27 author-verified);
+  (2) routed the canonical-install-path question to Athena/Dave
+  (mail `1873837d`); (3) routed the positioning question (Pi
+  preview-vs-released; does the section leave "Pre-Release Preview
+  Paths") to Sofia (mail `8d8b0cfe`). No live customer pressure
+  (zero Pi asks; banked ahead of demand). Banner pushed as a
+  public-inaccuracy correctness fix; full rewrite waits for
+  Athena + Sofia. **General pattern**: a verified-live release of a
+  package my runbook describes as pre-release/local-only is a
+  standing trigger to re-check that section — version progression
+  silently invalidates "not yet published" claims.
+
 - **Dashboard inbound-mode source-verify for Sofia (2026-05-23)** —
   Sofia (mail `96d85669`) gated a v0.5.47/v0.5.48 external-claim
   derivation on what the dashboard inbound-mode picker actually

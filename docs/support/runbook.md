@@ -461,6 +461,20 @@ the entry was banked.
 
 ### Pi extension (`@awebai/pi`) — local install from aweb repo
 
+> **⚠ STALE PENDING RE-VERIFICATION (2026-05-26).** `@awebai/pi` is
+> now PUBLISHED on npm at `0.1.15` (verified-live by Hestia mail
+> `eb0cbd98`; independently confirmed `npm view @awebai/pi version`
+> → `0.1.15`, `latest`). The "not yet published / do not use
+> `npm install`" guidance below is OUT OF DATE — this section's own
+> stated replacement trigger ("the public install path will replace
+> this entry when the package is published") has fired. Do NOT rely
+> on the npm guidance in this entry until it is rewritten. The
+> correct post-launch customer install path is being confirmed with
+> engineering (Athena/Dave) per #27 (author-verified, not inferred);
+> positioning of Pi as preview-vs-released is with Sofia. Until the
+> rewrite lands, the local-build path below still WORKS but is no
+> longer the only or likely-recommended path.
+
 **When this applies.** Customer asks about trying the aweb Pi
 integration before public release. The npm package `@awebai/pi`
 is NOT yet published; do not point customers at
