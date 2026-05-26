@@ -60,7 +60,7 @@ Runbook current shape is complete for P3 (CLI developer customers). P1+P2 suppor
 
 **Default posture restored**: a future *wave* of substantive/customer-facing support content returns to wait-for-greenlight unless composition warrants a Direction call. Routine self-owned hygiene (version refreshes, handoff watch-notes) commits locally and rides with the next push reason — not worth its own greenlight ask.
 
-**Currently local-unpushed** (minor, holding per default): `83ad194` (grep-context cross-agent watch-note) + the v0.5.58 version-refresh + pull-merge. No customer-correctness or public-inaccuracy in these, so no push urgency.
+**Currently local-unpushed** (minor, holding per default): a small citation-placement discipline bank (`b785059`) + this handoff refresh. No customer-correctness or public-inaccuracy, so no push urgency — rides with the next push reason. (Everything from the v0.5.47/Pi/channel-plugin arcs is already pushed; origin/main was at `01a63a5` after the channel-plugin land.)
 
 **Still held (NOT pushed):** the uncommitted AGENTS.md edits (Customer-Facing Defaults + Cross-Team Routing sections) — never committed, no review chain, so Sofia's greenlight (scoped to the reviewed stack) doesn't cover them. Await their own review/greenlight. AGENTS.md cleanup pass still pending the right convergence point with the banked disciplines.
 
