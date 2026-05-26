@@ -1,10 +1,101 @@
 # Operations Status
 
-Last updated: 2026-05-24 00:25 CEST (22:25 UTC) — **AC v0.5.47 +
-aweb 1.25.3 destructive cutover SHIPPED VERIFIED LIVE**. Closes
-the aapq wave: consolidated 001 rebaseline now the canonical aweb
-migration line in prod; original 001 + bridge 002 history wiped via
-3-schema DROP + re-migrate + data-only restore.
+Last updated: 2026-05-24 20:35 CEST (18:35 UTC) — **aapr BYOT
+cluster + skill-content ripple SHIPPED**. AC v0.5.49 + v0.5.50
+live; aw CLI 1.25.3 + Pi 0.1.7 + claude-skills 0.2.1 + skills-v0.2.1
+ZIPs all verified-published with corrected `team_and_contacts`
+guidance and access_mode-free CLI import-request shape.
+
+## Published-state table (cross-harness, aapr.22 + 61c15ae ripple)
+
+This is the single point of reference for what's live across the
+distribution surfaces after today's BYOT/skill-content cluster:
+
+| Harness | Source | Version | BYOT state |
+|---------|--------|---------|------------|
+| Installed aw CLI | @awebai/aw npm + binaries | 1.25.3 | no --access-mode in `aw id team import-request`; signing verified against AC canonical_json_bytes |
+| Claude Code | @awebai/claude-skills@0.2.2 (marketplace 0.2.2) | 0.2.2 | fresh-BYOT walkthrough body (Grace a796a73) |
+| Claude.ai web | skills-v0.2.2 GH Release ZIPs | 0.2.2 | fresh-BYOT walkthrough, 4 ZIPs |
+| Codex | awebai/codex-plugins git-subdir | aweb main (a796a73+) | fresh-BYOT walkthrough (auto-updates with main) |
+| Pi | @awebai/pi@0.1.8 npm | 0.1.8 | fresh-BYOT walkthrough (14570 bytes SKILL.md, 7 keyword hits) |
+| AC backend | release_tag=v0.5.50, git_sha=3af8dbb4 | v0.5.50 | aapr.14 bridge no-mint + aapr.15-17 colon-URL route + aapr.4 BYOT e2e gate + aapr.18-20 identities-page action split |
+
+## v0.5.49 + v0.5.50 verified-live evidence summary
+
+- /health: release_tag=v0.5.50, git_sha=3af8dbb4cbd9, aweb=1.25.3, awid=0.5.8, all checks connected, started_at 2026-05-24T17:55:16Z (5/5 stability probes consistent)
+- Server-side smoke (1): unauth GET /api/v1/dashboard/agents on imported BYOT team (id 7eb51ab1-...) → HTTP 401 "Authentication required" (was 500 pre-c3b83290; bridge no-mint live for BYOT teams without cloud-held controller keys)
+- Pre-deploy gate (Mia clearance + 263-test cloud journey green at 91110d3b for v0.5.49, and at 253123f2 for v0.5.50, including BYOT e2e using test.juanreyero.com)
+- Browser smokes (2)-(4) (BYOT redirect, navigation, custodial activation) pending Juan's drive against the live v0.5.50 dashboard
+- Athena formal ack on prior bridge-fix-only release pattern; Grace cluster-close ack 63cc381d on aapr.22 + skill ripple
+
+## Earlier today (2026-05-24)
+
+- Morning: AC v0.5.48 hotfix shipped + verified-live (Grace's inbound-mode P0 fix; closed v0.5.47 cluster)
+- @awebai/claude-skills 0.1.0 → 0.2.0 (aweb-bootstrap added; Olivia aaps.1)
+- @awebai/pi 0.1.5 → 0.1.6 → 0.1.7 (aweb-bootstrap; then BYOT inbound-mode body correction)
+
+## Earlier ship discipline banked
+
+**v0.5.47 destructive cutover (2026-05-23 verified-live)**:
+The v0.5.47 destructive cutover landed clean; post-cutover live
+test surfaced a P0 (aw inbound-mode 401 — wrong auth dependency
+on the endpoint) which Grace fixed at AC main 2682eade. v0.5.48
+deploys Option B (sibling `/api/v1/agents/me/inbound-mode` using
+`get_namespace_auth_context`, dashboard endpoint preserved).
+
+**v0.5.48 verified-live evidence (2026-05-23 23:08:38Z /health
+flip)**:
+- /health: release_tag=v0.5.48, git_sha=60819eca (merge commit
+  at tag including Grace's 2682eade + Hestia's 7606382f bump +
+  intervening homepage cosmetic merges), aweb_version=1.25.3,
+  awid_service_version=0.5.8, all green
+- Hestia full 5-step CLI matrix: show → open (no-op) → show →
+  team_and_contacts → show → restore → final show — all green,
+  end-state restored
+- Show-step from aida, iris, metis, ama identities: all green
+- DB before/after diff for 7 default:aweb.ai agents: empty
+  (round-trip clean — Hestia's intermediate flip restored)
+- Athena independent re-run from her own identity: green, end-
+  state restored (mail 0323d5cc/ee7ace12)
+- Grace acks fix as verified-live (mail 2635d8c3)
+- Sofia closes hold-item 1 on external-claim derivation (mail
+  6fdec860 in conversation 878c06b1)
+- Local-identity 422 path covered by Grace's backend regression
+  tests (test_agent_messaging_policy.py 7 passed at 2682eade);
+  not live-exercised because all accessible identities are global
+
+**v0.5.47 destructive cutover (preserved, still verified-live)**:
+- aweb consolidated 001 rebaseline live (was: original 001 +
+  bridge 002; now: single 001 with final state CHECK constraint)
+- Sprint Phase 2 DROP → /health flip: 7m05s within 10-min SLO
+- 3-schema scope expansion (aweb + aweb_cloud + server) handled
+  the cross-schema FK foot-gun (runbook line 1402); 7 FKs reborn
+
+**inbound_mode product fact (banked through Sofia + Aida read)**:
+- Two modes only: `open` (customer-facing label: "All") and
+  `team_and_contacts` (label: "Team and contacts")
+- Default for new global agents: open
+- contacts_only is legacy; LEGACY_INBOUND_MODE_ALIASES silently
+  normalizes to team_and_contacts; 0 affected customers
+- Picker visible only on global identities; local-only aliases
+  don't see the control (PATCH on local returns 422)
+- Customer-facing labels always — slugs only on CLI surface
+- Production distribution: 301 open / 46 team_and_contacts /
+  0 contacts_only (0 is structural — value not accepted post-aapq)
+
+**Follow-ups carried forward**:
+- AC Makefile gate `release-verify-migration-immutability`
+  restored post-cutover (53215c09); standing gate is back live
+- `prod_db_reset.py` argv-echo prints full DATABASE_URL to stdout
+  during dump — Juan acknowledged in-session; patch needed in
+  `_run` to mask the URL
+- Task #209: team_and_contacts BLOCKING-path live test still
+  pending — requires sender outside athena's teams AND not in
+  her contacts (a third-team identity)
+- Task #204: post-cutover to_did drop in chat history records —
+  unchanged by v0.5.48
+- Task #182: cross-namespace federation smoke post v0.5.41 —
+  still pending
 
 **v0.5.47 verified-live evidence (2026-05-23 22:17:18Z /health
 flip)**:

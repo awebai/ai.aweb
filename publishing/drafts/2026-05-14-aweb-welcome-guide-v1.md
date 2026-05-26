@@ -2,10 +2,12 @@
 title: "aweb welcome guide — v5 draft for MCP welcome tool + resource"
 date: "2026-05-14"
 type: "ai-facing-doc-draft"
-status: "Iris drafted v5 (Athena v4 cleared 6b88d7bb with contacts_remove nit folded); routing to Aida for support-integration; Juan bless after"
+status: "SUPERSEDED 2026-05-16 by AC commit 052530aa (aaoq + aaor paired wave). welcome.md deleted; load_welcome_guide() now reads mcp-tutorial.md, which is aweb-canonical and synced via Makefile. AWEB_HOSTED_MCP_INSTRUCTIONS in hosted_mcp.py rewritten in the same wave. Historical record of v5; do not edit live customer surface from this file."
 canonical-destination: "ac/backend/src/aweb_cloud/resources/welcome.md (AC-canonical per Athena tech-accuracy read; Grace's load_welcome_guide() reads from that path via importlib.resources). Moves on Juan's bless."
 brief: "Athena spec lock 44c8c92a; Aida pre-think 204e971e; Sofia framing approval 55bed1b7; Athena tool-name lock a58bc12b + 69ed8365; Athena tech-accuracy revisions dfeb103a; Athena v4 clear + contacts_remove nit 6b88d7bb."
 ---
+
+> **SUPERSEDED 2026-05-16.** This draft shipped to `ac/backend/src/aweb_cloud/resources/welcome.md` on 2026-05-14. AC commit `052530aa` (aaoq + aaor paired wave) deleted `welcome.md` and migrated the customer-facing surface to `mcp-tutorial.md` (aweb-canonical, synced via Makefile). `load_welcome_guide()` in `hosted_mcp.py` reads `mcp-tutorial.md` from that commit forward, and `AWEB_HOSTED_MCP_INSTRUCTIONS` was rewritten in the same wave. Both live surfaces are free of the deprecated tool aliases (`send_message_to_contact`, `read_messages_from_contact`) referenced below. Keep this file as a historical record of the v5 review chain. **Do not treat the tool list or copy below as current spec.**
 
 ## Iteration history (Iris notes for reviewers)
 

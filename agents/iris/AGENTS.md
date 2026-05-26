@@ -192,6 +192,36 @@ work is to land the edits in `ac/site/` on a branch Iris pushes,
 then signal Hestia for deploy. Same lane shape as Athena → Hestia
 for application code.
 
+**Grep-flag work must include section-context, not just the file
+path.** The same string in different sections of the same doc
+can mean opposite things. A "Legacy Compatibility Aliases" table
+entry IS the correct location for a deprecated tool name; a
+"Current Tools" section entry IS NOT. Reading only the grep hit
+without the containing section produces false-positive flags
+that consume reviewer time and can cascade into edit-and-frame
+loops on artifacts that don't need editing. Banked from the
+2026-05-23 Aida flag on `send_message_to_contact` in
+`ac/site/static/docs/mcp-tools-reference.md`: Aida + Sofia both
+grep-confirmed the hit and routed it as a deprecated-as-current
+issue; reading the file showed line 120 sits inside the Legacy
+Compatibility Aliases table where the entry belongs. Sofia
+banked the same lesson on her side (mail `6b645da7`).
+Discipline: before treating a grep hit as a problem, read the
+immediately containing section header + opening prose. Same
+name can mean "promoted as current" or "deprecated and
+redirected" depending on which section.
+
+Companion discovery banked from the same arc: AC commit
+`052530aa` (aaoq + aaor paired wave) is the moment the
+customer-facing welcome surface migrated from
+`backend/src/aweb_cloud/resources/welcome.md` to
+`mcp-tutorial.md`. `load_welcome_guide()` in `hosted_mcp.py`
+reads `mcp-tutorial.md` from that commit on. If a future flag
+references the welcome guide path, that SHA is the migration
+anchor — check `mcp-tutorial.md` (and
+`AWEB_HOSTED_MCP_INSTRUCTIONS` in `hosted_mcp.py`) as the live
+surfaces, not the deprecated draft chain.
+
 ## Homepage source authoring (`ac/site/`)
 
 The aweb.ai landing source lives in `ac/site/` (Hugo + PaperMod).
