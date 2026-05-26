@@ -48,7 +48,9 @@ complete record; never edited after capture except for `capture_2` and
 
 **Submission-surface** (submit metadata to registry → approval-in-days + ongoing-discoverability feedback loop):
 
-`claude-plugin-marketplace`, `mcp-registry-official`, `mcp-registry-mcp-so`, `mcp-registry-smithery`, `mcp-registry-glama`, `awesome-mcp-servers`, `clawhub`, `nanoclaw-channel`
+`claude-code-marketplace`, `mcp-registry-official`, `mcp-so`, `smithery-ai`, `glama-ai`, `awesome-mcp-pr`, `clawhub`, `nanoclaw-channel`
+
+The naming logic: the official MCP registry keeps the `mcp-registry-` prefix because it's the canonical one (registry.modelcontextprotocol.io); third-party registries use their bare brand names because the brand already identifies the surface. `awesome-mcp-pr` names the action-shape (PR submission against the awesome-list) rather than the surface, because the action-shape is what matters for daily-loop log-reading.
 
 Pi listings (pi.dev/packages/@awebai/pi) are automatic via the `pi-package` npm keyword and are not attempts to log. Pi promotion goes through community-engagement channels (DEV.to article, GitHub Show & Tell, etc.).
 
@@ -71,7 +73,7 @@ For channels like `hn`, `reddit-*`, `twitter`, `devto`, `direct-mail`, etc. The 
 
 ### Result fields — submission-surface variant (initial capture — at submit + later check passes)
 
-For channels like `claude-plugin-marketplace`, `mcp-registry-*`, `clawhub`, `nanoclaw-channel`, `awesome-mcp-servers`. The feedback shape is submit → approval-in-days → ongoing-discoverability.
+For channels like `claude-code-marketplace`, `mcp-registry-official`, `mcp-so`, `smithery-ai`, `glama-ai`, `awesome-mcp-pr`, `clawhub`, `nanoclaw-channel`. The feedback shape is submit → approval-in-days → ongoing-discoverability.
 
 | Field | Type | Example | Notes |
 |---|---|---|---|
@@ -102,7 +104,7 @@ For channels like `claude-plugin-marketplace`, `mcp-registry-*`, `clawhub`, `nan
 ### Submission-surface (MCP registry)
 
 ```json
-{"id":"2026-05-27-mcp-so-aweb-channel","date_utc":"2026-05-27T15:00:00Z","channel":"mcp-registry-mcp-so","channel_url":"https://mcp.so/submit/aweb-channel","submitter":"sofia","title_or_subject":"aweb-channel — agent coordination over signed messaging","content_path":"co.aweb/outreach/submissions/mcp-so-aweb-channel.md","result_submission":{"status":"submitted","listing_url":null,"discoverability":null,"ref_traffic_observed":false,"captured_at_utc":"2026-05-27T15:00:00Z"},"notes":"Initial submit. Approval window per mcp.so is typically 3-5 days; check back at 7d."}
+{"id":"2026-05-27-mcp-so-aweb-channel","date_utc":"2026-05-27T15:00:00Z","channel":"mcp-so","channel_url":"https://mcp.so/submit/aweb-channel","submitter":"sofia","title_or_subject":"aweb-channel: agent coordination over signed messaging","content_path":"co.aweb/outreach/submissions/mcp-so-aweb-channel.md","result_submission":{"status":"submitted","listing_url":null,"discoverability":null,"ref_traffic_observed":false,"captured_at_utc":"2026-05-27T15:00:00Z"},"notes":"Initial submit. Approval window per mcp.so is typically 3-5 days; check back at 7d."}
 ```
 
 ## How to append a row
