@@ -460,6 +460,86 @@ release-verified. Re-verify against the package author or release
 owner if more than one release cycle has passed since the entry was
 banked (discipline #27).
 
+### Claude Code — install the aweb channel plugin
+
+**When this applies.** Customer runs Claude Code and wants aweb
+coordination (real-time wakeups on mail/chat/task events) in it.
+Released; one supported client among several, not the recommended
+default. Use the channel plugin, NOT `aw run claude` (legacy/
+deprecated — do not make it the default install path).
+
+**Canonical install** (Claude Code plugin marketplace):
+
+```text
+/plugin marketplace add awebai/claude-plugins
+/plugin install aweb-channel@awebai-marketplace
+/reload-plugins
+```
+
+Then launch Claude Code from the aweb worktree with the channel
+enabled:
+
+```bash
+cd /path/to/aweb/worktree
+claude --dangerously-load-development-channels plugin:aweb-channel@awebai-marketplace
+```
+
+The dev-channel warning on launch is expected for this plugin.
+
+**What it does.** `aweb-channel` pushes aweb coordination events —
+mail, chat, work/task/claim notifications, and control signals — into
+a running Claude Code session in real time. Outbound replies/actions
+still use the `aw` CLI.
+
+**Skills are a separate plugin.** Unlike `@awebai/pi`, the channel
+plugin does NOT bundle the canonical skills. Install them separately:
+
+```text
+/plugin install aweb-skills@awebai-marketplace
+```
+
+`aweb-skills` carries the five canonical skills (`aweb-bootstrap`,
+`aweb-identity`, `aweb-team-membership`, `aweb-coordination`,
+`aweb-messaging`).
+
+**Prerequisites / post-install:**
+- The directory must be an aweb workspace (`.aw/workspace.yaml`
+  present). If not, run `aw init` first.
+- Start Claude Code from that worktree; the channel resolves
+  workspace identity from the working directory / workspace files.
+- After installing or updating inside a running session, run
+  `/reload-plugins`, then relaunch with the
+  `--dangerously-load-development-channels` flag above.
+
+**Updating later:**
+
+```text
+/plugin marketplace update awebai-marketplace
+/plugin update aweb-channel@awebai-marketplace
+/reload-plugins
+```
+
+**Short version for customer reply.** `/plugin marketplace add
+awebai/claude-plugins`, then `/plugin install
+aweb-channel@awebai-marketplace`, then `/reload-plugins`; launch
+Claude Code from an aweb worktree with `claude
+--dangerously-load-development-channels
+plugin:aweb-channel@awebai-marketplace`. Install
+`aweb-skills@awebai-marketplace` for the skills.
+
+**Alternative (not the customer default).** `aw init --setup-channel`
++ `claude --dangerously-load-development-channels server:aweb`
+configures the local MCP-server/channel path (`npx
+@awebai/claude-channel`). Keep this as a development / self-hosted /
+marketplace-avoidance fallback, not the primary customer entry.
+
+**Source.** Install path + marketplace/skills surface: Athena mail
+`5acc6ec4` (2026-05-26, marketplace + npm tarball-inspected).
+Positioning (released; one client among several, not the default;
+`aw run claude` deprecated): Sofia mails `de34ad4d` / `54294ac1`,
+aligned with the standing Customer-Facing Default (Juan, 2026-05-02).
+Marketplace entry `@awebai/claude-channel` 1.4.8 at time of writing.
+
 ### Pi (`pi.dev`) — install the aweb extension
 
 **When this applies.** Customer runs Pi and wants aweb multi-agent
