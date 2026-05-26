@@ -8,6 +8,39 @@ signal, attribution caveat.
 
 ---
 
+## 2026-05-08 · "Pair Your Coding Agent with a Reviewer" — Juan published on juanreyero.com (captured retroactively 2026-05-26)
+
+> **Tracking gap (banked):** this post shipped 2026-05-08 but was not captured in publishing/history.md at the time. The outreach side (Iris) was tracking it as "still pending" in entries dated 2026-05-11, 2026-05-12, 2026-05-13 — those entries are accurate-for-their-date in voice but factually wrong about ship state. The 2026-05-26 outreach pivot audit (step 2 parked-artifact review) surfaced the actual ship. Banked discipline for next time: before treating a handoff entry as current, verify the ship state of any "awaiting commit/push" or "on X's plate" item — author-owned surfaces (juanreyero.com here) can move underneath the handoff. The "still pending" mentions in subsequent entries reflect the gap, not a re-assessment.
+
+**Channel**: juanreyero.com (Juan's personal site, blog format)
+**Public link**: https://juanreyero.com/article/ai/two-agents-not-one/ (URL slug preserves original "Two Agents Not One" working title; page title is "Pair Your Coding Agent with a Reviewer")
+**Artifact**: Juan-authored long-form post. Draft chain captured in earlier publishing/drafts/ history; final shipped under Juan's own voice from his own surface. Not in publishing/drafts/ because the publication path was his own repo.
+**Audience**: P3 (developer team) primary — practitioners running 1+ coding agent who are ready for the pair shape. Adjacent overlap with P1 if a daily-AI-user discovers the post.
+**Voice**: founder first-person; no marketing-shape; "the simplest improvement you can make"; ends with concrete next step.
+
+### Live shape
+
+Lead with the move: "The simplest improvement you can make to your agentic programming workflow is to run two agents instead of one." Pair-shape (builder + reviewer in parallel worktrees, shared task list, post-TDD-cycle handoff). Names aweb explicitly: "open-source coordination layer for AI coding agents." Links to aweb.ai + github.com/awebai/aweb.
+
+### Signal (post-ship, deferred — outreach didn't track at the time)
+
+Empirical signal not captured at ship time. Plausible was not live on juanreyero.com (it tracks aweb.ai), so no referral or page-view data on the post itself. Any referral traffic from juanreyero.com → aweb.ai would have shown in Plausible after 2026-05-16 (Plausible live date); pre-2026-05-16 referrals are unobservable from our side.
+
+Signal worth retro-capturing if available:
+- juanreyero.com analytics on the post (if Juan tracks anything on his own site)
+- Cross-channel discussion: was the post linked anywhere (Reddit, HN, Twitter, dev.to)?
+- Any signups attributable to juanreyero.com referral after Plausible went live 2026-05-16
+
+### Cross-channel promotion (not done)
+
+The post was not promoted to Reddit / HN / Twitter from the outreach side. The Twitter thread P1 draft (2026-05-13) was an independent track, not a promotion-of-the-post track. Post-publish promotion is a deferred follow-up question for the outreach pivot.
+
+### Attribution caveat
+
+If any signups, signal, or signal-on-the-blog arrived between 2026-05-08 and 2026-05-26 that's attributable to this post, the outreach side missed the attribution window for direct capture. Future outreach signal that mentions the post can cite it as one upstream factor.
+
+---
+
 ## 2026-05-14 · aweb welcome guide v5 — committed to AC-canonical path (Juan blessed)
 
 > **SUPERSEDED 2026-05-16 by AC commit `052530aa`** (aaoq + aaor paired wave). `welcome.md` deleted; customer-facing surface migrated to `ac/backend/src/aweb_cloud/resources/mcp-tutorial.md` (aweb-canonical, synced via Makefile). `load_welcome_guide()` in `hosted_mcp.py` reads `mcp-tutorial.md` from that commit forward. `AWEB_HOSTED_MCP_INSTRUCTIONS` rewritten in the same wave; the v5 serverInfo string quoted below was replaced. Both live surfaces are free of the deprecated `send_message_to_contact` / `read_messages_from_contact` aliases referenced in the v5 tools list. This entry stands as accurate-for-its-date record of what shipped 2026-05-14; do not treat it as current customer surface.

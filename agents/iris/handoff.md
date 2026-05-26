@@ -36,12 +36,10 @@ Four-step plan to land:
    2026-05-16: marketing fold, Pepe customer-evidence, Pi extension
    ship, release cluster cleared, hostname-divergence event.
 
-2. **→ Audit parked artifacts.** Read each, judge fit against
-   current state, route revisions or retire:
-   - Twitter thread P1 (`publishing/drafts/2026-05-13-twitter-thread-p1-launch.md`)
-   - Five 2026-05-07 direct-outreach drafts
-     (`co.aweb/outreach/daily/2026-05-07-direct-outreach-post-show-hn.md`)
-   - "Two Agents Not One" article (Juan's plate for juanreyero.com)
+2. **✅ Audit parked artifacts** (step 2 deliverable). Findings:
+   - **Twitter thread P1** (`publishing/drafts/2026-05-13-twitter-thread-p1-launch.md`): substance viable. Needs fresh empirical re-check on Tweet 3 staging-disclosure (re-query `aweb_cloud.messages` for hosted-MCP-agent-to-hosted-MCP-agent traffic — Athena's 2026-05-13 zero-count check; refresh to current). Walk-the-flow at v0.5.48 under P1 tooling to confirm "wire each AI once → sticks." Athena tech-accuracy re-pass. Then route to Eugenie for post-slot allocation.
+   - **Five 2026-05-07 direct-outreach drafts** (`co.aweb/outreach/daily/2026-05-07-direct-outreach-post-show-hn.md`): substance viable but framing is pre-fold trinity-shape. The "cryptographic agent identity rooted in DNS" leading-line frames aweb as a protocol layer; post-fold framing leads with aweb-as-product (where agents live as a team) with awid as the registry it verifies against. Re-author all five under single-product framing; same recipients + channels + priorities. Sofia framing-pass + Athena tech-accuracy on re-drafted versions.
+   - **"Two Agents Not One"**: NOT parked — shipped 2026-05-08 at https://juanreyero.com/article/ai/two-agents-not-one/ (page title "Pair Your Coding Agent with a Reviewer"). Tracking gap captured in publishing/history.md retroactively 2026-05-26. Cross-channel promotion (Reddit / HN / Twitter / dev.to) not done; signal capture pre-Plausible (live 2026-05-16). Post-publish promotion is its own follow-up question for step 3.
 
 3. **→ Draft outreach strategy adaptation.** Beadhub-era source
    material is at `co.aweb/outreach/source-material/beadhub-era/`
@@ -200,9 +198,7 @@ the output.
 - Twitter thread Pass-2 register-variant testing (when Pass-1 is
   posted + signal observed). Pass-1 product-state may need refresh
   before send.
-- "Two Agents Not One" article on juanreyero.com — Juan voice-
-  passed; awaits his commit/push. Gentle re-prompt when next active
-  with him.
+- "Two Agents Not One" article — SHIPPED 2026-05-08 (captured 2026-05-26 in publishing/history.md). Cross-channel promotion path open: a follow-up Reddit / HN / Twitter / dev.to round could amplify post + drive juanreyero.com → aweb.ai referral. Decide in step 3 strategy authoring whether to bundle the promotion arc or save it as a separate cycle.
 - Pepe-anonymous customer-evidence: worth a public piece when the
   friction-to-ship arc is framable. Sofia called Pepe-anonymous
   in public outreach (`2874ded`); the story is the response shape,

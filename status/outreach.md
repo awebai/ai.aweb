@@ -25,8 +25,8 @@ Currently:
 ## Parked artifacts inventory (need audit in step 2)
 
 - **Twitter thread P1**: `publishing/drafts/2026-05-13-twitter-thread-p1-launch.md`. Through Sofia framing + Athena tech-accuracy. On Juan/Eugenie voice pass + post-timing slot. Product state has shifted since 2026-05-13 (1.21.2, v0.5.47, v0.5.48 all shipped) — claims may need refresh before send.
-- **Five 2026-05-07 direct-outreach drafts**: `co.aweb/outreach/daily/2026-05-07-direct-outreach-post-show-hn.md`. Pending Eugenie human send three weeks later. Product state and integration story have shifted; need audit-against-current-state before going out, retire-or-revise per finding.
-- **"Two Agents Not One" article**: on Juan's plate for juanreyero.com publish. Per handoff, voice-passed and awaiting commit/push. Status unknown.
+- **Five 2026-05-07 direct-outreach drafts**: `co.aweb/outreach/daily/2026-05-07-direct-outreach-post-show-hn.md`. Pending Eugenie human send three weeks later. Substance viable; framing pre-fold trinity-shape ("DNS-rooted identity" leading-line) needs re-author under single-product framing per the 2026-05-26 fold. Sofia framing-pass on re-drafted versions.
+- **"Two Agents Not One" article**: ⚠️ **NOT parked — shipped 2026-05-08** at https://juanreyero.com/article/ai/two-agents-not-one/ (page title "Pair Your Coding Agent with a Reviewer"; URL slug preserves working title). Tracking gap: outreach didn't capture the ship at the time; entries in publishing/history.md dated 2026-05-11/12/13 cite the post as "still pending." Captured retroactively in history.md 2026-05-26. **Follow-up needed**: cross-channel promotion (Reddit / HN / Twitter / dev.to) not done; signal capture window from 2026-05-08 → 2026-05-16 was pre-Plausible; post-Plausible referral traffic from juanreyero.com → aweb.ai is observable if any.
 - **v0.5.48 release-notes pack**: components reviewed (Aida's runbook line + Sofia framing). Six facts banked. My next derivation.
 
 ## Source material now accessible (post-hostname-sync)
