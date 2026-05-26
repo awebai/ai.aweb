@@ -446,108 +446,97 @@ entry mail `f393168c` (2026-05-02), Athena's review mail `df41abbc`
 finding #3. Captured 422 envelopes were verified against the
 production schema by Mia on 2026-05-02.
 
-## Known Pre-Release Preview Paths
+## Client Install Paths
 
-For customer asks about trying features that exist in code but are
-not publicly released. Distinct from Known Errors (symptom-keyed):
-these are NOT bugs; they are intentional pre-release states with a
-sanctioned preview path the customer can use.
+How customers run aweb with their agent client. aweb supports several
+client surfaces — Claude Code (via the channel plugin), Pi (via the
+`@awebai/pi` extension), ChatGPT/Claude.ai (hosted custodial MCP
+flows), and the raw `aw` CLI for terminal-native agents. None is "the"
+default; the right primary surface depends on the customer's setup, so
+present the one that matches what they already run.
 
-Per discipline #27 refinement: command shapes below are
-engineering-authored (the package author or release owner provided
-the canonical preview steps). Re-verify against the relevant source
-before recommending if more than one release cycle has passed since
-the entry was banked.
+Install/command shapes here are engineering-authored and
+release-verified. Re-verify against the package author or release
+owner if more than one release cycle has passed since the entry was
+banked (discipline #27).
 
-### Pi extension (`@awebai/pi`) — local install from aweb repo
+### Pi (`pi.dev`) — install the aweb extension
 
-> **⚠ STALE PENDING RE-VERIFICATION (2026-05-26).** `@awebai/pi` is
-> now PUBLISHED on npm at `0.1.15` (verified-live by Hestia mail
-> `eb0cbd98`; independently confirmed `npm view @awebai/pi version`
-> → `0.1.15`, `latest`). The "not yet published / do not use
-> `npm install`" guidance below is OUT OF DATE — this section's own
-> stated replacement trigger ("the public install path will replace
-> this entry when the package is published") has fired. Do NOT rely
-> on the npm guidance in this entry until it is rewritten. The
-> correct post-launch customer install path is being confirmed with
-> engineering (Athena/Dave) per #27 (author-verified, not inferred);
-> positioning of Pi as preview-vs-released is with Sofia. Until the
-> rewrite lands, the local-build path below still WORKS but is no
-> longer the only or likely-recommended path.
+**When this applies.** Customer runs Pi and wants aweb multi-agent
+coordination in it. Released and on npm; one supported client among
+several, not the recommended default.
 
-**When this applies.** Customer asks about trying the aweb Pi
-integration before public release. The npm package `@awebai/pi`
-is NOT yet published; do not point customers at
-`npm install @awebai/pi`.
-
-**Supported preview path** (clone + local install):
+**Canonical install** (through Pi's package installer, not raw npm):
 
 ```bash
-# 1. Clone aweb and build the Pi package
-git clone https://github.com/awebai/aweb.git
-cd aweb/pi-extension
-npm install
-npm run build
-```
-
-Notes on the build:
-- Package lives at `aweb/pi-extension` on aweb origin/main
-  (source-grep verified 2026-05-19: tree object exists, package.json
-  + src/ + dist/ present).
-- Build also copies the canonical aweb skills into
-  `pi-extension/skills`.
-- Package bundles channel-core from the repo; no separate npm
-  publish is required for this local path.
-
-```bash
-# 2. Install or run the local package in Pi
-#    Persistent local install:
-pi install /absolute/path/to/aweb/pi-extension
-
-#    One-off test run without writing settings:
-pi -e /absolute/path/to/aweb/pi-extension
-
-# 3. Start Pi from an aweb-initialized workspace, not a random dir
-cd /path/to/customer/workspace
-aw workspace status   # should show their aweb identity/team
+pi install npm:@awebai/pi@latest    # or @0.1.15 to pin a version
+pi list                              # confirm @awebai/pi is registered
+cd /path/to/aweb/worktree            # an aw-initialized workspace
 pi
 ```
 
-If the workspace is not initialized yet, run `aw init` first, then
-start Pi.
+Use `pi install npm:...`, NOT plain `npm install @awebai/pi`: plain
+`npm install` fetches the node package but does not register it in
+Pi's settings; `pi install npm:...` wires the extension into Pi. Do
+not tell customers to run plain `npm install @awebai/pi`.
+
+**What it does.** Wakes Pi sessions on aweb channel events (mail and
+chat) and bundles the canonical aweb skills, so a Pi agent can
+coordinate on a team.
+
+**The npm package is sufficient — no clone/build needed.** Per
+Athena's tarball inspection of `@awebai/pi@0.1.15`:
+- `pi.extensions` → `./dist/index.js` (bundles the channel-core
+  wakeup path).
+- `pi.skills` → `./skills` (bundled: `aweb-bootstrap`,
+  `aweb-identity`, `aweb-team-membership`, `aweb-coordination`,
+  `aweb-messaging`).
+- Depends on `@awebai/aw`; the current npm `@awebai/aw` exposes the
+  `aw` binary, so a fresh Pi install can resolve `aw` even if it is
+  not globally installed.
+
+**Post-install notes:**
+- If the customer previously installed a local checkout, remove it
+  first: `pi remove /path/to/aweb/pi-extension`.
+- Start Pi from an aweb worktree. If it is not initialized, the
+  extension shows setup guidance — usually run `aw init`.
+- After `aw init`, restart Pi or run `/reload` so the extension
+  reloads against the new `.aw` state.
 
 **Expected signs of success:**
-
-- Pi footer/status shows: `✓ aweb connected`
-- First-time local install may show the aweb welcome message.
+- Pi footer/status shows `✓ aweb connected`.
 - Incoming aweb mail/chat events wake Pi with message content,
   metadata, and sender verification status.
-- Bundled skills appear as `aweb-coordination`, `aweb-messaging`,
-  and `aweb-team-membership`.
+- Bundled skills appear (`aweb-coordination`, `aweb-messaging`,
+  `aweb-team-membership`, and the rest).
 
 **Common support notes:**
-
-- If Pi still shows old status text or behavior after rebuilding,
-  fully quit/restart Pi; `/reload` may not clear the loaded
-  extension module.
+- If Pi still shows old status text after reinstall, fully
+  quit/restart Pi; `/reload` may not clear the loaded module.
 - If Pi says "aweb installed but not ready," check
   `aw workspace status` in the same directory.
-- Do NOT tell customers to install `npm:@awebai/pi` yet; use the
-  local path until the package is announced as released.
-- This is preview/local testing guidance, not the final customer
-  install path; the public install path will replace this entry
-  when the package is published.
 
-**Short version for customer reply.** Clone aweb, build
-`pi-extension`, run `pi install /path/to/aweb/pi-extension`, then
-launch Pi from an `aw`-initialized workspace.
+**Short version for customer reply.** `pi install
+npm:@awebai/pi@latest`, then launch Pi from an `aw`-initialized
+workspace (run `aw init` first if needed; `/reload` or restart after).
 
-**Source.** Dave (`juan.aweb.ai/dave`, dev-team package author),
-mail `5e31c05e` 2026-05-19 — engineering-authored preview path
-delivered for customer-readiness ahead of any actual customer ask.
-Cross-team routing through Athena is the standing discipline for
-engineering coordination; Dave routed directly here at Juan's
-request as a one-time customer-readiness delivery.
+**Claude Code customers** use the channel plugin instead of Pi (`aw
+run claude` is sunsetting). Pi and the Claude Code channel plugin are
+parallel client surfaces — pick by what the customer already runs.
+
+**Engineering/development note (not customer-facing).** The local
+clone+build path (`git clone … aweb/pi-extension; npm install; npm
+run build; pi install /abs/path`) is superseded for customer setup.
+Keep it only for testing unreleased Pi changes ahead of an npm
+publish.
+
+**Source.** Install path + package-surface confirmation: Athena mail
+`1b0dc344` (2026-05-26, npm tarball-inspected). Positioning (released;
+one client among several, not the default): Sofia mail `de34ad4d`
+(2026-05-26). `@awebai/pi@0.1.15` verified-live on npm by Hestia
+`eb0cbd98`; independently confirmed `npm view @awebai/pi version` →
+`0.1.15`. Supersedes Dave's pre-release local-build path (`5e31c05e`,
+2026-05-19).
 
 ## Customer Orientation Responses
 

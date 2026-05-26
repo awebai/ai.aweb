@@ -256,11 +256,20 @@ catch up the discipline pointer once Iris's update lands.
   preview-vs-released; does the section leave "Pre-Release Preview
   Paths") to Sofia (mail `8d8b0cfe`). No live customer pressure
   (zero Pi asks; banked ahead of demand). Banner pushed as a
-  public-inaccuracy correctness fix; full rewrite waits for
-  Athena + Sofia. **General pattern**: a verified-live release of a
-  package my runbook describes as pre-release/local-only is a
-  standing trigger to re-check that section — version progression
-  silently invalidates "not yet published" claims.
+  public-inaccuracy correctness fix. **RESOLVED same day — section
+  rewritten.** Athena (`1b0dc344`, tarball-inspected) gave the
+  canonical install (`pi install npm:@awebai/pi@latest`, NOT raw
+  `npm install`; package surface sufficient; local-build superseded
+  → engineering note). Sofia (`de34ad4d`) ruled Pi **RELEASED** —
+  graduate out of pre-release framing into a normal client-install
+  entry, one client among several, not the default. Rewrote: retired
+  "Known Pre-Release Preview Paths" (Pi was its only entry) → new
+  "## Client Install Paths" section; Pi entry now release-shaped with
+  the verified install path. Review chain closed (Athena tech + Sofia
+  framing). **General pattern**: a verified-live release of a package
+  my runbook describes as pre-release/local-only is a standing
+  trigger to re-check that section — version progression silently
+  invalidates "not yet published" claims.
 
 - **Dashboard inbound-mode source-verify for Sofia (2026-05-23)** —
   Sofia (mail `96d85669`) gated a v0.5.47/v0.5.48 external-claim
