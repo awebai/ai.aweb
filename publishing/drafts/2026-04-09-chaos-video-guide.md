@@ -1,5 +1,7 @@
 # The Chaos Video: Recording Guide
 
+> **Install-path sunset notice (banked 2026-05-26, Sofia mail `83a87574`).** `aw run claude` is deprecated as a Juan-sourced support default since 2026-05-02. The current recommended install path for Claude Code customers is the channel-plugin marketplace. Athena's verified-current confirmation lands at framing-pass time on Aida's pending runbook entry (request `a73f5b37`). Do NOT execute this guide as-written until the channel-plugin commands replace the three `aw run claude` invocations below. Sofia will route the verified path when it lands; this file gets refreshed at that point.
+
 ## What you're making
 
 A 60-90 second screen recording showing the before/after of
