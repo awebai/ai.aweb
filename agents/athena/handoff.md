@@ -1,5 +1,5 @@
 # Athena Handoff
-Last updated: 2026-05-23 23:12 GMT
+Last updated: 2026-05-28 13:45 GMT
 
 ## Read this first
 
@@ -13,6 +13,25 @@ You are Athena. You bridge two teams:
 Default active team is `aweb:juan.aweb.ai`. Use `--team default:aweb.ai`
 for company-side mail/chat. Dev-team members do not need company-team
 release mechanics; to them, Athena is the gate.
+
+## 2026-05-28 immediate state
+
+- pmbah incident root cause split:
+  - `Agent not connected` was server-side soft deletion of coord/dev workspaces/agents, not quota. Hestia undeleted after Juan authorization. Stale registered workspace paths under `/Users/juanre/prj/pmh/...` made 1.26.3 cleanup classify them as gone. Avoid broad cleanup until path state/fix-forward is safe.
+  - New add-worktree bug found from pmbah dev worktree: hosted bootstrap-created worktree parent is cert-only (team cert + signing key, no local team controller key, no workspace API key). Generic `aw workspace add-worktree` stranded that valid parent because it only branched local-team-key vs API-key bootstrap.
+- Pushed hotfixes:
+  - aweb `a3fbc47` (`cli: support hosted cert-only add-worktree`) changes generic add-worktree authority order to local team key -> workspace API key -> hosted parent-invite via current workspace cert.
+  - AC `a6629b8b` (`test: cover hosted cert-only add-worktree journey`) extends cloud e2e by removing a hosted child api_key and creating a further child from the cert-only parent.
+- Validation run locally: focused add-worktree/API-key tests pass, full `cd aweb/cli/go && go test ./cmd/aw -count=1` pass, `bash -n ac/scripts/e2e-cloud-user-journey.sh` pass, diff-check clean before commit. After push, Athena also ran `cd ac && AWEB_CLOUD_E2E_ONLY_HOSTED_AUTONOMOUS_INSTALL=1 make test-cloud-user-journeys`: PASS, `ALL PASSED: 39 tests`.
+- Grace agreed with the fix shape and invariants before commit; Dave approved pushed diff + coverage (`13b7a5c6-f6f3-4976-a7e3-490be6309ede`, follow-up `50840746-04d6-4b3b-9435-085e08a7b09a`). Grace approved ship-OK for CLI hotfix (`5c19e2f7-e0c0-4be6-ae4f-7100320e9ff1`, `7b8ad887-1656-4967-9aea-1ae4448ba98a`). Production handoff sent to Hestia as CLI-only `aw-v1.26.4` candidate (`bdfb8c65-c986-4c55-9d91-544f618e4489`). AC `a6629b8b` is test coverage only; no AC production release needed. Grace caveat: full unfiltered AC cloud journey hit unrelated registry timestamp-skew later; track separately, not a blocker for this CLI hotfix.
+
+## 2026-05-27 immediate state
+
+- Reviewed Dave's `aweb-aapx` Hermes Aweb gateway prototype at aweb `d1b3831` (prototype `b43c16b` + discovery-smoke doc `d1b3831`). Reran plugin unit tests, py_compile, focused Go ack/read/history tests, full `cd cli/go && go test ./cmd/aw -count=1`, and diff-check; all passed.
+- Review result sent to Dave in mail conversation `3739fb83-13a5-4741-9c63-b1e2c954c751`, reply message `e969362e-cba5-4062-b6da-93995f3d991d`: no blocker to run the real Hermes gateway live validation with one chat session; pre-ship blocker remains that chat replies use `aw chat send-and-leave <sender>` instead of exact `session_id`, so multiple sessions with the same sender can misroute/fail. Before publishing/shipping the chat path, add/use exact session-addressed chat send CLI/API.
+- Dave pushed exact session-send fix at aweb `542a2c3`. Athena reran focused/full Go cmd/aw tests, adapter unittest, py_compile, diff-check, and help inspection. Exact-session invariant cleared: `aw chat send --session-id` has no positional target and adapter uses `route["session_id"]`, then marks read only after successful send. Athena blocked once more because adapter used `--body <content>` and leaked Hermes replies into process argv (`4468b4d4-bc16-47be-ba0b-3cf326925e84`). Dave fixed at aweb `62642c3`; Athena reran adapter unittest, py_compile, diff-check, focused Go tests, and full `go test ./cmd/aw -count=1`; all passed. Review result sent in `3e9921b7-6842-4e74-9154-a183f02f1460`: blocker cleared, proceed to real Hermes gateway smoke with evidence for plugin discovery/config, mail reply+ack ordering, chat exact-session reply+read ordering, unauthorized sender behavior, and event-stream reconnect/exit logs.
+- Dave completed deterministic Hermes adapter smoke with fake `aw` boundary at `/tmp/hermes-aweb-smoke.dbfVxI`. Athena read `report.json` and `aw-commands.jsonl`; evidence covers plugin discovery/config, mail reply before ack, chat exact session send before read, chat body not in argv and temp file present at send time, authorized/denied sender behavior, and event-stream exit/reconnect. Reply `feeb829a-f03e-4beb-891a-a9c4fc88d08f`: no remaining review blocker for prototype/external plugin repo; real app.aweb.ai + model/provider smoke should be a separate readiness claim if we want real-world readiness.
+- Packaging recommendation for aapx: external `awebai/hermes-aweb-platform` repo first; PyPI entry point later if usage warrants; Hermes bundled PR only after external validation and maintainer interest. Shelling to `aw` is acceptable for MVP because it preserves Aweb signing/team/auth/routing/E2EE boundaries. `aw mail ack` / `aw chat read` are the right minimal read-state surface.
 
 ## 2026-05-23 immediate state
 
