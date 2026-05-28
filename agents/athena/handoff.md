@@ -23,7 +23,7 @@ release mechanics; to them, Athena is the gate.
   - aweb `a3fbc47` (`cli: support hosted cert-only add-worktree`) changes generic add-worktree authority order to local team key -> workspace API key -> hosted parent-invite via current workspace cert.
   - AC `a6629b8b` (`test: cover hosted cert-only add-worktree journey`) extends cloud e2e by removing a hosted child api_key and creating a further child from the cert-only parent.
 - Validation run locally: focused add-worktree/API-key tests pass, full `cd aweb/cli/go && go test ./cmd/aw -count=1` pass, `bash -n ac/scripts/e2e-cloud-user-journey.sh` pass, diff-check clean before commit. After push, Athena also ran `cd ac && AWEB_CLOUD_E2E_ONLY_HOSTED_AUTONOMOUS_INSTALL=1 make test-cloud-user-journeys`: PASS, `ALL PASSED: 39 tests`.
-- Grace agreed with the fix shape and invariants before commit; Dave approved pushed diff + coverage (`13b7a5c6-f6f3-4976-a7e3-490be6309ede`). Grace has pulled the pushed diffs and is running broader cmd/aw + Docker-backed cloud journey; do not send Hestia production handoff until Grace approves.
+- Grace agreed with the fix shape and invariants before commit; Dave approved pushed diff + coverage (`13b7a5c6-f6f3-4976-a7e3-490be6309ede`, follow-up `50840746-04d6-4b3b-9435-085e08a7b09a`). Grace approved ship-OK for CLI hotfix (`5c19e2f7-e0c0-4be6-ae4f-7100320e9ff1`, `7b8ad887-1656-4967-9aea-1ae4448ba98a`). Production handoff sent to Hestia as CLI-only `aw-v1.26.4` candidate (`bdfb8c65-c986-4c55-9d91-544f618e4489`). AC `a6629b8b` is test coverage only; no AC production release needed. Grace caveat: full unfiltered AC cloud journey hit unrelated registry timestamp-skew later; track separately, not a blocker for this CLI hotfix.
 
 ## 2026-05-27 immediate state
 
