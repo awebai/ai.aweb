@@ -1,7 +1,8 @@
 # Engineering Status
-Last updated: 2026-05-23 23:12 GMT
+Last updated: 2026-05-28 13:45 GMT
 
 ## Current focus
+- **Hotfix in validation: hosted cert-only `aw workspace add-worktree`.** Root cause: bootstrap-created hosted worktree parents can be valid cert-only members (team cert, no local team key, no workspace API key), but generic add-worktree only handled local-team-key or API-key authority. Pushed aweb `a3fbc47` with hosted parent-invite fallback and AC `a6629b8b` cloud journey coverage. Dave + Grace validation requested; do not send Hestia production handoff until both approve.
 - **aapj/aapk/aapl/aapm consolidated release wave is verified-live.** Hestia reported verified-live from a message that displayed `identity_mismatch`, but independent public checks line up: `app.aweb.ai/health` reports `v0.5.45` / git `fe364950` / aweb `1.25.0` / awid_service `0.5.8`; `api.awid.ai/health` reports `0.5.8`; npm reports `@awebai/aw=1.25.0`; channel/pi have since advanced to `@awebai/claude-channel=1.4.5` and `@awebai/pi=0.1.2` at aweb `2007106` to carry the verification fixes.
 - **Prod DB reset/restore completed.** AC prod was rebuilt clean and restored; AWID 003/004 applied after the approved disposition. Boundary note: no checksum bypass markers or `schema_migrations` edits; only approved disposition row mutations.
 - **AWID/AC disposition landed.** Active legacy AWID non-neutral public addresses were normalized public/null in AWID; corresponding AC/aweb agents were set `contacts_only` to preserve old non-public delivery intent at the delivery layer. Historical soft-deleted AWID rows were left as-is.
