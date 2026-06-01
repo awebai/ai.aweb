@@ -269,6 +269,8 @@ catch up the discipline pointer once Iris's update lands.
 
 ## Recent peer / verification work (live evidence base)
 
+- **Bertha → Hestia relay, 7-day sign-up count (IN FLIGHT, 2026-06-01)** — Bertha (mail `8ada1bdc`) pinged me asking if Hestia was running; she'd been silent 10 days on a simple 7-day sign-up count ask. Confirmed Hestia is running from my own seat (verified-live deploy notices from her active through 2026-05-28), so the silence to Bertha specifically is not an outage. Bertha picked option 1 (relay), so I nudged Hestia (mail `4fd69253`) with the specific ask + 10-day-silence framing, no pressure on the metric itself; asked her to reply on Bertha's thread if in lane or signal a re-route to Metis/Juan if not. Ack'd Bertha that the nudge is out. Awaiting Hestia's response → will loop Bertha either way.
+
 - **Pi runbook section went stale on `@awebai/pi` npm publish
   (2026-05-26)** — Hestia's `eb0cbd98` closed `@awebai/pi` 0.1.15
   verified-live (aapv Wave 5 complete). That fired the replacement

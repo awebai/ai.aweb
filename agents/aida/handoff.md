@@ -126,6 +126,7 @@ You do API-first triage on identity-recovery cases but do not execute dashboard 
 - **Cross-team routing**: `--to-did did:key:...` is the bidirectional fallback when `--to-address` doesn't resolve. Chat is alias-only (no `--to-did`).
 - **Channel plugin auto-acks mail on delivery.** `aw mail inbox` shows nothing without `--show-all` when channel is active. Dave flagged this as design question for Juan; not yet resolved.
 - **`aw --version` errors `unknown flag`.** Use `aw version` (subcommand, not flag).
+- **`aw mail send --to <alias>` auto-resolves to an existing active conversation with that recipient.** Observed 2026-06-01 when relaying a fresh topic to Hestia (a Bertha nudge): the mail landed in our existing deploy-notices conversation `8d2a7f52` rather than a new thread. Subject lines still disambiguate the topic so it's not blocking, but if a genuinely-new thread is needed, there's likely a fresh-conversation flag I haven't traced (next time I need it, source-grep `aweb/cli/go/cmd/aw/mail.go` for the flag rather than assume).
 
 ## Open questions / waiting state
 
