@@ -214,6 +214,43 @@ The runbook lives at `runbook.md` in this directory. Writing it is
 the first task under the new model; for now it's TBD pending the
 first end-to-end ship.
 
+## Analytics & probe scripts
+
+Recurring questions from Juan, Bertha (Eugenie's outreach agent), and
+support triage have durable scripts under `scripts/`. Use these instead
+of writing one-off `/tmp/probe.py` files when the question shape
+matches one we've seen before.
+
+| Script | Answers | Triggered by |
+|---|---|---|
+| `scripts/signups.py --days N` | "how many sign-ups in last N days? CLI vs browser? who?" | Bertha outreach (daily-signup-export + ad-hoc rollups), Juan funnel reads |
+| `scripts/user_activity.py --email <e>` | "is user X active since signup? agents/messages/last-seen?" | Bertha pre-outreach context, support triage |
+| `scripts/multi_agent_active.py --days N` | "is anyone actually using aweb multi-agent? who?" | Juan product reads, Metis signal |
+| `scripts/team_probe.py --team <id>` | "what's the state of team X? agents/workspaces/messages/deletes" | "agent not connected" triage, BYOT audit, cleanup-incident response (#245) |
+
+Invoke with `uv run --with asyncpg python scripts/<name>.py [args]` from
+this dir. DATABASE_URL resolves from `$DATABASE_URL` or
+`../../../ac/.env.production` (the `ac` symlink).
+
+PII discipline:
+- Internal team only. Don't paste raw output to external surfaces.
+- Bertha mail with emails is by-design for outreach (authorized via
+  daily-signup-export skill).
+- Don't check probe output (especially emails or controller keys) into
+  the public ai.aweb repo. Use `artifacts/` for PII-clean writeups
+  only.
+- Delete tmp dumps after use.
+
+When a question shape repeats more than twice, add a new script
+following the pattern in `scripts/README.md` and update this table.
+Banked from Juan 2026-06-02: "we really need to have pre-made scripts
+for the questions that you get from bertha and from me, and they
+should be a clear part of your agents.md."
+
+See `scripts/README.md` for schema notes (cli_signup user shape,
+team_id is TEXT not UUID, mail/chat tables have no deleted_at,
+cloud_agent_certificates is keyed by workspace_id, etc.).
+
 ## Sibling Repos
 
 Symlinks under your dir:
