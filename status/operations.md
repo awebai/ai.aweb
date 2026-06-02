@@ -1,10 +1,95 @@
 # Operations Status
 
-Last updated: 2026-05-24 20:35 CEST (18:35 UTC) — **aapr BYOT
-cluster + skill-content ripple SHIPPED**. AC v0.5.49 + v0.5.50
-live; aw CLI 1.25.3 + Pi 0.1.7 + claude-skills 0.2.1 + skills-v0.2.1
-ZIPs all verified-published with corrected `team_and_contacts`
-guidance and access_mode-free CLI import-request shape.
+Last updated: **2026-06-02 13:30 CEST (11:30 UTC)** — May 26 → June 2
+release wave shipped. Live npm matrix flipped to aw 1.26.4 +
+channel 1.4.11 + skills 0.2.10 + Pi 0.1.16; PyPI aweb on 1.26.5;
+AC v0.5.59 image in GHCR awaiting Juan Render deploy.
+
+## Current focus
+
+- **AC v0.5.59** Render deploy waiting on Juan + env confirm
+  (`AWEB_CUSTODIAL_E2EE_KEY`, `AWEB_CUSTODIAL_E2EE_KEY_ID`). Will
+  flip aweb_version to 1.26.5 and unlock hosted custodial E2EE.
+  Custodial-E2EE smoke required before verified-live mail.
+- **aw 1.26.3 cleanup regression** (#245) open. Juan's pmbah team
+  recovered via DB undelete + workspace_path rewrite; fix-forward
+  shape pending Athena + Mia decision in mail thread 96317ca9.
+  ANY ship targeting cli/go/cmd/aw/workspace* must explicitly
+  address this.
+
+## Live state (verified 2026-06-02 11:30 UTC)
+
+- app.aweb.ai/health: `release_tag=v0.5.58 git_sha=340122ef
+  aweb_version=1.26.1 awid_service_version=0.5.9` healthy
+- api.awid.ai/health: `version=0.5.9` ok
+- PyPI aweb: **1.26.5**
+- npm @awebai/aw: **1.26.4**
+- npm @awebai/claude-channel: **1.4.11**
+- npm @awebai/claude-skills: **0.2.10**
+- npm @awebai/pi: **0.1.16**
+- Marketplace pins (claude-plugins): aweb-channel 1.4.11,
+  aweb-skills 0.2.10
+- aweb.ai (Hugo site, deploy-landing): 92860b93 (Olivia home
+  restructure + /mcp page + /orchestration teaser, all
+  verified-live)
+
+## Release pipeline (2026-06-02)
+
+- v0.5.59 Athena/Grace ready ✅ (tag pushed, GHCR success)
+- Gates run ✅ (Grace make release-ready green at 0896ecea)
+- Tagged ✅ (v0.5.59 at 0896ecea)
+- Deployed ⏳ (waiting for Juan Render click)
+- Verified live ⏳
+
+## Open holds
+
+- **#239** aw 1.27.0 E2EE-default Phase 2 — gated on customer
+  adoption of channel 1.4.11 + Pi 0.1.16 receive-side. Grace owns
+  the threshold call. Do NOT tag aw-v1.27.0 without explicit
+  re-route.
+- **#245** aw 1.26.3 workspace-cleanup regression — fix-forward
+  shape pending Athena + Mia. Juan's pmbah team is restored but
+  any other customer who triggers the same path-rename pattern
+  will re-hit it. Don't ship a CLI release that extends 8b55181
+  behavior without addressing this.
+
+## Operational discrepancies
+
+- None currently flagged. Production stable since AC v0.5.58 ship
+  on 2026-05-26; no Render redeploy in 7 days (uptime ~138k s as
+  of last health probe).
+
+## Next checks
+
+1. After Juan clicks Render: verify /health flips to v0.5.59 /
+   git_sha=0896ecea / aweb_version=1.26.5. Smoke hosted
+   custodial E2EE flow. Roll back if any
+   `custodial_e2ee_kek_unconfigured` / 500 surfaces.
+2. Check Athena/Mia thread 96317ca9 for #245 fix-forward shape.
+3. Sweep remaining pending follow-ups: #234 (Dockerfile
+   sibling-overlay guard), #226 (service-register colon-encoding),
+   #210 (Hugo bump), #190/#191 (MCP OAuth live smoke + Sofia loop).
+
+## Recent ship summary (May 26 → June 2)
+
+| Date | Artifact | Source | Outcome |
+|---|---|---|---|
+| 2026-05-26 | AC v0.5.58 | 93454954 | verified-live (activity-card metadata-only) |
+| 2026-05-26 | channel 1.4.9 | db9a492 | verified-live (mcpName for MCP registry) |
+| 2026-05-26 | channel 1.4.10 + skills 0.2.10 | 848bba5 | verified-live (em-dash → colon plugin.json) |
+| 2026-05-26 | channel 1.4.11 + Pi 0.1.16 | ea75b1a | verified-live (E2EE decrypt receive-side) |
+| 2026-05-27 | aw CLI 1.26.2 | 21928a2 | verified-live (E2EE opt-in revert for customer mtg) |
+| 2026-05-27 | aw CLI 1.26.3 | 8b55181 | verified-live (workspace cleanup; introduced #245) |
+| 2026-05-28 | aw CLI 1.26.4 | a3fbc47 | verified-live (hosted cert-only add-worktree) |
+| 2026-05-28 | server-v1.26.5 | 54c30fa | verified-live (PyPI; 007 migration for AC E2EE) |
+| 2026-06-01 | aweb.ai site restructure | 92860b93 | verified-live by Olivia |
+| 2026-06-02 | analytics scripts banked | hestia/scripts/ | committed |
+| In flight | AC v0.5.59 | 0896ecea | GHCR ready; awaiting Render deploy |
+
+---
+
+<!-- Historical content below preserved for reference; not the
+current snapshot. -->
 
 ## Published-state table (cross-harness, aapr.22 + 61c15ae ripple)
 
