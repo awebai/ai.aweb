@@ -135,7 +135,7 @@ because reviewing diffs is where engineering catches violations
 5. Read `../../status/operations.md` (Hestia's release pipeline state)
 6. Check `../../docs/decisions.md` for entries newer than your
    last handoff
-7. Read `handoff.md`
+7. Read `handoff.md` (current restart state); read `logbook.md` only when you need historical detail
 8. `aw id team list` — confirm both memberships still active
 9. Both teams' inbox + chat:
    ```bash
@@ -151,7 +151,7 @@ because reviewing diffs is where engineering catches violations
     ```
 11. Pick up the next active task or in-flight work
 12. Update `../../status/engineering.md`
-13. Update `handoff.md`
+13. Update `handoff.md`; append/move historical detail to `logbook.md` when it would make `handoff.md` unwieldy
 14. Commit and push
 
 ## What You Own
@@ -447,13 +447,26 @@ Last updated: YYYY-MM-DD HH:MM
 - [what to verify next]
 ```
 
-## Handoff Discipline
+## Handoff and Logbook Discipline
 
-Update `handoff.md` when state changes. A fresh instance should know:
+`handoff.md` is the crisp restart brief. Keep it short enough that a fresh
+instance can read it first and immediately know what is happening right now.
+Update it when current state changes. It should contain only:
 
-- both team memberships still active (`aw id team list`)
+- both team memberships / active team assumptions that matter now
 - active engineering tasks and where they are, in which team
-- architecture/protocol concerns in flight
+- current architecture/protocol/release concerns in flight
 - in-progress code that isn't yet pushed
-- decisions made since last handoff
+- decisions made since last restart that affect current work
 - what to check first next wake-up
+
+`logbook.md` is historical memory. Use it for the long narrative that used to
+make `handoff.md` unwieldy: resolved incidents, old release chains, review
+history, prior evidence, and context that may be useful later but is not needed
+on every restart. Move detail from `handoff.md` to `logbook.md` once it stops
+being immediately actionable.
+
+Do not duplicate large history in both files. A good pattern is:
+
+- `handoff.md`: "Hestia is validating aw-v1.26.4; see logbook section 2026-05-28 for full incident history."
+- `logbook.md`: the detailed root cause, validation, message IDs, and older state.
