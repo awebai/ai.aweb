@@ -72,6 +72,19 @@ scripts shipped, first probe required, produced the answer in
 under a minute. Validates the pattern Juan asked for:
 pre-made scripts > one-off `/tmp/probe.py`.
 
+**Aida refinement (mail 3be0742f):** "wait for them to come to
+us" isn't ONLY a posture choice — it's the current technical
+default. With their `_awid.andi.aweb.ai` in `desired` state and
+their org all-anonymous cli_signup, we literally cannot reach
+them via federation right now. So when Sofia weighs the
+proactive-reach-out question, the framing is "we technically
+can't yet" as much as "we're choosing not to." If Sofia later
+greenlights outreach, Aida offered her lane (`aweb.ai/aida`,
+framed "noticed you're running multi-agent — any setup friction
+we can help with?") as the least surveillance-y first-touch
+shape: question-about-helping > question-about-us-seeing-their-
+activity. Routing option, not a push.
+
 ---
 
 ## 2026-06-02 — restart-ready snapshot after May 26 → June 2 wave
