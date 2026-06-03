@@ -63,19 +63,29 @@ the test file's actual assertions, the endpoint's actual handler
 
 ## On every wake-up
 
-1. `git pull`
-2. Read:
+1. `git pull` in ai.aweb and the sibling repos (aweb, ac).
+2. Read `handoff.md` FIRST — that's the crisp brief: what's in
+   flight right now, open holds you'd regret tripping, the live
+   matrix in one line, wake-up checklist. It's designed to fit
+   on a screen.
+3. Read `logbook.md` only if `handoff.md` references something you
+   don't have context on (an incident SHA, a banked lesson, a
+   release-wave backstory). Logbook = depth-on-demand, not
+   linear-read-every-time.
+4. Read these shared docs (skim — read in depth only if
+   `handoff.md` flagged a relevant change):
    - `../../docs/team.md`
    - `../../docs/agent-first-company.md`
    - `../../docs/invariants.md`
-3. Read `../../status/operations.md` (your status)
-4. Read `../../status/engineering.md` (Athena's release-ready state)
-5. Read `../../status/product.md` (Sofia's claims about live state)
-6. Check `../../docs/decisions.md` for entries newer than your last
-   handoff
-7. Read `handoff.md`
+5. Skim `../../status/operations.md` (current snapshot at top;
+   older sections preserved as history).
+6. Read `../../status/engineering.md` (Athena's release-ready
+   state) and `../../status/product.md` (Sofia's claims about live
+   state) if a release is in flight per handoff.
+7. Check `../../docs/decisions.md` for entries newer than your
+   last handoff.
 8. `aw chat pending` and `aw mail inbox` — pick up release-handoff
-   mail from Athena
+   mail from Athena.
 9. Run live-state checks (always, every wake-up):
 
 ```bash
@@ -83,11 +93,14 @@ curl -sS https://app.aweb.ai/health
 curl -sS https://api.awid.ai/health
 ```
 
-10. Run operational hygiene checks (see "What To Check" below)
-11. If a release candidate is in your inbox, run the gate chain
-12. Update `../../status/operations.md`
-13. Update `handoff.md`
-14. Commit and push
+10. Run operational hygiene checks (see "What To Check" below).
+11. If a release candidate is in your inbox, run the gate chain.
+12. When state changes meaningfully, update `handoff.md` (the
+    crisp brief) AND append a dated entry to `logbook.md` (the
+    history). When the release pipeline / live state shifts,
+    update `../../status/operations.md` (current-snapshot
+    section at top).
+13. Commit and push.
 
 ## What You Own
 
@@ -311,12 +324,51 @@ Last updated: YYYY-MM-DD HH:MM
 `status/weekly.md` continues as a roll-up until you replace it with a
 proper dashboard/report.
 
-## Handoff Discipline
+## Handoff Discipline (two files, split by purpose)
 
-Update `handoff.md` when state changes. A fresh instance should know:
+You maintain TWO state files for restart-readiness, by Juan's
+direction 2026-06-03: "the handoff.md file is much too unwieldy
+to be useful. instead, i want you to keep a logbook.md for history
+access purpose with pretty much what you have in handoff.md
+today, and have a crisp handoff with the things that you need to
+tell your future self upon restart about what is going on at the
+moment."
 
-- in-flight release candidate (if any) and which step in the chain
-- last verified-live evidence
-- operational discrepancies open and routed
-- ops-runbook gaps you've found while running the chain
-- what to check first next wake-up
+### `handoff.md` — crisp wake-up brief
+
+What future-you needs to act in the first 30 seconds of waking
+up. Designed to fit on a screen.
+
+Required sections:
+- In flight (the one or two things currently waiting on
+  someone — gate green? Render deploy? Mia review? — with the
+  specific person and the specific blocker)
+- Open holds (don't trip these — anti-actions, with task refs)
+- Live matrix (one line, just version numbers)
+- Wake-up checklist (5-7 concrete commands)
+- Where to look (pointers to logbook.md / AGENTS.md / scripts/ /
+  artifacts/ / sibling repos)
+- Discipline you'll regret skipping (5 lines max, the gotchas
+  you'll repeat without a reminder)
+
+Rewrite (don't append) when state changes meaningfully. Stay
+crisp; resist adding narrative.
+
+### `logbook.md` — dense history, append-only
+
+Dated entries, most recent on top. Each entry is a snapshot at
+that moment, not a rolling rewrite. New release waves, incidents,
+discipline banked, lessons learned, customer-activity reads — all
+land here as dated sections.
+
+You come HERE when handoff.md points at something you need
+backstory on. Don't bloat handoff with what belongs here.
+
+### Status files (`../../status/operations.md` etc.)
+
+These are TEAM-VISIBLE rolling status, separate from your
+private handoff/logbook. The shape stays per the "Status Format"
+template above (Current focus / Live state / Release pipeline /
+Operational discrepancies / Next checks); rewrite the snapshot
+at the top, preserve older sections as a rule below for
+historical context.
