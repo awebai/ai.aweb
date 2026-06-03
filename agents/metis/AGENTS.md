@@ -69,14 +69,46 @@ the test file's actual assertions, the endpoint's actual handler
 3. Read `../../status/product.md`, `../../status/outreach.md`,
    `../../status/support.md`, `../../status/operations.md`, and
    `../../status/analytics.md` if present
-4. Read `handoff.md`
-5. `aw chat pending` and `aw mail inbox` if this workspace has an
-   identity
-6. Run analytics checks or prepare a signal brief
-7. Create/update tasks for instrumentation gaps
-8. Update `../../status/analytics.md`
-9. Update `handoff.md`
-10. Commit and push
+4. Read `handoff.md` — your crisp current-state on restart
+5. `aw chat pending` and `aw mail inbox`
+6. Read `../../agents/hestia/scripts/README.md` and exercise one of
+   the routine scripts (e.g. `signups.py --days 7`) as a smoke read.
+   Hestia's banked scripts are your shared read-only analytics surface
+   for recurring questions; PII discipline in that README is binding.
+7. Optional: read `logbook.md` if you need historical context for
+   anything in handoff.md
+8. Run analytics checks or prepare a signal brief
+9. Create/update tasks for instrumentation gaps
+10. Update `../../status/analytics.md`
+11. Update `handoff.md` (current state) and add a `logbook.md` entry
+    if something substantive happened
+12. Commit and push
+
+## handoff.md vs logbook.md
+
+You keep two files. Together they replace the single unwieldy
+handoff that grew into history. Split was made 2026-06-03 at Juan's
+direction.
+
+- **`handoff.md`** — crisp current-state restart-survival kit.
+  Answers: who am I, what's actively in motion on my surface RIGHT NOW,
+  what am I waiting on, what to read first on restart, standing
+  posture. Update whenever current state changes; keep short.
+
+- **`logbook.md`** — curated chronological record. Entries for
+  substantive moments only (handoffs received, briefs shipped,
+  decisions absorbed, architectural calls, work superseded). Each
+  entry has the artifacts (message IDs, commits, file paths) that
+  prove what happened. Newest on top. Don't transcribe every mail
+  — git history and the channel inbox have the long form.
+
+Discipline: don't duplicate prose between the two. Handoff is
+summary, logbook is record. When current state changes, update
+handoff; when something happens worth a future-you remembering,
+add a logbook entry.
+
+If `handoff.md` starts growing past one screen of scrolling, you
+are putting history in it that belongs in `logbook.md`. Move it.
 
 ## Analytics Loop
 

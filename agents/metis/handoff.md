@@ -1,170 +1,90 @@
-# Metis Handoff
+# Metis handoff
 
-Last updated: 2026-05-15 14:30 CEST
+Last updated: 2026-06-03 (server-restart prep at Juan's direction).
 
-## First signal brief shipped 2026-05-15
+Crisp current-state. For history — how we got here, who said what when,
+artifact IDs — read `logbook.md`.
 
-`agents/metis/briefs/2026-05-15-adoption-state-first-brief.md` —
-closes aals.4. Routed to Sofia (ce87ea44), Iris (bdf77013), Athena
-(ff265a3d). Headlines: external signup rate 2-5/week steady 7
-weeks, no observable lift from pain-narrative deploy in first 36h;
-**counting trap on mcp_oauth_grants** — true external population
-n=1, not n=7. Conversion baseline 0/1, not 0/7.
+## Who you are
 
-Sofia banked sibling discipline `feedback_verify_baseline_before_
-claiming_rate.md` (n=1 is not a baseline). Standing-line wording
-"insufficient grant volume to compute conversion rate; will
-re-baseline at n>=10" in flight with Juan for bless as company line.
+Metis — analytics surface on the six-role peer team (Sofia direction,
+Athena code, Hestia operations, Aida support, Iris outreach, you).
+Workspace identity: `metis` on `default:aweb.ai` team, developer role.
+Path: `agents/metis/` in this repo.
 
-Two instrumentation tasks filed (Athena routing to Grace on dev team):
-- `default-aaad` — referrer/source at signup. Grace clear to start.
-- `default-aaae` — daily_active_workspace_facts extend / aggregation-
-  job verify. Blocked on Hestia empirical answer (job firing? or
-  filter too tight?).
+You produce signal briefs with attribution limits made explicit.
+Discipline: state the question first, separate direct evidence from
+correlation, say when attribution is unknown, file tasks for missing
+events.
 
-Next decision-window-driven brief: post-Twitter-thread-publish
-(pre/post 2-5/week comparator on signup velocity). Iris drives
-the trigger.
+## What's in flight on your surface right now
 
-## Read this first
+**Nothing.** The world moved during a 2-week silent gap (2026-05-19 →
+2026-06-02). Current state of the workstreams you owned:
 
-You are Metis, the analytics role on the six-role peer team. You
-produce signal — you don't decide priorities. Read `AGENTS.md` (in
-this dir) for the role description and `../../docs/team.md` +
-`../../docs/agent-first-company.md` for the operating model.
-Decision-record check: top of `../../docs/decisions.md`.
+| Item | State | Notes |
+|---|---|---|
+| First signal brief (`aals.4`) | DONE | `briefs/2026-05-15-adoption-state-first-brief.md`; routed and absorbed. |
+| Bertha-pipeline takeover | SUPERSEDED | Juan directed Hestia 2026-06-02 to bank reusable read-only scripts (`agents/hestia/scripts/`). YAGNI-correct at 0-row-most-days volume. The architectural-call thread (Option B run-scheduler service) is parked in Sofia's lane via `default-aaae`. |
+| `default-aaad` referrer/source at signup | OPEN, P1 | Filed 2026-05-15; Grace's lane via Athena; no movement visible. |
+| `default-aaae` workspace-facts aggregation | OPEN, P2 | Filed 2026-05-15; sharpened to scheduler-never-starts via Hestia's empirical; Sofia owns architectural call (Option A vs B) before Grace executes. |
+| OAuth-onboarding signal (Athena queue) | QUEUED | Numerator: `mcp_oauth_grants` → `consumer_contact_invites` within N=15min. Baseline at last check was n=1; re-baseline at n>=10. Schema bank in logbook. |
 
-## Identity status
+## What you're waiting on
 
-This workspace HAS an identity now: `metis` alias on `default:aweb.ai`
-team, developer role. (Prior handoff said this was pending; it's
-done.) You can mail and chat.
+- **Sofia**: architectural call on Option A vs B for the run-scheduler
+  service. If Option B lands, your Bertha-pipeline proposal could
+  un-park as apscheduler jobs registered in that process. But don't
+  re-propose — wait for the call.
+- **Juan**: bless or revise Sofia's standing-line wording for the n=1
+  baseline ("insufficient grant volume to compute conversion rate;
+  will re-baseline at n>=10"). Sofia was in flight with him 2026-05-15.
 
-## Current work — Bertha pipeline takeover
+## First reads on restart
 
-**Juan redirect 2026-05-10**: "we are going to task metis, who is
-responsible for analytics, for the regular check of the database…
-she will need to design and write admin entrypoints to do the
-tasks." Hestia briefed me with the full operational picture (mail
-e8bf1afe, conversation b690dca3) and continues running the
-session-cron stop-gap until cutover. Acked back: c8e94011.
+1. `git pull` (always first).
+2. `aw mail inbox` and `aw chat pending`.
+3. `../../status/operations.md` and `../../status/product.md` — for
+   what's shipping right now.
+4. `../../docs/decisions.md` — entries newer than 2026-06-03.
+5. `../../agents/hestia/scripts/README.md` — Hestia's banked analytics
+   scripts. These ARE your read-only analytics surface for routine
+   questions. Exercise `signups.py --days 7` and
+   `multi_agent_active.py --days 7` as the first smoke read to refresh
+   your view of the population. PII discipline in that README is
+   binding on you too.
+6. `logbook.md` only if you need the history behind the table above.
 
-The two pipelines:
+## Server-restart verification
 
-1. **Daily sign-up export** — previous-26h sign-ups with email →
-   pipe-separated batch → `aw mail send --to bertha` daily 08:13
-   CEST. Authority: Juan 2026-05-08.
-2. **Hourly multi-agent milestone check** — detect external
-   customers crossing 2+ same-user agent coordination on any of
-   mail / chat / contacts / tasks / task_claims; alert Bertha on
-   first-cross. Authority: Juan + Eugenie via Bertha 2026-05-08
-   (chat 4d4383fc / 2901b3a5).
+Juan is restarting you on a server (2026-06-03). On first wake-up:
 
-Hestia's stop-gap files:
+- `aw workspace status` should show `metis` alias on `default:aweb.ai`
+  team. If identity didn't survive the move, stop and ask Juan.
+- DB read access via `DATABASE_URL` in `../../../ac/.env.production`.
+  Smoke: run one of Hestia's scripts. If you can't reach the DB, mail
+  Athena.
+- If server-restart now means you have real durable scheduling
+  available, that COULD un-park the Bertha-pipeline architectural
+  call. Don't re-propose; surface to Sofia + Juan with the new
+  capability context and let them call.
 
-- `agents/hestia/.claude/skills/daily-signup-export/SKILL.md`
-- `agents/hestia/.claude/skills/multi-agent-milestone-check/SKILL.md`
-- `agents/hestia/.claude/skills/multi-agent-milestone-check/check.py`
-- `agents/hestia/.claude/state/multi-agent-alerted-users.json`
-  (currently empty, last_check 2026-05-10T10:29Z after my dry-run)
+## Standing posture
 
-Existing infrastructure I'll extend (in `../../../ac/`):
+- Probe mails (e.g. `MATRIX-PROBE-*`) get silent receipt. Delivery
+  acks; no reply needed.
+- Don't ack-of-ack peer routing confirmations — that's noise.
+- Brief cadence is decision-window-driven, not schedule-driven. Next
+  natural trigger after a distribution action (Twitter thread,
+  long-fruit submission cluster reach) — pre/post comparator against
+  the 2-5/week external-signup steady-state baseline.
+- Don't write briefs without a decision-relevant question they
+  inform. "Activity report" briefs are noise.
+- Internal exclusion list when querying external users:
+  `juan@aweb.ai`, `juan@juanreyero.com`, `eugenie@aweb.ai`. Hestia's
+  scripts already handle this; preserve it in any new query.
 
-- `aweb-admin` Click CLI at `backend/src/aweb_cloud/admin.py` (4881
-  lines; has DATABASE_URL resolution, `AdminDB` shared-pool with
-  cloud/server/aweb schemas, --dry-run conventions, audit options).
-- `services/admin_analytics.py` (462 lines; daily-active-workspace
-  + message analytics; window helpers).
-- `routers/admin_analytics.py`, `admin_support.py`, `admin_activity.py`
-  surfaces if we want HTTP later.
-- Write-path pattern: `SET LOCAL default_transaction_read_only = off`
-  inside a tx (used by retire/delete commands).
+## How peers reach you
 
-Recommended architecture (proposed to Juan; awaiting his call):
-
-- Extend aweb-admin with `daily-signup-export` and `milestone-check`
-  commands, not a new aweb-analytics CLI.
-- Lift SQL into `services/admin_analytics.py` (testable, reusable).
-- New migration for `aweb_cloud.analytics_milestone_alerts`
-  (user_id uuid PK, alerted_at timestamptz).
-- CLI emits structured stdout; thin wrapper script does
-  `aw mail send --to bertha`. Keeps CLI testable, doesn't bind to
-  an aweb identity.
-- Schedule via launchd plists on altair.local for cutover.
-- Mail-from identity for Bertha: lean metis.
-
-Open questions for Juan (pinned in `../../status/analytics.md`):
-
-- Run-host (altair launchd vs AC-server-side apscheduler/cron).
-- DB write-path connection shape (existing pattern: relax read-
-  only inside a txn via `SET LOCAL default_transaction_read_only
-  = off`; the retire/delete commands use it at admin.py:1138,
-  1199, 1846). Settled from the code side.
-- Mail-from identity to Bertha.
-- Cutover handshake (parallel-run vs hard cutover).
-
-## Queued P1 — Athena's OAuth-onboarding signal (2026-05-14)
-
-Mail 7223708e, conversation 7fb1d95b. Athena flagged the
-load-bearing signal for the post-OAuth consumer-onboarding
-investment (MCP create-invite tool + welcome guide + serverInfo
-.instructions + consent-page banner + email already in v0.5.32):
-
-> Fraction of new aweb-MCP-OAuth connections that produce an
-> invite-link creation within N minutes.
-
-- Numerator: new `mcp_oauth_grants` rows that trigger downstream
-  `consumer_contact_invites` row within window N (N=15 initial).
-- Denominator: new `mcp_oauth_grants` rows in the period.
-- Period: daily rolling.
-- Surface: company-dashboard signal-inventory entry.
-
-Empirical-zero-tolerance: until instrumented, no team claim that
-the OAuth onboarding "is working" should land. Acked 579c20ec.
-
-This is queued behind the Bertha-pipeline cutover so I have one
-durable scheduling pattern in place before adding new signal
-entrypoints under it. Athena confirmed 2026-05-14 (mail e60a0d1c):
-OAuth investment ship not imminent (2-3 days wall-clock); ordering
-held; Athena will surface my parked-four-days Bertha proposal to
-Juan separately.
-
-**Schema bank for when this signal lands** (from Athena e60a0d1c):
-- `aweb_cloud.mcp_oauth_grants` — has user_id, team_id, created_at.
-- `aweb_cloud.consumer_contact_invites` — has user_id, team_id,
-  created_at, accepted_count.
-- Ownership join: user_id + team_id present on both. Should be
-  clean for the numerator/denominator computation. Flag drift
-  if I find any when I scope.
-
-## What to check FIRST on next wake-up
-
-1. `aw mail inbox` and `aw chat pending` — Juan's design call
-   probably came back via mail.
-2. Has Juan answered the four open questions above? If yes,
-   create aw task and start authoring. If no, follow up.
-3. Hestia's session crons — still firing or dead with her
-   session? If dead, the daily-signup-export and milestone-check
-   have silently stopped; that itself is signal worth flagging
-   to Bertha/Juan.
-4. Read `../../status/operations.md` and `../../status/product.md`
-   for any new ops/direction state.
-5. If Bertha pipeline is unblocked and the OAuth investment is
-   close to shipping, check whether the queue should re-order
-   per Athena's note.
-
-## Pre-existing instrumentation gaps (still open, not yet tasked)
-
-- No event for first successful coordination (Stage 2 threshold).
-- No conversion query from outreach-action timestamp to signup
-  timestamp.
-- No queryable surface over support patterns.
-- No browser/edge telemetry beyond Render request stats.
-
-These get follow-up tasks once the Bertha pipeline cutover is
-done AND Athena's OAuth signal is in place.
-
-## Prior context
-
-Prior handoff is in git history (2026-04-30 placeholder; identity
-not yet bootstrapped, no active work).
+Per the role's communication table in `AGENTS.md`. Mail for non-urgent
+updates, chat-and-wait for blocking questions.
