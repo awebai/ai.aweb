@@ -169,33 +169,66 @@ directory. Shared documents are at `../../` relative to the agent.
    `../../docs/<file>` and `../../status/<file>`
 3. Check `../../docs/decisions.md` for entries newer than your last handoff
 4. Read `../../status/weekly.md` — the latest operations roll-up
-5. Read your `handoff.md` — remember what you were doing
+5. Read your `handoff.md` — crisp current state. Reach into your
+   `logbook.md` only when handoff references a paused/closed arc
+   and you need the depth.
 6. `aw chat pending` and `aw mail inbox` — check for messages
 7. Check whether your active work is represented as an `aw` task; if
    it is substantial and not represented, create or update the task.
 8. Do your job (see your own CLAUDE.md)
-9. Update `handoff.md` before going idle or when context gets large
+9. Update `handoff.md` before going idle or when context gets large.
+   When an arc closes or pauses, promote its detail to `logbook.md`
+   and replace it in handoff with a one-line pointer.
 10. `git add` your changed files, commit, and push
 
-### Handoff documents
+### Handoff and logbook
 
-Every agent maintains `handoff.md` — the document that lets a fresh
-instance pick up seamlessly.
+Every agent maintains two files. They have different jobs.
 
-**What goes in handoff.md:**
-- Current state of your area (specific, not vague)
-- Active decisions and their rationale
-- What needs attention right now
-- Key context that isn't obvious from other docs
+**`handoff.md` — crisp current-state pointer.** The first thing a
+fresh instance reads on wake-up. Keep it lean — a fresh instance
+should pick up in under a minute.
+
+What goes in handoff:
+- Active arcs and where each one stands right now
+- Who you're waiting on
+- What to check FIRST on wake-up
+- Bank-worthy reminders pulled forward
 - Open questions you haven't answered yet
 
-**What does NOT go in handoff.md:**
-- Information that's in status files or decision records (just
-  reference those)
-- Full conversation history (summarize, don't transcribe)
+What does NOT go in handoff:
+- Closed arcs (move to logbook)
+- Paused arcs you don't expect back this cycle (one-line pointer
+  to logbook is enough)
+- Full chronology (summarize the current state; logbook carries
+  history)
+- Information already in status files, `docs/decisions.md`, or
+  the relevant `AGENTS.md` (reference, don't duplicate)
 
-Update handoff.md **whenever something significant changes**, not just
+Update handoff **whenever something significant changes**, not just
 at the end of a session.
+
+**`logbook.md` — historical record.** When detail accumulates in
+handoff and an arc closes or pauses, promote the snapshot to
+`logbook.md` and replace it in handoff with a one-line pointer.
+Most recent on top; append as arcs close.
+
+What goes in logbook:
+- Closed arcs (what was decided, why, verification trail, links to
+  artifacts)
+- Paused arcs (state at pause, what was held mid-flight, the
+  next-move-if-resumed)
+- Peer-state snapshots from prior handoffs
+- Lessons banked from session-specific work that aren't yet
+  general enough for team-wide docs
+
+Logbook is reach-for, not first-read. It's an archive — don't
+compress it aggressively. The value is in being able to reconstruct
+context for a paused arc that surfaces back weeks later.
+
+The split exists because handoffs grow unwieldy as arcs accumulate;
+a long handoff stops being a useful re-entry pointer. Keep the
+first-read crisp and push depth to logbook.
 
 ### Decision log
 

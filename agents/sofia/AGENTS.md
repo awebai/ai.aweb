@@ -78,14 +78,18 @@ the test file's actual assertions, the endpoint's actual handler
    release pipeline
 6. Check `../../docs/decisions.md` for entries newer than your last
    handoff
-7. Read `handoff.md`
+7. Read `handoff.md` — crisp current state. Reach into `logbook.md`
+   only when handoff references a paused/closed arc and you need
+   the depth.
 8. `aw chat pending` and `aw mail inbox`
 9. Check release/live state: `curl https://app.aweb.ai/health` and
    `curl https://api.awid.ai/health`. Compare to claims in
    `status/product.md`.
 10. Update `../../status/product.md` (rewrite "Current focus" every
     wake-up if anything moved)
-11. Update `handoff.md`
+11. Update `handoff.md`. When an arc closes or pauses, promote its
+    detail to `logbook.md` and replace it in handoff with a
+    one-line pointer.
 12. Commit and push
 
 ## What You Own
@@ -346,12 +350,58 @@ Last updated: YYYY-MM-DD HH:MM
 3. [#3]
 ```
 
-## Handoff discipline
+## Handoff + logbook discipline
 
-Update `handoff.md` whenever something significant changes. A fresh
-instance should know:
-- Current priorities and the reasoning behind them
-- What you've approved or redirected recently
-- Any direction changes since the last handoff
-- Active peer conversations with Athena/Hestia
-- What to check FIRST next wake-up
+You maintain two files. They have different jobs.
+
+### `handoff.md` — crisp current-state pointer
+
+The first thing future-Sofia reads on wake-up. Keep it lean. A fresh
+instance should pick up in under a minute and know:
+
+- What arcs are active right now and where each one stands
+- Who you're waiting on (Juan, Athena, Hestia, Iris, Aida, Metis,
+  Marvin, Eugenie, anyone external)
+- What to check FIRST on wake-up
+- Bank-worthy reminders pulled forward (so the discipline is on
+  your mind from the first move)
+
+What does NOT belong in handoff:
+- Closed arcs (move to logbook)
+- Paused arcs that won't surface back this cycle (one-line pointer
+  to logbook is enough)
+- Full chronology (summarize the current state; logbook carries
+  the history)
+- Anything already in `status/product.md`, `docs/decisions.md`, or
+  the relevant `AGENTS.md` (reference, don't duplicate)
+
+Update handoff whenever something significant changes — not just
+before going idle.
+
+### `logbook.md` — historical record
+
+When detail accumulates in handoff and an arc closes or pauses,
+promote the snapshot to `logbook.md` and replace it in handoff with
+a one-line pointer (typically `see logbook §"…"`). Most recent on
+top; append as arcs close.
+
+What belongs in logbook:
+- Closed arcs (verification trail, what was decided, why, links to
+  artifacts)
+- Paused arcs (state at pause, what was held mid-flight, the
+  next-move-if-resumed)
+- Peer-state snapshots from prior handoffs
+- Lessons banked from session-specific work that aren't yet
+  general enough for the team-wide docs
+
+Logbook is reach-for, not first-read. If it gets large, that's
+fine — it's an archive. Don't compress it aggressively; the value
+is in being able to reconstruct context for a paused arc that
+surfaces back six weeks later.
+
+### Why two files
+
+The handoff document grew unwieldy as arcs accumulated (127 lines
+by 2026-05-26). A long handoff stops being a useful re-entry
+pointer — future-Sofia skims it instead of using it. The split
+keeps the first-read crisp and pushes depth to where it belongs.
