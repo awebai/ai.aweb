@@ -17,6 +17,63 @@ remain a faithful record.
 
 ---
 
+## 2026-06-03 — first external multi-agent customer detected (andi.aweb.ai)
+
+Bertha pinged in chat asking how to reach `andi.aweb.ai/coord`
+and `andi.aweb.ai/coord-global` because she was getting connection
+errors. Ran `scripts/team_probe.py --team default:andi.aweb.ai`.
+
+**What I found:** the andi BYOT team was registered today
+2026-06-03 09:44 UTC with 4 active agents (coord, dev, review,
+remoteagent) running on a Hetzner host (ubuntu-8gb-nbg1-1) plus
+one remote-machine agent on Theresias-MacBook-Air.local. By
+10:13 UTC they had 17 mail + 5 chat messages across 6 active
+conversations, with coord ↔ dev coordinating on real tasks
+(default-aaaa etc).
+
+**Why this matters:** yesterday's customer-activity reality
+check (2026-06-02 logbook entry below) said "External adoption
+of the multi-agent value prop is still zero." Today: not zero
+anymore. Andi is the first observed external team actually
+doing the thing we built aweb for — multi-agent coordination in
+production, with a remote agent joining a self-hosted team.
+
+**Why Bertha's connection errors:**
+- `coord-global` doesn't exist as an alias on this team. Likely
+  a customer-typed typo or a mis-remembered alias. `coord` is
+  the right one.
+- The team's DNS TXT (`_awid.andi.aweb.ai`) shows
+  `dns_status='desired'` in our managed_namespaces row. The AWID
+  registry knows what they SHOULD publish, but if the customer
+  hasn't put the TXT live on their DNS yet, federated DID
+  verification fails and the route returns a connection error.
+  Worth retrying after a few hours and/or checking with the
+  customer that they've published the TXT record.
+
+**Contact path gap:** all 5 org members of the andi
+organization are anonymous cli_signup users with `email=NULL`.
+Same shape as the default-aaaj observation (Thanos). We have NO
+dashboard-side path to the human behind the namespace. Bertha's
+only in-system contact route is federated mail/chat to one of
+the agents. If Eugenie needs an out-of-band channel (email,
+twitter, GitHub) she needs to source it externally.
+
+**Routing to Sofia + Juan as direction-level signal** (mail
+sent in same beat). This changes the "is anyone using aweb"
+narrative we held for 24h. Not just a flicker either — they
+have a Hetzner instance running, cross-machine federation set
+up, real task coordination happening. Worth Iris/Sofia
+considering whether an outreach (via the federated mail-to-coord
+path) makes sense, or whether to leave them to discover us.
+
+**Banked discipline (new):** the `team_probe.py` script paid
+back its banking cost immediately. First wake-up after the
+scripts shipped, first probe required, produced the answer in
+under a minute. Validates the pattern Juan asked for:
+pre-made scripts > one-off `/tmp/probe.py`.
+
+---
+
 ## 2026-06-02 — restart-ready snapshot after May 26 → June 2 wave
 
 ### Live matrix
