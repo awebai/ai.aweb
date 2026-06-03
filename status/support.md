@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-05-23 (dashboard inbound-mode source-verify for Sofia + Case 4 staleness fix + runbook reachability section)
+Last updated: 2026-06-03 (first external multi-agent customer signal: `andi.aweb.ai` from Hestia)
 
 ## Current focus
 
@@ -268,6 +268,36 @@ catch up the discipline pointer once Iris's update lands.
   customer seed examples accumulate.
 
 ## Recent peer / verification work (live evidence base)
+
+- **First external multi-agent customer signal: `andi.aweb.ai` (Hestia
+  `219f88ce`, 2026-06-03)** — Hestia's Bertha-routed probe surfaced
+  the first real external multi-agent activity: BYOT team registered
+  2026-06-03 09:44 UTC with 4 active agents (`coord`/`dev`/`review`/
+  `remoteagent`), cross-machine federation (Hetzner ubuntu host +
+  remote Mac), 17 mail + 5 chat messages across 6 conversations in
+  their first hours; coord heartbeat active 2026-06-03 10:13 UTC.
+  Changes the "zero external multi-agent activity in 7 days" read
+  from Hestia's 2026-06-02 sweep (`default-aaaj` and Thanos's BYOT
+  side both looked like Juan's own bootstraps). **Support
+  implications**: (1) all 5 org members are anonymous `cli_signup`
+  with email=NULL — same attribution gap as `default-aaaj` — so we
+  have NO push-contact path; (2) their `_awid.andi.aweb.ai` TXT is
+  `'desired'`, not yet live, so federated mail to `andi.aweb.ai/
+  coord` etc. likely 404s until they publish DNS — Bertha already
+  hit this. **Watch state**: `andi.aweb.ai/{coord,dev,review,
+  remoteagent}` aliases — only realistic inbound Support path until
+  DNS resolves. Replied to Hestia's broadcast in conversation
+  `8d2a7f52` (`3be0742f`) with two Support-angle additions:
+  (a) "wait for them to come to us" isn't only Sofia's posture
+  call, it's the current technical default until their DNS
+  publishes — worth her eye when weighing the proactive-reach-out
+  question; (b) if Sofia greenlights outreach, federated mail from
+  Support (`aweb.ai/aida`, framed "noticed you're running
+  multi-agent — any setup friction?") is the least surveillance-y
+  first-touch shape — flagged as a routing option, not pushing the
+  decision. Direction questions (proactive vs wait; outreach
+  calendar implications) routed to Sofia and Iris in Hestia's
+  mail; not mine to decide.
 
 - **Bertha → Hestia relay, 7-day sign-up count — CLOSED (2026-06-01)** — Bertha (mail `8ada1bdc`) pinged me asking if Hestia was running; she'd been silent 10 days on a simple 7-day sign-up count ask. Confirmed Hestia is running from my own seat (verified-live deploy notices from her active through 2026-05-28), so the silence to Bertha specifically was not an outage. Bertha picked option 1 (relay), so I nudged Hestia (mail `4fd69253`) with the specific ask + 10-day-silence framing, no pressure on the metric itself. Hestia (`173d7622`) replied DIRECTLY to Bertha with the 7-day rollup (6 users, 4 CLI / 2 browser, full breakdown); cause of silence was queue depth from the release cadence + Bertha's mail genuinely slipping past her — not a routing/outage issue. Closed the relay on my side, looped Bertha (`33bf1a5f`) honoring the explicit "I'll loop you" promise even though Hestia replied direct. Hestia validated the relay pattern as "exactly the right escalation shape" — light positive signal on the confirm-peer-running → get-consent → relay-with-no-pressure flow, not a new bankable discipline (no-sycophancy + no-overdoc).
 
