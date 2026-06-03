@@ -1,244 +1,33 @@
 # Product Status
-
-Last updated: 2026-05-26 21:00Z (Sofia, long-fruit submission cluster drafts landed)
+Last updated: 2026-06-03 13:28Z (Sofia catch-up pass)
 
 ## Current focus
-
-**Long-fruit submission cluster active (2026-05-26).** Eight-item
-submission package drafted at `agents/sofia/.aw/drafts/submission-drafts-v0.md`
-(commit `a005fbf` on ai.aweb main):
-
-- B.1: Claude Code official marketplace, aweb-channel plugin — READY
-- B.2: Claude Code official marketplace, aweb-skills plugin — READY
-- B.3: Official MCP Registry (registry.modelcontextprotocol.io) —
-  source-ready; Hestia npm-publishing `@awebai/claude-channel@1.4.9`
-  now (~20 min ETA per her plan)
-- B.4: mcp.so — submit after B.3
-- B.5: smithery.ai — shape mismatch (stdio vs hosted-URL); three
-  documented options
-- B.6: glama.ai/mcp — submit after B.3
-- B.7: punkpeye/awesome-mcp-servers PR — READY (one-line under
-  Communication category)
-- B.8: ClawHub variant SKILL.md — drafted; needs to land in aweb
-  repo before `clawhub skill publish`
-
-Engineering prep landed same-session via Athena (`f32393a` =
-LICENSE files + skills plugin.json metadata; `db9a492` =
-`@awebai/claude-channel 1.4.9` with `mcpName: "io.github.awebai/channel"`).
-Each submission produces one `attempts.jsonl` row at submission
-time (submission-surface variant per Iris's schema-extensions PR).
-
-Iris voice-pass routed (msg `2e0054ec` in conv `345f95bb`):
-long-form descriptions, ClawHub variant body, smithery shape-mismatch
-framing. Hestia owns the npm-publish gate (msg `3bd13257` in conv
-`878c06b1`; her plan confirmed).
-
-**The pivot context this fits inside:** Juan called outreach the
-priority on 2026-05-26 ("we need to start seriously doing outreach"),
-narrowed to the long-fruit cluster on direction "the ones that
-will take the longer to bear fruit (Anthropic and OpenAI submissions)."
-Iris parallel work on community-engagement loop continues; the
-long-fruit cluster IS the first wave.
-
-## Earlier focus (banked)
-
-**Consumer-onboarding v1 cycle closed (2026-05-13 22:28Z).**
-ac v0.5.31 backend + aweb.ai pain-narrative homepage + /developers
-landing all live in production. Headline customer outcome arc
-(P1 lands at aweb.ai → clicks "Connect your AI" → picks client
-→ paste instructions → OAuth consent → handle pick → adds
-contact by @handle → messages friend's AI) plausibly complete
-end-to-end. Cycle had two gaps caught post-ship and reframed in
-`docs/decisions.md` 2026-05-13.
-
-Sofia banked framing-review discipline (`feedback_framing_review_requires_deployed_spot_check.md`):
-release-claim framing must spot-check the deployed surface, not
-trust the release-notes description. Hestia banked her side as
-runbook discipline #30 (schema-migration verification in
-verify-live, not /health).
-
-**Persona model and UX scoring** (ongoing reference work):
-`docs/audiences.md` carries the four personas + tier model
-(rewritten 2026-05-12 with Personas 1+2 added per the priority
-reorder). `agents/sofia/ux/` carries the role_for-based UX scoring
-system: personas.yaml + surfaces.yaml + score.py generate
-ux-surface-report.md. The persona-aware visibility patterns
-(HIDE_FOR / REFRAME_FOR / NEVER_CUT) are the model the
-simplification work runs through.
-
-## Earlier focus (deeper banked)
-
-Day-2 of team-genesis closes with the build/ship boundary now real,
-not theoretical. **First end-to-end Hestia gate run completed today**
-on ac v0.5.18 + aw CLI 1.18.8 (claim-human contract fix). Gate caught
-a real failure on the first run (test-script gap in e2e A.18); Athena
-landed the fix in `1be46c42`; re-run green; tagged + pushed; image
-built; Juan deployed manually; Hestia verified live and posted the
-evidence mail. ~80 min end-to-end including the failure detour. The
-operating model behaved correctly: Athena bless-and-run → Hestia gate
-chain → joint failure-shape work with Athena → re-run → ship → verify
-→ evidence mail.
-
-The morning's setup that fed this:
-
-- **Aida is online** (commits `571ad94`, `ab4f915` overnight). Her
-  status/handoff still pre-rename; she'll refresh on her own wake-up.
-- **Hestia hardened the runbook overnight via the right loop**:
-  Render auto-deploy was a wrong assumption (Juan deploys manually);
-  awid registry is also manual-deploy; verify-live table split by
-  deploy shape; artifact map + dependency rule added; ac
-  gate-default narrowing + compat-invocation policy folded in.
-- **Athena landed test-infra work in ac**: parallelize pytest, reuse
-  migrated DB across runs, reuse release image across docker e2e,
-  make installed-CLI journey optional. Direct response to the
-  iteration-cost flag Hestia raised; non-feature authoring per
-  decision `4491df5`.
-- **v0.5.17** shipped without Hestia's retroactive gate-run (Juan
-  called it off last night; v0.5.18 became the first real exercise
-  instead).
-- **Conversations-as-first-class**: parked midday with four named
-  triggers (decision `c874f2a`), then unparked late afternoon by
-  Juan's operator-level call (decision `325556a`). aweb-aame moves
-  from P3-parked to active under Grace's authoring lane; Athena
-  reviews per the standard feature-work flow. Invariant 8
-  (findability and continuation are independent reachability
-  concerns) stands either way — architectural truth is unaffected
-  by sequencing. Specific reasoning for Juan's override not yet
-  captured in shared artifacts; pending.
-
-## Today's priorities (status at end of day)
-
-1. **Build/ship boundary's first end-to-end Hestia gate run** —
-   **DONE** today (v0.5.18 + aw 1.18.8). Operating-model
-   validation; runbook will fold first-exercise observations.
-2. **Aida sweeps the runbook for v0.5.10-18 customer-visible
-   deltas.** Original scope was v0.5.10 (1.9 NOT-boundary,
-   login-failure section, 409 conflict messaging); now expanded
-   to include the Add-Existing-Identity dialog UX (v0.5.13-17)
-   and the BYOD CLI breaking change in v0.5.18 (old aw on BYOD
-   now hits 422; new aw 1.18.8 requires explicit `--username`).
-   Athena reviews tech-accuracy; I review framing.
-3. **Athena lands the Playwright-MCP reproducer for Add-Existing.**
-   Reproducer-as-gate (policy 12) for the UI surface that
-   generated five iterations. Status not visible from my surface
-   yet today; check next wake-up.
-
-This week, beyond today:
-
-1. **First distribution action.** The "5 agents" blog post draft has
-   sat since 2026-04-09 awaiting Juan's voice pass. Iris not yet
-   online; until she is, this is an open priority that hasn't moved.
-2. **KI#1 closure decision record.** Athena drafts technical content
-   (cert-presentation auth correction + aalk continuity arc + 1.18.6
-   trust-model arc + Aida 4/4 attestation); I frame.
-3. **Bring Iris and Metis online.** Directories exist; identity setup
-   pending Juan-interactive Hetzner work.
-4. **Mia's aalr.2 (AWID ensure-team + ac persist refactor)** when
-   branch-ready. Will exercise the gate chain again with a feature
-   change rather than a bug-fix.
+- **Production release state:** AC v0.5.59 is tagged/built but not deployed; app.aweb.ai still reports v0.5.58 / aweb 1.26.1. Hestia owns deploy/live-verify once Juan confirms Render env and clicks deploy.
+- **Engineering risk to track with Athena:** aw 1.26.3 workspace-cleanup regression (#245) restored Juan's affected pmbah team but still needs a fix-forward shape before any CLI/workspace-cleanup-adjacent ship.
+- **E2EE framing boundary:** receive-side package wave is live (channel 1.4.11, Pi 0.1.16), PyPI aweb 1.26.5 is published, but hosted custodial E2EE is not a live AC claim until v0.5.59 deploy + smoke. Hosted custodial/server-side messaging must not be described as E2E.
+- **Outreach remains the company bottleneck:** long-fruit submission drafts exist and Iris has refreshed the outreach lane; actual submission/attempt rows are still unobserved from this pass.
+- **Direction context:** gbrain/corpus/omnigraph question is waiting on Juan; no product priority change until that answer lands.
 
 ## Product readiness
+- **OSS aweb / PyPI:** `aweb==1.26.5` published.
+- **aw CLI npm:** `@awebai/aw@1.26.4` published.
+- **Channel / skills / Pi:** `@awebai/claude-channel@1.4.11`, `@awebai/claude-skills@0.2.10`, `@awebai/pi@0.1.16` published.
+- **aweb-cloud:** live health check 2026-06-03 13:28Z reports `release_tag=v0.5.58`, `git_sha=340122ef`, `aweb_version=1.26.1`, `awid_service_version=0.5.9`, healthy. v0.5.59 GHCR image/tag is awaiting Juan deploy per Hestia.
+- **awid registry:** `https://api.awid.ai/health` reports `version=0.5.9`, ok.
+- **Landing site:** latest restructure verified-live per Hestia/Olivia; no direction action unless Iris's trinity-leak pass finds stale copy.
 
-- **OSS aweb**: stable. Latest tags `server-v1.18.6`, `aw-v1.18.6`,
-  `awid-v0.5.2`, `awid-service-v0.5.2` (2026-04-27). No commits on
-  main since.
-- **aweb-cloud**: live at v0.5.18. `https://app.aweb.ai/health`
-  reports `release_tag=v0.5.18`, `aweb_version=1.18.6`,
-  `git_sha=4ace9770`, `awid_service_version=0.5.3`. db / redis /
-  awid / coordination_api healthy. Started 2026-05-02 19:50 UTC.
-  Shipped through Hestia's first end-to-end gate-chain exercise
-  (claim-human router validate-first/write-last refactor +
-  atomic cli_signup-upgrade UPDATE; closes the cli_signup orphan
-  vector at claim time).
-- **aw CLI**: 1.18.8 published. Removes BYOD-domain-as-username
-  auto-inference. BYOD users on old aw now hit 422; managed
-  (.aweb.ai) unaffected. New aw on either works.
-- **awid registry (standalone)**: live at `version=0.5.2`, redis/db/
-  schema healthy. Unchanged. (awid library inside cloud at 0.5.3,
-  bumped during yesterday's release cluster.)
-- **@awebai/claude-channel**: 1.3.3 published.
-- **Landing site (aweb.ai)**: live. Blog section TBD; first
-  personal/problem post planned for juanreyero.com.
-- **Pricing in public docs**: aligned to canonical $25/$150 per
-  `ac/backend/src/aweb_cloud/models/billing.py` (commit `2fbf16f`,
-  caught by YC agent on first wake-up).
-
-## Team state
-
-Company team (`default:aweb.ai`):
-
-- **Sofia (me)**: online. Direction surface.
-- **Athena**: online. Engineering surface; bridged into dev team.
-  Test-infra work last night addresses iteration-cost; Playwright
-  reproducer pending today.
-- **Hestia**: online. Runbook hardening overnight produced real banked
-  discoveries (Render manual, awid manual, verify-live by deploy
-  shape). Idle for next bless-and-run from Athena.
-- **Aida**: online (came up last night). Status/handoff still
-  pre-rename; will refresh on her wake-up. Runbook PR scope
-  expansion is on her plate.
-- **YC agent (`aweb.ai/yc`)**: offline (seen 19h ago in co.aweb).
-  Special-purpose for the YC application.
-- **Iris, Metis**: directories exist; identity setup pending Juan-
-  interactive Hetzner work.
-
-Dev team (`aweb:juan.aweb.ai`):
-
-- **Athena**: cross-team membership.
-- **Mia**: shipped v0.5.13-17 cluster yesterday; aalr.2 starts today
-  per Athena's status.
-- **Noah, Grace, Kate**: in the team; activity not yet visible from
-  my surface.
-
-## Outreach state
-
-- **Blog post "5 agents"**: draft ready since 2026-04-09. Awaiting
-  Juan's voice pass. Iris will own packaging once online.
-- **Contacts**: identified in `co.aweb` (private), uncontacted.
-- **Daily scanning**: not running.
-- **Conversations joined**: 0.
+## Outreach
+- Iris status (2026-05-26) says the active pivot is from authoring to distribution: audit parked artifacts, adapt beadhub-era source material against current aweb state, add Pi extension as Persona-3 promotion arc, derive v0.5.48 release-notes pack.
+- Long-fruit submission drafts are at `agents/sofia/.aw/drafts/submission-drafts-v0.md`; latest Sofia draft commit observed here is `fc7bbcb` retargeting to channel 1.4.10 / skills 0.2.10. `publishing/attempts.jsonl` has no observed rows yet.
+- Juan confirmation is still useful on cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.
 
 ## Support / user feedback
+- No new external customer feedback observed in this pass.
+- Prior concrete evidence remains Pepe-anonymous autonomous-install friction-to-ship arc and internal dogfood release smokes.
+- #245 is the live customer-risk item: recovered affected team, fix-forward still pending.
 
-- KI#1 closed empirically (4/4 attestation + second-shape probe on
-  2026-04-27). No regression observed across yesterday's release
-  cluster.
-- Add-Existing-Identity dialog UX is new customer-facing surface
-  landed across v0.5.13-17. Aida folds into runbook PR.
-- No external user feedback yet — distribution hasn't started.
-
-## Compat policy (post multi-instance resolution)
-
-A Sofia-instance divergence on the compat-scope question (N=1 vs
-N=2) was resolved by Juan midday 2026-05-02. Canonical Sofia is the
-N=2 voice. **Compat policy: cloud tests against current released
-aw + prior 2 released versions = 3 binaries in the compat-test
-invocation** (definition is "whatever the prior two released semver
-tags happen to be" — patches in normal weeks, mixed during
-minor-bump cycles, NOT strict semver-minor).
-
-Decision record deferred until bless-and-run evidence per Athena's
-defer-pending-evidence discipline. Implementation lives in Athena's
-correctives — Mia (`6627836c`) and Hestia (`a5afc809`); Mia owns
-wiring multi-version compat infra when convenient. Hestia's runbook
-compat-scope section is currently in-flux state (revert `92f6fc2`
-predates the resolution); will re-fold to N=2 when Hestia's next
-runbook pass picks it up.
-
-YC public-facing claim deferred behind bless-and-run evidence per
-the sequencing in the same correctives.
-
-## Open questions
-
-- Target YC batch and deadline. Pacing for the YC agent depends on this.
-- First concrete distribution action this week — Iris needs a target
-  once she's online.
-- Collision video before or after the first blog post? (Open from
-  prior wake-up.)
-- BYOD CLI breaking change in v0.5.18 was borderline on the
-  "behavior change customers will notice" Sofia-involvement
-  threshold. Hestia's call to ship without me was right (small BYOD
-  user count today, framing in verified-live mail is honest, no
-  public claim made). As BYOD users grow, the threshold may need
-  refinement. Mental note for now; revisit when Iris/Metis are
-  online and we have a real customer-base picture.
+## Priorities
+1. **Catch up with Athena on #245 + v0.5.59/E2EE release boundary.** Need her current engineering read and any direction/framing ask before external claims or CLI-adjacent work moves.
+2. **Let Hestia complete v0.5.59 only after Juan env/deploy confirmation, then frame claims from live evidence.** Do not pre-claim hosted custodial E2EE.
+3. **Restart distribution execution with Iris once the release boundary is clear.** Submissions/attempts need actual rows, not just drafts.
+4. **Resolve Juan's gbrain/corpus/omnigraph direction question before turning it into product or outreach positioning.**
