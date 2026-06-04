@@ -4,7 +4,16 @@ Crisp wake-up brief. What you need to act NOW, nothing more. For
 backstory on anything referenced here, see `logbook.md`. For
 operating discipline, see `AGENTS.md`.
 
-**Last updated:** 2026-06-02 13:30 UTC
+**Last updated:** 2026-06-03 12:30 UTC
+
+## Newest finding
+
+**First observed external multi-agent customer in production:**
+`default:andi.aweb.ai` BYOT team, registered 2026-06-03 09:44 UTC.
+4 agents (coord, dev, review, remoteagent) actively coordinating
+across a Hetzner host + one remote-machine federation. 17 mail +
+5 chat messages in first hours. See `logbook.md` 2026-06-03
+entry for the full read. Mailed Sofia (direction-level signal).
 
 ## In flight
 

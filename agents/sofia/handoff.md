@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 (server-restart prep + handoff/logbook split)
+Last updated: 2026-06-03 13:28Z (catch-up pass + Athena sync routed)
 
 ## How this file works
 
@@ -23,6 +23,17 @@ Keep handoff lean. When detail accumulates here, promote it to
   had grown to 127 lines and stopped being a useful re-entry pointer.
 
 ## Active arcs (verify on wake-up — last update inside the file)
+
+### Athena catch-up / release-risk sync (routed 2026-06-03)
+
+Current read from status files + live checks:
+
+- app.aweb.ai still `v0.5.58` / aweb `1.26.1`; api.awid.ai `0.5.9`.
+- v0.5.59 is tagged/built and waiting on Juan Render deploy + env confirm per Hestia.
+- Published packages observed: aw `1.26.4`, channel `1.4.11`, skills `0.2.10`, Pi `0.1.16`, PyPI aweb `1.26.5`.
+- #245 aw 1.26.3 workspace-cleanup regression is the active customer-risk item; pmbah team recovered, fix-forward shape pending Athena/Mia.
+
+Mail sent to Athena asking for current engineering read on #245, v0.5.59/E2EE boundary, and any Sofia direction/framing ask.
 
 ### gbrain integration analysis (in-flight with Juan, 2026-06-03)
 
@@ -50,21 +61,17 @@ omnigraph / corpus arc come back off the shelf, or were you steering
 me toward 'drop the corpus ambition entirely and let
 humans-with-gbrain be the model'?"
 
-### Long-fruit submission cluster (state at 2026-05-26 — VERIFY)
+### Long-fruit submission cluster (verified 2026-06-03)
 
-Drafts at `agents/sofia/.aw/drafts/submission-drafts-v0.md`. Iris
-voice-pass folded; Hestia npm-publish on 1.4.10 / skills 0.2.10
-landed. Day-1 execution was ready to go when the conversation
-shifted to gbrain.
+Drafts remain at `agents/sofia/.aw/drafts/submission-drafts-v0.md`.
+Latest observed draft commit is `fc7bbcb` (retarget to channel 1.4.10 /
+skills 0.2.10). `publishing/attempts.jsonl` has no rows observed in this
+pass. Iris status says outreach pivot is active, but actual submission
+execution is not yet visible from Sofia's surface.
 
-**Check what moved while I was off**:
-- `git log --oneline -10 -- agents/sofia/.aw/drafts/`
-- `../../publishing/attempts.jsonl` tail (submission-surface rows)
-- `aw mail inbox` for Iris/Hestia/Juan threads on the cluster
-
-Submission readiness was: B.1/B.2/B.7 READY; B.3 waiting npm; B.4,
-B.5, B.6, B.8 staged. See logbook §"Long-fruit submission cluster"
-for the full state at last update.
+Submission readiness from last live planning was: B.1/B.2/B.7 READY;
+B.3 no longer blocked by npm package availability; B.4, B.5, B.6, B.8
+staged. See logbook §"Long-fruit submission cluster" for full state.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
@@ -88,11 +95,12 @@ substrate.
 
 ## Open threads / waiting on
 
+- **Athena** — response to 2026-06-03 catch-up mail: #245 fix-forward shape, v0.5.59/E2EE boundary, and whether Sofia is needed.
 - **Juan** — response to gbrain analysis (whether corpus arc resumes).
 - **Iris** — long-fruit cluster execution status; original ramp-up
   mail `e1b6c7d0` in conv `345f95bb` had broader community-engagement
   loop questions still partially open.
-- **Hestia** — npm-publish gating B.3 may have completed; verify.
+- **Hestia** — v0.5.59 deploy/live-verify after Juan env confirm + Render click.
 - **Marvin** — silent since 2026-05-23. Fold + corpus rename mail
   (msg `4f55b529` in conv `adb6cc44`) is his re-entry point.
 
