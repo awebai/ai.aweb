@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 13:28Z (catch-up pass + Athena sync routed)
+Last updated: 2026-06-03 13:45Z (Athena sync answered + Aida framing pass)
 
 ## How this file works
 
@@ -24,16 +24,17 @@ Keep handoff lean. When detail accumulates here, promote it to
 
 ## Active arcs (verify on wake-up — last update inside the file)
 
-### Athena catch-up / release-risk sync (routed 2026-06-03)
+### Athena catch-up / release-risk sync (answered 2026-06-03)
 
-Current read from status files + live checks:
+Current release/risk read:
 
 - app.aweb.ai still `v0.5.58` / aweb `1.26.1`; api.awid.ai `0.5.9`.
 - v0.5.59 is tagged/built and waiting on Juan Render deploy + env confirm per Hestia.
 - Published packages observed: aw `1.26.4`, channel `1.4.11`, skills `0.2.10`, Pi `0.1.16`, PyPI aweb `1.26.5`.
-- #245 aw 1.26.3 workspace-cleanup regression is the active customer-risk item; pmbah team recovered, fix-forward shape pending Athena/Mia.
+- #245 aw 1.26.3 workspace-cleanup regression is live but pattern-specific. Athena root cause: `aw workspace status` / cleanup path treated missing local `workspace_path` as enough to soft-delete server workspace/agent rows after pmbah path rename. Direction agrees with Athena: read/status flows must not be destructive lifecycle operations; fix should require explicit cleanup/delete or stronger multi-signal evidence.
+- E2EE claim boundary: no broad "E2EE is live" claim. Only exact smoked surface after v0.5.59 deploy. Do not call hosted custodial/server-side messaging E2E. Also hold generic self-custodial E2EE readiness because Athena observed aw 1.26.4 encryption-key publish fails against AWID 0.5.9 on `custody` extra_forbidden.
 
-Mail sent to Athena asking for current engineering read on #245, v0.5.59/E2EE boundary, and any Sofia direction/framing ask.
+Sofia replied aligned. Product status carries the holds.
 
 ### gbrain integration analysis (in-flight with Juan, 2026-06-03)
 
@@ -73,6 +74,16 @@ Submission readiness from last live planning was: B.1/B.2/B.7 READY;
 B.3 no longer blocked by npm package availability; B.4, B.5, B.6, B.8
 staged. See logbook §"Long-fruit submission cluster" for full state.
 
+### Aida Customer-Facing Defaults framing pass (answered 2026-06-03)
+
+Aida asked for AGENTS.md framing on hosted-default + no-`aw run`-for-Claude-Code defaults. Sofia cleared with wording changes:
+
+- replace "All real customers will use app.aweb.ai" with "Hosted is the default first-touch path" / assume hosted unless customer asks for self-hosting;
+- replace "do not upsell it" with "do not introduce it as an option for Claude Code flows";
+- keep source lines as `Default set by Juan, 2026-05-02.`
+
+No Juan reroute needed unless Aida thinks defaults have changed.
+
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
 See memory `[[project-omnigraph-outreach-incoming]]`. Posture:
@@ -95,7 +106,8 @@ substrate.
 
 ## Open threads / waiting on
 
-- **Athena** — response to 2026-06-03 catch-up mail: #245 fix-forward shape, v0.5.59/E2EE boundary, and whether Sofia is needed.
+- **Athena** — #245 fix-forward implementation/owner; no direction action pending unless someone argues to preserve auto-delete-on-status.
+- **Aida** — commit Customer-Facing Defaults section after applying framing pass.
 - **Juan** — response to gbrain analysis (whether corpus arc resumes).
 - **Iris** — long-fruit cluster execution status; original ramp-up
   mail `e1b6c7d0` in conv `345f95bb` had broader community-engagement

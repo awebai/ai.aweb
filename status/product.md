@@ -1,10 +1,10 @@
 # Product Status
-Last updated: 2026-06-03 13:28Z (Sofia catch-up pass)
+Last updated: 2026-06-03 13:45Z (Athena reply folded)
 
 ## Current focus
 - **Production release state:** AC v0.5.59 is tagged/built but not deployed; app.aweb.ai still reports v0.5.58 / aweb 1.26.1. Hestia owns deploy/live-verify once Juan confirms Render env and clicks deploy.
-- **Engineering risk to track with Athena:** aw 1.26.3 workspace-cleanup regression (#245) restored Juan's affected pmbah team but still needs a fix-forward shape before any CLI/workspace-cleanup-adjacent ship.
-- **E2EE framing boundary:** receive-side package wave is live (channel 1.4.11, Pi 0.1.16), PyPI aweb 1.26.5 is published, but hosted custodial E2EE is not a live AC claim until v0.5.59 deploy + smoke. Hosted custodial/server-side messaging must not be described as E2E.
+- **Engineering risk tracked with Athena:** aw 1.26.3 workspace-cleanup regression (#245) is live but pattern-specific. Root is read/status cleanup deleting server rows when a stale local `workspace_path` is missing. Fix-forward direction: status/read flows must not destructively delete server workspace/agent rows from local path nonexistence alone; require explicit cleanup/delete or stronger evidence.
+- **E2EE framing boundary:** receive-side package wave is live (channel 1.4.11, Pi 0.1.16), PyPI aweb 1.26.5 is published, but hosted custodial E2EE is not a live AC claim until v0.5.59 deploy + exact smoke. Hosted custodial/server-side messaging must not be described as E2E. Additional Athena caveat: aw 1.26.4 local encryption-key setup currently fails AWID publish against api.awid.ai 0.5.9 (`custody` extra_forbidden), so do not claim generic self-custodial E2EE readiness until fixed or explained.
 - **Outreach remains the company bottleneck:** long-fruit submission drafts exist and Iris has refreshed the outreach lane; actual submission/attempt rows are still unobserved from this pass.
 - **Direction context:** gbrain/corpus/omnigraph question is waiting on Juan; no product priority change until that answer lands.
 
@@ -24,10 +24,10 @@ Last updated: 2026-06-03 13:28Z (Sofia catch-up pass)
 ## Support / user feedback
 - No new external customer feedback observed in this pass.
 - Prior concrete evidence remains Pepe-anonymous autonomous-install friction-to-ship arc and internal dogfood release smokes.
-- #245 is the live customer-risk item: recovered affected team, fix-forward still pending.
+- #245 is the live customer-risk item: recovered affected pmbah team; acceptance for fix is missing local path does not delete rows during `aw workspace status`, explicit cleanup/delete still works for truly gone ephemeral workspaces, persistent/global identities are never deleted by stale-path cleanup, pmbah rename regression covered, release notes warn 1.26.3 users who renamed worktree roots.
 
 ## Priorities
-1. **Catch up with Athena on #245 + v0.5.59/E2EE release boundary.** Need her current engineering read and any direction/framing ask before external claims or CLI-adjacent work moves.
-2. **Let Hestia complete v0.5.59 only after Juan env/deploy confirmation, then frame claims from live evidence.** Do not pre-claim hosted custodial E2EE.
+1. **Hold outward E2EE claims narrow.** No broad “E2EE is live” or generic self-custodial E2EE readiness claim; only claim exact smoked surfaces after v0.5.59 live evidence and AWID publish skew is resolved/explained.
+2. **Track #245 fix-forward before CLI/workspace-cleanup-adjacent ships.** Direction agrees with Athena: read/status commands should not be destructive lifecycle operations.
 3. **Restart distribution execution with Iris once the release boundary is clear.** Submissions/attempts need actual rows, not just drafts.
 4. **Resolve Juan's gbrain/corpus/omnigraph direction question before turning it into product or outreach positioning.**
