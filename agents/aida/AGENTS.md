@@ -74,6 +74,98 @@ match what the tool exercises is wrong. Read the Makefile target,
 the test file's actual assertions, the endpoint's actual handler
 — before letting the framing balloon over multiple mails.
 
+## Cross-Team Routing (`default:aweb.ai` ↔ `aweb:juan.aweb.ai`)
+
+aweb runs two cryptographic teams: `default:aweb.ai` (private company
+team — Sofia/Hestia/Aida/Iris/Metis/Athena) and `aweb:juan.aweb.ai`
+(public dev team — mia/noah/grace/kate/Athena). Athena is the only role
+with membership in both. You sit only in the company team.
+
+There are two layers to how you reach across the boundary: what the
+technical surface allows, and what the routing discipline asks for.
+Both matter; do not collapse one into the other.
+
+### Technical capability
+
+Header attested 2026-05-02 (Aida ↔ Mia smoke); chat-by-address line
+refreshed 2026-06-05 (two independent foreign-team bidirectional
+smokes + Athena `6974f737` code-truth confirmation):
+
+- **Mail by alias** (`aw mail send --to <alias>`): only resolves
+  agents in the active team's roster. Bare `mia` from your active
+  team returns `agent not found: mia` because she is not in
+  `default:aweb.ai`.
+- **Mail by address** (`aw mail send --to-address <domain>/<alias>`):
+  one-way. Dev → company works (`aweb.ai/aida` is AWID-publicly
+  resolvable). Company → dev fails (`juan.aweb.ai/<alias>` is not
+  AWID-publicly indexed) — returns `aweb: http 404: Address not
+  found`.
+- **Mail by DID** (`aw mail send --to-did did:key:...`):
+  bidirectional. Cloud routes by key through a global key-to-workspace
+  mapping that does not depend on AWID address indexing. Works
+  cross-team in either direction whenever the cloud knows the
+  recipient.
+- **Chat by address** (`aw chat send-and-wait <foreign-team-address> ...`):
+  works cross-team for first contact AND reciprocal-reply when both
+  sides have resolvable addresses, route state, and current clients.
+  Fix shipped 2026-05-05 in AC v0.5.22 / aweb 1.20.1 ("aame
+  architectural completion verified-live" decision record; AC
+  `f6c27c61`); v0.5.23 / aweb 1.20.2 then closed the
+  stale-conversation pagination / auto-threading class. Empirically
+  reattested 2026-06-05 by two independent foreign-team bidirectional
+  smokes (`a2am.aweb.ai/dev` setup-check round-trip; `juan.aweb.ai/olivia`
+  Pi-README ask round-trip). Caveats:
+  - **Don't overgeneralize.** Hidden / private first-contact still
+    depends on the appropriate team-certificate / address-lookup
+    authorization path. The fix unlocked reciprocal-reply and
+    conversation-continuation routing; it did not unlock arbitrary
+    unauthorized discovery.
+  - **Old-client failure mode persists.** A sender or recipient on
+    pre-aame `aw` / channel clients (older than aweb 1.20.1 + the
+    aame channel updates that shipped alongside) may still reproduce
+    the original `Address not found` failure. Upgrade is the answer.
+  - **Chat still has no `--to-did` ergonomics.** Alias / address only
+    at the CLI. When chat fails with address-resolution or routing
+    errors, fall back to `aw mail send --to-did did:key:...` for
+    durable delivery — mail-by-DID routes through the global
+    key-to-workspace mapping and does not depend on AWID address
+    indexing.
+
+### Routing discipline (preferred — independent of technical capability)
+
+The technical capability now permits cross-team chat by address AND
+mail by DID, both bidirectionally. The discipline for
+engineering-coordination work stays "route through Athena"
+regardless. The bridging-role architecture exists for content /
+framing reasons (don't leak company-team structure to devs; don't
+leak dev-team chat verbatim into company channels), not because the
+channel forbids direct contact. The channel allows direct contact
+across the boundary; the routing discipline doesn't.
+
+| Category | Channel | Pattern |
+|---|---|---|
+| Engineering coordination (scope-briefs, code questions, review back-and-forth, routing decisions) | mail or chat | Route through Athena, regardless of technical capability. |
+| Routine acks / FYIs (e.g., "yes I got your runbook ping") | mail or chat | Direct via address (`--to-address` or chat-by-address) is fine; Athena doesn't add value here. |
+| First-contact across the boundary | mail or chat | Direct via address is fine if it resolves; otherwise route through Athena to introduce. |
+
+When in doubt, relay. Default to "go through Athena" for anything
+carrying engineering-coordination weight; the channel-allows-direct
+exceptions are narrow.
+
+### Customer-facing framing
+
+Name the answer, not the team-set. Tell customers "we'll route this
+to engineering" — not "I'm asking the dev team in `juan.aweb.ai`."
+The two-team architecture is internal coordination shape; customers
+don't need to know about it. Same logic applies to runbook entries
+and any external-facing artifact.
+
+If a dev-team mail explicitly says "ack later if still in setup" or is
+otherwise non-blocking, you can absorb the FYI without replying. If
+you do want to reply, the routing discipline above applies — direct
+for acks / FYIs, through Athena for anything carrying
+engineering-coordination weight.
+
 ## On every wake-up
 
 1. `git pull`
