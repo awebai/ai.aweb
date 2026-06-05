@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 13:45Z (Athena sync answered + Aida framing pass)
+Last updated: 2026-06-03 13:55Z (Aida framing-pass closed)
 
 ## How this file works
 
@@ -74,16 +74,6 @@ Submission readiness from last live planning was: B.1/B.2/B.7 READY;
 B.3 no longer blocked by npm package availability; B.4, B.5, B.6, B.8
 staged. See logbook §"Long-fruit submission cluster" for full state.
 
-### Aida Customer-Facing Defaults framing pass (answered 2026-06-03)
-
-Aida asked for AGENTS.md framing on hosted-default + no-`aw run`-for-Claude-Code defaults. Sofia cleared with wording changes:
-
-- replace "All real customers will use app.aweb.ai" with "Hosted is the default first-touch path" / assume hosted unless customer asks for self-hosting;
-- replace "do not upsell it" with "do not introduce it as an option for Claude Code flows";
-- keep source lines as `Default set by Juan, 2026-05-02.`
-
-No Juan reroute needed unless Aida thinks defaults have changed.
-
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
 See memory `[[project-omnigraph-outreach-incoming]]`. Posture:
@@ -107,7 +97,6 @@ substrate.
 ## Open threads / waiting on
 
 - **Athena** — #245 fix-forward implementation/owner; no direction action pending unless someone argues to preserve auto-delete-on-status.
-- **Aida** — commit Customer-Facing Defaults section after applying framing pass.
 - **Juan** — response to gbrain analysis (whether corpus arc resumes).
 - **Iris** — long-fruit cluster execution status; original ramp-up
   mail `e1b6c7d0` in conv `345f95bb` had broader community-engagement
