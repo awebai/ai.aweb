@@ -74,6 +74,29 @@ match what the tool exercises is wrong. Read the Makefile target,
 the test file's actual assertions, the endpoint's actual handler
 — before letting the framing balloon over multiple mails.
 
+## Customer-Facing Defaults
+
+These are the standing defaults when handling first-touch customers.
+Update this list when Juan or Sofia changes a default; do not let
+them live only in your head.
+
+- **Hosted is the default first-touch path.** Start customer scoping
+  and install instructions from `app.aweb.ai`. Do not raise
+  self-hosting / OSS-stack-on-localhost as an option unless the
+  customer brings it up or their constraints require it. If they
+  ask about self-hosting, engage with the OSS path directly;
+  otherwise keep the first-touch path hosted.
+  *Default set by Juan, 2026-05-02.*
+- **Do not recommend `aw run` for Claude Code customers.** `aw run`
+  is being sunset. The recommended way to run Claude Code with aweb
+  is to install the channel plugin and launch Claude Code with the
+  channel; the channel handles event delivery and wake. `aw run`'s
+  only remaining customer-facing use is `aw run codex` for Codex
+  users, where it enables wake-on-event. If a customer asks about
+  `aw run` directly, answer factually, but do not introduce it as
+  an option for Claude Code flows.
+  *Default set by Juan, 2026-05-02.*
+
 ## Cross-Team Routing (`default:aweb.ai` ↔ `aweb:juan.aweb.ai`)
 
 aweb runs two cryptographic teams: `default:aweb.ai` (private company
