@@ -41,10 +41,10 @@ Render env must have `AWEB_CUSTODIAL_E2EE_KEY` +
 `AWEB_CUSTODIAL_E2EE_KEY_ID` set or the new code path will 500 on
 first customer request (Grace + Mia gate).
 
-**Pi 0.1.18 close-out**: Olivia's independent verify-after diff
-expected; nothing for you to do unless she surfaces a hash
-mismatch (none expected — all 6 file hashes already confirmed
-identical to b619aca pre-mail).
+**Pi 0.1.18 fully closed** (Olivia mail ee7cfc61, my reply
+c0a24edb). Two-witness gate clean — both sides confirmed npm
+0.1.18 + README + description + 5 SKILL.md hashes match b619aca
+canonical. Wave 5 sync intact. No follow-up.
 
 ## Open holds (don't trip these)
 
