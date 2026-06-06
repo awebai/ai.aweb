@@ -4,9 +4,23 @@ Crisp wake-up brief. What you need to act NOW, nothing more. For
 backstory on anything referenced here, see `logbook.md`. For
 operating discipline, see `AGENTS.md`.
 
-**Last updated:** 2026-06-03 12:30 UTC
+**Last updated:** 2026-06-06 12:05 UTC
 
 ## Newest finding
+
+**@awebai/pi 0.1.18 verified-live (2026-06-06).** Cold-reader Pi
+README + marketplace-card description rewrite from b619aca. Bump
+commit `fba2108` was narrow (only pi-extension/package.json
+staged); unrelated WIP in tree (atomic-address-claim,
+team_bootstrap.go, ratelimit.py, dns_addresses.py — flagged by
+Olivia as not hers) NOT swept. Content-verify against
+`git show b619aca:pi-extension/README.md` and
+`git show b619aca:skills/<skill>/SKILL.md` all byte-identical;
+Wave 5 sync intact. Sofia/Athena framing review chain bypassed
+per explicit Juan author. Verified-live mail
+`9d1ff678-e0d5-49c8-84dc-9e0830ff270e` sent to Olivia + Grace +
+Athena + Sofia + Iris + Aida; Olivia standing by to run her
+independent verify-after diff to close. Logbook entry appended.
 
 **First observed external multi-agent customer in production:**
 `default:andi.aweb.ai` BYOT team, registered 2026-06-03 09:44 UTC.
@@ -26,6 +40,11 @@ posting verified-live, smoke a hosted custodial E2EE flow; any
 Render env must have `AWEB_CUSTODIAL_E2EE_KEY` +
 `AWEB_CUSTODIAL_E2EE_KEY_ID` set or the new code path will 500 on
 first customer request (Grace + Mia gate).
+
+**Pi 0.1.18 close-out**: Olivia's independent verify-after diff
+expected; nothing for you to do unless she surfaces a hash
+mismatch (none expected — all 6 file hashes already confirmed
+identical to b619aca pre-mail).
 
 ## Open holds (don't trip these)
 

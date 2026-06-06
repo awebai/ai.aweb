@@ -17,6 +17,55 @@ remain a faithful record.
 
 ---
 
+## 2026-06-06 — Pi 0.1.18 verified-live (README + marketplace-card rewrite)
+
+Olivia's mail 07ad3f2c arrived: bump @awebai/pi 0.1.17 → 0.1.18 from
+aweb b619aca. Scope: pi-extension/README.md fully rewritten for
+cold-reader Pi users (no aweb background) + package.json description
+field rewrite ("Lets your Pi communicate with other AI agents on an
+open network…"). Juan-authored, greenlit directly — Sofia/Athena
+framing review chain bypassed explicitly per author. SKILL.md
+content unchanged (Wave 5 sync from aapy still canonical).
+
+Discipline notes captured in flight:
+- Olivia called out unrelated WIP in working tree
+  (atomic-address-claim, team_bootstrap.go, ratelimit.py,
+  dns_addresses.py, registry_register_test.go, cli-command-reference.md
+  — none hers, scope-creep risk). I confirmed back: ONLY
+  pi-extension/package.json staged for the bump. Verified via
+  `git diff --cached --name-only` returning that single file before
+  commit.
+- Bump commit fba2108 is narrow: 1 file, 1 insertion, 1 deletion.
+- Tag pi-v0.1.18 pushed individually (banked policy).
+- GHA pi-release.yml run 27061497123 success — sync-skills + build +
+  version-check + npm publish.
+
+Content-verify against canonical:
+- README.md byte-identical to `git show b619aca:pi-extension/README.md`
+  (sha256 bfae69022014f6b1085e49c17210114242e545f4fdd88774e7e70f377a3d21fe).
+- package.json description matches Olivia's spec verbatim.
+- All 5 SKILL.md hashes (aweb-identity, aweb-team-membership,
+  aweb-messaging, aweb-bootstrap, aweb-coordination) byte-identical
+  to `git show b619aca:skills/<skill>/SKILL.md`. Wave 5 sync intact —
+  Pi tarball still carries the aapy in-repo bootstrap content from
+  b78fc79.
+
+Verified-live mail 9d1ff678-e0d5-49c8-84dc-9e0830ff270e sent to
+Olivia + Grace + Athena + Sofia + Iris + Aida with 4-point standard
+shape (fixed / not fixed / evidence / live check) plus full live
+matrix. Olivia (mail 9c8fe60e) ACK'd plan and is standing by to run
+her independent verify-after — npm pack + diff README + description
++ 5 SKILL hashes against b619aca canonical — to close.
+
+Marketplace.json (claude-plugins repo) NOT bumped — Pi is not a
+Claude Code plugin; only @awebai/claude-channel and
+@awebai/claude-skills are. Pi installs from npm direct via Pi's own
+extension system.
+
+Task #255 closed.
+
+---
+
 ## 2026-06-03 — first external multi-agent customer detected (andi.aweb.ai)
 
 Bertha pinged in chat asking how to reach `andi.aweb.ai/coord`
