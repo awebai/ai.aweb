@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 13:55Z (Aida framing-pass closed)
+Last updated: 2026-06-03 14:05Z (Claude marketplace hold recorded)
 
 ## How this file works
 
@@ -72,7 +72,13 @@ execution is not yet visible from Sofia's surface.
 
 Submission readiness from last live planning was: B.1/B.2/B.7 READY;
 B.3 no longer blocked by npm package availability; B.4, B.5, B.6, B.8
-staged. See logbook §"Long-fruit submission cluster" for full state.
+staged. **Update 2026-06-03:** Claude marketplace submissions are on hold.
+Athena routed to Grace after Juan confirmed stale/wrong skills: `@awebai/claude-skills@0.2.11`
+aweb-bootstrap still says `aw team bootstrap` instead of current aw agents
+lifecycle, and channel configure skill still says deprecated `aw run claude`.
+Do not proceed until Grace publishes/identifies corrected package versions or
+an exact source commit for rematerialization; then run validation/provenance
+flow before submission. See logbook §"Long-fruit submission cluster" for full state.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
