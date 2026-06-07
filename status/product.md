@@ -1,11 +1,11 @@
 # Product Status
-Last updated: 2026-06-03 14:30Z (Claude configure exact behavior folded)
+Last updated: 2026-06-03 14:40Z (Claude missing-workspace guidance hold tightened)
 
 ## Current focus
 - **Production release state:** AC v0.5.59 is tagged/built but not deployed; app.aweb.ai still reports v0.5.58 / aweb 1.26.1. Hestia owns deploy/live-verify once Juan confirms Render env and clicks deploy.
 - **Engineering risk tracked with Athena:** aw 1.26.3 workspace-cleanup regression (#245) is live but pattern-specific. Root is read/status cleanup deleting server rows when a stale local `workspace_path` is missing. Fix-forward direction: status/read flows must not destructively delete server workspace/agent rows from local path nonexistence alone; require explicit cleanup/delete or stronger evidence.
 - **E2EE framing boundary:** receive-side package wave is live (channel 1.4.11, Pi 0.1.16), PyPI aweb 1.26.5 is published, but hosted custodial E2EE is not a live AC claim until v0.5.59 deploy + exact smoke. Hosted custodial/server-side messaging must not be described as E2E. Additional Athena caveat: aw 1.26.4 local encryption-key setup currently fails AWID publish against api.awid.ai 0.5.9 (`custody` extra_forbidden), so do not claim generic self-custodial E2EE readiness until fixed or explained.
-- **Outreach remains the company bottleneck:** long-fruit submission drafts exist and Iris has refreshed the outreach lane; actual submission/attempt rows are still unobserved from this pass. Claude marketplace submissions are held until Wave 4 corrected packages publish (expected channel 1.4.12 / skills 0.2.12), then rematerialization + provenance + strict validation must rerun.
+- **Outreach remains the company bottleneck:** long-fruit submission drafts exist and Iris has refreshed the outreach lane; actual submission/attempt rows are still unobserved from this pass. Claude marketplace submissions are held until Wave 4 corrected packages publish (expected channel 1.4.12 / skills 0.2.12), and current channel configure wording may need another source tweak before packaging; then rematerialization + provenance + strict validation must rerun.
 - **Direction context:** gbrain/corpus/omnigraph question is waiting on Juan; no product priority change until that answer lands.
 
 ## Product readiness
@@ -18,7 +18,7 @@ Last updated: 2026-06-03 14:30Z (Claude configure exact behavior folded)
 
 ## Outreach
 - Iris status (2026-05-26) says the active pivot is from authoring to distribution: audit parked artifacts, adapt beadhub-era source material against current aweb state, add Pi extension as Persona-3 promotion arc, derive v0.5.48 release-notes pack.
-- Long-fruit submission drafts are at `agents/sofia/.aw/drafts/submission-drafts-v0.md`; latest Sofia draft commit observed here is `fc7bbcb` retargeting to channel 1.4.10 / skills 0.2.10. `publishing/attempts.jsonl` has no observed rows yet. Hold Claude marketplace submissions: do not use channel 1.4.11 or skills 0.2.11. Expected Wave 4 corrected packages are channel 1.4.12 and skills 0.2.12. Exact channel configure fix at aweb `fb9ff8e9`: if `.aw/workspace.yaml` or `mcpServers.aweb` is missing, tell user to run `aw init --setup-channel`; show manual `.mcp.json` command `npx`, args `[@awebai/claude-channel]`, cwd `<project directory>`; if configured, tell user to launch Claude Code with `claude --dangerously-load-development-channels server:aweb`. Plugin install is README/install path, not core configure-skill fix.
+- Long-fruit submission drafts are at `agents/sofia/.aw/drafts/submission-drafts-v0.md`; latest Sofia draft commit observed here is `fc7bbcb` retargeting to channel 1.4.10 / skills 0.2.10. `publishing/attempts.jsonl` has no observed rows yet. Hold Claude marketplace submissions: do not use channel 1.4.11 or skills 0.2.11. Expected Wave 4 corrected packages are channel 1.4.12 and skills 0.2.12, but Juan/Athena flagged the current `fb9ff8e9` missing-workspace guidance as too broad. Marketplace/support wording should say: if workspace config is missing, first initialize or join through the correct team source (hosted new team, invite/API key, BYOT, or current-flow forwarding as applicable), then configure the channel. `aw init --setup-channel` is acceptable as one-step init+channel only when intended team source is clear. Source may need another Grace tweak before Wave 4 packaging.
 - Juan confirmation is still useful on cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.
 
 ## Support / user feedback
