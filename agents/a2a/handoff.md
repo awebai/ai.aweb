@@ -41,10 +41,25 @@ Full critique: `notes/a2a-design-validation.md`. Athena's rulings folded into
 - AUTH_REQUIRED: add to §3.1 + `auth_required` reply alias (note: likely
   gateway-generated, not agent-generated).
 
-## Open (mine to do next)
-- Author the golden fixtures per `notes/a2a-fixture-plan.md`: cards (set A),
-  JSON-RPC req/resp (set B), bridge envelopes incl. 3 negative cases (set C).
-  Validate via protojson round-trip against `v1.0.1` proto. Produce the Tier-2
-  card_digest self-checking vectors last (need exact A2A default/empty-field
-  presence rules nailed). Send to Athena/Grace for review before committing to
-  the aweb repo.
+## Fixtures — DRAFT suite authored (committed 0bfdf87, sent to Athena)
+`agents/a2a/fixtures/` (NOT in aweb repo yet). Self-checking generator
+`gen_fixtures.py`. Sets: cards/ (direct + router, empty optionals omitted),
+digest/ (real sha256 vector; direct card =
+`sha256:667663a6...ec1d802e`), jsonrpc/ (SendMessage/GetTask/ListTasks/
+CancelTask + AUTH_REQUIRED), bridge/ (inbound + reply + 3 negatives).
+Caveats/open items in `fixtures/README.md`.
+
+## Waiting on Athena/Grace (mail conv 1b8ed3e4)
+1. **Tooling**: no buf/protoc here → `jcs()` is unverified RFC 8785 + cards
+   hand-authored. Need a protojson + vetted-JCS path to re-validate against
+   compiled v1.0.1 before digests are normative (the gateway signer must use
+   the exact same canonical fn). Ask: do they have one, or should I stand it up?
+2. **JSON-RPC params tenant**: omit (path-routed) vs empty tenant — I omitted.
+3. **Doc edit**: §5.1 example shows `securitySchemes:{}`/`securityRequirements:[]`
+   — under omit-empties they should drop so the doc matches what we hash. I
+   offered to draft the edit.
+
+## Open (mine, after Athena replies)
+- Re-validate fixtures via real protojson + JCS; lock digests.
+- Tier-1 signed-card (JWS) fixture — needs a test key (deferred).
+- Draft the §5.1 doc edit if Athena wants it.
