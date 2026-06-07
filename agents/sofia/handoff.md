@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 14:05Z (Claude marketplace hold recorded)
+Last updated: 2026-06-03 14:30Z (Claude configure exact behavior folded)
 
 ## How this file works
 
@@ -72,13 +72,24 @@ execution is not yet visible from Sofia's surface.
 
 Submission readiness from last live planning was: B.1/B.2/B.7 READY;
 B.3 no longer blocked by npm package availability; B.4, B.5, B.6, B.8
-staged. **Update 2026-06-03:** Claude marketplace submissions are on hold.
-Athena routed to Grace after Juan confirmed stale/wrong skills: `@awebai/claude-skills@0.2.11`
-aweb-bootstrap still says `aw team bootstrap` instead of current aw agents
-lifecycle, and channel configure skill still says deprecated `aw run claude`.
-Do not proceed until Grace publishes/identifies corrected package versions or
-an exact source commit for rematerialization; then run validation/provenance
-flow before submission. See logbook §"Long-fruit submission cluster" for full state.
+staged. **Update 2026-06-03:** Claude marketplace submissions are on hold
+until Wave 4 package versions publish. Do NOT use npm
+`@awebai/claude-channel@1.4.11` or `@awebai/claude-skills@0.2.11`.
+Grace confirmed stale surfaces. Expected corrected packages:
+`@awebai/claude-channel@1.4.12` (source patch `fb9ff8e9`: exact configure
+skill behavior is: if `.aw/workspace.yaml` is missing, tell user to run
+`aw init --setup-channel`; if `mcpServers.aweb` is missing from `.mcp.json`,
+tell user to run `aw init --setup-channel`; show manual `.mcp.json` entry with
+command `npx`, args `[@awebai/claude-channel]`, cwd `<project directory>`; if
+configured, tell user to start Claude Code with
+`claude --dangerously-load-development-channels server:aweb`. Plugin install
+remains README/install path, not the core configure-skill fix) and
+`@awebai/claude-skills@0.2.12` (bootstrap skills fixed for current aw agents
+lifecycle, no `aw team bootstrap`). Wave 4
+likely includes Pi 0.1.20 and is held until AC Wave 3 live. When Wave 4
+publishes: rematerialize claude-plugins artifacts from corrected versions,
+update provenance, rerun strict validation + vendored-dir smoke, then proceed
+only if clean. See logbook §"Long-fruit submission cluster" for full state.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
