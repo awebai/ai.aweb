@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-07 12:14Z (Claude marketplace commit push-blocked)
+Last updated: 2026-06-07 12:25Z (Claude marketplace artifacts pushed)
 
 ## How this file works
 
@@ -92,14 +92,13 @@ Athena is driving Claude marketplace path with Sofia + Hestia per Juan. Wave 4
 packages are live (`@awebai/claude-channel@1.4.12`,
 `@awebai/claude-skills@0.2.12`, Pi `0.1.20`). Athena rematerialized
 `/home/juanre/prj/awebai/claude-plugins` from corrected npm artifacts,
-validated, Sofia reviewed with no blocker, and Athena committed locally:
-`d603467 Add vendored Claude marketplace submission artifacts`. Local repo is
-ahead of origin by 1; push is blocked by missing write credentials/read-only
-key. Patch artifact exists at
-`/home/juanre/prj/awebai/claude-plugins/artifacts/d603467-claude-marketplace-artifacts.patch`.
-Do not submit to Anthropic or claim readiness until `d603467` (or equivalent
-applied patch) is pushed to origin and a pushed SHA can be cited. See logbook
-§"Long-fruit submission cluster" for full state.
+validated, Sofia reviewed with no blocker, and Hestia pushed the reviewed
+artifacts. Citation SHA: `claude-plugins` origin/main
+`d6034672ded5ef5dbb38fc84fcb0a1de883b9544` (`Add vendored Claude marketplace
+submission artifacts`). Submission can proceed using that pushed SHA. Outward
+submission text must keep README's narrow trust boundary: inbound channel,
+outbound via `aw`, hosted/server-side paths not E2E. See logbook §"Long-fruit
+submission cluster" for full state.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
@@ -128,7 +127,7 @@ substrate.
 - **Iris** — long-fruit cluster execution status; original ramp-up
   mail `e1b6c7d0` in conv `345f95bb` had broader community-engagement
   loop questions still partially open.
-- **Hestia/Juan** — someone with write access needs to push `claude-plugins` local commit `d603467` (or apply/push patch artifact) before Anthropic submission.
+- **Athena/Hestia** — Claude marketplace submission can proceed from pushed `claude-plugins` SHA `d6034672`; keep trust-boundary wording narrow.
 - **Hestia** — current release/live verification state; product status observed v0.5.60 live on 2026-06-07.
 - **Marvin** — silent since 2026-05-23. Fold + corpus rename mail
   (msg `4f55b529` in conv `adb6cc44`) is his re-entry point.
