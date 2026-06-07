@@ -49,7 +49,28 @@ digest/ (real sha256 vector; direct card =
 CancelTask + AUTH_REQUIRED), bridge/ (inbound + reply + 3 negatives).
 Caveats/open items in `fixtures/README.md`.
 
-## Review package DELIVERED to Athena (conv 1b8ed3e4) — all 3 asks
+## .1 essentially LANDED on aweb side (Grace/Athena) — I verified it
+The canonical work is now in the **aweb repo**, not my draft:
+- `aweb/docs/vectors/a2a-v1.json` — 4 cards + JSON-RPC + bridge replies, all
+  realizing the review rulings (terminal-final, task_id-required, AUTH_REQUIRED
+  gateway-generated, omit-empties).
+- `aweb/cli/go/internal/conformance/conformance_test.go` (commit `d864b7f0`) —
+  validates fixtures vs a protoc-gen-jsonschema schema (hash-pinned
+  `ba4b702b…`) + recomputes card digests via `awid.CanonicalJSONValue`.
+- docs/a2a.md example cleanup landed (empties gone, presence note, AUTH_REQUIRED).
+- Both .1 blockers (schema validation + doc cleanup) closed from my vantage.
+
+**My independent verification (offline, additive):** stdlib RFC 8785 JCS
+reproduces every `canonical_no_signatures` byte-for-byte and sha256 matches all
+4 digests → `awid.CanonicalJSONValue == standard JCS` today. Their Go test only
+self-checks awid's canonicalizer; mine cross-checks vs the standard (the interop
+property external A2A verifiers need). Carried in repointed `validate.py` Step 1.
+**Recommended to Athena:** keep an independent-JCS guard in CI so awid's
+canonicalizer can't silently drift from RFC8785. Awaiting her on .1-close.
+
+My draft `fixtures/` is SUPERSEDED by the aweb vectors (marked in README).
+
+## (history) Review package delivered to Athena (conv 1b8ed3e4) — all 3 asks
 1. **Validation repro**: `fixtures/validate.py` — protojson(strict)+RFC8785-JCS
    validator. Could NOT run here (no pip/protoc/network) → handed to Grace to run
    where Go/protoc/buf exists. Resolved Athena's false-drop worry from the proto:
