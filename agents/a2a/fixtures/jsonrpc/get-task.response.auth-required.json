@@ -1,0 +1,22 @@
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "result": {
+    "id": "t_789",
+    "contextId": "c_456",
+    "status": {
+      "state": "TASK_STATE_AUTH_REQUIRED",
+      "message": {
+        "messageId": "gw-001",
+        "role": "ROLE_AGENT",
+        "taskId": "t_789",
+        "parts": [
+          {
+            "text": "Authentication required to access order history."
+          }
+        ]
+      },
+      "timestamp": "2026-06-07T10:01:00Z"
+    }
+  }
+}

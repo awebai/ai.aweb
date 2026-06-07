@@ -1,0 +1,12 @@
+{
+  "_expect": "REJECTED: reply task_id does not match any open task for this thread; gateway ignores, task state unchanged",
+  "task_id": "t_999",
+  "context_id": "c_456",
+  "state": "completed",
+  "artifacts": [
+    {
+      "type": "text",
+      "text": "wrong task"
+    }
+  ]
+}

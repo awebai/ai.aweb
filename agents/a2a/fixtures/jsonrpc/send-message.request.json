@@ -1,0 +1,22 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "SendMessage",
+  "params": {
+    "message": {
+      "messageId": "msg-001",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "text": "Where is order 1234?"
+        }
+      ]
+    },
+    "configuration": {
+      "returnImmediately": true,
+      "acceptedOutputModes": [
+        "text/plain"
+      ]
+    }
+  }
+}

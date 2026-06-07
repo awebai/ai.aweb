@@ -1,0 +1,43 @@
+{
+  "name": "Acme Help",
+  "description": "Customer support agent for Acme products.",
+  "provider": {
+    "organization": "Acme",
+    "url": "https://acme.com"
+  },
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "https://aweb.ai/a2a/ext/awid-publication/v1",
+        "description": "AWID publication and delegation metadata"
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "supportedInterfaces": [
+    {
+      "url": "https://acme.com/a2a/agents/r_help_01/rpc",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "skills": [
+    {
+      "id": "order-status",
+      "name": "Order status",
+      "description": "Look up order status from an order ID.",
+      "tags": [
+        "support",
+        "orders"
+      ]
+    }
+  ]
+}

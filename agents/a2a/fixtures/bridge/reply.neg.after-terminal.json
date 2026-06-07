@@ -1,0 +1,12 @@
+{
+  "_expect": "IGNORED: task already TASK_STATE_FAILED (timeout); late reply must not mutate a terminal task; ignore+log or start new task by policy",
+  "task_id": "t_123",
+  "context_id": "c_456",
+  "state": "completed",
+  "artifacts": [
+    {
+      "type": "text",
+      "text": "late answer after timeout"
+    }
+  ]
+}

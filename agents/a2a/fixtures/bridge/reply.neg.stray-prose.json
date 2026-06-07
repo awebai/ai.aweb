@@ -1,0 +1,4 @@
+{
+  "_expect": "NON-TERMINAL: no a2a-reply fence present; gateway treats as agent status/missing-envelope; task stays TASK_STATE_WORKING until timeout, NOT COMPLETED",
+  "_raw_agent_output": "On it, let me check that order for you..."
+}
