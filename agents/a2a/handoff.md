@@ -21,20 +21,30 @@ protocol-conformance side of epic `aweb-aaqa` / gate `aweb-aaqa.1`.
   (`3303592...`), file `specification/a2a.proto` (package `lf.a2a.v1`).
   JSON Schema is generated from the proto. Pin the tag, not `main`.
 
-## Waiting on Athena (sent via mail)
-1. **Task-tracking gap**: epic `aweb-aaqa` / `aweb-aaqa.1` referenced in my
-   AGENTS.md + her welcome brief **do not exist as `aw` tasks** in team
-   `default:aweb.ai` (IDs run `default-aaaa..aaaj`; no `aaqa`). Need to know
-   whether to create them (and under what real ID) or whether they live
-   elsewhere. Did NOT create — IDs are auto-assigned, can't force `aaqa`.
-2. **Small pin/gap items** for the contract (none block sign-off):
-   - `TASK_STATE_AUTH_REQUIRED` missing from §3.1 list + §10.2 reply mapping.
-   - Make interface `protocolVersion="1.0"` vs agent `version="1.0.0"`
-     explicit in fixtures.
-   - Product decision: v1.0-only vs accept 0.3 JSON-RPC aliases for inbound
-     compat (live SDKs still speak 0.3). Flag to Sofia too.
+## Task home (RESOLVED)
+- Canonical `aweb-aaqa`/`aweb-aaqa.1` live in dev-team `aweb:juan.aweb.ai`
+  (invisible from company team — expected boundary). My company-side mirror is
+  **`default-aaak`** (in_progress). Send findings to Athena/Grace; she bridges
+  them into the dev task.
+
+## Design validation — DONE, all 6 issues accepted by Athena
+Full critique: `notes/a2a-design-validation.md`. Athena's rulings folded into
+`notes/a2a-fixture-plan.md`. Summary of decisions:
+- #1 reply→task: a2a-reply REQUIRES `task_id` (+context_id when avail);
+  one-thread-per-task design; mismatched task_id rejected.
+- #2 unfenced→completed: forbidden. Unfenced = non-terminal/missing-envelope,
+  stays WORKING until timeout. Terminal requires a2a-reply.
+- #3 late reply after terminal: ignored/logged/new-task; never mutates terminal.
+- #4 card_digest: `sha256:<lowercase-hex>` over A2A card-signature canonical
+  bytes (JCS, signatures absent). Blocking for Tier-2 vectors only.
+- #5 wake path / #6 AWID sequencing: implementation gates, not fixture blockers.
+- AUTH_REQUIRED: add to §3.1 + `auth_required` reply alias (note: likely
+  gateway-generated, not agent-generated).
 
 ## Open (mine to do next)
-- Draft golden fixtures from `v1.0.1` proto: hosted default card, BYOT card,
-  router card, `SendMessage` + `GetTask` JSON-RPC req/resp. Hold until
-  Athena confirms task home + the AUTH_REQUIRED/compat decisions.
+- Author the golden fixtures per `notes/a2a-fixture-plan.md`: cards (set A),
+  JSON-RPC req/resp (set B), bridge envelopes incl. 3 negative cases (set C).
+  Validate via protojson round-trip against `v1.0.1` proto. Produce the Tier-2
+  card_digest self-checking vectors last (need exact A2A default/empty-field
+  presence rules nailed). Send to Athena/Grace for review before committing to
+  the aweb repo.
