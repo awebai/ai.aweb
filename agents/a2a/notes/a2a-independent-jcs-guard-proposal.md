@@ -65,3 +65,17 @@ strictly worse for a one-line equality check.
 
 ## Effort
 ~1 dependency add + ~6 lines in an existing test loop. Low.
+
+## Dependency health check — `github.com/gowebpki/jcs` (verified 2026-06-07)
+Pre-clears Athena's precondition before adoption under `aweb-aaqa.11`:
+- **API**: `func Transform(jsonData []byte) ([]byte, error)` — matches the sketch.
+- **Runtime deps**: stdlib only (`container/list, errors, fmt, strconv, strings,
+  unicode/utf16`). No external runtime dependency tree.
+- **go.mod require**: only `github.com/stretchr/testify v1.7.0` — TEST-scoped;
+  aweb's Go module almost certainly already pulls testify. Confirm at adoption;
+  if absent it's a trivial standard add, not a heavy tree.
+- **License**: Apache-2.0 (permissive, compatible).
+- **Health**: 0 open issues, not archived, `go 1.15`+; last push Oct 2023.
+  Low churn is expected — RFC 8785 is a frozen spec, so a vector-passing
+  canonicalizer is "done", not abandoned. Acceptable, low-risk pick.
+Re-verify version/API at adoption time; pin a specific tag.
