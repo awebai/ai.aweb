@@ -49,7 +49,20 @@ digest/ (real sha256 vector; direct card =
 CancelTask + AUTH_REQUIRED), bridge/ (inbound + reply + 3 negatives).
 Caveats/open items in `fixtures/README.md`.
 
-## .1 essentially LANDED on aweb side (Grace/Athena) — I verified it
+## aweb-aaqa.1 CLOSED (Athena, 2026-06-07)
+Closed by Grace's `d864b7f0` + protojson evidence. I verified the landed work
+(below) and delivered a scoped follow-on. Epic `aweb-aaqa` continues.
+
+### Parked follow-ons (mine, awaiting Athena's scheduling/priority)
+- **Independent-JCS guard** — proposal in
+  `notes/a2a-independent-jcs-guard-proposal.md`. One `awid==RFC8785` equality
+  assertion via `gowebpki/jcs` in the existing Go conformance loop. Follow-on
+  candidate, NOT a .1 reopen. Ready to implement on Athena's go.
+- **Tier-1 / signed-card (JWS) fixture** — BLOCKED on a chosen test-key shape
+  (Athena: do not start until then).
+- **A2A spec-watch** — pinned at `v1.0.1`; watch for v1.0.x/1.1 changes.
+
+## .1 landed work I verified (now on aweb side)
 The canonical work is now in the **aweb repo**, not my draft:
 - `aweb/docs/vectors/a2a-v1.json` — 4 cards + JSON-RPC + bridge replies, all
   realizing the review rulings (terminal-final, task_id-required, AUTH_REQUIRED
