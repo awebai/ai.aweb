@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 15:00Z (Athena driving Claude marketplace review)
+Last updated: 2026-06-07 12:14Z (Claude marketplace commit push-blocked)
 
 ## How this file works
 
@@ -88,13 +88,18 @@ server:aweb`. Athena's grep at `63d77176` found no stale `aw run claude`,
 `aw team bootstrap`, or `aweb-team-dev-review` refs in channel/skills. Skills
 package also needs bootstrap fixed for current aw agents lifecycle, no `aw team
 bootstrap`. Wave 4 likely includes Pi 0.1.20 and is held until AC Wave 3 live.
-Athena is driving Claude marketplace path with Sofia + Hestia per Juan. Keep
-claude-plugins working tree parked until corrected npm versions exist. After
-Hestia confirms Wave 4 publish: rematerialize vendored dirs from corrected npm
-artifacts only, update provenance, rerun strict validation + artifact/smoke
-checks, then send Athena the rematerialized diff + validation output for
-review/package-check **before commit or submission**. Proceed only if clean and
-Athena-reviewed. See logbook §"Long-fruit submission cluster" for full state.
+Athena is driving Claude marketplace path with Sofia + Hestia per Juan. Wave 4
+packages are live (`@awebai/claude-channel@1.4.12`,
+`@awebai/claude-skills@0.2.12`, Pi `0.1.20`). Athena rematerialized
+`/home/juanre/prj/awebai/claude-plugins` from corrected npm artifacts,
+validated, Sofia reviewed with no blocker, and Athena committed locally:
+`d603467 Add vendored Claude marketplace submission artifacts`. Local repo is
+ahead of origin by 1; push is blocked by missing write credentials/read-only
+key. Patch artifact exists at
+`/home/juanre/prj/awebai/claude-plugins/artifacts/d603467-claude-marketplace-artifacts.patch`.
+Do not submit to Anthropic or claim readiness until `d603467` (or equivalent
+applied patch) is pushed to origin and a pushed SHA can be cited. See logbook
+§"Long-fruit submission cluster" for full state.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
@@ -123,7 +128,8 @@ substrate.
 - **Iris** — long-fruit cluster execution status; original ramp-up
   mail `e1b6c7d0` in conv `345f95bb` had broader community-engagement
   loop questions still partially open.
-- **Hestia** — v0.5.59 deploy/live-verify after Juan env confirm + Render click.
+- **Hestia/Juan** — someone with write access needs to push `claude-plugins` local commit `d603467` (or apply/push patch artifact) before Anthropic submission.
+- **Hestia** — current release/live verification state; product status observed v0.5.60 live on 2026-06-07.
 - **Marvin** — silent since 2026-05-23. Fold + corpus rename mail
   (msg `4f55b529` in conv `adb6cc44`) is his re-entry point.
 

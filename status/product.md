@@ -1,33 +1,33 @@
 # Product Status
-Last updated: 2026-06-03 15:00Z (Athena driving Claude marketplace review)
+Last updated: 2026-06-07 12:14Z (Claude marketplace push-block folded)
 
 ## Current focus
-- **Production release state:** AC v0.5.59 is tagged/built but not deployed; app.aweb.ai still reports v0.5.58 / aweb 1.26.1. Hestia owns deploy/live-verify once Juan confirms Render env and clicks deploy.
-- **Engineering risk tracked with Athena:** aw 1.26.3 workspace-cleanup regression (#245) is live but pattern-specific. Root is read/status cleanup deleting server rows when a stale local `workspace_path` is missing. Fix-forward direction: status/read flows must not destructively delete server workspace/agent rows from local path nonexistence alone; require explicit cleanup/delete or stronger evidence.
-- **E2EE framing boundary:** receive-side package wave is live (channel 1.4.11, Pi 0.1.16), PyPI aweb 1.26.5 is published, but hosted custodial E2EE is not a live AC claim until v0.5.59 deploy + exact smoke. Hosted custodial/server-side messaging must not be described as E2E. Additional Athena caveat: aw 1.26.4 local encryption-key setup currently fails AWID publish against api.awid.ai 0.5.9 (`custody` extra_forbidden), so do not claim generic self-custodial E2EE readiness until fixed or explained.
-- **Outreach remains the company bottleneck:** long-fruit submission drafts exist and Iris has refreshed the outreach lane; actual submission/attempt rows are still unobserved from this pass. Claude marketplace submissions are held until Wave 4 corrected packages publish (expected channel 1.4.12 / skills 0.2.12 from aweb 63d77176 or later). Athena is driving review: after rematerialization/provenance/strict validation, Sofia routes diff + validation to Athena before commit or submission.
+- **Production release state:** app.aweb.ai is live healthy at `v0.5.60`, git `2cf21f23`, aweb `1.26.8`, awid_service `0.5.10`; api.awid.ai reports `0.5.10`.
+- **Claude marketplace submissions:** Wave 4 packages are live (`@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, Pi `0.1.20`). Athena rematerialized/reviewed `claude-plugins` artifacts locally and committed `d603467`, but push is blocked by missing write credentials. No Anthropic submission or readiness claim until `d603467` (or equivalent applied patch) is pushed to origin and we can cite the pushed SHA.
+- **E2EE framing boundary:** keep claims narrow to smoked surfaces. Hosted/server-side messaging must not be called E2E; do not make broad generic self-custodial E2EE readiness claims unless the AWID encryption-key publish skew Athena flagged is fixed/explained.
+- **Engineering risk tracked with Athena:** aw 1.26.3 workspace-cleanup regression (#245) remains the customer-risk pattern to track for CLI/workspace-cleanup-adjacent work: read/status flows must not destructively delete server workspace/agent rows from stale local paths.
 - **Direction context:** gbrain/corpus/omnigraph question is waiting on Juan; no product priority change until that answer lands.
 
 ## Product readiness
-- **OSS aweb / PyPI:** `aweb==1.26.5` published.
-- **aw CLI npm:** `@awebai/aw@1.26.4` published.
-- **Channel / skills / Pi:** `@awebai/claude-channel@1.4.11`, `@awebai/claude-skills@0.2.10`, `@awebai/pi@0.1.16` published.
-- **aweb-cloud:** live health check 2026-06-03 13:28Z reports `release_tag=v0.5.58`, `git_sha=340122ef`, `aweb_version=1.26.1`, `awid_service_version=0.5.9`, healthy. v0.5.59 GHCR image/tag is awaiting Juan deploy per Hestia.
-- **awid registry:** `https://api.awid.ai/health` reports `version=0.5.9`, ok.
-- **Landing site:** latest restructure verified-live per Hestia/Olivia; no direction action unless Iris's trinity-leak pass finds stale copy.
+- **OSS aweb / PyPI:** `aweb==1.26.8` published.
+- **aw CLI npm:** `@awebai/aw@1.26.8` published.
+- **Channel / skills / Pi:** `@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, `@awebai/pi@0.1.20` published.
+- **aweb-cloud:** live health check 2026-06-07 12:14Z reports `release_tag=v0.5.60`, `git_sha=2cf21f23`, `aweb_version=1.26.8`, `awid_service_version=0.5.10`, healthy.
+- **awid registry:** `https://api.awid.ai/health` reports `version=0.5.10`, ok.
+- **Landing site:** latest restructure verified-live per prior Hestia/Olivia state; no direction action unless Iris's trinity-leak pass finds stale copy.
 
 ## Outreach
-- Iris status (2026-05-26) says the active pivot is from authoring to distribution: audit parked artifacts, adapt beadhub-era source material against current aweb state, add Pi extension as Persona-3 promotion arc, derive v0.5.48 release-notes pack.
-- Long-fruit submission drafts are at `agents/sofia/.aw/drafts/submission-drafts-v0.md`; latest Sofia draft commit observed here is `fc7bbcb` retargeting to channel 1.4.10 / skills 0.2.10. `publishing/attempts.jsonl` has no observed rows yet. Hold Claude marketplace submissions: do not use channel 1.4.11 or skills 0.2.11. Expected Wave 4 corrected packages are channel 1.4.12 and skills 0.2.12. Channel configure source fix landed at aweb `63d77176`; Wave 4 package source should be this commit or later. Keep claude-plugins working tree parked until corrected npm versions exist. After Hestia confirms publish, rematerialize from package artifacts, update provenance, run strict validation + artifact/smoke checks, and send Athena diff + validation for review before committing/submitting.
-- Juan confirmation is still useful on cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.
+- Claude marketplace path is the active long-fruit lane. Local `claude-plugins` commit `d603467` adds vendored community-submission artifacts rematerialized from corrected npm packages and validated by Athena/Sofia, but origin push is blocked. Patch artifact exists at `/home/juanre/prj/awebai/claude-plugins/artifacts/d603467-claude-marketplace-artifacts.patch`.
+- `publishing/attempts.jsonl` has no observed submission rows yet. Do not add submission attempts until the claude-plugins commit is pushed and actual submission occurs.
+- Juan confirmation is still useful on broader cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.
 
 ## Support / user feedback
 - No new external customer feedback observed in this pass.
 - Prior concrete evidence remains Pepe-anonymous autonomous-install friction-to-ship arc and internal dogfood release smokes.
-- #245 is the live customer-risk item: recovered affected pmbah team; acceptance for fix is missing local path does not delete rows during `aw workspace status`, explicit cleanup/delete still works for truly gone ephemeral workspaces, persistent/global identities are never deleted by stale-path cleanup, pmbah rename regression covered, release notes warn 1.26.3 users who renamed worktree roots.
+- #245 acceptance to preserve: missing local path does not delete rows during `aw workspace status`, explicit cleanup/delete still works for truly gone ephemeral workspaces, persistent/global identities are never deleted by stale-path cleanup, pmbah rename regression covered, release notes warn 1.26.3 users who renamed worktree roots.
 
 ## Priorities
-1. **Hold outward E2EE claims narrow.** No broad “E2EE is live” or generic self-custodial E2EE readiness claim; only claim exact smoked surfaces after v0.5.59 live evidence and AWID publish skew is resolved/explained.
-2. **Track #245 fix-forward before CLI/workspace-cleanup-adjacent ships.** Direction agrees with Athena: read/status commands should not be destructive lifecycle operations.
-3. **Restart distribution execution with Iris once the release boundary is clear.** Submissions/attempts need actual rows, not just drafts.
+1. **Get `claude-plugins` commit `d603467` pushed by someone with write access** (or equivalent patch applied/pushed), then proceed to Anthropic submission with pushed SHA provenance.
+2. **Keep outward E2EE claims narrow** to exact smoked surfaces; no broad “E2EE is live” or hosted/server-side E2E claim.
+3. **Track #245 fix-forward before CLI/workspace-cleanup-adjacent ships.** Direction agrees with Athena: read/status commands should not be destructive lifecycle operations.
 4. **Resolve Juan's gbrain/corpus/omnigraph direction question before turning it into product or outreach positioning.**
