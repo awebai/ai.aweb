@@ -1,7 +1,19 @@
-# A2A v1.0 golden fixtures — DRAFT (for Athena/Grace review)
+# A2A v1.0 golden fixtures — SUPERSEDED scratch
 
-Status: **draft, not yet normative.** Authored by a2a for `default-aaak` /
-dev-team `aweb-aaqa.1`. Do not land in the aweb repo until reviewed.
+> **SUPERSEDED (2026-06-07).** The canonical golden vectors now live in the aweb
+> repo at `docs/vectors/a2a-v1.json`, validated by a Go conformance test
+> (`cli/go/internal/conformance/conformance_test.go`, commit `d864b7f0`) against
+> a JSON schema generated from the pinned A2A proto. These draft card/JSON-RPC/
+> bridge files are kept only as provenance; do NOT treat them as authoritative.
+>
+> The one still-useful tool here is **`validate.py`**, repointed at the canonical
+> `docs/vectors/a2a-v1.json`. Its Step 1 is an INDEPENDENT RFC 8785 JCS +
+> sha256 cross-check of every card digest — complementary to the aweb Go test,
+> which canonicalizes with aweb's own `awid.CanonicalJSONValue`. Step 1 confirms
+> `awid.CanonicalJSONValue` agrees byte-for-byte with standard JCS (the property
+> external A2A verifiers depend on). a2a ran it 2026-06-07: all 4 cards pass.
+
+Status of the original draft below: **draft, not normative.** Kept for history.
 
 ## Source pin
 `github.com/a2aproject/A2A` tag **`v1.0.1`**, commit

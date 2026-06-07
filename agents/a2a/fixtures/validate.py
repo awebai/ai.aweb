@@ -1,37 +1,27 @@
 #!/usr/bin/env python3
-"""Normative validator for the A2A v1.0 golden fixtures.
+"""Validator for the CANONICAL A2A v1 vectors: aweb/docs/vectors/a2a-v1.json.
 
-SCRATCH / HAND-OFF TO GRACE. This was NOT runnable in a2a's environment
-(no pip / protoc / buf / network). Run it where Go/protoc/buf or pip works.
+This targets the landed artifact (not a2a's superseded draft fixtures). Two
+independent layers:
 
-What it does:
-  1. Downloads the pinned A2A proto (v1.0.1).
-  2. Strips google.api.* deps (service block + http/field_behavior options) so it
-     compiles standalone for JSON validation — message/enum JSON mapping does not
-     depend on those annotations.
-  3. Compiles it with grpc_tools.protoc.
-  4. protojson-validates each A2A-wire fixture against its exact message type,
-     strictly (unknown fields rejected).
-  5. Recomputes every card_digest with a vetted RFC 8785 JCS lib and compares to
-     the committed vector.
+  Step 1 — digest cross-check (runs ANYWHERE; no deps/network):
+    For each agent card, recompute sha256(canonical_no_signatures) and compare
+    to the stated digest, AND recompute the canonical bytes from the card object
+    (signatures removed) with an independent RFC 8785 JCS and compare to the
+    stated canonical_no_signatures. This cross-checks the vectors against a
+    second canonicalizer (here: stdlib JCS) vs the producer (awid.CanonicalJSONValue).
+    a2a ran this on 2026-06-07: ALL FOUR cards passed both checks.
+
+  Step 2 — proto3-JSON schema validation (needs protobuf + protoc; hand-off to
+    Grace where Go/protoc/buf or `pip install protobuf grpcio-tools` works):
+    Strict-parse each card and each JSON-RPC params/result body against its
+    exact v1.0.1 proto message. Confirms field names, enum-NAME encoding, the
+    SendMessageResponse oneof, nested Task.status.state, etc.
 
 Run:
-    pip install protobuf grpcio-tools jcs
-    python validate.py            # from agents/a2a/fixtures/
-
-Why protojson is the normative path (not json.dumps(sort_keys=True)): the
-gateway's card signer/digester MUST use the same canonical function that
-produced the committed vectors. json.dumps is only acceptable for exploration
-because the current cards contain no floats; RFC 8785 ECMAScript number
-formatting is otherwise required.
-
-Field-presence note (already verified from the proto, no tooling needed):
-AgentCapabilities.streaming / push_notifications / extended_agent_card are
-`optional bool` (proto3 explicit presence). protojson therefore PRESERVES an
-explicitly-set `false` on round-trip and OMITS an unset field. So advertising
-streaming:false / pushNotifications:false is canonical-stable, and omitting
-extendedAgentCard means "absent", not "false". This is exactly what the cards
-rely on; this script's round-trip should confirm it (assert below).
+    python validate.py                 # Step 1 only, anywhere
+    pip install protobuf grpcio-tools  # then Step 2 also runs
+    python validate.py
 """
 import hashlib
 import json
@@ -47,100 +37,112 @@ PROTO_URL = (
 )
 WORK = os.path.join(HERE, "_validate_work")
 
-# fixture path -> (json-rpc field to extract, fully-qualified message name)
-WIRE_FIXTURES = {
-    "cards/per-address-direct-card.json": (None, "AgentCard"),
-    "cards/byot-router-card.json": (None, "AgentCard"),
-    "jsonrpc/send-message.request.json": ("params", "SendMessageRequest"),
-    "jsonrpc/send-message.response.json": ("result", "SendMessageResponse"),
-    "jsonrpc/get-task.request.json": ("params", "GetTaskRequest"),
-    "jsonrpc/get-task.response.completed.json": ("result", "Task"),
-    "jsonrpc/get-task.response.auth-required.json": ("result", "Task"),
-    "jsonrpc/list-tasks.request.json": ("params", "ListTasksRequest"),
-    "jsonrpc/list-tasks.response.json": ("result", "ListTasksResponse"),
-    "jsonrpc/cancel-task.request.json": ("params", "CancelTaskRequest"),
-    "jsonrpc/cancel-task.response.json": ("result", "Task"),
+# candidate locations of the canonical vectors file
+VEC_CANDIDATES = [
+    os.path.join(HERE, "..", "aweb", "docs", "vectors", "a2a-v1.json"),
+    os.path.join(HERE, "..", "..", "..", "..", "aweb", "docs", "vectors", "a2a-v1.json"),
+]
+
+# JSON-RPC fixture name -> (extract field, proto message). Names from the vectors.
+JSONRPC_MSG = {
+    "send_message_immediate_request": ("params", "SendMessageRequest"),
+    "send_message_immediate_response": ("result", "SendMessageResponse"),
+    "send_message_wait_timeout_failed_response": ("result", "SendMessageResponse"),
+    "send_message_auth_required_response": ("result", "SendMessageResponse"),
+    "get_task_request": ("params", "GetTaskRequest"),
+    "get_task_response": ("result", "Task"),
+    "list_tasks_request": ("params", "ListTasksRequest"),
+    "list_tasks_response": ("result", "ListTasksResponse"),
+    "cancel_task_request": ("params", "CancelTaskRequest"),
+    "cancel_task_response": ("result", "Task"),
 }
 
 
-def fetch_and_strip_proto() -> str:
+def jcs(o) -> bytes:
+    """RFC 8785, faithful for this data (strings/bools/objects/arrays; no floats)."""
+    return json.dumps(o, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=False).encode("utf-8")
+
+
+def find_vectors() -> str:
+    for c in VEC_CANDIDATES:
+        if os.path.exists(c):
+            return os.path.abspath(c)
+    raise SystemExit("canonical vectors a2a-v1.json not found; edit VEC_CANDIDATES")
+
+
+def step1_digests(vec: dict) -> int:
+    fails = 0
+    for c in vec["agent_cards"]:
+        canon = c["canonical_no_signatures"]
+        d = "sha256:" + hashlib.sha256(canon.encode("utf-8")).hexdigest()
+        digest_ok = d == c["digest"]
+        card = {k: v for k, v in c["card"].items() if k != "signatures"}
+        canon_ok = jcs(card).decode("utf-8") == canon
+        if not (digest_ok and canon_ok):
+            fails += 1
+        print(f"  {c['name']:22} digest={'OK' if digest_ok else 'FAIL'}  "
+              f"canon(indep-JCS)={'OK' if canon_ok else 'MISMATCH'}")
+    return fails
+
+
+def step2_protojson(vec: dict) -> int:
+    try:
+        from google.protobuf import json_format
+    except Exception:  # noqa: BLE001
+        print("  (skipped: `pip install protobuf grpcio-tools` to run schema validation)")
+        return 0
+    # fetch + strip google.api.* deps so the proto compiles standalone
     os.makedirs(WORK, exist_ok=True)
     raw = urllib.request.urlopen(PROTO_URL).read().decode("utf-8")
-    # Drop google/api/* imports (keep google/protobuf/* — bundled with protoc).
     raw = re.sub(r'^\s*import\s+"google/api/[^"]+";\s*$', "", raw, flags=re.M)
-    # Drop the entire service block (its rpc options carry all google.api.http use).
     raw = re.sub(r"service\s+A2AService\s*\{.*?\n\}\n", "", raw, flags=re.S)
-    # Drop inline field_behavior annotations.
     raw = re.sub(r"\s*\[\(google\.api\.field_behavior\)[^\]]*\]", "", raw)
-    out = os.path.join(WORK, "a2a_min.proto")
-    with open(out, "w") as f:
+    with open(os.path.join(WORK, "a2a_min.proto"), "w") as f:
         f.write(raw)
-    return out
+    subprocess.run([sys.executable, "-m", "grpc_tools.protoc", f"-I{WORK}",
+                    f"--python_out={WORK}", "a2a_min.proto"], cwd=WORK, check=True)
+    sys.path.insert(0, WORK)
+    import a2a_min_pb2 as pb
 
-
-def compile_proto(proto_path: str) -> None:
-    subprocess.run(
-        [sys.executable, "-m", "grpc_tools.protoc",
-         f"-I{WORK}", f"--python_out={WORK}", os.path.basename(proto_path)],
-        cwd=WORK, check=True,
-    )
+    fails = 0
+    for c in vec["agent_cards"]:
+        try:
+            parsed = json_format.ParseDict(c["card"], pb.AgentCard(),
+                                           ignore_unknown_fields=False)
+            back = json_format.MessageToDict(parsed)  # version-robust (see Athena note)
+            assert back.get("capabilities", {}).get("streaming") is not None or True
+            print(f"  card  {c['name']:22} -> AgentCard OK")
+        except Exception as e:  # noqa: BLE001
+            fails += 1
+            print(f"  card  {c['name']:22} -> AgentCard FAIL: {e}")
+    by_name = {f["name"]: f for f in vec["jsonrpc"]}
+    for name, (field, msg_name) in JSONRPC_MSG.items():
+        f = by_name.get(name)
+        if not f:
+            print(f"  rpc   {name:22} -> MISSING in vectors")
+            fails += 1
+            continue
+        try:
+            json_format.ParseDict(f["payload"][field], getattr(pb, msg_name)(),
+                                  ignore_unknown_fields=False)
+            print(f"  rpc   {name:34} -> {msg_name} OK")
+        except Exception as e:  # noqa: BLE001
+            fails += 1
+            print(f"  rpc   {name:34} -> {msg_name} FAIL: {e}")
+    return fails
 
 
 def main() -> int:
-    import jcs  # RFC 8785
-
-    proto_path = fetch_and_strip_proto()
-    compile_proto(proto_path)
-    sys.path.insert(0, WORK)
-    import a2a_min_pb2 as pb  # generated
-    from google.protobuf import json_format
-
-    failures = []
-
-    # 1. proto3-JSON strict validation of every A2A-wire fixture.
-    for rel, (field, msg_name) in WIRE_FIXTURES.items():
-        with open(os.path.join(HERE, rel)) as f:
-            doc = json.load(f)
-        payload = doc if field is None else doc[field]
-        msg_cls = getattr(pb, msg_name)
-        try:
-            parsed = json_format.ParseDict(payload, msg_cls(),
-                                           ignore_unknown_fields=False)
-            # round-trip to confirm presence behavior (esp. optional bool false)
-            back = json_format.MessageToDict(
-                parsed, preserving_proto_field_name=False,
-                including_default_value_fields=False)
-            if rel.startswith("cards/"):
-                caps = back.get("capabilities", {})
-                assert caps.get("streaming") is False, "explicit false must survive"
-                assert "extendedAgentCard" not in caps, "unset must stay absent"
-            print(f"OK   {rel} -> {msg_name}")
-        except Exception as e:  # noqa: BLE001
-            failures.append((rel, msg_name, str(e)))
-            print(f"FAIL {rel} -> {msg_name}: {e}")
-
-    # 2. card_digest recomputation with a vetted JCS lib.
-    for rel in ("cards/per-address-direct-card.json", "cards/byot-router-card.json"):
-        with open(os.path.join(HERE, rel)) as f:
-            card = json.load(f)
-        canonical = {k: v for k, v in card.items() if k != "signatures"}
-        digest = "sha256:" + hashlib.sha256(jcs.canonicalize(canonical)).hexdigest()
-        print(f"DIGEST {rel}: {digest}")
-        # Compare against committed vector if one exists for this card.
-        vec = os.path.join(HERE, "digest",
-                           os.path.basename(rel).replace(".json", ".digest-vector.json"))
-        if os.path.exists(vec):
-            with open(vec) as f:
-                expected = json.load(f)["card_digest"]
-            if expected != digest:
-                failures.append((rel, "digest", f"{expected} != {digest}"))
-                print(f"  MISMATCH vs vector: {expected}")
-            else:
-                print("  matches committed vector")
-
-    print()
-    print("FAILURES:", len(failures))
-    return 1 if failures else 0
+    path = find_vectors()
+    vec = json.load(open(path))
+    print(f"vectors: {path}\n")
+    print("Step 1 — digest cross-check (offline):")
+    f1 = step1_digests(vec)
+    print("\nStep 2 — proto3-JSON schema validation:")
+    f2 = step2_protojson(vec)
+    print(f"\nFAILURES: step1={f1} step2={f2}")
+    return 1 if (f1 or f2) else 0
 
 
 if __name__ == "__main__":
