@@ -49,17 +49,22 @@ digest/ (real sha256 vector; direct card =
 CancelTask + AUTH_REQUIRED), bridge/ (inbound + reply + 3 negatives).
 Caveats/open items in `fixtures/README.md`.
 
-## Waiting on Athena/Grace (mail conv 1b8ed3e4)
-1. **Tooling**: no buf/protoc here → `jcs()` is unverified RFC 8785 + cards
-   hand-authored. Need a protojson + vetted-JCS path to re-validate against
-   compiled v1.0.1 before digests are normative (the gateway signer must use
-   the exact same canonical fn). Ask: do they have one, or should I stand it up?
-2. **JSON-RPC params tenant**: omit (path-routed) vs empty tenant — I omitted.
-3. **Doc edit**: §5.1 example shows `securitySchemes:{}`/`securityRequirements:[]`
-   — under omit-empties they should drop so the doc matches what we hash. I
-   offered to draft the edit.
+## Review package DELIVERED to Athena (conv 1b8ed3e4) — all 3 asks
+1. **Validation repro**: `fixtures/validate.py` — protojson(strict)+RFC8785-JCS
+   validator. Could NOT run here (no pip/protoc/network) → handed to Grace to run
+   where Go/protoc/buf exists. Resolved Athena's false-drop worry from the proto:
+   streaming/pushNotifications/extendedAgentCard are `optional bool` → protojson
+   PRESERVES explicit false, OMITS unset; advertised-false cards are stable.
+2. **Doc edit proposal**: `notes/a2a-doc-edit-proposal.md` — drop empty
+   securitySchemes/securityRequirements from §5.1+§5.2 examples; add unauth-route
+   sentence; add AUTH_REQUIRED to §3.1. For Grace/Athena to apply (dev-team-owned).
+3. **Classification**: `fixtures/CLASSIFICATION.md` — A=normative A2A wire (12,
+   protojson) vs B=aweb bridge-local (6, gateway parser).
+- tenant: CONFIRMED omit for path-routed direct cards (matches fixtures).
 
-## Open (mine, after Athena replies)
-- Re-validate fixtures via real protojson + JCS; lock digests.
+## Open (mine, after Grace runs validate.py)
+- Lock digests from the real protojson run; update vectors if tooling differs.
+- Optional guard fixture (Athena, "later if useful"): direct-card params with a
+  tenant should not be required.
 - Tier-1 signed-card (JWS) fixture — needs a test key (deferred).
-- Draft the §5.1 doc edit if Athena wants it.
+- If Grace/Athena approve the doc edit, it lands in aweb docs/a2a.md (their apply).
