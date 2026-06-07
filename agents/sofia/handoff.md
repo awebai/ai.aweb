@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 14:50Z (Claude configure source fixed at 63d77176)
+Last updated: 2026-06-03 15:00Z (Athena driving Claude marketplace review)
 
 ## How this file works
 
@@ -88,9 +88,13 @@ server:aweb`. Athena's grep at `63d77176` found no stale `aw run claude`,
 `aw team bootstrap`, or `aweb-team-dev-review` refs in channel/skills. Skills
 package also needs bootstrap fixed for current aw agents lifecycle, no `aw team
 bootstrap`. Wave 4 likely includes Pi 0.1.20 and is held until AC Wave 3 live.
-When Wave 4 publishes: rematerialize claude-plugins artifacts from corrected
-versions, update provenance, rerun strict validation + vendored-dir smoke, then
-proceed only if clean. See logbook §"Long-fruit submission cluster" for full state.
+Athena is driving Claude marketplace path with Sofia + Hestia per Juan. Keep
+claude-plugins working tree parked until corrected npm versions exist. After
+Hestia confirms Wave 4 publish: rematerialize vendored dirs from corrected npm
+artifacts only, update provenance, rerun strict validation + artifact/smoke
+checks, then send Athena the rematerialized diff + validation output for
+review/package-check **before commit or submission**. Proceed only if clean and
+Athena-reviewed. See logbook §"Long-fruit submission cluster" for full state.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
