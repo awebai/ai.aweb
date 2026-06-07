@@ -17,6 +17,84 @@ remain a faithful record.
 
 ---
 
+## 2026-06-07 — aapz HOLD mid-AWID-wave (P1 audit)
+
+Grace handed off aapz aw agents lifecycle release at aweb
+0f303786 (9626e66d). 5-surface wave: awid 0.5.10 → aweb 1.26.8 →
+skills 0.2.12 → Pi 0.1.20, with AC v0.5.60 floor bump deferred
+until v0.5.59 verified-live. Scope verified empirically: awid
+1484 LOC, server 43 LOC, CLI 5919 LOC, skills/aweb-bootstrap
+canonical drift sha 0a29e68 → 52f4c5b.
+
+Mailed planned versions e92c48d1; Grace green-lit with
+corrections (d419d930): tag at bump SHA not 0f303786, migration
+path is `awid/src/awid_service/migrations/` not
+`awid/src/awid/migrations/`, AC deferral OK with explicit
+verified-live mention, skills uses workflow not hand-bump, Mia
+is aapz reviewer-of-record (no Athena re-loop). Grace short-form
+ACK 8190c796 confirmed.
+
+Executed AWID wave 1:
+- awid/pyproject.toml 0.5.9 → 0.5.10 + uv sync
+- make release-awid-check: 201 tests passed
+- Commit 9e921ecc 'release: awid-service 0.5.10 (aapz wave 1 …)'
+- Tags awid-service-v0.5.10 + awid-v0.5.10 at 9e921ecc
+- Pushed main + both tags individually (per banked policy)
+- GHA awid-service PyPI run 27086928868 success: awid-service
+  0.5.10 LIVE on PyPI (2 artifacts)
+- GHA awid GHCR run 27086931086 success: Docker image in ghcr.io
+
+NOT executed (HOLD landed mid-flight):
+- AWID prod migrations (006_identity_encryption_key_custody.sql)
+- api.awid.ai Render redeploy signal
+- aweb wave 2 (server 1.26.8 + aw 1.26.8)
+- skills 0.2.12, Pi 0.1.20
+
+Grace HOLD (a147126b + 992469cf): Juan challenged proceeding
+with aapz.16/.18/.19/.21 open. Disposition:
+- KEEP 0.5.10 on PyPI (no yank, no force rollback)
+- KEEP GHCR image (workflow already completed)
+- KEEP bump commit 9e921ecc + tags on origin/main
+- All runtime/deployment steps HELD
+- Possible outcome: deployed AWID becomes 0.5.11 post-audit,
+  with 0.5.10 as unused artifact — Grace says preferable to
+  yank or history-rewrite.
+
+api.awid.ai continues serving 0.5.9 — no production change. PyPI
++ GHCR are registry artifacts only until migrations + redeploy
+fire.
+
+Lesson banked (will surface next AWID/aweb wave): peer
+green-light at the wave gate ≠ closure on epic P1 audit. Before
+tagging+pushing registry-permanent artifacts, re-verify open P1s
+in the epic even with explicit wave authorization. The aw 1.26.6
+lesson covered 'peer-validation ≠ canonical gate at target SHA';
+this is its dual: 'wave green-light ≠ epic ready'.
+
+---
+
+## 2026-06-07 — Pi 0.1.19 verified-live (description colon-led tweak)
+
+Olivia mail 93a16ac6 from aweb b7015275: bump 0.1.18 → 0.1.19
+with description revision (em-dash → colon-led list of three
+clauses, surfaces 'join agent teams' capability). Juan-authored
+description, fast-tracked same as 0.1.18.
+
+Bump commit 2b76c804 narrow (only pi-extension/package.json).
+WIP in tree (team_bootstrap.go, docs, skills/aweb-bootstrap) not
+swept per Olivia heads-up. Tag pi-v0.1.19 pushed individually,
+GHA pi-release run 27086086858 success.
+
+Content-verify against b619aca canonical: description matches
+spec byte-for-byte; README byte-identical to
+b619aca:pi-extension/README.md (no change since 0.1.18, sha256
+bfae6902…); all 5 SKILL.md hashes byte-identical to
+b619aca:skills/<skill>/SKILL.md (Wave 5 sync intact).
+Verified-live mail ce7ab07e to peers + Juan. Olivia ACK
+24384f53, then independent verify-after came back clean.
+
+---
+
 ## 2026-06-06 — Pi 0.1.18 verified-live (README + marketplace-card rewrite)
 
 Olivia's mail 07ad3f2c arrived: bump @awebai/pi 0.1.17 → 0.1.18 from

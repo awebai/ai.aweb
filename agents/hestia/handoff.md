@@ -4,47 +4,54 @@ Crisp wake-up brief. What you need to act NOW, nothing more. For
 backstory on anything referenced here, see `logbook.md`. For
 operating discipline, see `AGENTS.md`.
 
-**Last updated:** 2026-06-06 12:05 UTC
+**Last updated:** 2026-06-07 08:15 UTC
 
 ## Newest finding
 
-**@awebai/pi 0.1.18 verified-live (2026-06-06).** Cold-reader Pi
-README + marketplace-card description rewrite from b619aca. Bump
-commit `fba2108` was narrow (only pi-extension/package.json
-staged); unrelated WIP in tree (atomic-address-claim,
-team_bootstrap.go, ratelimit.py, dns_addresses.py — flagged by
-Olivia as not hers) NOT swept. Content-verify against
-`git show b619aca:pi-extension/README.md` and
-`git show b619aca:skills/<skill>/SKILL.md` all byte-identical;
-Wave 5 sync intact. Sofia/Athena framing review chain bypassed
-per explicit Juan author. Verified-live mail
-`9d1ff678-e0d5-49c8-84dc-9e0830ff270e` sent to Olivia + Grace +
-Athena + Sofia + Iris + Aida; Olivia standing by to run her
-independent verify-after diff to close. Logbook entry appended.
+**aapz HOLD active — partial AWID wave 1 already on origin/main.**
+Grace pulled back her green-light after Juan challenged open P1s
+(aapz.16/.18/.19/.21). Disposition per Grace mail 992469cf:
+- KEEP awid-service 0.5.10 on PyPI (do not yank)
+- KEEP awid 0.5.10 GHCR image (Docker workflow completed)
+- KEEP bump commit 9e921ecc + tags awid-service-v0.5.10 + awid-v0.5.10
+  on origin/main (no force rollback — they're registry artifacts only
+  while api.awid.ai stays on 0.5.9)
+- DO NOT run AWID migrations
+- DO NOT signal api.awid.ai Render redeploy
+- DO NOT start aweb server/CLI wave 2 (server-v1.26.8 / aw-v1.26.8)
+- DO NOT start skills 0.2.12 / Pi 0.1.20
+- Possible outcome: post-audit AWID may become 0.5.11 with 0.5.10 as
+  unused artifact. Grace says that's preferable to yank/rewrite.
 
-**First observed external multi-agent customer in production:**
-`default:andi.aweb.ai` BYOT team, registered 2026-06-03 09:44 UTC.
-4 agents (coord, dev, review, remoteagent) actively coordinating
-across a Hetzner host + one remote-machine federation. 17 mail +
-5 chat messages in first hours. See `logbook.md` 2026-06-03
-entry for the full read. Mailed Sofia (direction-level signal).
+api.awid.ai/health continues 0.5.9 — no production change. No
+customer impact while migrations + redeploy don't fire.
 
 ## In flight
+
+**#257 aapz HOLD — awaiting Grace's explicit resume.** Do not
+touch any file in the aweb tree until her resume mail lands.
 
 **#248 AC v0.5.59 Render deploy waiting on Juan.** Image is in
 GHCR (run 26767320236). When /health flips, expect
 `release_tag=v0.5.59 git_sha=0896ecea aweb_version=1.26.5`. Before
 posting verified-live, smoke a hosted custodial E2EE flow; any
 `custodial_e2ee_kek_unconfigured` / 500 → bad deploy → roll back.
+Schema migrations already applied to prod DB 2026-06-06 18:09 UTC
+(both `aweb.schema_migrations` 007 and `aweb_cloud.schema_migrations`
+002 confirmed in DB).
 
 Render env must have `AWEB_CUSTODIAL_E2EE_KEY` +
 `AWEB_CUSTODIAL_E2EE_KEY_ID` set or the new code path will 500 on
 first customer request (Grace + Mia gate).
 
-**Pi 0.1.18 fully closed** (Olivia mail ee7cfc61, my reply
-c0a24edb). Two-witness gate clean — both sides confirmed npm
-0.1.18 + README + description + 5 SKILL.md hashes match b619aca
-canonical. Wave 5 sync intact. No follow-up.
+**#258 AC v0.5.60 floor bump (aweb>=1.26.8)** — deferred until
+aapz resumes AND v0.5.59 verified-live. Grace explicit: AC is
+temporarily not pinned to latest PyPI aweb. Do not claim AC floor
+is current until v0.5.60 lands.
+
+**Pi 0.1.19 fully closed** (Olivia ee7cfc61 → my reply, then
+Olivia independent verify-after also confirmed clean). Two-witness
+gate clean for both 0.1.18 and 0.1.19.
 
 ## Open holds (don't trip these)
 
