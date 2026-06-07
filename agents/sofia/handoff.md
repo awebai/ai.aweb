@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-03 14:40Z (Claude missing-workspace guidance hold tightened)
+Last updated: 2026-06-03 14:50Z (Claude configure source fixed at 63d77176)
 
 ## How this file works
 
@@ -76,20 +76,21 @@ staged. **Update 2026-06-03:** Claude marketplace submissions are on hold
 until Wave 4 package versions publish. Do NOT use npm
 `@awebai/claude-channel@1.4.11` or `@awebai/claude-skills@0.2.11`.
 Grace confirmed stale surfaces. Expected corrected packages include
-`@awebai/claude-channel@1.4.12` and `@awebai/claude-skills@0.2.12`, but
-Juan challenged the `fb9ff8e9` missing-workspace instruction and Athena agrees:
-marketplace/support guidance must not say unqualified "run `aw init --setup-channel`"
-when `.aw/workspace.yaml` is missing. Safer guidance: first initialize or join
-the workspace through the correct team source (hosted new team, invite/API key,
-BYOT, or current-flow forwarding as applicable), then configure the channel.
-`aw init --setup-channel` can be a one-step init+channel command only when the
-intended team source is clear. This may require a Grace/source tweak before
-Wave 4 packaging, not just rematerialization from `fb9ff8e9`. Skills package
-also needs bootstrap fixed for current aw agents lifecycle, no `aw team bootstrap`.
-Wave 4 likely includes Pi 0.1.20 and is held until AC Wave 3 live. When Wave 4
-publishes: rematerialize claude-plugins artifacts from corrected versions,
-update provenance, rerun strict validation + vendored-dir smoke, then proceed
-only if clean. See logbook §"Long-fruit submission cluster" for full state.
+`@awebai/claude-channel@1.4.12` and `@awebai/claude-skills@0.2.12`. Channel
+configure source fix landed at aweb `63d77176` (Wave 4 package source should be
+that commit or later): if `.aw/workspace.yaml` is missing, do not guess
+team/service; tell the user to initialize or join through the correct source
+first (`aw init`, or explicit invite/service/BYOT as applicable). `aw init
+--setup-channel` appears only in the MCP-configuration-missing branch after
+`workspace.yaml` exists. Manual `.mcp.json` `npx @awebai/claude-channel` entry
+remains. Launch instruction remains `claude --dangerously-load-development-channels
+server:aweb`. Athena's grep at `63d77176` found no stale `aw run claude`,
+`aw team bootstrap`, or `aweb-team-dev-review` refs in channel/skills. Skills
+package also needs bootstrap fixed for current aw agents lifecycle, no `aw team
+bootstrap`. Wave 4 likely includes Pi 0.1.20 and is held until AC Wave 3 live.
+When Wave 4 publishes: rematerialize claude-plugins artifacts from corrected
+versions, update provenance, rerun strict validation + vendored-dir smoke, then
+proceed only if clean. See logbook §"Long-fruit submission cluster" for full state.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
