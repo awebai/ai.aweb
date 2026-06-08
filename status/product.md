@@ -1,11 +1,12 @@
 # Product Status
-Last updated: 2026-06-07 12:25Z (Claude marketplace artifacts pushed)
+Last updated: 2026-06-07 12:35Z (site hero redesign verified-live)
 
 ## Current focus
 - **Production release state:** app.aweb.ai is live healthy at `v0.5.60`, git `2cf21f23`, aweb `1.26.8`, awid_service `0.5.10`; api.awid.ai reports `0.5.10`.
 - **Claude marketplace submissions:** Wave 4 packages are live (`@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, Pi `0.1.20`). Reviewed vendored artifacts are now pushed to `awebai/claude-plugins` origin/main at `d6034672ded5ef5dbb38fc84fcb0a1de883b9544`; submission can proceed using that pushed SHA. Outward text must keep the README trust boundary: inbound channel, outbound via `aw`, hosted/server-side paths not E2E.
 - **E2EE framing boundary:** keep claims narrow to smoked surfaces. Hosted/server-side messaging must not be called E2E; do not make broad generic self-custodial E2EE readiness claims unless the AWID encryption-key publish skew Athena flagged is fixed/explained.
 - **Engineering risk tracked with Athena:** aw 1.26.3 workspace-cleanup regression (#245) remains the customer-risk pattern to track for CLI/workspace-cleanup-adjacent work: read/status flows must not destructively delete server workspace/agent rows from stale local paths.
+- **Landing site framing:** aweb.ai home hero redesign is verified live (site-only deploy `27f43d4c`): new H1 “Let agents work together in an open network” + runtime-toggle panels; stale `aw team bootstrap` / `aw run claude` strings purged across home, /orchestration, /mcp, and /docs/team-bootstrap. Silent by default; package as distribution beat only if we deliberately choose it.
 - **Direction context:** gbrain/corpus/omnigraph question is waiting on Juan; no product priority change until that answer lands.
 
 ## Product readiness
@@ -14,10 +15,11 @@ Last updated: 2026-06-07 12:25Z (Claude marketplace artifacts pushed)
 - **Channel / skills / Pi:** `@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, `@awebai/pi@0.1.20` published.
 - **aweb-cloud:** live health check 2026-06-07 12:14Z reports `release_tag=v0.5.60`, `git_sha=2cf21f23`, `aweb_version=1.26.8`, `awid_service_version=0.5.10`, healthy.
 - **awid registry:** `https://api.awid.ai/health` reports `version=0.5.10`, ok.
-- **Landing site:** latest restructure verified-live per prior Hestia/Olivia state; no direction action unless Iris's trinity-leak pass finds stale copy.
+- **Landing site:** deploy `27f43d4c` verified live by Hestia/Olivia: home hero/open-network framing, `/llms.txt` get-started structure, canonical aw-agents-bootstrap form site-wide, stale-string checks clean. AC backend untouched.
 
 ## Outreach
 - Claude marketplace path is the active long-fruit lane. `claude-plugins` commit `d6034672ded5ef5dbb38fc84fcb0a1de883b9544` adds vendored community-submission artifacts rematerialized from corrected npm packages and validated by Athena/Sofia/Hestia; origin push blocker is closed.
+- Site hero redesign is ready as a possible distribution beat but has not been announced; route to Iris only if we decide to package it.
 - `publishing/attempts.jsonl` has no observed submission rows yet. Do not add submission attempts until the claude-plugins commit is pushed and actual submission occurs.
 - Juan confirmation is still useful on broader cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.
 
