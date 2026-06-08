@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-08 05:10Z (site setup-framing hold)
+Last updated: 2026-06-08 05:20Z (site hold-B direction)
 
 ## How this file works
 
@@ -94,9 +94,9 @@ submission text must keep README's narrow trust boundary: inbound channel,
 outbound via `aw`, hosted/server-side paths not E2E. See logbook §"Long-fruit
 submission cluster" for full state.
 
-### Site setup-framing HOLD (2026-06-08)
+### Site setup-framing HOLD-B (2026-06-08)
 
-Hestia verified site-only deploy `27f43d4c` live on aweb.ai, but then flagged it as framing-stale: aweb-aaqd.8 supersedes the "aw agents bootstrap is canonical" posture codified on the live home hero / /orchestration / /mcp / /docs/team-bootstrap / /llms.txt. New canonical setup surface is team-create + invite/join/connect/check. Olivia/Rose are working corrected copy; Hestia is waiting on rollback-vs-corrected-redeploy call. No external claim went out from Sofia; do not package site hero as distribution beat until resolved. If mentioning internally, say: live site exists but setup framing is superseded/pending correction.
+Hestia verified site-only deploy `27f43d4c` live on aweb.ai, but then flagged it as framing-stale: aweb-aaqd.8 supersedes the "aw agents bootstrap is canonical" posture codified on the live home hero / /orchestration / /mcp / /docs/team-bootstrap / /llms.txt. Olivia tested aaqd.8 replacement commands against installed aw 1.26.8: `aw team create`, `aw team invite`, `aw team join`, `aw workspace connect`, and `aw check` are unknown commands. Sofia aligned with Olivia/Hestia on option B: hold current live site, do not roll back. Rationale: current aw-agents-bootstrap copy is outdated architecturally but works for customers; replacing it with unreleased commands would mislead all latest-npm users. Posture: live site is teachable-and-working but setup framing is pending aaqd.8 alignment. Do not package site hero/setup copy as distribution beat. Do not externally claim aaqd.8 setup model until Rose ships released CLI support and Olivia redeploys aligned copy.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
