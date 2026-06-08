@@ -4,54 +4,42 @@ Crisp wake-up brief. What you need to act NOW, nothing more. For
 backstory on anything referenced here, see `logbook.md`. For
 operating discipline, see `AGENTS.md`.
 
-**Last updated:** 2026-06-07 08:15 UTC
+**Last updated:** 2026-06-08 00:15 UTC
 
 ## Newest finding
 
-**aapz HOLD active — partial AWID wave 1 already on origin/main.**
-Grace pulled back her green-light after Juan challenged open P1s
-(aapz.16/.18/.19/.21). Disposition per Grace mail 992469cf:
-- KEEP awid-service 0.5.10 on PyPI (do not yank)
-- KEEP awid 0.5.10 GHCR image (Docker workflow completed)
-- KEEP bump commit 9e921ecc + tags awid-service-v0.5.10 + awid-v0.5.10
-  on origin/main (no force rollback — they're registry artifacts only
-  while api.awid.ai stays on 0.5.9)
-- DO NOT run AWID migrations
-- DO NOT signal api.awid.ai Render redeploy
-- DO NOT start aweb server/CLI wave 2 (server-v1.26.8 / aw-v1.26.8)
-- DO NOT start skills 0.2.12 / Pi 0.1.20
-- Possible outcome: post-audit AWID may become 0.5.11 with 0.5.10 as
-  unused artifact. Grace says that's preferable to yank/rewrite.
+**aapz Waves 1-3 verified-live. A2A release train + olivia 27f43d4c
+site deploy both moved this session.**
 
-api.awid.ai/health continues 0.5.9 — no production change. No
-customer impact while migrations + redeploy don't fire.
+- aapz Wave 1 AWID 0.5.10 → verified-live earlier (api.awid.ai
+  flipped, schema migrated)
+- aapz Wave 2 aweb 1.26.8 PyPI + aw 1.26.8 npm → verified-live
+- aapz Wave 3 AC v0.5.60 → verified-live (Render flipped; site
+  canonical at deploy-landing 6da746de)
+- aapz Wave 4 (channel 1.4.12 + skills 0.2.12 + Pi 0.1.20 +
+  marketplace) was HELD when Grace took the release lane under
+  Juan's "drive it through" mandate
+- A2A release train at aweb 81e8d01c (AWID 0.5.11 + aweb 1.26.9 +
+  aw 1.26.9 + new aweb-a2a-gw gateway binary) — Grace owns lane;
+  Grace confirmed AWID 0.5.11 deployed mid-session
+- Olivia home hero redesign at ac 27f43d4c → verified-live THIS
+  TURN. Site-only deploy (no AC backend bump). CF Pages caught up
+  after ~30s build window; live H1 confirms "Let agents work
+  together in an open network" with runtime-toggle install panels.
+- Sofia ACK'd verified-live mail (two copies — bus retry); Olivia
+  not directly addressable from this workspace (`aweb.ai/olivia`
+  → 404). Past closure pattern was conversation-thread reply via
+  her inbound mail.
 
 ## In flight
 
-**#257 aapz HOLD — awaiting Grace's explicit resume.** Do not
-touch any file in the aweb tree until her resume mail lands.
+**A2A wave** — Grace owns. Awaiting her verified-live mail for
+aweb/aw 1.26.9 + AWID 0.5.11. Live a2a.aweb.ai routes
+(personal/customer-service/research) pending future
+ubuntu-8gb-nbg1-1 SSH-assist provisioning that Grace may request.
 
-**#248 AC v0.5.59 Render deploy waiting on Juan.** Image is in
-GHCR (run 26767320236). When /health flips, expect
-`release_tag=v0.5.59 git_sha=0896ecea aweb_version=1.26.5`. Before
-posting verified-live, smoke a hosted custodial E2EE flow; any
-`custodial_e2ee_kek_unconfigured` / 500 → bad deploy → roll back.
-Schema migrations already applied to prod DB 2026-06-06 18:09 UTC
-(both `aweb.schema_migrations` 007 and `aweb_cloud.schema_migrations`
-002 confirmed in DB).
-
-Render env must have `AWEB_CUSTODIAL_E2EE_KEY` +
-`AWEB_CUSTODIAL_E2EE_KEY_ID` set or the new code path will 500 on
-first customer request (Grace + Mia gate).
-
-**#258 AC v0.5.60 floor bump (aweb>=1.26.8)** — deferred until
-aapz resumes AND v0.5.59 verified-live. Grace explicit: AC is
-temporarily not pinned to latest PyPI aweb. Do not claim AC floor
-is current until v0.5.60 lands.
-
-**Pi 0.1.19 fully closed** (Olivia ee7cfc61 → my reply, then
-Olivia independent verify-after also confirmed clean). Two-witness
-gate clean for both 0.1.18 and 0.1.19.
+**aapz Wave 4 closure** — verify status with Grace before any
+parallel action; her A2A wave may have folded it.
 
 ## Open holds (don't trip these)
 
@@ -65,18 +53,24 @@ gate clean for both 0.1.18 and 0.1.19.
 
 ## Live matrix (one line)
 
-AC v0.5.58 prod, v0.5.59 in flight • PyPI aweb 1.26.5 • npm
-aw 1.26.4 / channel 1.4.11 / claude-skills 0.2.10 / Pi 0.1.16 •
-awid 0.5.9 • aweb.ai static deploy-landing at 92860b93.
+AC v0.5.60 prod • PyPI aweb 1.26.9 (per Grace; self-last-verified
+1.26.8) • npm aw 1.26.9 (per Grace; self-last-verified 1.26.8) /
+channel 1.4.11 / claude-skills 0.2.11 / Pi 0.1.20 • AWID 0.5.10
+verified-live (Grace deployed 0.5.11 mid-session — re-probe needed)
+• aweb.ai deploy-landing 7203f5c2 atop 27f43d4c (Olivia home hero
++ runtime-toggle + canonical bootstrap, verified this turn) •
+marketplace pins: channel 1.4.12 + skills 0.2.12 (Path B vendored
+dirs, d6034672).
 
 ## Wake-up checklist
 
 1. `git pull` in ai.aweb and your sibling repos (aweb, ac).
 2. `aw chat pending && aw mail inbox`.
-3. `curl -sS https://app.aweb.ai/health && curl -sS https://api.awid.ai/health`.
-4. If app.aweb.ai flipped to v0.5.59 while you were idle: close
-   #248 with verified-live + custodial-E2EE smoke. If still
-   v0.5.58: nudge Juan if you haven't already.
+3. `curl -sS https://app.aweb.ai/health && curl -sS https://api.awid.ai/health`
+   — confirm AWID flip to 0.5.11 (Grace deployed mid-session) +
+   AC still at v0.5.60.
+4. `npm view @awebai/aw version` + `curl -sS https://pypi.org/pypi/aweb/json | jq '.info.version'`
+   — confirm Grace's A2A wave aw 1.26.9 + aweb 1.26.9 published.
 5. `aw mail show 96317ca9` — Athena/Mia thread on #245 fix-forward
    shape; if a candidate fix arrived, gate it carefully.
 6. `aw task list --status pending --owner hestia` — open

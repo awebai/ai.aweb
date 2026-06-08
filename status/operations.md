@@ -1,45 +1,63 @@
 # Operations Status
 
-Last updated: **2026-06-02 13:30 CEST (11:30 UTC)** — May 26 → June 2
-release wave shipped. Live npm matrix flipped to aw 1.26.4 +
-channel 1.4.11 + skills 0.2.10 + Pi 0.1.16; PyPI aweb on 1.26.5;
-AC v0.5.59 image in GHCR awaiting Juan Render deploy.
+Last updated: **2026-06-08 00:10 UTC** — aapz release wave (Wave 1-3
+verified-live) + A2A release train at 81e8d01c (Grace took the
+lane after Juan's "drive it through" mandate; AWID 0.5.11 / aweb
+1.26.9 / aw 1.26.9 cut by Grace). Olivia home hero redesign 27f43d4c
+deployed via site-only path; live on aweb.ai post CF Pages rebuild.
 
 ## Current focus
 
-- **AC v0.5.59** Render deploy waiting on Juan + env confirm
-  (`AWEB_CUSTODIAL_E2EE_KEY`, `AWEB_CUSTODIAL_E2EE_KEY_ID`). Will
-  flip aweb_version to 1.26.5 and unlock hosted custodial E2EE.
-  Custodial-E2EE smoke required before verified-live mail.
-- **aw 1.26.3 cleanup regression** (#245) open. Juan's pmbah team
-  recovered via DB undelete + workspace_path rewrite; fix-forward
-  shape pending Athena + Mia decision in mail thread 96317ca9.
-  ANY ship targeting cli/go/cmd/aw/workspace* must explicitly
-  address this.
+- **aapz release wave** Waves 1-3 verified-live (AWID 0.5.10 + aweb
+  1.26.8 + AC v0.5.60). Wave 4 (channel 1.4.12 + skills 0.2.12 + Pi
+  0.1.20 + marketplace re-materialize) held earlier this session
+  while Grace took ownership; status of Wave 4 closure with Grace.
+- **A2A release train (81e8d01c)** — Grace drove this. AWID 0.5.11
+  (additive migration 007_a2a_publications.sql) + aweb server 1.26.9
+  + aw CLI 1.26.9. Grace confirmed AWID deploy. aweb-a2a-gw gateway
+  binary packaged with aw CLI; live a2a.aweb.ai routes pending future
+  ubuntu-8gb-nbg1-1 SSH-assist provisioning.
+- **Site canonical** — Olivia 27f43d4c home-hero redesign verified
+  live on aweb.ai (this turn).
+- **aw 1.26.3 cleanup regression** (#245) still open. Fix-forward
+  shape pending Athena + Mia decision in mail thread 96317ca9. ANY
+  ship targeting cli/go/cmd/aw/workspace* must explicitly address
+  this.
 
-## Live state (verified 2026-06-02 11:30 UTC)
+## Live state (verified 2026-06-08 00:10 UTC)
 
-- app.aweb.ai/health: `release_tag=v0.5.58 git_sha=340122ef
-  aweb_version=1.26.1 awid_service_version=0.5.9` healthy
-- api.awid.ai/health: `version=0.5.9` ok
-- PyPI aweb: **1.26.5**
-- npm @awebai/aw: **1.26.4**
-- npm @awebai/claude-channel: **1.4.11**
-- npm @awebai/claude-skills: **0.2.10**
-- npm @awebai/pi: **0.1.16**
-- Marketplace pins (claude-plugins): aweb-channel 1.4.11,
-  aweb-skills 0.2.10
-- aweb.ai (Hugo site, deploy-landing): 92860b93 (Olivia home
-  restructure + /mcp page + /orchestration teaser, all
-  verified-live)
+- app.aweb.ai/health: `release_tag=v0.5.60 git_sha=2cf21f23
+  aweb_version=1.26.8 awid_service_version=0.5.10` healthy (untouched
+  by this site cycle; A2A release train doesn't bump AC yet)
+- api.awid.ai/health: Grace deployed AWID this session (per chat
+  handover) — re-probe for 0.5.11 confirmation if Wave 4 / A2A
+  surfaces a claim
+- PyPI aweb: **1.26.9** (per Grace's A2A wave) — last self-verified
+  was 1.26.8 in aapz Wave 2
+- npm @awebai/aw: **1.26.9** (per Grace's A2A wave) — last
+  self-verified was 1.26.8 in aapz Wave 2
+- npm @awebai/claude-channel: 1.4.11 (Wave 4 of aapz / 1.4.12 pending
+  Grace's wave-4 close)
+- npm @awebai/claude-skills: 0.2.11 (Wave 4 pending)
+- npm @awebai/pi: 0.1.20 (per published state seen this session in
+  pi-extension/package.json — verify against npm registry next probe)
+- Marketplace pins (claude-plugins): aweb-channel 1.4.12,
+  aweb-skills 0.2.12 (d6034672 — pushed this session for community
+  marketplace path B + vendored plugin dirs)
+- aweb.ai (Hugo site, deploy-landing): **6da746de → 7203f5c2 atop
+  27f43d4c** — Olivia home-hero redesign live. Canonical bootstrap
+  shape `aw agents bootstrap https://github.com/awebai/aweb-team-coord-worktrees.git
+  --username <username> --identity-prefix <you>` on home + /llms.txt
+  + /orchestration + /mcp + /docs/team-bootstrap. Zero stale
+  `aw team bootstrap` / `aw run claude` on those surfaces.
 
-## Release pipeline (2026-06-02)
+## Release pipeline (2026-06-07 → 2026-06-08)
 
-- v0.5.59 Athena/Grace ready ✅ (tag pushed, GHCR success)
-- Gates run ✅ (Grace make release-ready green at 0896ecea)
-- Tagged ✅ (v0.5.59 at 0896ecea)
-- Deployed ⏳ (waiting for Juan Render click)
-- Verified live ⏳
+- Olivia 27f43d4c site deploy ✅ (this turn — verified-live)
+- A2A train (Grace owned) — awaiting Grace's verified-live mail for
+  aweb 1.26.9 + aw 1.26.9 + AWID 0.5.11
+- aapz Wave 4 — held; Grace took the wave under "drive it through"
+  mandate. Verify with Grace on closure.
 
 ## Open holds
 

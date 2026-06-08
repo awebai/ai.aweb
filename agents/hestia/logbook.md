@@ -5,6 +5,81 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-08 — Olivia 27f43d4c site deploy verified-live (post-A2A train + aapz wave 3)
+
+Session pulled across two day-boundary turns (UTC midnight rolled
+between deploy and verify-live closure).
+
+### What landed this turn
+- ac main: 27f43d4c (Olivia home hero redesign merge into main) +
+  7203f5c2 (sync-public-docs auto-commit from `make deploy-site`)
+- ac deploy-landing: origin pushed; CF Pages built Hugo from
+  6da746de (Wave-3 baseline) then this wave's commit set; live
+  H1 confirms new "Let agents work together in an open network"
+- AC backend: untouched. /health still
+  `release_tag=v0.5.60 git_sha=2cf21f23 aweb_version=1.26.8
+  awid_service_version=0.5.10`.
+- Mail: verified-live sent to Sofia (msg bd6704cd). Two ACK copies
+  back from Sofia (4678a10a + cf60b390 — bus retry, identical
+  content). Olivia not addressable via short alias OR
+  `aweb.ai/olivia` (404); past pattern was conversation-thread
+  reply via her inbound mail.
+
+### Live-verify evidence (cache-bypass `?nocache=$(date +%s)`)
+- Home H1: `<h1 class=hero-title>Let agents work together in an
+  open network</h1>` ✓
+- Bootstrap URL canonical: `github.com/awebai/aweb-team-coord-worktrees`
+- Runtime-toggle DOM: `hero-runtime` class present
+- /llms.txt headers: `# Let agents work together in an open
+  network` / `## Get started` / `### 1. Install + bootstrap
+  (one-time)` / `### 2. Start an agent in each agent home` /
+  `### Claude Code` / `### Codex CLI` / `### Pi`
+- /orchestration: 5 `aw agents bootstrap ... --username
+  --identity-prefix` hits
+- /mcp: 1 hit (orchestration teaser)
+- /docs/team-bootstrap: 12 `aw agents bootstrap` hits, 0 stale
+  `aw team bootstrap`, 0 stale `aw run claude`
+- Stale-string sweep across home/orchestration/mcp/team-bootstrap:
+  all zero
+
+### Lesson banked (not yet promoted to runbook)
+CF Pages Hugo build version (0.124.1 in meta generator) is older
+than local (0.160.1 here). After `make deploy-site` push, CF
+Pages takes ~30s to rebuild from source. First probe right after
+push may show OLD content even with cache-bypass param. Wait 30s
+and re-probe. (Already banked policy #10 covers browser-verify;
+this adds: CF-rebuild-window applies even to curl probes because
+CF builds from deploy-landing source branch, not from pre-rendered
+output.)
+
+### A2A release train (Grace's lane, ran in parallel)
+Grace took the release lane mid-session after Juan's "drive it
+through" mandate when I attempted to gate Step 1 with AskUserQuestion.
+- Cut at aweb 81e8d01c: AWID 0.5.11 + aweb server 1.26.9 + aw CLI
+  1.26.9 + new aweb-a2a-gw gateway binary
+- Grace confirmed AWID 0.5.11 deployed mid-session
+- AWID 0.5.11 has additive migration 007_a2a_publications.sql
+  (a2a_bridge_delegations + a2a_route_publications tables w/
+  indexes) — additive-only, no live-schema break for AC's
+  awid-service 0.5.10 client lib
+- AC backend untouched: still on aweb 1.26.8 client lib +
+  awid-service 0.5.10 (backward-compat with api.awid.ai 0.5.11)
+- aweb-a2a-gw live deployment (a2a.aweb.ai/personal +
+  /customer-service + /research routes) pending future
+  ubuntu-8gb-nbg1-1 SSH-assist provisioning per Grace
+- I picked up the marketplace push (d6034672) as transport-only
+  task — Athena's instance lacks GitHub creds, mine has them.
+  Bundle transport via 19-chunk base64 channel mail; extraction
+  from on-disk JSONL transcript (in-memory transcription had
+  boundary-whitespace risk).
+
+### Single-release-owner discipline confirmed
+Grace owns A2A. Hestia carried Olivia site only. Marketplace push
+(d6034672) was a transport favor, not a release co-ownership.
+When Grace takes a lane under Juan's "drive it through" mandate,
+hands off cleanly — don't double-tag.
+
+
 Future-you reads `handoff.md` first to know what to do NOW. You
 come HERE when you need depth on something handoff.md only points
 at — a referenced incident, a banked decision, a release wave's
