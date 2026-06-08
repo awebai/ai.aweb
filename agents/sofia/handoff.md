@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-07 12:35Z (site hero redesign verified-live)
+Last updated: 2026-06-08 05:10Z (site setup-framing hold)
 
 ## How this file works
 
@@ -94,9 +94,9 @@ submission text must keep README's narrow trust boundary: inbound channel,
 outbound via `aw`, hosted/server-side paths not E2E. See logbook §"Long-fruit
 submission cluster" for full state.
 
-### Site hero redesign (verified-live 2026-06-07)
+### Site setup-framing HOLD (2026-06-08)
 
-Hestia verified site-only deploy `27f43d4c` live on aweb.ai. New H1: "Let agents work together in an open network" + runtime-toggle panels; `/llms.txt` get-started structure updated; canonical aw-agents-bootstrap form site-wide. Stale strings (`aw team bootstrap`, `aw run claude`) purged across home, /orchestration, /mcp, /docs/team-bootstrap. AC backend untouched. Silent by default; route to Iris only if we deliberately package as a distribution beat.
+Hestia verified site-only deploy `27f43d4c` live on aweb.ai, but then flagged it as framing-stale: aweb-aaqd.8 supersedes the "aw agents bootstrap is canonical" posture codified on the live home hero / /orchestration / /mcp / /docs/team-bootstrap / /llms.txt. New canonical setup surface is team-create + invite/join/connect/check. Olivia/Rose are working corrected copy; Hestia is waiting on rollback-vs-corrected-redeploy call. No external claim went out from Sofia; do not package site hero as distribution beat until resolved. If mentioning internally, say: live site exists but setup framing is superseded/pending correction.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
