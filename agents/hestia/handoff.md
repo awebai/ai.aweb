@@ -4,42 +4,55 @@ Crisp wake-up brief. What you need to act NOW, nothing more. For
 backstory on anything referenced here, see `logbook.md`. For
 operating discipline, see `AGENTS.md`.
 
-**Last updated:** 2026-06-08 00:15 UTC
+**Last updated:** 2026-06-08 16:05 UTC
 
 ## Newest finding
 
-**aapz Waves 1-3 verified-live. A2A release train + olivia 27f43d4c
-site deploy both moved this session.**
+**a2a-gw v1.26.9 image banked at GHCR. Manual-deploy lane
+ABANDONED per Grace ec961791; product path is now AC-managed
+A2A gateway under Grace's lane.**
 
-- aapz Wave 1 AWID 0.5.10 → verified-live earlier (api.awid.ai
-  flipped, schema migrated)
-- aapz Wave 2 aweb 1.26.8 PyPI + aw 1.26.8 npm → verified-live
-- aapz Wave 3 AC v0.5.60 → verified-live (Render flipped; site
-  canonical at deploy-landing 6da746de)
-- aapz Wave 4 (channel 1.4.12 + skills 0.2.12 + Pi 0.1.20 +
-  marketplace) was HELD when Grace took the release lane under
-  Juan's "drive it through" mandate
-- A2A release train at aweb 81e8d01c (AWID 0.5.11 + aweb 1.26.9 +
-  aw 1.26.9 + new aweb-a2a-gw gateway binary) — Grace owns lane;
-  Grace confirmed AWID 0.5.11 deployed mid-session
-- Olivia home hero redesign at ac 27f43d4c → verified-live THIS
-  TURN. Site-only deploy (no AC backend bump). CF Pages caught up
-  after ~30s build window; live H1 confirms "Let agents work
-  together in an open network" with runtime-toggle install panels.
-- Sofia ACK'd verified-live mail (two copies — bus retry); Olivia
-  not directly addressable from this workspace (`aweb.ai/olivia`
-  → 404). Past closure pattern was conversation-thread reply via
-  her inbound mail.
+Banked (NOT rolled back, per Grace's "keep as banked
+infrastructure"):
+- a2a-gw-v1.26.9 tag at aweb 66b0e70c
+- ghcr.io/awebai/a2a-gateway:1.26.9 + :latest multi-arch on GHCR
+- Runbook + Dockerfile + GHA workflow + Makefile + e2e (33-test
+  real-backend Docker journey) at 66b0e70c
+- Hestia review APPROVED 66b0e70c; Mia signed via Grace relay
+  a5330b8d
+
+Stopped (not started — NO state change in aweb.ai namespace):
+- Identity provisioning (a2a.aweb.ai/gateway). No controller keys
+  touched, no aw id create / team create / accept-invite, nothing.
+- Render Secret File packaging / tarball / command-override
+- Per-route AWID publication + SendMessage→GetTask transcripts
+- Verified-live mail for a2a.aweb.ai
+
+Render service state: Juan created the Web Service at 15:46 UTC
+for ghcr.io/awebai/a2a-gateway:1.26.9 with only AWEB_A2A_GW_CONFIG
+env (no Secret Files, no command override). Service in restart
+loop, exit status 1 (no config mounted). Per Grace, leave
+suspended/stopped; don't delete (Render slot + DNS may be reused
+by AC-managed gateway).
+
+Also this session, NOT pivoted:
+- aapz Waves 1-3 verified-live (AWID 0.5.10 → 0.5.11 by Grace's
+  A2A train, aweb 1.26.8 PyPI+npm → 1.26.9 by Grace, AC v0.5.60)
+- Olivia 27f43d4c home hero redesign verified-live on aweb.ai
+- aapz Wave 4 (channel 1.4.12 / skills 0.2.12 / Pi 0.1.20 /
+  marketplace) status unclear — Grace's A2A wave may have folded
+  it. Do not parallel-action without Grace surfacing it.
 
 ## In flight
 
-**A2A wave** — Grace owns. Awaiting her verified-live mail for
-aweb/aw 1.26.9 + AWID 0.5.11. Live a2a.aweb.ai routes
-(personal/customer-service/research) pending future
-ubuntu-8gb-nbg1-1 SSH-assist provisioning that Grace may request.
+**AC-managed A2A gateway** — Grace scoping. She'll pull me back
+in when AC controls the release lane. No Hestia action until
+then.
 
-**aapz Wave 4 closure** — verify status with Grace before any
-parallel action; her A2A wave may have folded it.
+**Olivia not directly addressable** — `aweb.ai/olivia` 404s. Past
+closure pattern is conversation-thread reply via her inbound
+mail. For future site-deploy closure: ACK Sofia, conversation-
+thread Olivia where possible.
 
 ## Open holds (don't trip these)
 

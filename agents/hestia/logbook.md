@@ -5,6 +5,159 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-08 — a2a-gw v1.26.9 lane: image banked, manual-deploy abandoned, pivot to AC-managed gateway
+
+### Arc summary
+
+Full release-chain ran from gate-review through tag-push through
+GHCR build through Render Web Service creation. Manual-deploy lane
+collapsed at the workspace-state delivery question. Grace pivoted
+mid-arc to AC-managed gateway as the product path. Image +
+infrastructure stay banked at 66b0e70c; nothing rolled back; no
+identity provisioning was started; no controller keys touched.
+
+### Sequence of events (all 2026-06-08)
+
+- Grace pushed bab02eb1 (initial gateway container release + e2e)
+  for review. Hestia reviewed: APPROVE structural shape, flagged
+  2 P1 gaps (gateway identity provisioning subsection missing;
+  /health AWID version-floor advertisement-only, not enforced), 1
+  P2 clarification (narrow-gate caveat), 1 decision-confirm
+  (Render not Hetzner).
+- Grace pushed 66b0e70c with fixes folded credibly: new "Gateway
+  Identity Provisioning" runbook subsection (creation, team-cert,
+  smoke, AWID publication, gateway.yaml template, Render delivery,
+  rotation, compromise procedure), /health Compatible+MinimumVersion
+  enforcement with 503 on missing/old AWID, narrow-gate caveat, Render
+  decision banked with "Hetzner needs a separate reviewed runbook"
+  caveat. e2e bumped 30→33 tests for compatible/minimum/version
+  assertions.
+- Mia cleared 66b0e70c per Grace relay a5330b8d (Mia review
+  request ef106835 was delivered via Grace's mail path).
+- Hestia drove release chain at 66b0e70c:
+  - branch main / tree clean / no existing a2a-gw tag / Docker up /
+    CLI_VERSION=1.26.9 (from SERVER_VERSION coupling, #219 debt)
+  - make release-a2a-gateway-check: go tests (4 packages green) +
+    production Docker build + in-container --check + real-backend
+    Docker e2e PASS 33/33 in ~10 min
+  - make release-a2a-gateway-tag: a2a-gw-v1.26.9 at 66b0e70c
+  - make release-a2a-gateway-push: tag to origin
+  - GHA workflow 27129622205 "A2A Gateway Release (GHCR)" SUCCESS
+    in 4m19s — multi-arch image at ghcr.io/awebai/a2a-gateway:1.26.9
+    + :latest
+- Juan created Render Web Service for the image at 15:46 UTC. Image
+  pulled clean (no GHCR auth issue). Container started clean. Exit
+  status 1 with `open /config/gateway.yam: no such file or directory`
+  — Juan's env-var typo (missing trailing `l` on gateway.yaml).
+- Typo fixed; second deploy also exit-status-1 with the corrected
+  `gateway.yaml` path — expected, because no config or workspace
+  was mounted yet.
+- Hestia mailed Grace 86e2be87 surfacing the v1 workspace-state
+  delivery question: (a) Render Secret Files read-only, (b) Persistent
+  Disk + Render Shell seeding, (c) Dockerfile entrypoint tarball
+  expansion in a fresh patch release.
+- Grace mail 020fc0bc picked (a)-with-tarball: Render Secret Files
+  for gateway.yaml + base64 tarball + command-override doing
+  `base64 -d | tar -xz` at startup. Validated /bin/sh, base64, tar,
+  mkdir present in the 1.26.9 image. Code-checked gateway workspace
+  state is read-only at runtime (only writable thing is optional
+  audit JSONL).
+- Hestia asked two clarifying questions (team-naming + cert-path
+  relative/absolute). Grace mail 9765e48a answered: dedicated NEW
+  team; cert paths are RELATIVE (SaveTeamCertificateForTeam writes
+  `team-certs/<encoded>.pem`; runtime resolves as
+  `<workspace_dir>/.aw/<cert_path>`). Tarball: `tar -czf - .aw |
+  base64 > gateway-workspace.tgz.b64`. Exclude controller keys +
+  human workspace state. Pre-tarball verify: grep `cert_path` is
+  relative `team-certs/*.pem`, files exist under `.aw/team-certs/`.
+- Hestia gave Juan the 16-step provisioning + Render setup table.
+  Asked: (1) is `a2a.aweb.ai` namespace controller-prepared? (2)
+  team name? (3) where do you run controller-key bits from?
+- Before Juan answered, Grace mail 5bf40922 pivoted: "Stop manual
+  A2A tarball deploy; pivot to AC-managed gateway." Reasoning: Juan
+  not demoing this endpoint, tarball flow not product-quality, only
+  useful as temp manual endpoint, hosted customers should not handle
+  .aw workspace state or tarballs.
+- Hestia ACK'd Grace 54d52f02; closed #263 as banked-infrastructure /
+  manual-lane-abandoned. Grace ACK'd that closure ec961791.
+
+### What's banked (NOT rolled back, per Grace's instruction)
+
+- aweb tag a2a-gw-v1.26.9 at 66b0e70c
+- ghcr.io/awebai/a2a-gateway:1.26.9 + :latest multi-arch on GHCR
+- Dockerfile.a2a-gw + .github/workflows/a2a-gateway-release.yml +
+  Makefile release-a2a-gateway-* lane
+- scripts/e2e-a2a-gateway-docker.sh (33-test real-backend Docker
+  journey)
+- docs/a2a-release-runbook.md with Gateway Identity Provisioning
+  section, /health AWID-compatible enforcement, narrow-gate
+  caveat, Render-decision-banked
+- cli/go/awid/registry_resolver.go DNS-bypass fix (TestRegistryResolverEmbeddedFallbackBypassesDNSForAddress)
+- /health emits build.release_tag + build.git_sha + aweb_version +
+  awid_service_version (floor) + awid_registry{url,reachable,compatible,
+  status,version,minimum_version,error} + gateway diagnostics; flips
+  to 503 when !reachable OR !compatible
+
+### What's stopped (NO state change in aweb.ai namespace)
+
+- Identity provisioning for a2a.aweb.ai/gateway — not started
+- No `aw id namespace prepare-controller`, no `aw id create`, no
+  team create, no controller-signed cert, no `aw init`
+- No Render Secret Files uploaded, no command override set
+- No per-route AWID publication
+- No verified-live mail for a2a.aweb.ai
+
+### Render service state
+
+Juan's Render Web Service at slot `a2a.aweb.ai` is in restart-loop
+(exit-status-1 on each restart). Configured with only
+AWEB_A2A_GW_CONFIG env, no Secret Files, no command override. Per
+Grace, leave suspended/stopped; don't delete (slot + DNS may be
+reused when AC-managed gateway needs it).
+
+### Lessons banked (not yet promoted to runbook)
+
+1. **Render Secret Files mount as /etc/secrets/<filename> by
+   default, read-only.** Useful for config-and-workspace delivery
+   when workspace state is read-only at runtime; insufficient for
+   anything that writes (audit logs, cert renewal, local outgoing-
+   mail spool).
+2. **Workspace tarball + command-override is the right v1 for
+   read-only workspace state** without recutting the image — IF
+   `sh`, `base64`, `tar`, `mkdir` are present in the runtime
+   image. Alpine base provides all four. Pattern: secret-file
+   `*.tgz.b64`, Render command override does `base64 -d | tar
+   -xz` into `/tmp/...`, then exec the daemon.
+3. **Manual workspace-state surgery is not customer-product.**
+   Useful for temporary live endpoints (founder-demo), not for
+   hosted customers. When a manual deploy lane starts requiring
+   per-customer tarball generation, namespace-controller
+   coordination, and Render Secret File uploads, the right move
+   is control-plane managed (AC owns identity + cert + config +
+   deploy).
+4. **DNS-resolution intermittently times out from this machine to
+   *.onrender.com origins** (api.awid.ai + app.aweb.ai both saw
+   ~10s context-deadline-exceeded multiple times this session;
+   non-Render destinations like github.com and pypi.org resolved
+   fine). Likely Render origin cold-start lag in GCP-us-west1.
+   Mitigation: retry with longer timeout.
+
+### Live state at end of session
+
+- AC: v0.5.60 prod, aweb 1.26.8 client, awid_service 0.5.10
+- AWID: api.awid.ai version 0.5.11 (Grace deployed mid-session)
+- PyPI aweb: 1.26.9 (Grace's A2A wave; self-last-verified 1.26.8)
+- npm aw: 1.26.9 (Grace's wave; self-last-verified 1.26.8)
+- aweb.ai: Olivia 27f43d4c hero redesign live
+- a2a.aweb.ai: NOT live — Render Web Service exists but suspended
+- a2a-gw image: GHCR 1.26.9 + :latest, banked
+
+### Tracking
+
+#262 closed (review complete). #263 closed (release chain complete
+on the banked-infrastructure side; manual-deploy lane abandoned).
+
+
 ## 2026-06-08 — Olivia 27f43d4c site deploy verified-live (post-A2A train + aapz wave 3)
 
 Session pulled across two day-boundary turns (UTC midnight rolled
