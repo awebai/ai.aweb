@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-08 05:20Z (site hold-B direction)
+Last updated: 2026-06-08 05:45Z (OpenClaw research restart point)
 
 ## How this file works
 
@@ -97,6 +97,73 @@ submission cluster" for full state.
 ### Site setup-framing HOLD-B (2026-06-08)
 
 Hestia verified site-only deploy `27f43d4c` live on aweb.ai, but then flagged it as framing-stale: aweb-aaqd.8 supersedes the "aw agents bootstrap is canonical" posture codified on the live home hero / /orchestration / /mcp / /docs/team-bootstrap / /llms.txt. Olivia tested aaqd.8 replacement commands against installed aw 1.26.8: `aw team create`, `aw team invite`, `aw team join`, `aw workspace connect`, and `aw check` are unknown commands. Sofia aligned with Olivia/Hestia on option B: hold current live site, do not roll back. Rationale: current aw-agents-bootstrap copy is outdated architecturally but works for customers; replacing it with unreleased commands would mislead all latest-npm users. Posture: live site is teachable-and-working but setup framing is pending aaqd.8 alignment. Do not package site hero/setup copy as distribution beat. Do not externally claim aaqd.8 setup model until Rose ships released CLI support and Olivia redeploys aligned copy.
+
+### OpenClaw × aweb integration (active — ClawHub skills drafted, awaiting publish)
+
+**2026-06-09 with Juan:** decided ClawHub strategy and implemented. Decision:
+publish new canonical `aweb` skill AND push final corrected update to the
+existing `claweb` slug (625 downloads; its content is broken against aw 1.26.x —
+`--to-alias`, `--unread-only`, `ack --message-id` no longer exist; brand stale).
+ClawHub search for "aweb" returned zero results before this.
+
+State:
+- Both SKILL.md drafts written under `agents/sofia/openclaw-skill/`
+  (`aweb/` v1.0.0, `claweb/` v0.4.0 = same content + rename pointer).
+  Every command verified against installed aw 1.26.8 `--help` output.
+  Setup flows checked against canonical skills (messaging, team-membership).
+  E2EE boundary wording per standing claim discipline.
+- Publish runbook in `agents/sofia/openclaw-skill/README.md` —
+  `clawhub sync` from that dir, requires Juan's clawhub auth (CLI not on
+  this machine).
+- Cron poller block follows current OpenClaw docs but untested live
+  (no openclaw binary here); `--every 1m` chosen conservatively.
+- Athena asked for tech-accuracy review (mail) before/around publish.
+
+Research note `agents/sofia/openclaw-aweb-research.md` carries the wider
+ladder (npm bundle Level 0 test, marketplace relative-source Level 1 with
+Athena/Hestia, native plugin Level 4 deferred).
+
+Key current read:
+- OpenClaw is a self-hosted multi-channel Gateway. It supports native plugins,
+  ClawHub skills/plugins, and Claude/Codex/Cursor compatible bundles.
+- Fastest likely path: OpenClaw installs `@awebai/claude-skills@0.2.12` as a
+  Claude-compatible bundle, plus user installs `@awebai/aw`. Do **not** frame
+  `@awebai/claude-channel` as the OpenClaw path; it is Claude Code-specific.
+- Current `awebai/claude-plugins` marketplace source is npm-based. OpenClaw
+  remote Claude-marketplace installs require relative paths inside the cloned
+  marketplace repo, so direct `--marketplace awebai/claude-plugins` may fail
+  unless we switch entries to relative dirs or create an OpenClaw-specific
+  marketplace. Don't change that without Athena/Hestia coordination because
+  Claude Code users currently rely on npm-source marketplace pins.
+- Old user-provided `claweb` skill structure is useful despite stale commands:
+  setup once, start-of-session inbox/chat check, mail/chat examples, security,
+  and especially **automatic polling**.
+- Wakeup is load-bearing. OpenClaw has no aweb-native push receiver today.
+  Near-term wake path is OpenClaw cron (or heartbeat, but default ~30 min is too
+  slow for chat). Current docs support `openclaw cron add/create`, `--every`,
+  `--session main`, `--wake now`, and `--system-event`. Creating/mutating cron
+  likely requires `operator.admin`, so user docs should tell the human/operator
+  to install the poller.
+- Proposed poller shape to test, not publish blindly:
+  `openclaw cron add --name "aweb inbox poller" --every 30s --session main --wake now --system-event "aweb poll: Check for new aweb mail and chat. Run 'aw mail inbox --unread-only' and 'aw chat pending'. If there is anything new, read it and respond using the aweb-messaging policy. Reply in existing conversations; do not start duplicates. If no new items, output NO_REPLY."`
+- Must test whether `30s` is accepted/too noisy, whether `NO_REPLY` suppresses
+  output for main-session cron, whether `aw mail inbox --unread-only` is still
+  best command spelling, and whether the skills appear after npm bundle install.
+
+Likely next actions:
+1. Get a clean OpenClaw install/workspace and test:
+   `npm install -g @awebai/aw@latest`; `cd ~/.openclaw/workspace`; initialize or
+   join aweb correctly; `openclaw plugins install npm:@awebai/claude-skills@0.2.12 --pin`;
+   `openclaw gateway restart`; `openclaw plugins inspect ...`; `openclaw skills check`.
+2. Draft an `aweb-openclaw` skill/package based on current aweb wording + the
+   old `claweb` structure, but update all obsolete terms (aweb not ClaWeb,
+   awid.ai not clawdid, current `aw init`/invite/BYOT flows, plaintext/E2EE
+   boundary). Include cron polling prominently.
+3. Consider adding OpenClaw metadata to canonical aweb skills (`metadata.openclaw`
+   with `requires.bins: ["aw"]` and node install hint for `@awebai/aw`) only after
+   validating Claude Code and OpenClaw parsers tolerate it.
+4. Decide distribution ladder after test: direct npm bundle docs → OpenClaw-compatible
+   marketplace → ClawHub bundle/skills → native OpenClaw plugin wrapping `aw`.
 
 ### Omnigraph incoming-agent posture (banked 2026-05-27, no contact yet)
 
