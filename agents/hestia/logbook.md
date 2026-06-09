@@ -5,6 +5,118 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-09 — Olivia site deploy 2facc1e1: 5/6 verified-live, Render publish-dir staleness banked as #266
+
+### Arc summary
+
+Cut Olivia's blueprint-voice site deploy from ac main 2facc1e1
+("blueprint voice for home hero, teasers, and docs redirect").
+Five of six checklist items verified live on aweb.ai cleanly.
+Sixth item (/docs/team-bootstrap.md should 404) blocked on
+Render-side publish-dir staleness — file deleted from source +
+Makefile sync list, local Hugo build doesn't include it, deploy-
+landing tree at 2facc1e1 has no team-bootstrap.md anywhere, but
+Render still serves the 15KB file with prior-sync mtime. Other
+paths show fresh today's mtime. Root cause: Render's publish dir
+not cleaned between builds.
+
+### Sequence (all 2026-06-09)
+
+- `make deploy-site` ran clean from ac main 2facc1e1 → built
+  Hugo locally (51 pages, 33 static files, 2 aliases, 0 cleaned),
+  push 7203f5c2..2facc1e1 main → deploy-landing landed.
+- First probe at +30s after deploy: CF Pages still serving stale
+  Hugo build (`Hugo 0.124.1` in generator meta), all 6 items
+  showed pre-deploy state.
+- Second probe at +120s: Render rebuilt. 5/6 items green:
+  * Home hero: "Create a team · from a blueprint" present;
+    runtime-toggle / hero-runtime CSS classes absent.
+  * /mcp: "Create your team from a blueprint" present.
+  * /docs/team-bootstrap/: Hugo meta-refresh alias page with
+    `<link rel=canonical href=https://aweb.ai/orchestration/>` +
+    `<meta http-equiv=refresh content="0; url=https://aweb.ai/orchestration/">`.
+    Body has no team-bootstrap content. Olivia ACK: meta-refresh
+    acceptable for static host, no hard 30x expected.
+  * /llms.txt: 0 "aw agents bootstrap", 7 "blueprint" hits.
+  * /mcp/llms.txt: 0 "aw agents bootstrap".
+  * Docs sidebar: 0 "Bootstrap a repo-local aweb team" listings.
+- 6th item gap: `/docs/team-bootstrap.md` HTTP 200, content is
+  full original markdown, `last-modified: Mon 2026-06-08 07:17:01
+  UTC` (prior 7203f5c2 sync commit timestamp). Other paths show
+  `last-modified: Tue 2026-06-09 22:10:31 UTC` (today's build).
+- Source-side audit confirms file genuinely absent:
+  * 2facc1e1 deleted `site/static/docs/team-bootstrap.md` (459
+    lines per `git show --stat`).
+  * Makefile diff removed `team-bootstrap.md` from
+    `AWEB_PUBLIC_DOCS` AND `AWEB_HUGO_DOCS` lists.
+  * `sync-public-docs` target does `rm -f
+    "$(AWEB_STATIC_DOC_DIR)"/*.md` then re-copies AWEB_PUBLIC_DOCS
+    — so it won't recreate team-bootstrap.md.
+  * Local `ls -la ac/site/static/docs/` and `ls ac/site/public/docs/`
+    both have no team-bootstrap.md.
+  * `git -C ac ls-tree -r origin/deploy-landing | grep team-bootstrap`
+    returns empty.
+- Conclusion: Render's publish dir is incremental — files removed
+  from source persist in published output. Render's build command
+  for aweb.ai static site likely does `hugo --minify` without
+  `--cleanDestinationDir`.
+
+### Coordination
+
+- Mailed Olivia (juan.aweb.ai/olivia, msg 6a216fcc) with full
+  verify-live report + Render-side hypothesis + ask for Juan
+  Clear-build-cache & deploy.
+- Mailed Sofia (aweb.ai/sofia, msg 03056d2f) with same +
+  framing-review request.
+- Tried Juan via `juan`, `juanre`, `juan.aweb.ai/juan`, `aweb.ai/juan`
+  — all 404. Sofia replied she's in session with Juan and
+  surfacing the Render clear-cache ask directly.
+- Olivia replied (msg d51a5424): confirmed /docs/team-bootstrap.md
+  should hard 404 (no stub — it was agent-facing copy for
+  superseded flow, canonical legacy reference stays in aweb repo);
+  meta-refresh acceptable; +1 on #266 Makefile pre-clean as
+  durable fix.
+- Sofia replied with framing-pass (msg 2c415cd9): mail names
+  what-fixes / what-doesn't / evidence chain, all good; she
+  independently re-curled and grepped to confirm; will close
+  HOLD-B (site setup-framing) once stale .md confirmed gone; +1
+  on #266 Makefile pre-clean.
+- Sofia second reply (msg 7245b58e): confirmed live hero teaches
+  blueprint prompt + aw commands all in released 1.26.8, so
+  HOLD-B substance is resolved pending the post-rebuild check.
+- ACK'd Sofia (msg 65bb8b26) with closure-condition: post-rebuild
+  curl routed to her + Olivia, then HOLD-B closes; Makefile
+  pre-clean diff prepped after verify closes.
+
+### Banked discipline
+
+- **Olivia's address is `juan.aweb.ai/olivia`** (cross-namespace
+  form). Short `olivia` 404s, `aweb.ai/olivia` 404s. Memory
+  already had this; verified again.
+- **Juan's aw alias not reachable via short forms.** Loop through
+  Sofia when she's in session; else Juan@aweb.ai direct.
+- **Render publish-dir staleness is real.** Site-deploy verify-live
+  must specifically re-curl URLs of REMOVED static files, not just
+  ADDED/MODIFIED ones. Banked as task #266; #266's fix is Makefile
+  pre-clean of publish dir before hugo build (both Olivia + Sofia
+  +1; doesn't depend on Render config staying correct).
+
+### Task created
+
+- #266 Render publish-dir stale for removed-from-source static
+  files (aweb.ai). Pending Juan's Render Clear-build-cache & deploy
+  first, then Makefile pre-clean diff lands as the durable fix.
+
+### Next-move-if-resumed
+
+1. Re-curl `https://aweb.ai/docs/team-bootstrap.md` periodically
+   until 404 or fresh mtime.
+2. Mail Olivia + Sofia closure with the post-rebuild evidence.
+3. Cut Makefile pre-clean diff (rm publish dir before hugo) under
+   #266 — prep in a branch, mail Athena for review before push.
+
+---
+
 ## 2026-06-08 — a2a-gw v1.26.9 lane: image banked, manual-deploy abandoned, pivot to AC-managed gateway
 
 ### Arc summary
