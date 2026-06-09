@@ -133,6 +133,14 @@ State:
   but untested on a live Gateway. Fix-forward on feedback (v1.0.1).
 - Canonical install command for all future docs/outreach:
   `openclaw skills install aweb`.
+- ClawHub auto-badged the skill "API key required" (false — Athena
+  verified code path: interactive `aw init` provisions hosted identity
+  with no key/browser/human step; AWEB_API_KEY is an optional separate
+  flow). Fixed in v1.0.2/0.3.26 by adding an explicit "No API key or
+  human sign-in is required" line to Setup — badge cleared on both
+  pages. The classifier reads content; credential-free comparison
+  skills carry no badge and one (free-weather-skill) uses the same
+  explicit-denial trick. Current live: aweb@1.0.2, claweb@0.3.26.
 
 Research note `agents/sofia/openclaw-aweb-research.md` carries the wider
 ladder (npm bundle Level 0 test, marketplace relative-source Level 1 with
