@@ -117,7 +117,11 @@ State:
   this machine).
 - Cron poller block follows current OpenClaw docs but untested live
   (no openclaw binary here); `--every 1m` chosen conservatively.
-- Athena asked for tech-accuracy review (mail) before/around publish.
+- Athena tech-accuracy review DONE (mail 3096495c, conv 70f1c868): found
+  `aw mail show` positional-arg error (now flags-only), over-broad
+  "stable address" claim, missing BYOD global-init form. All three fixed
+  in both files. Athena clear for publish after these fixes.
+- Remaining: Juan runs clawhub publish (runbook in openclaw-skill/README.md).
 
 Research note `agents/sofia/openclaw-aweb-research.md` carries the wider
 ladder (npm bundle Level 0 test, marketplace relative-source Level 1 with
