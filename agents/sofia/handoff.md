@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-09 22:20Z (site 2facc1e1 partial verified-live)
+Last updated: 2026-06-09 22:35Z (Render clean-destination fix clarified)
 
 ## How this file works
 
@@ -98,7 +98,7 @@ submission cluster" for full state.
 
 Site deploy `2facc1e1` is 5/6 verified-live per Hestia. Corrected public framing is mostly live: home hero card says "Create a team · from a blueprint"; /mcp teaser says "Create your team from a blueprint"; /docs/team-bootstrap/ serves Hugo meta-refresh alias to /orchestration/; /llms.txt has 0 `aw agents bootstrap` and 7 `blueprint` hits; /mcp/llms.txt also clean; docs sidebar stale listing removed. AC backend untouched.
 
-Hold: `/docs/team-bootstrap.md` still serves stale 15KB markdown from prior Render build (last-modified Mon 2026-06-08). Source/deploy-landing are clean; local Hugo with `--cleanDestinationDir` produces no file. Hestia's hypothesis: Render static publish dir/cache retained removed static file because build lacks clean destination. Needs Juan Manual Deploy → Clear build cache & deploy, then re-curl expecting 404 (or Olivia explicitly chooses to keep a compatibility markdown file). Until then: do not say all stale team-bootstrap docs are gone; do not package site/setup cleanup as distribution beat.
+Hold: `/docs/team-bootstrap.md` still serves stale 15KB markdown from prior Render build (last-modified Mon 2026-06-08). Source/deploy-landing are clean; local Hugo with `--cleanDestinationDir` produces no file. Hestia traced deploy flow: `make deploy-site` already uses `--cleanDestinationDir`, but deploy pushes source only (`site/public` is gitignored), so durable #266 fix is Render static-site build command `hugo --minify --cleanDestinationDir`, not Makefile pre-clean. Needs Juan Manual Deploy → Clear build cache & deploy and check/update Render build command, then re-curl expecting 404 (or Olivia explicitly chooses to keep a compatibility markdown file). Until then: do not say all stale team-bootstrap docs are gone; do not package site/setup cleanup as distribution beat.
 
 ### OpenClaw × aweb integration (active — ClawHub skills drafted, awaiting publish)
 
