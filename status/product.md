@@ -1,12 +1,12 @@
 # Product Status
-Last updated: 2026-06-08 05:20Z (site hold-B direction)
+Last updated: 2026-06-09 22:20Z (site 2facc1e1 partial verified-live)
 
 ## Current focus
 - **Production release state:** app.aweb.ai is live healthy at `v0.5.60`, git `2cf21f23`, aweb `1.26.8`, awid_service `0.5.10`; api.awid.ai reports `0.5.10`.
 - **Claude marketplace submissions:** Wave 4 packages are live (`@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, Pi `0.1.20`). Reviewed vendored artifacts are now pushed to `awebai/claude-plugins` origin/main at `d6034672ded5ef5dbb38fc84fcb0a1de883b9544`; submission can proceed using that pushed SHA. Outward text must keep the README trust boundary: inbound channel, outbound via `aw`, hosted/server-side paths not E2E.
 - **E2EE framing boundary:** keep claims narrow to smoked surfaces. Hosted/server-side messaging must not be called E2E; do not make broad generic self-custodial E2EE readiness claims unless the AWID encryption-key publish skew Athena flagged is fixed/explained.
 - **Engineering risk tracked with Athena:** aw 1.26.3 workspace-cleanup regression (#245) remains the customer-risk pattern to track for CLI/workspace-cleanup-adjacent work: read/status flows must not destructively delete server workspace/agent rows from stale local paths.
-- **Landing site framing HOLD (B):** site-only deploy `27f43d4c` stays live; do not roll back. Its aw-agents-bootstrap setup framing is superseded by aaqd.8 direction, but it works in released `@awebai/aw@1.26.8`. Replacement commands (`aw team create/invite/join`, `aw workspace connect`, `aw check`) are not in released CLI, so do not teach or claim them externally yet. Do not package current hero/setup copy as a distribution beat until Rose ships the CLI surface and Olivia redeploys aligned copy.
+- **Landing site setup-framing cleanup:** site deploy `2facc1e1` is 5/6 verified-live. Home, /mcp, /llms.txt, /mcp/llms.txt, /docs/team-bootstrap/ alias, and docs sidebar now use blueprint/orchestration framing and purge stale `aw agents bootstrap` / `aw team bootstrap` / `aw run claude` surfaces. HOLD remains because `/docs/team-bootstrap.md` still serves stale 15KB markdown from Render cache; needs Juan Clear build cache & deploy or Olivia decision to keep a compatibility file.
 - **Direction context:** gbrain/corpus/omnigraph question is waiting on Juan; no product priority change until that answer lands.
 
 ## Product readiness
@@ -15,11 +15,11 @@ Last updated: 2026-06-08 05:20Z (site hold-B direction)
 - **Channel / skills / Pi:** `@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, `@awebai/pi@0.1.20` published.
 - **aweb-cloud:** live health check 2026-06-07 12:14Z reports `release_tag=v0.5.60`, `git_sha=2cf21f23`, `aweb_version=1.26.8`, `awid_service_version=0.5.10`, healthy.
 - **awid registry:** `https://api.awid.ai/health` reports `version=0.5.10`, ok.
-- **Landing site:** deploy `27f43d4c` is live and held in place (no rollback). It centers aw-agents-bootstrap, which aweb-aaqd.8 supersedes architecturally, but the replacement commands are unreleased and fail on aw 1.26.8. Treat site as teachable-and-working but pending aaqd.8 alignment. AC backend untouched.
+- **Landing site:** deploy `2facc1e1` is mostly live and corrected: hero card says “Create a team · from a blueprint,” /mcp teaser says “Create your team from a blueprint,” /docs/team-bootstrap/ is a Hugo meta-refresh alias to /orchestration/, /llms.txt has 0 `aw agents bootstrap` and 7 `blueprint` hits, docs sidebar stale listing removed. `/docs/team-bootstrap.md` is still stale due Render publish-dir/cache behavior. AC backend untouched.
 
 ## Outreach
 - Claude marketplace path is the active long-fruit lane. `claude-plugins` commit `d6034672ded5ef5dbb38fc84fcb0a1de883b9544` adds vendored community-submission artifacts rematerialized from corrected npm packages and validated by Athena/Sofia/Hestia; origin push blocker is closed.
-- Site hero redesign is NOT ready as a distribution beat while setup-framing hold is open. No public claim went out from Sofia; nothing to retract externally from this surface.
+- Site/setup cleanup is NOT ready as a distribution beat until `/docs/team-bootstrap.md` stale Render artifact is cleared. No public claim went out from Sofia; nothing to retract externally from this surface.
 - `publishing/attempts.jsonl` has no observed submission rows yet. Do not add submission attempts until the claude-plugins commit is pushed and actual submission occurs.
 - Juan confirmation is still useful on broader cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.
 
@@ -29,7 +29,7 @@ Last updated: 2026-06-08 05:20Z (site hold-B direction)
 - #245 acceptance to preserve: missing local path does not delete rows during `aw workspace status`, explicit cleanup/delete still works for truly gone ephemeral workspaces, persistent/global identities are never deleted by stale-path cleanup, pmbah rename regression covered, release notes warn 1.26.3 users who renamed worktree roots.
 
 ## Priorities
-1. **Keep landing-site setup-framing hold explicit** until Rose ships the new CLI commands and Olivia redeploys aligned copy; current site stays live but is not a distribution beat.
+1. **Close landing-site stale artifact hold**: Juan clear-build-cache redeploy (or Olivia decides markdown compatibility file remains), then verify `/docs/team-bootstrap.md` no longer serves stale 2026-06-08 content before any site/setup distribution beat.
 2. **Proceed with Claude marketplace submission from pushed SHA `d6034672`** while keeping trust-boundary wording narrow.
 3. **Keep outward E2EE claims narrow** to exact smoked surfaces; no broad “E2EE is live” or hosted/server-side E2E claim.
 4. **Track #245 fix-forward before CLI/workspace-cleanup-adjacent ships.** Direction agrees with Athena: read/status commands should not be destructive lifecycle operations.

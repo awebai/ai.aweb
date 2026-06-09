@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-08 05:45Z (OpenClaw research restart point)
+Last updated: 2026-06-09 22:20Z (site 2facc1e1 partial verified-live)
 
 ## How this file works
 
@@ -94,9 +94,11 @@ submission text must keep README's narrow trust boundary: inbound channel,
 outbound via `aw`, hosted/server-side paths not E2E. See logbook §"Long-fruit
 submission cluster" for full state.
 
-### Site setup-framing HOLD-B (2026-06-08)
+### Site setup-framing cleanup HOLD (updated 2026-06-09)
 
-Hestia verified site-only deploy `27f43d4c` live on aweb.ai, but then flagged it as framing-stale: aweb-aaqd.8 supersedes the "aw agents bootstrap is canonical" posture codified on the live home hero / /orchestration / /mcp / /docs/team-bootstrap / /llms.txt. Olivia tested aaqd.8 replacement commands against installed aw 1.26.8: `aw team create`, `aw team invite`, `aw team join`, `aw workspace connect`, and `aw check` are unknown commands. Sofia aligned with Olivia/Hestia on option B: hold current live site, do not roll back. Rationale: current aw-agents-bootstrap copy is outdated architecturally but works for customers; replacing it with unreleased commands would mislead all latest-npm users. Posture: live site is teachable-and-working but setup framing is pending aaqd.8 alignment. Do not package site hero/setup copy as distribution beat. Do not externally claim aaqd.8 setup model until Rose ships released CLI support and Olivia redeploys aligned copy.
+Site deploy `2facc1e1` is 5/6 verified-live per Hestia. Corrected public framing is mostly live: home hero card says "Create a team · from a blueprint"; /mcp teaser says "Create your team from a blueprint"; /docs/team-bootstrap/ serves Hugo meta-refresh alias to /orchestration/; /llms.txt has 0 `aw agents bootstrap` and 7 `blueprint` hits; /mcp/llms.txt also clean; docs sidebar stale listing removed. AC backend untouched.
+
+Hold: `/docs/team-bootstrap.md` still serves stale 15KB markdown from prior Render build (last-modified Mon 2026-06-08). Source/deploy-landing are clean; local Hugo with `--cleanDestinationDir` produces no file. Hestia's hypothesis: Render static publish dir/cache retained removed static file because build lacks clean destination. Needs Juan Manual Deploy → Clear build cache & deploy, then re-curl expecting 404 (or Olivia explicitly chooses to keep a compatibility markdown file). Until then: do not say all stale team-bootstrap docs are gone; do not package site/setup cleanup as distribution beat.
 
 ### OpenClaw × aweb integration (active — ClawHub skills drafted, awaiting publish)
 
