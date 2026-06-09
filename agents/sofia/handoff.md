@@ -120,8 +120,19 @@ State:
 - Athena tech-accuracy review DONE (mail 3096495c, conv 70f1c868): found
   `aw mail show` positional-arg error (now flags-only), over-broad
   "stable address" claim, missing BYOD global-init form. All three fixed
-  in both files. Athena clear for publish after these fixes.
-- Remaining: Juan runs clawhub publish (runbook in openclaw-skill/README.md).
+  in both files. Athena cleared for publish after these fixes.
+- **PUBLISHED 2026-06-09** via clawhub device-flow auth on this server:
+  `aweb@1.0.0` (id k97d1ps8vhvjhp0s7hadevhe6x88adne) and
+  `claweb@0.3.24` (id k97ag6hsdz9477wgf5ayq53hwx88a477 — sync auto-bumped
+  patch; frontmatter 0.4.0 was ignored, cosmetic). Verified live:
+  clawhub.ai/juanre/aweb shows v1.0.0 with current commands;
+  clawhub.ai/juanre/claweb shows v0.3.24 with rename notice.
+  `clawhub search aweb` returns aweb@juanre as top hit (web UI search
+  lagged at publish time; recheck if it persists).
+- Caveat that survives publish: cron poller section follows OpenClaw docs
+  but untested on a live Gateway. Fix-forward on feedback (v1.0.1).
+- Canonical install command for all future docs/outreach:
+  `openclaw skills install aweb`.
 
 Research note `agents/sofia/openclaw-aweb-research.md` carries the wider
 ladder (npm bundle Level 0 test, marketplace relative-source Level 1 with
