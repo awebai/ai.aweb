@@ -5,6 +5,81 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-10 — Olivia site deploy f528b366: hero intent tabs verified-live 3/3 (Playwright-measured no-layout-shift)
+
+### Arc summary
+
+Olivia's second site change in two days — three-tab intent
+switcher [In your terminal | As a team | In your browser] in the
+home hero card. Rose-reviewed b0907441 + Juan design-approved.
+Batches naturally with yesterday's still-pending Render clean
+rebuild for /docs/team-bootstrap.md: one Render clear-build-cache
+settles both waves.
+
+### Verify trail
+
+- `make deploy-site` from ac main f528b366 → sync commit 00838640
+  → push 2facc1e1..00838640 main → deploy-landing clean.
+- Hugo built: 51 pages, 33 static files, 2 aliases, 0 cleaned.
+- Render rebuilt by 08:07:17 UTC (verified via last-modified on
+  fresh paths).
+- Checklist 1/3: pill toggle [In your terminal | As a team | In
+  your browser] all three labels rendered; default-terminal panel
+  has 'npm install' + 'aw init' (3 hits each).
+- Checklist 2/3: Playwright-measured layout-shift across tab
+  switches:
+  * Hero `<section>` = 1200 × 646.75 across all 3 tab states (0px
+    delta).
+  * Panel container `.hero-code--intent` = ~442px pinned
+    (terminal 442.0, team 442.4, browser 442.0; <0.5px subpixel
+    jitter).
+  * Individual visible panel content varies 232–323px but
+    container clamp absorbs.
+  * Confirms commit's "Card height pinned so tab switches don't
+    shift layout" claim.
+- Checklist 3/3: /llms.txt has 'Get started — pick where you
+  work' heading + ### In your terminal / ### As a team / ### In
+  your browser panel headers in tab order.
+- ARIA tablist semantics (commit claim): VERIFIED. 1
+  `role=tablist`, 3 `role=tab` (1 `aria-selected=true` on default
+  terminal, 2 `aria-selected=false`), 3 `role=tabpanel`, 3
+  `aria-labelledby` cross-refs.
+- Adjacent yesterday hold: /docs/team-bootstrap.md still
+  last-modified Mon 2026-06-08 — Render hasn't done the
+  clear-build-cache yet.
+
+### Banked lesson
+
+**Hugo `--minify` strips attribute quotes per HTML5 spec.** When
+curl-probing for ARIA / role / data-* attributes, use a
+quote-optional regex: `role="?tablist"?` not `role="tablist"`.
+Earlier today's first probe scored 0 ARIA hits and looked like a
+defect; the markup was correct, my regex was wrong. Verify
+infrastructure contract before debating policy is the meta-rule;
+verify regex behavior on minified output is its corollary for
+site verify-live.
+
+### Coordination
+
+- Mailed Olivia (msg 870b866d) + Sofia (msg 21a86223) with
+  3/3 PASS evidence + the yesterday hold reminder.
+- Sofia ACK (msg 6ec5ca1a): carries f528b366 verified-live;
+  team-bootstrap.md cleanup not fully closed until post-rebuild
+  curl confirms 404.
+- Task #267 tracks the f528b366 wave; #266 still pending Juan's
+  Render-side fix.
+
+### Next-move-if-resumed
+
+1. Re-curl `/docs/team-bootstrap.md` periodically; expect HTTP
+   404 once Render clear-build-cache lands.
+2. Mail closure to Olivia + Sofia with the post-rebuild evidence,
+   closing aweb-aaqe.6 and #266.
+3. No further Hestia action on this wave — Juan owns the Render
+   dashboard step.
+
+---
+
 ## 2026-06-09 — Olivia site deploy 2facc1e1: 5/6 verified-live, Render publish-dir staleness banked as #266
 
 ### Arc summary

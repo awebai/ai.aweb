@@ -4,44 +4,55 @@ Crisp wake-up brief. What you need to act NOW, nothing more. For
 backstory on anything referenced here, see `logbook.md`. For
 operating discipline, see `AGENTS.md`.
 
-**Last updated:** 2026-06-09 22:25 UTC
+**Last updated:** 2026-06-10 08:15 UTC
 
 ## In flight
 
-**1) Olivia site deploy 2facc1e1 — 5/6 verified-live, 1 hold.**
+**1) Olivia site deploys 2facc1e1 + f528b366 — paired, 1 hold.**
 
-ac main 2facc1e1 ("blueprint voice for home hero, teasers, and
-docs redirect") deployed via `make deploy-site` at 22:10 UTC.
-Verified live on aweb.ai:
-- Home hero "Create a team · from a blueprint" card; runtime-toggle
-  / hero-runtime panels gone.
-- /mcp orchestration teaser heading "Create your team from a
-  blueprint".
-- /docs/team-bootstrap/ → Hugo meta-refresh alias to
-  /orchestration/ (Olivia ACK: canonical link present, acceptable
-  for static host).
-- /llms.txt + /mcp/llms.txt: 0 "aw agents bootstrap", blueprint
-  vocabulary in place.
-- Docs sidebar: 0 "Bootstrap a repo-local aweb team" listings.
+- **2facc1e1** ("blueprint voice for home hero, teasers, docs
+  redirect"): deployed 2026-06-09 22:10 UTC. 5/6 verified-live.
+  Item 6 (/docs/team-bootstrap.md → 404) blocked on Render
+  publish-dir staleness — see HOLD below.
+- **f528b366** ("hero intent tabs — terminal/team/browser"):
+  deployed 2026-06-10 08:07 UTC. Rose-reviewed b0907441 + Juan
+  design-approved. Scope: layouts/index.html + index.llms.txt +
+  baseof.html + main.css. 3/3 verify PASS:
+  * Pill toggle [In your terminal | As a team | In your browser]
+    with terminal default (npm install + aw init visible).
+  * Tabs switch with NO layout shift (Playwright-measured: hero
+    <section> = 1200 × 646.75 across all 3 tab states, 0px delta;
+    panel container .hero-code--intent pinned at ~442px ±0.5px).
+  * /llms.txt has 'Get started — pick where you work' heading +
+    ### In your terminal / ### As a team / ### In your browser.
+  * ARIA tablist semantics verified: 1 role=tablist, 3 role=tab
+    (1 aria-selected=true, 2 false), 3 role=tabpanel, 3
+    aria-labelledby cross-refs. (Hugo --minify strips quotes per
+    HTML5; regex needs to be quote-optional.)
 
 **HOLD: /docs/team-bootstrap.md still serves stale 15KB markdown**
 (last-modified Mon 2026-06-08 from prior 7203f5c2 sync). File is
-deleted in 2facc1e1 source AND removed from AWEB_PUBLIC_DOCS in
-Makefile, but Render's publish dir isn't cleaned between builds so
-the file persists. Sofia: Juan in session with her, she's
-surfacing Render Clear-build-cache & deploy ask directly. After
-Juan triggers, re-curl:
+deleted in 2facc1e1 AND removed from AWEB_PUBLIC_DOCS in Makefile,
+local Hugo build (with --cleanDestinationDir) has no team-bootstrap.md,
+deploy-landing tree at 00838640 has none either. But Render's
+publish dir isn't cleaned between builds so the file persists.
+
+Sofia surfaced ask to Juan in session. Olivia confirmed one clean
+rebuild from f528b366 checkout settles BOTH waves. After Juan
+triggers Render Clear-build-cache + sets build command to include
+`--cleanDestinationDir`, re-curl:
 
 ```
 curl -sI "https://aweb.ai/docs/team-bootstrap.md" | grep -i 'http\|last-modified'
 ```
 
-Expect HTTP 404 (Olivia: no stub) or current Tue mtime if Render
-rebuild surfaces the same file. Then mail closure to Olivia + Sofia.
+Expect HTTP 404. Then mail closure to Olivia + Sofia; aweb-aaqe.6
+closes.
 
-Tracked as task **#266** (Render publish-dir stale). Olivia + Sofia
-both +1 Makefile pre-clean (rm publish dir before hugo) as the
-durable fix — prep diff once verify-live closes.
+Tracked as task **#266** (Render publish-dir staleness). CORRECTED
+fix shape: Render-side `hugo --minify --cleanDestinationDir` build
+command, NOT Makefile pre-clean (local already uses it; deploy
+pushes source only). Both Olivia + Sofia ACK'd correction.
 
 **2) AC-managed A2A release train (#265) — Wave 3 daemon-pending.**
 
@@ -92,8 +103,9 @@ AC v0.5.68 prod (a68dd55a) • aweb PyPI 1.26.13 + aw npm 1.26.13 /
 channel 1.4.12 / claude-skills 0.2.12 / Pi 0.1.20 • awid-service
 PyPI 0.5.12 + awid GHCR 0.5.12, api.awid.ai verified-live • a2a.aweb.ai
 daemon-pending (waiting on Grace first AC route) • aweb.ai
-deploy-landing 2facc1e1 (5/6 verify-live + #266 hold) • marketplace
-pins: channel 1.4.12 + skills 0.2.12.
+deploy-landing 00838640 (f528b366 hero-intent-tabs 3/3 live atop
+2facc1e1 blueprint-voice 5/6 live; #266 hold on team-bootstrap.md) •
+marketplace pins: channel 1.4.12 + skills 0.2.12.
 
 ## Juan-action queue (real-time)
 
