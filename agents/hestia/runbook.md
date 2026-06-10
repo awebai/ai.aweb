@@ -1571,6 +1571,52 @@ quick local iteration, not the standing release path.
     Sofia for direction reroute. Sofia carries the same rule on
     her copy-review checklist; this surface enforces at
     verify-live.
+16. **Failure-path rollback must be transactional over known
+    local writes and conservative about remote uncertainty.**
+    Authored by Athena 2026-06-10, ratified by Sofia, banked off
+    her direction-side adoption (msg 84861e5c). Verbatim wording:
+
+    > Failure-path rollback must be transactional over known
+    > local writes and conservative about remote uncertainty.
+    > Automatic rollback may remove only local artifacts that
+    > this attempt created and that are not the only remaining
+    > authority/correlation needed to reconcile a possible
+    > remote side effect. If remote state may have succeeded,
+    > preserve enough local state to retry or repair, and
+    > surface the ambiguity. Destructive cleanup of confirmed
+    > remote state must be an explicit lifecycle/recovery
+    > action with the right authority, not an incidental
+    > rollback/read/status side effect.
+
+    Corollary: rollback must be manifest/snapshot-based, never
+    broad `rm -rf .aw`, and must preserve pre-existing `.aw`
+    plus any partial-init/recovery marker unless an explicit
+    user/operator cleanup command is being run.
+
+    Cite chain:
+    - **#245 P0** (aw 1.26.3 cleanup deleted live pmbah
+      workspace+agents): destructive remote cleanup happened as
+      an incidental side effect of a read/status flow, no
+      lifecycle authority gate.
+    - **aweb-aaqi bug-3** (aw init DID mismatch on re-init):
+      `rm -rf .aw/` between attempts destroyed the local signing
+      authority for a successfully-registered remote identity,
+      manufacturing the mismatch.
+    - **aw 1.26.14** carries the implementation: connect
+      failures preserve resumable partial-init; already-
+      registered names fail deterministically with both DIDs +
+      recovery guidance, no key written.
+
+    Hestia-surface application: server-side cleanups invoked at
+    Hestia's surface (e.g. #271-pattern soft-delete on aweb.agents
+    / aweb.workspaces / aweb_cloud projections) ARE the
+    "explicit lifecycle/recovery action with the right
+    authority" this policy points at. Belt-and-suspenders WHERE
+    clauses + sanity gate + transaction + post-verify is the
+    enforcement shape on this surface. Identity-state cleanups
+    (global identities, namespace registrations) additionally
+    require explicit Juan-go or controller-signed authority
+    (see #213 juanreyero.com pattern).
 
 ## Working-agreement bank (peer-confirmed)
 
