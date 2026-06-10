@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-09 22:35Z (Render clean-destination fix clarified)
+Last updated: 2026-06-10 08:20Z (site f528b366 verified, stale artifact hold remains)
 
 ## How this file works
 
@@ -94,11 +94,11 @@ submission text must keep README's narrow trust boundary: inbound channel,
 outbound via `aw`, hosted/server-side paths not E2E. See logbook §"Long-fruit
 submission cluster" for full state.
 
-### Site setup-framing cleanup HOLD (updated 2026-06-09)
+### Site setup-framing cleanup HOLD (updated 2026-06-10)
 
-Site deploy `2facc1e1` is 5/6 verified-live per Hestia. Corrected public framing is mostly live: home hero card says "Create a team · from a blueprint"; /mcp teaser says "Create your team from a blueprint"; /docs/team-bootstrap/ serves Hugo meta-refresh alias to /orchestration/; /llms.txt has 0 `aw agents bootstrap` and 7 `blueprint` hits; /mcp/llms.txt also clean; docs sidebar stale listing removed. AC backend untouched.
+Site deploy `f528b366` verified-live 3/3 per Hestia: home pill toggle labels [In your terminal | As a team | In your browser], layout-stable tab panels (hero section fixed across states), /llms.txt “Get started — pick where you work” with three panel headers, and ARIA tablist semantics verified. Prior `2facc1e1` setup cleanup is 5/6 verified-live: blueprint/orchestration framing, /docs/team-bootstrap/ meta-refresh alias to /orchestration/, /llms and /mcp/llms clean, docs sidebar stale listing removed. AC backend untouched.
 
-Hold: `/docs/team-bootstrap.md` still serves stale 15KB markdown from prior Render build (last-modified Mon 2026-06-08). Source/deploy-landing are clean; local Hugo with `--cleanDestinationDir` produces no file. Hestia traced deploy flow: `make deploy-site` already uses `--cleanDestinationDir`, but deploy pushes source only (`site/public` is gitignored), so durable #266 fix is Render static-site build command `hugo --minify --cleanDestinationDir`, not Makefile pre-clean. Needs Juan Manual Deploy → Clear build cache & deploy and check/update Render build command, then re-curl expecting 404 (or Olivia explicitly chooses to keep a compatibility markdown file). Until then: do not say all stale team-bootstrap docs are gone; do not package site/setup cleanup as distribution beat.
+Hold remains: `/docs/team-bootstrap.md` still serves stale 15KB markdown from prior Render build (last-modified Mon 2026-06-08). Source/deploy-landing are clean; local Hugo with `--cleanDestinationDir` produces no file. Hestia traced deploy flow: `make deploy-site` already uses `--cleanDestinationDir`, but deploy pushes source only (`site/public` is gitignored), so durable #266 fix is Render static-site build command `hugo --minify --cleanDestinationDir`, not Makefile pre-clean. Needs Juan Manual Deploy → Clear build cache & deploy and check/update Render build command, then re-curl expecting 404 (or Olivia explicitly chooses to keep a compatibility markdown file). Until then: do not say all stale team-bootstrap docs are gone; do not package site/setup cleanup as distribution beat.
 
 ### OpenClaw × aweb integration (active — ClawHub skills drafted, awaiting publish)
 
