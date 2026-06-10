@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-10 11:15Z (rollback invariant landed)
+Last updated: 2026-06-10 11:45Z (ClawHub claweb cutover hold)
 
 ## How this file works
 
@@ -111,7 +111,7 @@ State: rebuilt SKILL.md from `github.com/awebai/claw` main staged at `openclaw-s
 
 Review flags sent to Sam via Athena relay (mail 55d7d90f; my direct mail to Sam 403s — he must add aweb.ai/sofia as contact): (1) plaintext-boundary line missing in Security section — signed ≠ encrypted, I'd insist before publish; (2) 'API key required' classifier risk — recommend explicit denial line; (3) claweb↔aweb.ai cross-network round-trip should be in Sam/Tara's verify gates per #14.
 
-**Consolidated go-conditions (framed to Juan, his call):** (1) plaintext-boundary line in SKILL.md; (2) cross-network round-trip evidence at the applicable tier — Athena's two-tier gate (mail a64e159c): claw wraps aw libraries → live round-trip smoke suffices; claw reimplements envelope/signing/resolve → full conformance gate (claw→aw verify, aw→claw verify, resolution agreement, plaintext boundary both directions). Skill text itself makes the federation claim, so round-trip is PRE-publish, not post. Which tier = depends what claw is; answer expected from Sam with evidence; (3) version decision (auto-bump 0.3.27 vs explicit 1.0.0).
+**Go-conditions status (Athena relay a517205e; staged copy re-fetched from main + diff-verified, commit d123283):** (1) ✓ plaintext-boundary line landed ("readable by the ClaWeb relay… not end-to-end encrypted — signed proves who sent it, not that the server cannot read it") + explicit No-API-key + metadata.openclaw canonical w/ install hint; (2) round-trip: LIGHT tier applies (Sam: claw wraps aw Go libraries for signing/resolution/envelopes, zero reimplementation). Outbound `sam-smoke.claweb.ai/probe` → `aweb.ai/athena` DELIVERED + Athena replied + sent first-contact back; INBOUND RECEIPT CONFIRMATION FROM SAM PENDING — last open evidence item; (3) ✓ version resolved: explicit publish `--version 1.0.0` (Sam recommends; confirms with Juan in green light; auto-bump 0.3.27 would misrepresent a rebuilt product). Sam's identity is workspace-local, not globally addressable — Athena relay remains the channel. PUBLISH COMMAND READY from `openclaw-skill/`: `clawhub skill publish ./claweb --slug claweb --version 1.0.0`. HOLDING for Juan's go.
 
 Juan reversed greeter deprioritization (overrode my "stay with aida, drop ami/pi" — pi.aweb.ai/ama is designed AS a teammate, principle preserved). Lane: register `pi.aweb.ai` fresh, identity `pi.aweb.ai/ama`, Olivia drafts soul, Hestia runs persistent Pi runner. Hero stays `aweb.ai/aida` until policy #14 outside-team verify passes. Blocked on: Juan's orphan cleanup go (controller-signed AWID DELETE + #271 soft-delete for the orphaned pi.aweb.ai/ama row from the pre-1.26.14 failed registration). Intentional collision: `aweb.ai/ama` is the LIVE investor/press inbound proxy — full namespace addresses always, never bare "ama" (runbook #15 + my checklist). OPEN: who reviews `aweb.ai/ama`'s soul — routed to Olivia, answer pending on thread 878c06b1; if nobody, formalize peer-review for external-claim surfaces with active reply behavior as a direction call.
 
@@ -158,6 +158,19 @@ State:
   pages. The classifier reads content; credential-free comparison
   skills carry no badge and one (free-weather-skill) uses the same
   explicit-denial trick. Current live: aweb@1.0.2, claweb@0.3.26.
+- **New cutover direction from Sam via Athena (2026-06-10):** existing
+  ClawHub `claweb` skill (600+ installs) should be replaced in place with
+  rebuilt `github.com/awebai/claw` `skills/claweb/SKILL.md` at cutover, same
+  skill name, `requires.bins` changes from `[aw]` to `[claw]`. HOLD publish
+  until Sam/Juan green light. Re-fetch `awebai/claw` main before staging;
+  required fixes landed there: plaintext relay-readable/TLS/Ed25519/not-E2EE
+  boundary, explicit no-API-key statement, `metadata.openclaw` alongside legacy
+  `clawdbot`. Sam recommends explicit publish `--version 1.0.0` as relaunch
+  marker pending Juan confirmation. Interop tier: `claw` wraps aw Go libs for
+  signing/resolution/envelopes, so lighter live round-trip smoke applies;
+  cross-network smoke in flight (`sam-smoke.claweb.ai/probe` ↔ `aweb.ai/athena`).
+  Relay via Athena still needed because Sam identity is workspace-local; adding
+  `juan.aweb.ai/sam` as contact did not make direct sends resolve.
 
 Research note `agents/sofia/openclaw-aweb-research.md` carries the wider
 ladder (npm bundle Level 0 test, marketplace relative-source Level 1 with
