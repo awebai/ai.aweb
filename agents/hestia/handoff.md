@@ -52,13 +52,19 @@ Zero 'ami.aweb.ai' anywhere on home or /llms.txt.
 Sofia mirrors both as copy-review checklist lines on her
 surface; runbook enforces at verify-live.
 
-**Open: aweb.ai/ama soul-review ownership** (Sofia msg 6dd3ff82).
-aweb.ai/ama is a LIVE external-claim surface (YC/investors/press
-inbound proxy). If its replies make product claims, standing
-claim boundaries (E2EE wording, verified-live evidence) apply.
-Routed to Olivia (msg c7e6f28b, cc Sofia) asking who currently
-owns the soul. If unowned, Sofia takes it for direction-side
-peer-review. Doesn't block aaqe.7.
+**Soul-review precedent settled (Juan in session via Olivia
+msg 7ba255a9):** Sofia owns the sweep for external-claim
+auto-reply surfaces. Initial scope:
+- aweb.ai/ama (YC/investors/press inbound proxy; conv
+  570d949a as inventory handle since no documented baseline).
+- aweb.ai/aida (now the hero-taught address; auto-replies
+  across team boundaries — folded into Sofia's sweep per
+  Olivia's flag).
+Inventory-first posture: ask each identity directly for its
+soul/instructions, with Juan as workspace-access escalation
+path. Hestia-side precedent: any newly-discovered
+external-claim-surface with active auto-reply behavior routes
+to Sofia by default.
 
 **pi.aweb.ai ownership + aaqe.7 sequence (Juan reversed Sofia's
 deprioritization 2026-06-10 via Olivia 3ffd1fbb):**
