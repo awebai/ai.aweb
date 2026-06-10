@@ -248,6 +248,13 @@ promised state with only their tooling, given what the product
 actually does today" — same test that produced the Shape A vs
 Shape B miss in Pass-2.
 
+Any address, identity, command, or external artifact named in
+the copy must resolve AND respond at review time — run the exact
+taught command from a customer-shaped position, don't assume
+from source. (Banked 2026-06-10 from the `ami.aweb.ai/pi` hero
+miss: copy shipped naming a demo identity that was never
+provisioned; the customer's first command 404'd.)
+
 ## Release-Claim Framing
 
 Before Hestia posts a verified-live mail (the external-comms artifact
