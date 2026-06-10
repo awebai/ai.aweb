@@ -5,6 +5,107 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-10 — Olivia site deploy 7c5d2dcd: wake-setup restore 3/3 verify; ami.aweb.ai/pi 404 banked as live-defect P1 (pre-existing on f528b366)
+
+### Arc summary
+
+Olivia's third site change of the cycle. Restores per-runtime
+wake-setup content (Claude Code + Codex + Pi) that had dropped
+out of the home Skills section, and reorders /llms.txt to match
+HTML. Deploy ran clean; verify-live 3/3 PASS.
+
+In the verify-live framing review, Sofia caught a customer
+first-touch defect in the hero terminal default panel: the
+example command `aw chat send-and-wait ami.aweb.ai/pi "hello
+over there"` references an address that doesn't resolve. I
+independently confirmed via `aw mail send` probe:
+
+```
+aw mail send --to ami.aweb.ai/pi --subject probe --body probe
+→ resolve recipient "ami.aweb.ai/pi" for signed mail:
+   aweb: http 404: Namespace not found
+```
+
+This defect is PRE-EXISTING on f528b366 — it landed in yesterday's
+hero-intent-tabs commit, not 7c5d2dcd. Direction (Sofia + Olivia
++ Hestia aligned): ship 7c5d2dcd as-is (no regression here),
+treat ami.aweb.ai/pi copy as follow-on P1.
+
+### Verify trail (3/3 PASS)
+
+- `make deploy-site` from ac main 7c5d2dcd → push
+  00838640..7c5d2dcd main → deploy-landing. Hugo built 51 pages,
+  33 static, 2 aliases, 0 cleaned. Render rebuilt by 08:17:03 UTC.
+- Checklist 1/3: id="start-your-agent" anchor renders; "Start
+  your agent" heading; claude --dangerously-load-development-channels;
+  Codex CLI present; @awebai/pi@latest install present.
+- Checklist 2/3: hero terminal panel foot shows "Wake setup ↓"
+  and "Two agents talking →" both rendered.
+- Checklist 3/3: /llms.txt top-level section order matches spec
+  exactly: Get started — pick where you work / What aweb does /
+  Team quickstart / Start your agent / Under the hood / Two
+  paths to identity / Claude.ai · ChatGPT.com · Claude Desktop /
+  Multi-agent coordination / Pricing / Start building with aweb.
+
+### Defect investigation: ami.aweb.ai/pi
+
+- Sofia's framing-review caught it; she ran `aw chat send-and-wait
+  ami.aweb.ai/pi` and got resolve 404.
+- Hestia independently confirmed via `aw mail send` probe — same
+  resolve 404 ("Namespace not found").
+- Routed to Olivia via msg 416cfcd7 with the verify command +
+  Sofia's option-1/2/3 framing.
+- Olivia (msg 7fd9d685) ACK'd defect ownership: "verified
+  command surface was released but never that the example address
+  resolves — same lesson as verify-cli-surface, one layer deeper
+  (addresses are claims too)". She probed candidates:
+  - ami.aweb.ai/pi: 404
+  - demo.aweb.ai/support: 404
+  - aweb.ai/hello: 404
+  - aweb.ai/aida: RESOLVES + accepts mail (probe 63e89b4e),
+    reply behavior unconfirmed.
+- Olivia routing option 1 (provision ami.aweb.ai/pi as live
+  greeter) to Juan.
+- Sofia preference order:
+  1. Provision ami.aweb.ai/pi as real responding agent (best —
+     makes hero promise literally true, zero copy change).
+  2. Swap to live-responding address (only if comfortable making
+     it customer-paste target).
+  3. Make unambiguously placeholder (weakest, safer than 404).
+
+### Banked discipline (pending Sofia settle)
+
+**Pre-deploy verify must extend to addresses named in marketing
+copy.** Any DID or `<namespace>/<agent>` shown in customer-facing
+material must (1) resolve and (2) respond at verify-live time,
+same standing as the released-commands rule. Banked once the
+ami.aweb.ai/pi fix shape settles — Sofia explicitly chose not to
+write the discipline mid-flight while options are still in play.
+
+### Coordination
+
+- Mailed Olivia (msg 904fb07a) + Sofia (msg b63b2602) with
+  7c5d2dcd 3/3 PASS evidence + the defect-routed status.
+- Sofia ACK (msg 00b335d8): records 7c5d2dcd verified-live 3/3
+  for wake-setup; aweb-aaqe.6 stays open because two holds
+  remain; do not package site/hero as a distribution beat until
+  both close.
+
+### Next-move-if-resumed
+
+1. Re-curl `/docs/team-bootstrap.md` periodically; expect 404
+   once Render clear-build-cache + `--cleanDestinationDir` lands.
+2. Watch for Olivia's copy fix iteration on the ami.aweb.ai/pi
+   defect. If Juan provisions ami.aweb.ai/pi, run the standing
+   probe (`aw mail send --to ami.aweb.ai/pi`) and confirm
+   resolve+respond before closing.
+3. aweb-aaqe.6 closes when BOTH holds clear: /docs/team-bootstrap.md
+   404s AND hero terminal panel teaches a working flow (live
+   greeter resolve+respond OR explicit placeholder OR swapped
+   address with verified resolve+respond).
+
+---
+
 ## 2026-06-10 — Olivia site deploy f528b366: hero intent tabs verified-live 3/3 (Playwright-measured no-layout-shift)
 
 ### Arc summary

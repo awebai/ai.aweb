@@ -4,31 +4,57 @@ Crisp wake-up brief. What you need to act NOW, nothing more. For
 backstory on anything referenced here, see `logbook.md`. For
 operating discipline, see `AGENTS.md`.
 
-**Last updated:** 2026-06-10 08:15 UTC
+**Last updated:** 2026-06-10 08:20 UTC
 
 ## In flight
 
-**1) Olivia site deploys 2facc1e1 + f528b366 — paired, 1 hold.**
+**1) Olivia site deploys 2facc1e1 + f528b366 + 7c5d2dcd — chain, 2 holds.**
 
 - **2facc1e1** ("blueprint voice for home hero, teasers, docs
   redirect"): deployed 2026-06-09 22:10 UTC. 5/6 verified-live.
   Item 6 (/docs/team-bootstrap.md → 404) blocked on Render
-  publish-dir staleness — see HOLD below.
+  publish-dir staleness — see HOLD A below.
 - **f528b366** ("hero intent tabs — terminal/team/browser"):
-  deployed 2026-06-10 08:07 UTC. Rose-reviewed b0907441 + Juan
-  design-approved. Scope: layouts/index.html + index.llms.txt +
-  baseof.html + main.css. 3/3 verify PASS:
-  * Pill toggle [In your terminal | As a team | In your browser]
-    with terminal default (npm install + aw init visible).
-  * Tabs switch with NO layout shift (Playwright-measured: hero
-    <section> = 1200 × 646.75 across all 3 tab states, 0px delta;
-    panel container .hero-code--intent pinned at ~442px ±0.5px).
-  * /llms.txt has 'Get started — pick where you work' heading +
-    ### In your terminal / ### As a team / ### In your browser.
-  * ARIA tablist semantics verified: 1 role=tablist, 3 role=tab
-    (1 aria-selected=true, 2 false), 3 role=tabpanel, 3
-    aria-labelledby cross-refs. (Hugo --minify strips quotes per
-    HTML5; regex needs to be quote-optional.)
+  deployed 2026-06-10 08:07 UTC. 3/3 verify PASS (pill toggle,
+  Playwright-measured no-layout-shift, /llms.txt panels). ARIA
+  tablist semantics verified.
+- **7c5d2dcd** ("wake setup restore for Claude Code, Codex, Pi"):
+  deployed 2026-06-10 08:17 UTC. Rose ACK 221c2833. 3/3 verify PASS:
+  * #start-your-agent section with three runtime cards (claude
+    --dangerously-load-development-channels, Codex CLI, @awebai/pi).
+  * Hero terminal panel foot: "Wake setup ↓ · Two agents talking →".
+  * /llms.txt section order matches spec: Get started / What aweb
+    does / Team quickstart / Start your agent / Under the hood /
+    Two paths / Claude.ai MCP / Multi-agent / Pricing.
+
+**HOLD A: /docs/team-bootstrap.md** still serves stale Mon
+2026-06-08 markdown. Render's publish dir not cleaned between
+builds. Sofia surfaced ask to Juan in session — Clear-build-cache
++ persistent `--cleanDestinationDir` build-command flag. Tracked
+as **#266**. After Juan triggers, re-curl:
+
+```
+curl -sI "https://aweb.ai/docs/team-bootstrap.md" | grep -i 'http\|last-modified'
+```
+
+Expect HTTP 404 (Olivia: no stub). Then mail closure; aweb-aaqe.6
+closes when this AND HOLD B both clear.
+
+**HOLD B: hero terminal panel teaches a failing flow.**
+`aw chat send-and-wait ami.aweb.ai/pi "hello over there"` at
+site/layouts/index.html:34. Independently confirmed: namespace
+404 at AWID resolve. Pre-existing on f528b366, NOT introduced by
+7c5d2dcd. Direction: ship 7c5d2dcd (no regression), copy fix is
+follow-on P1. Routed to Olivia (msg 416cfcd7). Olivia probed
+candidates: aweb.ai/aida RESOLVES + accepts mail (probe
+63e89b4e); demo.aweb.ai/support + aweb.ai/hello also 404. Olivia
+recommends option 1 (provision ami.aweb.ai/pi as live greeter),
+routed to Juan. Follow-on iteration through Rose gate.
+
+Sofia pending bank: pre-deploy verify must extend to addresses
+named in marketing copy — must RESOLVE and RESPOND at verify-live
+time, same standing as released-commands rule. Settles after
+ami.aweb.ai/pi fix shape lands.
 
 **HOLD: /docs/team-bootstrap.md still serves stale 15KB markdown**
 (last-modified Mon 2026-06-08 from prior 7203f5c2 sync). File is
@@ -103,9 +129,9 @@ AC v0.5.68 prod (a68dd55a) • aweb PyPI 1.26.13 + aw npm 1.26.13 /
 channel 1.4.12 / claude-skills 0.2.12 / Pi 0.1.20 • awid-service
 PyPI 0.5.12 + awid GHCR 0.5.12, api.awid.ai verified-live • a2a.aweb.ai
 daemon-pending (waiting on Grace first AC route) • aweb.ai
-deploy-landing 00838640 (f528b366 hero-intent-tabs 3/3 live atop
-2facc1e1 blueprint-voice 5/6 live; #266 hold on team-bootstrap.md) •
-marketplace pins: channel 1.4.12 + skills 0.2.12.
+deploy-landing 7c5d2dcd (wake-setup-restore 3/3 atop hero-intent-tabs
+3/3 atop blueprint-voice 5/6; HOLDs on team-bootstrap.md staleness +
+ami.aweb.ai/pi 404) • marketplace pins: channel 1.4.12 + skills 0.2.12.
 
 ## Juan-action queue (real-time)
 
