@@ -103,7 +103,13 @@ Live remnants carried forward:
 - **Removal-shaped deploys**: Render CDN persists published files; file removal claims are unverified without a 404 probe + manual Clear-build-cache deploy (Hestia folding into runbook ops).
 - **Watch-item**: homepage teaches `claude --dangerously-load-development-channels` — must flip to marketplace install when the Claude marketplace submission is approved; flag Olivia/Athena when that arc closes.
 
-### aaqe.7 greeter lane (active, with Juan/Olivia/Hestia)
+### ClaWeb cutover — STAGED, AWAITING JUAN'S GO (2026-06-10)
+
+Juan + Sam (juan.aweb.ai/sam, real — Juan confirmed in session after I held an unverified relay) are launching ClaWeb as a federated-identity product on the aweb network (`claw` CLI, `<slug>.claweb.ai` namespaces, app.claweb.ai relay, free tier 3 identities/100 msgs/day, Plus $12/mo). The ClawHub `claweb` slug gets REPLACED with their rebuilt skill (supersedes this morning's rename-pointer content — fine, the 625 installs are ClaWeb-product users now). `aweb` slug unchanged, stays canonical for aweb.
+
+State: rebuilt SKILL.md from `github.com/awebai/claw` main staged at `openclaw-skill/claweb/SKILL.md`; `clawhub sync --dry-run` clean (would publish 0.3.27, aweb untouched); Juan's clawhub auth valid on this machine. **DO NOT PUBLISH until Juan's explicit go in session.** Version question open with Sam: sync auto-bumps to 0.3.27 vs explicit `clawhub skill publish --version 1.0.0` relaunch marker.
+
+Review flags sent to Sam via Athena relay (mail 55d7d90f; my direct mail to Sam 403s — he must add aweb.ai/sofia as contact): (1) plaintext-boundary line missing in Security section — signed ≠ encrypted, I'd insist before publish; (2) 'API key required' classifier risk — recommend explicit denial line; (3) claweb↔aweb.ai cross-network round-trip should be in Sam/Tara's verify gates per #14. Flagged to Athena: claw as second protocol client → interop conformance gate question.
 
 Juan reversed greeter deprioritization (overrode my "stay with aida, drop ami/pi" — pi.aweb.ai/ama is designed AS a teammate, principle preserved). Lane: register `pi.aweb.ai` fresh, identity `pi.aweb.ai/ama`, Olivia drafts soul, Hestia runs persistent Pi runner. Hero stays `aweb.ai/aida` until policy #14 outside-team verify passes. Blocked on: Juan's orphan cleanup go (controller-signed AWID DELETE + #271 soft-delete for the orphaned pi.aweb.ai/ama row from the pre-1.26.14 failed registration). Intentional collision: `aweb.ai/ama` is the LIVE investor/press inbound proxy — full namespace addresses always, never bare "ama" (runbook #15 + my checklist). OPEN: who reviews `aweb.ai/ama`'s soul — routed to Olivia, answer pending on thread 878c06b1; if nobody, formalize peer-review for external-claim surfaces with active reply behavior as a direction call.
 
