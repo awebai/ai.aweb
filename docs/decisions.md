@@ -6,6 +6,49 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-06-10 — Rollback invariant: transactional locally, conservative remotely (invariant 9)
+
+**Commits:**
+- aweb: `4518c85c` — release: aw 1.26.14 (aweb-aaqi fix shape the invariant generalizes)
+- ai.aweb: this commit — invariant 9 in `docs/invariants.md`
+
+**Decision maker:** Sofia (direction framing), Athena (technical wording — load-bearing refinement), Hestia (ops-chain ACK; runbook standing policy #16).
+
+Two incidents shared one failure class: #245 (aw 1.26.3 read/status cleanup destroyed workspaces based on stale local path state) and aweb-aaqi bug-3 (connect failure-path rollback deleted the local key after remote init had already succeeded, manufacturing a DID mismatch that orphaned a global identity row). Both are rollback/cleanup logic destroying state whose remote counterpart was in a different state than locally assumed.
+
+Banked as invariant 9 in `docs/invariants.md`: failure-path rollback must be transactional over known local writes and conservative about remote uncertainty; automatic rollback may remove only artifacts this attempt created that are not the last remaining authority/correlation handle; destructive cleanup of confirmed remote state must be an explicit authorized lifecycle action, never an incidental side effect. Corollary: manifest/snapshot-based rollback, never broad `rm -rf .aw`.
+
+Sofia's original stronger form ("local cleanup only when remote counterpart confirmed absent") was rejected on Athena's technical read: remote absence is unknowable after timeout/422-after-partial-success/network split, and the stronger bar would freeze safe local rollback of staging files. The safety bar is preserving the last local signing authority / durable correlation handle while remote success is possible.
+
+Affects: all aw CLI failure-path/rollback code (review against invariant 9), Hestia's release/cleanup operations (runbook #16: #271-pattern server-side cleanups are the explicit authorized action the invariant points at; identity-state cleanups additionally need explicit Juan-go or controller-signed authority), and future code review of any flow that deletes `.aw` state.
+
+---
+
+## 2026-06-10 — Rollback must preserve recovery authority when remote state is uncertain
+
+**Commits:**
+- aweb: `4518c85c` — release: aw 1.26.14
+- ai.aweb: this commit — add rollback/remote-uncertainty invariant and decision record
+
+**Decision maker:** Athena (engineering invariant wording), Sofia (direction/framing), Hestia (operations/runbook application).
+
+Failure-path rollback must be transactional over known local writes and conservative about remote uncertainty. Automatic rollback may remove only local artifacts that the current attempt created and that are not the only remaining authority or correlation needed to reconcile a possible remote side effect.
+
+If remote state may have succeeded, clients preserve enough local state to retry or repair, and surface the ambiguity. Destructive cleanup of confirmed remote state must be an explicit lifecycle or recovery action with the right authority, not an incidental rollback, read, or status side effect.
+
+Corollary: rollback is manifest/snapshot-based, never broad `rm -rf .aw`; it preserves pre-existing `.aw` plus partial-init or recovery markers unless an explicit user/operator cleanup command is being run.
+
+Why: two incidents exposed the same safety class from opposite directions.
+
+- **#245 workspace cleanup regression:** a read/status-shaped cleanup inferred remote deletion from a stale local path and soft-deleted server workspace/agent rows. That is forbidden; destructive remote cleanup needs an explicit lifecycle action and the right authority.
+- **aweb-aaqi bug 3:** a connect/init failure path deleted local key/correlation material after remote identity creation may have succeeded, manufacturing a mismatch. aw 1.26.14 fixes the forward path by preserving resumable partial-init state and refusing already-registered names with recovery guidance.
+
+This decision intentionally does **not** require proving remote absence before every local staging-file cleanup. Network splits and partial successes can make remote state unknowable. The required behavior is narrower and implementable: clean only known local writes that are safe to remove, preserve authority/correlation when remote side effects may exist, and route destructive remote cleanup through explicit recovery commands.
+
+Affects: aw CLI init/connect rollback, workspace cleanup/status flows, identity recovery tooling, Hestia release-runbook policy (#16), and any future feature that mutates local `.aw` state while also creating or deleting remote identity/workspace state.
+
+---
+
 ## 2026-05-21 — AWID hidden/limited address rows fail closed before visibility-column drop
 
 **Commits:**
