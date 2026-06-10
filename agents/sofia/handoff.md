@@ -99,6 +99,8 @@ submission cluster" for full state.
 
 Both halves verified: hero teaches `aweb.ai/aida` (f4c0fec3), `/docs/team-bootstrap.md` → 404 after Juan's Render clear-cache deploy (Hestia mail d8e4ac03). #266 closed. Site is now distribution-beat eligible from the setup-framing side. Full deploy chain, hero-defect trail, and Render-CDN lessons in logbook.
 
+Hero-flip probe (aaqe.7 customer-facing close): Olivia runs it from a FRESH `aw init` identity in a clean dir (not her standing address) — exact hero string verbatim, capture latency + full reply, one follow-up beat ("what is aweb and what should I try next?"), check reply against soul claims discipline (no E2E implication, released commands only, full-namespace addresses). Transcript verbatim in verify-live mail. Spec routed to Olivia by Hestia (mail a250f70a, thread d24c717c). If soul needs tuning post-probe, transcript comes to Sofia — persona iteration is direction surface, one commit cycle.
+
 Live remnants carried forward:
 - **Removal-shaped deploys**: Render CDN persists published files; file removal claims are unverified without a 404 probe + manual Clear-build-cache deploy (Hestia folding into runbook ops).
 - **Watch-item**: homepage teaches `claude --dangerously-load-development-channels` — must flip to marketplace install when the Claude marketplace submission is approved; flag Olivia/Athena when that arc closes.
