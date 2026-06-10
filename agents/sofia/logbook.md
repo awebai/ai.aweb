@@ -9,6 +9,25 @@ append the snapshot here so future-Sofia can recover the context.
 
 ---
 
+## 2026-06-10 — aweb-aaqe.6 site setup-framing cleanup CLOSED (full verification trail)
+
+**Arc**: stale "aw agents bootstrap is canonical" site framing (HOLD-B from 2026-06-08) → corrected blueprint/orchestration framing verified live, plus the hero first-touch defect found and fixed along the way.
+
+**Deploy chain, all Hestia-verified live on aweb.ai**:
+- `2facc1e1` setup cleanup 5/6: blueprint/orchestration framing on hero + /mcp; /docs/team-bootstrap/ Hugo meta-refresh alias → /orchestration/; /llms.txt + /mcp/llms.txt zero `aw agents bootstrap`; docs sidebar cleaned.
+- `f528b366` intent tabs 3/3: pill toggle [In your terminal | As a team | In your browser], Playwright-measured zero layout shift, ARIA tablist verified (earlier 0-hit probe was Hestia's regex artifact — Hugo --minify strips attribute quotes).
+- `7c5d2dcd` wake-setup restore 3/3: #start-your-agent section, hero foot links, /llms.txt section order to spec.
+- `f4c0fec3` hero address fix 2/2: hero + /llms.txt teach `aw chat send-and-wait aweb.ai/aida`; zero `ami.aweb.ai`. Olivia pre-commit end-to-end reply round-trip; Sofia cache-busted independent probes (one transient stale CDN edge inside s-maxage=300, gone on re-probe).
+- Final half: `/docs/team-bootstrap.md` → HTTP 404 (was stale Mon 2026-06-08 200) after Juan's Render Manual Deploy → Clear build cache & deploy, 2026-06-10 10:58:04 UTC (Hestia mail d8e4ac03). #266 closed.
+
+**Hero first-touch defect (found by Sofia framing probe, 2026-06-10)**: f528b366 hero default panel taught `aw chat send-and-wait ami.aweb.ai/pi` — namespace never provisioned, exact-flow probe failed `404: Namespace not found`. Hestia independently confirmed; Olivia fixed to `aweb.ai/aida` (real Support teammate) in f4c0fec3. Disciplines banked from it: runbook #14 (addresses named in marketing copy must resolve AND respond at verify-live), #15 (full namespace addresses only, never bare "ama" — guards the intentional aweb.ai/ama ↔ pi.aweb.ai/ama collision), Sofia AGENTS.md review-time mirror of #14.
+
+**Render staleness root cause (Hestia, two corrections en route)**: deploy-landing carries source only (site/public gitignored); Render runs its own Hugo. Final banked lesson: `--cleanDestinationDir` is build-local and does NOT evict Render-CDN-persisted published files — removal of a public file requires Manual Deploy → Clear build cache & deploy, every time. Sofia framing rule: removal-shaped deploys are unverified without a 404 probe of the removed path.
+
+**Sequencing calls made**: hold 2facc1e1 partial rather than roll back (current copy works for customers); ship 7c5d2dcd with defect live rather than gate on copy fix (defect predated it); hero stays aweb.ai/aida until policy #14 outside-team verify passes for pi.aweb.ai/ama (aaqe.7 lane, still active).
+
+---
+
 ## 2026-05-26 → Long-fruit submission cluster (was the active arc at handoff split)
 
 **Triggered by**: Juan, "the ones that will take the longer to bear fruit
