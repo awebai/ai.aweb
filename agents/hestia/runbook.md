@@ -1554,6 +1554,23 @@ quick local iteration, not the standing release path.
     Sofia mirrors this as a copy-review checklist line on her
     surface so it's enforced at review-time as well as
     verify-live.
+15. **Customer-facing copy uses FULL namespace addresses for
+    identities — never bare-name shorthand** (banked 2026-06-10
+    from the intentional aweb.ai/ama vs pi.aweb.ai/ama
+    different-scope collision: aweb.ai/ama is the live external
+    inbound proxy for YC/investors/press; pi.aweb.ai/ama is the
+    designed-as-greeter teammate; a shorthand 'ama' in copy,
+    docs, or llms.txt would misroute press to the greeter or
+    hero users to the investor proxy). Applies to all surfaces:
+    home/marketing copy, blog posts, docs, llms.txt mirrors,
+    skill/agent READMEs, demo transcripts, anywhere a
+    customer might paste a literal string. Bare-name shorthand
+    is a defect even if the address happens to resolve+respond
+    (#14): the address must address the INTENDED scope, not
+    just SOME scope. Flag any draft that uses shorthand to
+    Sofia for direction reroute. Sofia carries the same rule on
+    her copy-review checklist; this surface enforces at
+    verify-live.
 
 ## Working-agreement bank (peer-confirmed)
 

@@ -40,12 +40,25 @@ teaches `aw chat send-and-wait aweb.ai/aida`. Olivia cross-team
 reply round-trip + my intra-team resolve+accept probe both pass.
 Zero 'ami.aweb.ai' anywhere on home or /llms.txt.
 
-**Discipline banked as runbook standing policy #14** (Sofia
-2026-06-10, my runbook addition). Anything named in marketing/
-first-touch copy must RESOLVE AND RESPOND (or exist and serve)
-at verify-live time, probed from a customer-shaped position.
-Sofia mirrors as a copy-review checklist line on her surface.
-Applies to all site/marketing deploys from here.
+**Discipline banked as runbook standing policy #14 + #15**
+(Sofia 2026-06-10).
+- #14: Anything named in marketing/first-touch copy must
+  RESOLVE AND RESPOND (or exist and serve) at verify-live time,
+  probed from a customer-shaped position.
+- #15: Customer-facing copy uses FULL namespace addresses —
+  never bare-name shorthand (banked from aweb.ai/ama vs
+  pi.aweb.ai/ama different-scope collision). Defect even if
+  address resolves+responds; address must target INTENDED scope.
+Sofia mirrors both as copy-review checklist lines on her
+surface; runbook enforces at verify-live.
+
+**Open: aweb.ai/ama soul-review ownership** (Sofia msg 6dd3ff82).
+aweb.ai/ama is a LIVE external-claim surface (YC/investors/press
+inbound proxy). If its replies make product claims, standing
+claim boundaries (E2EE wording, verified-live evidence) apply.
+Routed to Olivia (msg c7e6f28b, cc Sofia) asking who currently
+owns the soul. If unowned, Sofia takes it for direction-side
+peer-review. Doesn't block aaqe.7.
 
 **pi.aweb.ai ownership + aaqe.7 sequence (Juan reversed Sofia's
 deprioritization 2026-06-10 via Olivia 3ffd1fbb):**
