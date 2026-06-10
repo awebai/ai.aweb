@@ -22,18 +22,16 @@ operating discipline, see `AGENTS.md`.
   in home + /llms.txt, zero ami.aweb.ai anywhere). Hero-defect
   half of aweb-aaqe.6 CLOSED.
 
-**HOLD A: /docs/team-bootstrap.md** still serves stale Mon
-2026-06-08 markdown. Render's publish dir not cleaned between
-builds. Sofia surfaced ask to Juan in session — Clear-build-cache
-+ persistent `--cleanDestinationDir` build-command flag. Tracked
-as **#266**. After Juan triggers, re-curl:
+**HOLD A CLOSED (2026-06-10 ~11:58 UTC).** /docs/team-bootstrap.md
+→ HTTP 404 verified after Juan's Render Manual Deploy → Clear
+build cache & deploy. Fresh rebuild mtime 10:58:04 UTC. Both
+halves of aweb-aaqe.6 now closed. Mailed Olivia (msg d2f0a31c)
++ Sofia (msg d8e4ac03).
 
-```
-curl -sI "https://aweb.ai/docs/team-bootstrap.md" | grep -i 'http\|last-modified'
-```
-
-Expect HTTP 404 (Olivia: no stub). Then mail closure; aweb-aaqe.6
-closes when this AND HOLD B both clear.
+**Banked correction**: Hugo `--cleanDestinationDir` is build-local
+and does NOT evict files from Render's CDN. Render Static Sites
+persist published files across regular deploys; only Clear build
+cache & deploy wipes them. Runbook foot-gun section updated.
 
 **HOLD B CLOSED (f4c0fec3, 08:43 UTC).** Hero terminal panel
 teaches `aw chat send-and-wait aweb.ai/aida`. Olivia cross-team

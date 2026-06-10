@@ -783,9 +783,42 @@ runbook.
 | awid lib (PyPI)     | none (GHA publishes) | check on PyPI                                       | `pip install awid==X.Y.Z` + import smoke |
 | aw CLI              | none (GHA publishes to GH Releases + npm) | check on GH Releases + npm | `aw --version` + smoke command           |
 | @awebai/claude-channel | none (GHA publishes to npm) | check on npm                                | `npm install` smoke                      |
-| ac site (deploy-landing) | `make deploy-site` | curl `aweb.ai/` `last-modified` matches deploy time | curl all checklist URLs + standing policy #14 address-resolves-and-responds probe for any new customer-paste address |
+| ac site (deploy-landing) | `make deploy-site` | curl `aweb.ai/` `last-modified` matches deploy time | curl all checklist URLs + standing policy #14 address-resolves-and-responds probe for any new customer-paste address + 404-probe any path REMOVED in this deploy (see Render Static Site published-file retention foot-gun for the Clear-build-cache pairing) |
 
 ## Foot-guns and known failure modes
+
+### Render Static Site published-file retention
+
+Render Static Sites persist published files across regular deploys.
+When a file is REMOVED from source, a normal auto-deploy (or
+Manual Deploy → Deploy latest commit) will publish the new build
+but does NOT evict the old file from Render's CDN.
+
+**Standing pairing** (banked 2026-06-10 from aweb-aaqe.6,
+refined by Sofia msg 89d8a054):
+- **Any deploy that REMOVES a public file ⇒ Manual Deploy →
+  Clear build cache & deploy** (not Deploy latest commit). This
+  is not a one-time fix — it's the steady-state operation for
+  removal-shaped deploys.
+- **Verify-live for removal-shaped deploys MUST include a 404
+  probe of the removed path.** "We removed X from the site" is
+  unverified until the probe returns 404. Add the removed paths
+  to the curl-checklist before mailing closure.
+- Hugo's `--cleanDestinationDir` flag is build-local and does NOT
+  evict CDN-side files. Keep it on the build command for
+  hygiene, but the Clear-build-cache step is the operationally
+  load-bearing one.
+
+Symptoms (so we recognize it when it re-trips): auto-deploy lands
+cleanly, fresh `last-modified` on all added/modified URLs, but
+a removed-from-source file still serves 200 with its
+prior-deploy mtime. `cf-cache-status: DYNAMIC` + `rndr-id` header
+confirms it's Render origin, not CloudFlare cache.
+
+Banked instance: aweb-aaqe.6 (f4c0fec3 deploy + 11:53 auto-deploy
+both kept `/docs/team-bootstrap.md` despite source deletion;
+Clear-build-cache deploy at ~11:58 UTC flipped it to 404 cleanly,
+mtime 10:58:04 UTC).
 
 ### PyPI cache-lag
 
