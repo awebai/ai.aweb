@@ -167,6 +167,15 @@ hero-tabs 3/3 atop blueprint-voice 5/6; ONE hold remains on
 team-bootstrap.md Render staleness) • marketplace pins: channel
 1.4.12 + skills 0.2.12.
 
+**Pepe orphan cleanup pattern**: 2026-06-10 reviewer-65e1331
+(a25c55e2-...) soft-deleted via direct DB UPDATE on
+aweb.agents + aweb.workspaces. Athena's aweb-aaqg replaces the
+manual path with explicit lifecycle/API/CLI; until then, one-off
+orphans go through belt-and-suspenders WHERE (agent_id + alias +
+team_id + workspace_path + deleted_at IS NULL) + sanity gate +
+transaction + post-verify-newer-untouched. See logbook 2026-06-10
+entry for the script shape.
+
 ## Juan-action queue (real-time)
 
 1. **Render clear-build-cache rebuild for aweb.ai** (Sofia loop, my #266).

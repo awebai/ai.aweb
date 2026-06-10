@@ -5,6 +5,58 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-10 — Pepe orphan reviewer-65e1331 server-side cleanup (Athena mail 43e19f14)
+
+### Arc summary
+
+Customer a2am/Pepe ran pre-fix teardown (rm'd local home before
+`aw workspace delete` returned 0), leaving an orphaned ephemeral
+reviewer workspace with no local `.aw` for retry. Athena asked
+for server-side cleanup. Single rogue row; #245 risk shape (any
+soft-delete of agent+workspace rows). Mitigation: belt-and-
+suspenders WHERE clauses (agent_id + alias + team_id +
+workspace_path + deleted_at IS NULL); sanity gate pre-execution;
+post-commit verify newer reviewers untouched.
+
+### Verify trail
+
+- Probe: team_probe.py for default:pepe.aweb.ai confirmed the
+  orphan shape exactly (agent_id=a25c55e2-..., alias=reviewer-65e1331,
+  hostname=athenea.home, workspace_path=/Users/pepe-reyero/a2am/agents/instances/reviewer-65e1331,
+  deleted_at=NULL). Two NEWER reviewers (reviewer-067408e,
+  reviewer-da2ef3a) post-fix daa7cbf existed and were marked
+  do-not-touch.
+- Sanity gate (alias + team_id + workspace_path + deleted_at IS NULL)
+  passed.
+- UPDATE aweb.agents → `UPDATE 1`. UPDATE aweb.workspaces →
+  `UPDATE 1`. Transaction-wrapped, committed.
+- POST: both rows deleted_at=2026-06-10 09:23:50 UTC.
+- Untouched re-verify: newer reviewers deleted_at still NULL.
+- aweb.agents.address was NULL — no AWID DID registered, so no
+  registry-side delete needed.
+- aweb.agents/workspaces 1:1 (workspace_id == agent_id).
+
+### Banked lesson
+
+**Belt-and-suspenders WHERE clauses + sanity gate + transaction
++ post-verify is the right shape for #245-class one-off
+cleanups.** Each WHERE clause is independent evidence of target
+identity (agent_id, alias, team_id, workspace_path); a wrong-row
+delete would require ALL of them to coincidentally match a
+different row, which is impossible for the unique target. Adding
+to the runbook as an explicit pattern would be premature (Athena
+is landing aweb-aaqg platform gap that should obviate one-off
+cleanups). If aaqg doesn't fully cover, formalize then.
+
+### Coordination
+
+- Replied to Athena (msg fa5c9178) with full pre+post evidence
+  + #245 mitigation framing + offer to route similar one-offs
+  through same chain unless she formalizes a dashboard/API.
+- Task #271 closed.
+
+---
+
 ## 2026-06-10 — Olivia site deploy f4c0fec3: hero copy fix closes ami.aweb.ai/pi defect; pi.aweb.ai ownership picture; runbook discipline #14 banked
 
 ### Arc summary
