@@ -1,12 +1,12 @@
 # Product Status
-Last updated: 2026-06-10 08:35Z (hero remote-address example 404 hold)
+Last updated: 2026-06-10 08:45Z (site 7c5d2dcd wake setup verified)
 
 ## Current focus
 - **Production release state:** app.aweb.ai is live healthy at `v0.5.60`, git `2cf21f23`, aweb `1.26.8`, awid_service `0.5.10`; api.awid.ai reports `0.5.10`.
 - **Claude marketplace submissions:** Wave 4 packages are live (`@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, Pi `0.1.20`). Reviewed vendored artifacts are now pushed to `awebai/claude-plugins` origin/main at `d6034672ded5ef5dbb38fc84fcb0a1de883b9544`; submission can proceed using that pushed SHA. Outward text must keep the README trust boundary: inbound channel, outbound via `aw`, hosted/server-side paths not E2E.
 - **E2EE framing boundary:** keep claims narrow to smoked surfaces. Hosted/server-side messaging must not be called E2E; do not make broad generic self-custodial E2EE readiness claims unless the AWID encryption-key publish skew Athena flagged is fixed/explained.
 - **Engineering risk tracked with Athena:** aw 1.26.3 workspace-cleanup regression (#245) remains the customer-risk pattern to track for CLI/workspace-cleanup-adjacent work: read/status flows must not destructively delete server workspace/agent rows from stale local paths.
-- **Landing site setup-framing cleanup:** site deploy `f528b366` is 3/3 verified-live for home intent tabs + /llms.txt update; prior `2facc1e1` setup cleanup remains 5/6 verified-live. HOLDS: `/docs/team-bootstrap.md` still serves stale 15KB markdown from Render cache; and the hero terminal panel teaches `ami.aweb.ai/pi`, which currently 404s at namespace resolution. Ship wake-setup restoration if needed, but fix the hero example as P1 follow-on.
+- **Landing site setup-framing cleanup:** site deploy `7c5d2dcd` is 3/3 verified-live for wake-setup restoration (#start-your-agent, hero foot links, /llms.txt section order). Prior `f528b366` intent tabs and `2facc1e1` setup cleanup remain verified. HOLDS: `/docs/team-bootstrap.md` still serves stale 15KB markdown from Render cache; and hero terminal panel teaches `ami.aweb.ai/pi`, which currently 404s at namespace resolution. aweb-aaqe.6 stays open until both close.
 - **Direction context:** gbrain/corpus/omnigraph question is waiting on Juan; no product priority change until that answer lands.
 
 ## Product readiness
@@ -15,7 +15,7 @@ Last updated: 2026-06-10 08:35Z (hero remote-address example 404 hold)
 - **Channel / skills / Pi:** `@awebai/claude-channel@1.4.12`, `@awebai/claude-skills@0.2.12`, `@awebai/pi@0.1.20` published.
 - **aweb-cloud:** live health check 2026-06-07 12:14Z reports `release_tag=v0.5.60`, `git_sha=2cf21f23`, `aweb_version=1.26.8`, `awid_service_version=0.5.10`, healthy.
 - **awid registry:** `https://api.awid.ai/health` reports `version=0.5.10`, ok.
-- **Landing site:** deploy `f528b366` verified live: home pill toggle labels [In your terminal | As a team | In your browser], layout-stable tab panels, /llms.txt “Get started — pick where you work” with the three panel headers, and ARIA tablist semantics verified. Prior `2facc1e1` cleanup mostly live: blueprint/orchestration framing and /docs/team-bootstrap/ alias. `/docs/team-bootstrap.md` is still stale due Render publish-dir/cache behavior. Hero terminal remote-address example `ami.aweb.ai/pi` is not live (404 Namespace not found). AC backend untouched.
+- **Landing site:** deploy `7c5d2dcd` verified live: `#start-your-agent` anchor/heading, Claude development-channel command, Codex CLI, `@awebai/pi@latest`, hero foot links (“Wake setup ↓” / “Two agents talking →”), and /llms.txt section order. Prior `f528b366` tabs and `2facc1e1` cleanup remain verified. `/docs/team-bootstrap.md` is still stale due Render publish-dir/cache behavior. Hero remote-address example `ami.aweb.ai/pi` is not live (404 Namespace not found). AC backend untouched.
 
 ## Outreach
 - Claude marketplace path is the active long-fruit lane. `claude-plugins` commit `d6034672ded5ef5dbb38fc84fcb0a1de883b9544` adds vendored community-submission artifacts rematerialized from corrected npm packages and validated by Athena/Sofia/Hestia; origin push blocker is closed.
