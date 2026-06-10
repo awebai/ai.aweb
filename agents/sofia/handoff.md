@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-10 08:35Z (hero remote-address example 404 hold)
+Last updated: 2026-06-10 08:55Z (hero address fixed, bootstrap artifact hold remains)
 
 ## How this file works
 
@@ -96,11 +96,11 @@ submission cluster" for full state.
 
 ### Site setup-framing cleanup HOLD (updated 2026-06-10)
 
-Site deploy `f528b366` verified-live 3/3 per Hestia: home pill toggle labels [In your terminal | As a team | In your browser], layout-stable tab panels (hero section fixed across states), /llms.txt “Get started — pick where you work” with three panel headers, and ARIA tablist semantics verified. Prior `2facc1e1` setup cleanup is 5/6 verified-live: blueprint/orchestration framing, /docs/team-bootstrap/ meta-refresh alias to /orchestration/, /llms and /mcp/llms clean, docs sidebar stale listing removed. AC backend untouched.
+Site deploy `f4c0fec3` verified-live 2/2 per Hestia: home hero and /llms.txt now teach `aw chat send-and-wait aweb.ai/aida ...`; zero `ami.aweb.ai` remains. Olivia pre-commit verified an end-to-end reply round-trip with `aweb.ai/aida`; Hestia independently verified resolve+accept layer by command shape. Hero-address half of aweb-aaqe.6 is CLOSED.
 
-**NEW HOLD (2026-06-10, Sofia/Hestia framing probe):** hero DEFAULT terminal panel teaches `aw chat send-and-wait ami.aweb.ai/pi "hello over there"` but that recipient does not exist — exact-flow probes fail `aweb: http 404: Namespace not found` (directory lookup also 404). Terminal customer's first command after install errors. Hestia confirmed and routed to Olivia. Direction: do not hold deploy `7c5d2dcd` if it restores wake setup and defect is already live; fix as P1 follow-on. Fix preference: provision live responding `ami.aweb.ai/pi` (best), swap to existing responding public address, or make clearly placeholder (weakest). Blueprint repo (200) and MCP endpoint (401 OAuth-gated, correct) verified fine. Until fixed: do not package the hero as a distribution beat; the "two agents talking" promise is not yet live.
+Prior deploys remain verified: `7c5d2dcd` wake-setup restore 3/3 (#start-your-agent section, hero panel foot links, /llms.txt section order); `f528b366` intent tabs 3/3; `2facc1e1` setup cleanup 5/6 (blueprint/orchestration framing, /docs/team-bootstrap/ meta-refresh alias to /orchestration/, /llms and /mcp/llms clean, docs sidebar stale listing removed). AC backend untouched. aweb-aaqe.6 stays open only on /docs/team-bootstrap.md stale Render artifact.
 
-`7c5d2dcd` (wake-setup restore) verified-live 3/3 per Hestia (mail b63b2602): #start-your-agent section, hero panel foot links, /llms.txt section order to spec. aaqe.6 closes when BOTH (a) ami.aweb.ai/pi copy fix lands (Olivia routing option-1 provisioning to Juan) AND (b) /docs/team-bootstrap.md flips 404 post Render clean rebuild (Juan, two-part Render visit).
+Banked discipline from f4c0fec3: pre-deploy verify for marketing copy must include any named agent address resolving AND responding at verify-live time. If a hero/example names an address, paste the exact command or equivalent and prove success before claim.
 
 **Watch-item from 7c5d2dcd evidence:** live homepage teaches `claude --dangerously-load-development-channels` (1 hit) — accurate today because the Claude marketplace listing isn't approved yet, so dev-channel load is the only path. When the marketplace submission is approved, that homepage line (and /llms.txt mirror) must flip to the marketplace install — flag to Olivia/Athena when the submission arc closes. A `--dangerously-*` flag in first-touch copy is acceptable only while it's literally the only way.
 
