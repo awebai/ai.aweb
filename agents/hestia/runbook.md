@@ -783,6 +783,7 @@ runbook.
 | awid lib (PyPI)     | none (GHA publishes) | check on PyPI                                       | `pip install awid==X.Y.Z` + import smoke |
 | aw CLI              | none (GHA publishes to GH Releases + npm) | check on GH Releases + npm | `aw --version` + smoke command           |
 | @awebai/claude-channel | none (GHA publishes to npm) | check on npm                                | `npm install` smoke                      |
+| ac site (deploy-landing) | `make deploy-site` | curl `aweb.ai/` `last-modified` matches deploy time | curl all checklist URLs + standing policy #14 address-resolves-and-responds probe for any new customer-paste address |
 
 ## Foot-guns and known failure modes
 
@@ -1533,6 +1534,26 @@ quick local iteration, not the standing release path.
     post-fix-pass) — surface-agnostic
 13. Code-reviewer subagent for gate-input commits (Athena runs this
     before signaling Hestia)
+14. **Anything named in marketing/first-touch copy must resolve
+    AND respond at verify-live time, probed from a customer-shaped
+    position** (banked 2026-06-10 from ami.aweb.ai/pi defect on
+    f528b366: hero terminal panel taught `aw chat send-and-wait
+    ami.aweb.ai/pi`, which 404'd at AWID namespace resolve, so a
+    customer's first command after install errored out; Sofia
+    caught it in framing-review). Any address, identity, command,
+    or external artifact named in customer-facing copy must be
+    verified to (a) resolve / exist (e.g. `aw id namespace <ns>`,
+    `aw mail send --to <addr>` probe, npm/PyPI version page), AND
+    (b) respond / serve (chat or mail round-trip, command run from
+    a clean shell, artifact returns expected content). Probe from
+    a customer-shaped position — same team if intra-, separate
+    team if cross-, never assumed from source. Same standing as
+    the released-commands rule (#9-shaped: published artifact ≠
+    deployed service; copy ≠ live behavior). Applies on every
+    site/marketing deploy where a customer-paste claim appears.
+    Sofia mirrors this as a copy-review checklist line on her
+    surface so it's enforced at review-time as well as
+    verify-live.
 
 ## Working-agreement bank (peer-confirmed)
 

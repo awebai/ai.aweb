@@ -5,6 +5,125 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-10 — Olivia site deploy f4c0fec3: hero copy fix closes ami.aweb.ai/pi defect; pi.aweb.ai ownership picture; runbook discipline #14 banked
+
+### Arc summary
+
+Two-line copy fix from Olivia: hero terminal example + /llms.txt
+mirror swap from the 404ing ami.aweb.ai/pi to aweb.ai/aida (a
+real teammate confirmed pre-commit by Olivia's cross-team reply
+round-trip). Closes the hero-defect half of aweb-aaqe.6.
+
+In parallel, Juan asked (via Olivia msg 5e69b3a4) for ownership
+picture on pi.aweb.ai for the aaqe.7 identity-creation step.
+Answered: pi.aweb.ai is not registered at AWID, has no DNS
+delegation, and is ours to claim as the aweb.ai controller.
+Sofia direction (msg 6b558f88) then settled aaqe.7 itself: stay
+with aweb.ai/aida, drop the ami/pi provisioning thread, real
+teammate > synthetic greeter.
+
+Sofia banked the operational discipline that surfaced from this
+arc as a copy-review checklist line; I mirrored it as standing
+policy #14 in the Hestia runbook plus added a Site row to the
+Verified-live probe pattern table.
+
+### Verify trail (2/2 PASS + intra-team attestation)
+
+- `make deploy-site` from ac main f4c0fec3 → push 7c5d2dcd..f4c0fec3
+  main → deploy-landing. Render rebuilt by 08:43:10 UTC.
+- Item 1 (home hero terminal): rendered command
+  `aw chat send-and-wait aweb.ai/aida ...`; zero 'ami.aweb.ai'
+  anywhere on the page.
+- Item 2 (/llms.txt mirror): same. Zero 'ami.aweb.ai' anywhere.
+- Intra-team attestation: I'm aweb.ai/hestia (same team as aida),
+  so my probe is intra- not cross-team. Ran the exact-as-taught
+  command shape:
+  `aw chat send-and-leave aweb.ai/aida "hestia verify probe ..."`
+  → "Message sent to aweb.ai/aida". Confirms resolve+accept layer
+  works as copy teaches (the layer that was broken for
+  ami.aweb.ai/pi).
+- Sofia's independent spot-check (msg 6b558f88): noted a transient
+  stale-edge hit on /llms.txt inside the s-maxage=300 window, gone
+  on cache-busted re-probe. Worth remembering: probe within 5
+  minutes of deploy with cache-bust query string, or wait out
+  s-maxage.
+
+### pi.aweb.ai ownership investigation
+
+- `aw id namespace pi.aweb.ai` → `Status: fail / Error:
+  target.not_found`. Not registered at AWID.
+- `curl https://api.awid.ai/v1/namespaces/pi.aweb.ai` →
+  `{"detail":"Namespace not found"}`.
+- `dig pi.aweb.ai` → no NS / A / TXT records. Undelegated
+  subdomain of aweb.ai.
+- aweb.ai controller is did:key:z6Mkgpop9yzY4dK8MA8CgUZevCsNxsAWP4ThHTASKkZsEuVn
+  (Juan/ours). As that controller, full authority to register
+  pi.aweb.ai.
+- No external owner / DNS delegation / AWID registration.
+- Adjacent finding: aweb.ai/ama already exists at the registry,
+  registered 2026-05-02 08:05:06 UTC, did:aw:28zhbe9P4yS3c9FsKZrBub4SwiDs,
+  log seq 1 (single register_did event, never updated). Existing
+  alternative if direction prefers it.
+- Mailed Olivia (msg 6356d09c) with the full picture.
+
+### Sofia direction settled
+
+Sofia (msg 6b558f88) chose: stay with aweb.ai/aida in the hero
+copy; drop the ami/pi provisioning thread; real teammate
+answering first-contact chats is stronger proof than a synthetic
+greeter, signal lands with Support where it belongs. Revisit
+only if hero traffic makes aida's inbox noisy — aweb.ai/ama is
+the fallback then. Juan's pending provisioning question is moot
+in this branch; Sofia is telling him in session. aweb-aaqe.7
+deprioritized.
+
+### Banked discipline — runbook standing policy #14
+
+Source: Sofia mail 499c13cd + 6b558f88 (2026-06-10), my runbook
+addition.
+
+> Anything named in marketing/first-touch copy must resolve AND
+> respond (or exist and serve) at verify-live time, probed from
+> a customer-shaped position. Any address, identity, command, or
+> external artifact named in customer-facing copy must be
+> verified to (a) resolve / exist via probe (aw id namespace,
+> aw mail send, npm/PyPI version page) AND (b) respond / serve
+> (chat or mail round-trip, command run from a clean shell,
+> artifact returns expected content). Probe from a
+> customer-shaped position — same team if intra-, separate team
+> if cross-, never assumed from source. Same standing as the
+> released-commands rule (published artifact ≠ deployed service;
+> copy ≠ live behavior). Applies on every site/marketing deploy
+> where a customer-paste claim appears.
+
+Sofia mirrors as a copy-review checklist line on her surface so
+it's enforced review-time as well as verify-time. Also added a
+Site row to the Verified-live probe pattern table referencing #14.
+
+### Coordination
+
+- Mailed Olivia (msg 6356d09c): verify-live 2/2 + pi.aweb.ai
+  ownership.
+- Mailed Sofia (msg 8a838019): verify-live 2/2 + ami/pi half
+  closure + discipline.
+- Sofia ACK (msg 499c13cd) banked the discipline.
+- Sofia direction (msg 6b558f88) closed aaqe.7 direction; spot-
+  checked f4c0fec3 independently; noted s-maxage=300 stale-edge
+  pattern.
+
+### Next-move-if-resumed
+
+1. aweb-aaqe.6 remaining: /docs/team-bootstrap.md 404. Still
+   pending Juan's Render clear-build-cache + --cleanDestinationDir
+   build-command flag (#266). Periodic re-curl until flip.
+2. When Render rebuild lands, mail closure to Olivia + Sofia.
+3. aweb-aaqe.7 deprioritized per Sofia direction. No Hestia
+   action required.
+4. New site/marketing deploys: enforce runbook policy #14 at
+   verify-live, in addition to existing checklists.
+
+---
+
 ## 2026-06-10 — Olivia site deploy 7c5d2dcd: wake-setup restore 3/3 verify; ami.aweb.ai/pi 404 banked as live-defect P1 (pre-existing on f528b366)
 
 ### Arc summary

@@ -10,22 +10,17 @@ operating discipline, see `AGENTS.md`.
 
 **1) Olivia site deploys 2facc1e1 + f528b366 + 7c5d2dcd — chain, 2 holds.**
 
-- **2facc1e1** ("blueprint voice for home hero, teasers, docs
-  redirect"): deployed 2026-06-09 22:10 UTC. 5/6 verified-live.
-  Item 6 (/docs/team-bootstrap.md → 404) blocked on Render
-  publish-dir staleness — see HOLD A below.
-- **f528b366** ("hero intent tabs — terminal/team/browser"):
-  deployed 2026-06-10 08:07 UTC. 3/3 verify PASS (pill toggle,
-  Playwright-measured no-layout-shift, /llms.txt panels). ARIA
-  tablist semantics verified.
-- **7c5d2dcd** ("wake setup restore for Claude Code, Codex, Pi"):
-  deployed 2026-06-10 08:17 UTC. Rose ACK 221c2833. 3/3 verify PASS:
-  * #start-your-agent section with three runtime cards (claude
-    --dangerously-load-development-channels, Codex CLI, @awebai/pi).
-  * Hero terminal panel foot: "Wake setup ↓ · Two agents talking →".
-  * /llms.txt section order matches spec: Get started / What aweb
-    does / Team quickstart / Start your agent / Under the hood /
-    Two paths / Claude.ai MCP / Multi-agent / Pricing.
+- **2facc1e1** (blueprint voice): deployed 2026-06-09 22:10 UTC.
+  5/6 verified-live. Item 6 (/docs/team-bootstrap.md → 404) blocked
+  on Render publish-dir staleness — HOLD A below.
+- **f528b366** (hero intent tabs): 3/3 PASS (pill toggle,
+  Playwright no-layout-shift, /llms.txt panels, ARIA tablist).
+- **7c5d2dcd** (wake setup restore): 3/3 PASS (#start-your-agent
+  runtime cards, hero foot "Wake setup ↓ · Two agents talking →",
+  /llms.txt section order).
+- **f4c0fec3** (hero copy fix aweb.ai/aida): 2/2 PASS (aweb.ai/aida
+  in home + /llms.txt, zero ami.aweb.ai anywhere). Hero-defect
+  half of aweb-aaqe.6 CLOSED.
 
 **HOLD A: /docs/team-bootstrap.md** still serves stale Mon
 2026-06-08 markdown. Render's publish dir not cleaned between
@@ -40,21 +35,26 @@ curl -sI "https://aweb.ai/docs/team-bootstrap.md" | grep -i 'http\|last-modified
 Expect HTTP 404 (Olivia: no stub). Then mail closure; aweb-aaqe.6
 closes when this AND HOLD B both clear.
 
-**HOLD B: hero terminal panel teaches a failing flow.**
-`aw chat send-and-wait ami.aweb.ai/pi "hello over there"` at
-site/layouts/index.html:34. Independently confirmed: namespace
-404 at AWID resolve. Pre-existing on f528b366, NOT introduced by
-7c5d2dcd. Direction: ship 7c5d2dcd (no regression), copy fix is
-follow-on P1. Routed to Olivia (msg 416cfcd7). Olivia probed
-candidates: aweb.ai/aida RESOLVES + accepts mail (probe
-63e89b4e); demo.aweb.ai/support + aweb.ai/hello also 404. Olivia
-recommends option 1 (provision ami.aweb.ai/pi as live greeter),
-routed to Juan. Follow-on iteration through Rose gate.
+**HOLD B CLOSED (f4c0fec3, 08:43 UTC).** Hero terminal panel
+teaches `aw chat send-and-wait aweb.ai/aida`. Olivia cross-team
+reply round-trip + my intra-team resolve+accept probe both pass.
+Zero 'ami.aweb.ai' anywhere on home or /llms.txt.
 
-Sofia pending bank: pre-deploy verify must extend to addresses
-named in marketing copy — must RESOLVE and RESPOND at verify-live
-time, same standing as released-commands rule. Settles after
-ami.aweb.ai/pi fix shape lands.
+**Discipline banked as runbook standing policy #14** (Sofia
+2026-06-10, my runbook addition). Anything named in marketing/
+first-touch copy must RESOLVE AND RESPOND (or exist and serve)
+at verify-live time, probed from a customer-shaped position.
+Sofia mirrors as a copy-review checklist line on her surface.
+Applies to all site/marketing deploys from here.
+
+**pi.aweb.ai ownership: settled.** Sofia direction (msg 6b558f88):
+stay with aweb.ai/aida as the hero address — real teammate
+answering first-contact is stronger proof than a synthetic
+greeter, signal lands with Support. Drop the ami/pi
+provisioning thread. aweb.ai/ama is fallback only if hero
+traffic makes aida's inbox noisy. Sofia telling Juan in session
+that the provisioning question is moot. aweb-aaqe.7
+(pi.aweb.ai/ama persistent Pi runner) deprioritized accordingly.
 
 **HOLD: /docs/team-bootstrap.md still serves stale 15KB markdown**
 (last-modified Mon 2026-06-08 from prior 7203f5c2 sync). File is
@@ -129,9 +129,10 @@ AC v0.5.68 prod (a68dd55a) • aweb PyPI 1.26.13 + aw npm 1.26.13 /
 channel 1.4.12 / claude-skills 0.2.12 / Pi 0.1.20 • awid-service
 PyPI 0.5.12 + awid GHCR 0.5.12, api.awid.ai verified-live • a2a.aweb.ai
 daemon-pending (waiting on Grace first AC route) • aweb.ai
-deploy-landing 7c5d2dcd (wake-setup-restore 3/3 atop hero-intent-tabs
-3/3 atop blueprint-voice 5/6; HOLDs on team-bootstrap.md staleness +
-ami.aweb.ai/pi 404) • marketplace pins: channel 1.4.12 + skills 0.2.12.
+deploy-landing f4c0fec3 (hero-aida 2/2 atop wake-setup 3/3 atop
+hero-tabs 3/3 atop blueprint-voice 5/6; ONE hold remains on
+team-bootstrap.md Render staleness) • marketplace pins: channel
+1.4.12 + skills 0.2.12.
 
 ## Juan-action queue (real-time)
 
