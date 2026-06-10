@@ -5,6 +5,118 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-10 — aw 1.26.14 ship: aweb-aaqi 3-bug stack closed; release-gate-halt-then-resume pattern exercised
+
+### Arc summary
+
+Bug-stack escalation from Juan's aaqe.7 identity-creation attempt
+ran the full cycle in one session: Juan's repro → Hestia routes
+to Athena → Athena relays Juan's "Olivia/Mia" direction → Olivia
+fixes TDD-style with Juan's repro as test cases → Mia + Athena
+clearance → merge to main → Hestia release-cli gate → halt on
+unrelated conformance vector failure → Athena patches → resume
+→ aw 1.26.14 verified-live on npm + GH Releases.
+
+### Sequence
+
+- Juan at terminal hit 3 bugs in aw 1.26.8 trying to provision
+  ama identity from his co.aweb checkout on the Hetzner box:
+  (1) /v1/connect 422 on repo_origin SSH-alias rejection;
+  (2) refusing to overwrite existing .aw/signing.key after the 422;
+  (3) DID mismatch after rm -rf .aw/ and retry.
+- Juan corrected initial framing: ALL identities are repo-
+  independent, not just --global. The CLI should never send
+  repo_origin to /v1/connect.
+- Routed to Athena urgent (msg 5bed9a81).
+- Athena relayed Juan's direction: route to Olivia with Mia as
+  reviewer (dev-team P0 aweb-aaqi). Hestia forwarded full repro
+  to juan.aweb.ai/olivia (msg e236009c); mia 403'd cross-namespace
+  first-contact, so Olivia loops Mia.
+- Olivia implemented TDD-style with verbatim repro as test cases.
+  Key insight on bug 3 (her framing): deleting key after
+  successful workspace init manufactures the mismatch; right fix
+  is preserve resumable partial-init AND fail deterministically
+  for already-registered names.
+- Mia approved d0dcb080. Athena architecture-reviewed, no
+  blockers. Mia's O2/O3 follow-ups folded as 70c2395a. Merged to
+  origin/main.
+
+### Release-gate halt + resume pattern
+
+- Bumped server/pyproject.toml 1.26.13 → 1.26.14, uv lock clean.
+- Ran release-cli skill's prescribed gate (cli/go tests on
+  cmd/aw, chat, awid, run, internal/conformance).
+- FAIL: TestA2AAWIDPublicationVectors — got − want =
+  {a2a_identity_key_history_invalid}. Pre-existing on main from
+  Grace's A2A refresh wave (#265 2429c7ff added the conflict code
+  to the source set without updating the test vector). NOT from
+  aaqi.
+- HALTED release per pristine-test-output discipline. Mailed
+  Athena (msg 0bbe76a6).
+- Athena confirmed code change is intended; provided one-line
+  test-vector patch (commit shape: cb9fb8cf "test: sync A2A
+  publication conformance conflict codes").
+- Hestia applied patch via Edit; gate green on 2nd run (all 5
+  packages pass). Conformance commit cb9fb8cf landed on origin/main
+  during Hestia's gate run (Athena or her relay pushed; matched
+  Hestia's applied patch byte-for-byte).
+- Release bump commit 4518c85c pushed to origin/main.
+- Tag aw-v1.26.14 created via make release-cli-tag, pushed via
+  make release-cli-push (banked policy #7 individual push).
+- GHA workflow 27270197173 (aweb 'aw Sync and Release') success.
+- Downstream awebai/aw workflow 27270207737 success: goreleaser +
+  npm publish.
+- npm: @awebai/aw@1.26.14 live.
+- GitHub Releases v1.26.14 published 2026-06-10 10:35:05 UTC.
+- aw upgrade smoke: local 1.26.13 → 1.26.14 clean, no resolver lag.
+
+### Mail-send foot-gun (banked)
+
+Parallel `aw mail send` calls to multiple recipients (background
+& wait pattern) tripped a CloudFlare/anti-bot block (648KB HTML
+"Blocked" page returned). Serial sends went through cleanly.
+**Bank: send mails serially when batching to multiple recipients,
+not in parallel via shell job control.** Wins: no rate-limit
+trip, clean message_id capture per send.
+
+### Coordination
+
+- Mail to Athena (msg 42ebbc4b): verify-live + aaqi closure.
+- Mail to Olivia (msg 0186b9db): verify-live + her TDD fixes are
+  live on npm.
+- Mail to Sofia (msg 9219e97c): verify-live + framing.
+- Sofia ACK (msg 0770a93a): carrying as verified-live and
+  forward-looking — connect rollback/recovery fixed for NEW
+  attempts; existing global identity orphan rows still need
+  controller-signed AWID DELETE or admin override. aaqe.7
+  pi.aweb.ai/ama still blocked on Juan's orphan cleanup.
+
+### Banked discipline
+
+**Release-gate halt-then-resume shape.** When a test gate fails
+on something unrelated to the release's own changes:
+1. HALT the release (no tag, no push).
+2. Mail the unit owner with: failure shape, suspected source
+   commit, no-ship rationale, what's local-uncommitted.
+3. Wait for owner-provided fix shape (commit/patch/regen
+   instructions).
+4. Apply, re-run the gate cleanly, resume the release.
+This is a recipe instance of standing policy "ALL TEST FAILURES
+ARE YOUR RESPONSIBILITY — never ship with red tests, never
+delete the failing test, raise with the owner."
+
+### Next-move-if-resumed
+
+1. aaqe.7 pi.aweb.ai/ama orphan cleanup: still pending Juan's
+   option-1 go (controller-signed AWID DELETE + #271 server-side
+   soft-delete). aw 1.26.14 makes the failure shape cleaner but
+   doesn't auto-recover registered identities.
+2. #266 Render visit still pending Juan.
+3. Watch for Olivia's namespace-ready ping for aaqe.7 (Pi runner
+   lane setup once identity provisioned cleanly).
+
+---
+
 ## 2026-06-10 — Pepe orphan reviewer-65e1331 server-side cleanup (Athena mail 43e19f14)
 
 ### Arc summary

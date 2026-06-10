@@ -158,7 +158,7 @@ is shared Render CDN alias for ALL services regardless of region.
 
 ## Live matrix (one line)
 
-AC v0.5.68 prod (a68dd55a) • aweb PyPI 1.26.13 + aw npm 1.26.13 /
+AC v0.5.68 prod (a68dd55a) • aweb PyPI 1.26.13 + aw npm 1.26.14 (aaqi shipped) /
 channel 1.4.12 / claude-skills 0.2.12 / Pi 0.1.20 • awid-service
 PyPI 0.5.12 + awid GHCR 0.5.12, api.awid.ai verified-live • a2a.aweb.ai
 daemon-pending (waiting on Grace first AC route) • aweb.ai
