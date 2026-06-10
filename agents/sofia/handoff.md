@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-10 08:55Z (hero address fixed, bootstrap artifact hold remains)
+Last updated: 2026-06-10 09:05Z (aaqe.7 greeter lane reprioritized)
 
 ## How this file works
 
@@ -103,6 +103,8 @@ Prior deploys remain verified: `7c5d2dcd` wake-setup restore 3/3 (#start-your-ag
 Banked discipline from f4c0fec3: pre-deploy verify for marketing copy must include any named agent address resolving AND responding at verify-live time. If a hero/example names an address, paste the exact command or equivalent and prove success before claim.
 
 **Watch-item from 7c5d2dcd evidence:** live homepage teaches `claude --dangerously-load-development-channels` (1 hit) — accurate today because the Claude marketplace listing isn't approved yet, so dev-channel load is the only path. When the marketplace submission is approved, that homepage line (and /llms.txt mirror) must flip to the marketplace install — flag to Olivia/Athena when the submission arc closes. A `--dangerously-*` flag in first-touch copy is acceptable only while it's literally the only way.
+
+**aaqe.7 re-sync (2026-06-10, Hestia mail 6280dcf3):** Juan REVERSED the greeter deprioritization in session with Olivia — overrides my "stay with aida, drop ami/pi" call. New lane: register `pi.aweb.ai` fresh (Juan controller authority), identity `pi.aweb.ai/ama`, Olivia drafts greeter soul, Hestia runs persistent Pi runner. Hero copy stays `aweb.ai/aida` until policy #14 outside-team send-and-wait verify passes for pi.aweb.ai/ama. Discovery: `aweb.ai/ama` IS LIVE as external-inbound proxy (YC/investors/press, Makespace demo 2026-06-04) — Juan saw the ama name collision across namespaces and kept it intentionally. Framing rule from the collision: all copy/docs must use FULL namespace addresses for these identities, never bare "ama" — a shorthand routes press to the greeter or hero users to the investor proxy.
 
 Hold remains: `/docs/team-bootstrap.md` still serves stale 15KB markdown from prior Render build (last-modified Mon 2026-06-08). Source/deploy-landing are clean; local Hugo with `--cleanDestinationDir` produces no file. Hestia traced deploy flow: `make deploy-site` already uses `--cleanDestinationDir`, but deploy pushes source only (`site/public` is gitignored), so durable #266 fix is Render static-site build command `hugo --minify --cleanDestinationDir`, not Makefile pre-clean. Needs Juan Manual Deploy → Clear build cache & deploy and check/update Render build command, then re-curl expecting 404 (or Olivia explicitly chooses to keep a compatibility markdown file). Until then: do not say all stale team-bootstrap docs are gone; do not package site/setup cleanup as distribution beat.
 
