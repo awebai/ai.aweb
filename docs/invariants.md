@@ -154,38 +154,6 @@ similar old nouns from new canonical fields just to preserve an old
 shape. Derived legacy fields are product-authority residue, not
 compatibility.
 
-## 9. Rollback is transactional over local writes and conservative about remote uncertainty
-
-Failure-path rollback must be transactional over known local writes and
-conservative about remote uncertainty. Automatic rollback may remove
-only local artifacts that the current attempt created and that are not
-the only remaining authority or correlation needed to reconcile a
-possible remote side effect.
-
-If remote state may have succeeded, preserve enough local state to
-retry or repair, and surface the ambiguity. Destructive cleanup of
-confirmed remote state must be an explicit lifecycle or recovery action
-with the right authority, not an incidental rollback, read, or status
-side effect.
-
-Rollback must be manifest/snapshot-based, never broad `rm -rf .aw`.
-It must preserve pre-existing `.aw` plus any partial-init or recovery
-marker unless an explicit user/operator cleanup command is being run.
-
-This is the shared invariant behind two incident classes:
-
-- A read/status-shaped cleanup must not infer server deletion from a
-  stale local path and delete remote workspace/agent rows (#245).
-- A failed connect/init attempt must not delete the last local key or
-  correlation handle when remote identity creation may already have
-  succeeded (aweb-aaqi bug 3).
-
-The safety bar is preserving the authority and evidence needed to
-repair ambiguity. Cleanup that destroys identity state, global rows,
-namespace registrations, or remote workspaces belongs behind explicit
-lifecycle/recovery commands and the appropriate controller/admin
-authority.
-
 ## 9. Failure-path rollback is transactional locally, conservative remotely
 
 Failure-path rollback must be transactional over known local writes
