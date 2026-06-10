@@ -47,14 +47,28 @@ at verify-live time, probed from a customer-shaped position.
 Sofia mirrors as a copy-review checklist line on her surface.
 Applies to all site/marketing deploys from here.
 
-**pi.aweb.ai ownership: settled.** Sofia direction (msg 6b558f88):
-stay with aweb.ai/aida as the hero address — real teammate
-answering first-contact is stronger proof than a synthetic
-greeter, signal lands with Support. Drop the ami/pi
-provisioning thread. aweb.ai/ama is fallback only if hero
-traffic makes aida's inbox noisy. Sofia telling Juan in session
-that the provisioning question is moot. aweb-aaqe.7
-(pi.aweb.ai/ama persistent Pi runner) deprioritized accordingly.
+**pi.aweb.ai ownership + aaqe.7 sequence (Juan reversed Sofia's
+deprioritization 2026-06-10 via Olivia 3ffd1fbb):**
+
+- Juan registers pi.aweb.ai fresh (his controller authority).
+- Identity pi.aweb.ai/ama created.
+- Olivia drafts greeter soul.
+- **Hestia lane**: persistent Pi runner bound to pi.aweb.ai/ama
+  — shape like a2a.aweb.ai gateway service (container image +
+  env config + Render web service + DNS + verify
+  resolve+respond before copy flip).
+- Hero copy stays aweb.ai/aida until policy #14 verify-live
+  passes for pi.aweb.ai/ama (could be days/weeks).
+
+**Adjacent finding banked**: aweb.ai/ama IS LIVE. Replied to
+Olivia's probe within a minute. Scope: external inbound proxy
+for YC/investors/press; Makespace demo 2026-06-04. Juan was
+shown name collision with new pi.aweb.ai/ama and KEPT
+pi.aweb.ai/ama anyway — different namespace, different scope,
+intentional. Existing aweb.ai/ama untouched.
+
+**Waiting on Olivia's namespace-ready ping** to start the
+persistent Pi runner lane.
 
 **HOLD: /docs/team-bootstrap.md still serves stale 15KB markdown**
 (last-modified Mon 2026-06-08 from prior 7203f5c2 sync). File is

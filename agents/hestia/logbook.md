@@ -111,16 +111,59 @@ Site row to the Verified-live probe pattern table referencing #14.
   checked f4c0fec3 independently; noted s-maxage=300 stale-edge
   pattern.
 
+### Direction update (later same day, msg 3ffd1fbb)
+
+Juan reversed Sofia's aaqe.7 deprioritization in session with
+Olivia. New sequence:
+
+1. Juan registers pi.aweb.ai fresh (controller authority).
+2. Identity pi.aweb.ai/ama created.
+3. Olivia drafts greeter soul.
+4. **Hestia lane**: persistent Pi runner bound to
+   pi.aweb.ai/ama. Shape like a2a.aweb.ai gateway service
+   (container image + env config + Render web service + DNS +
+   verify resolve+respond before copy flip).
+5. Hero copy flips to pi.aweb.ai/ama only after policy #14
+   verify-live (outside-team send-and-wait) clears.
+
+Adjacent clarification on aweb.ai/ama: NOT a stale registration
+as the "log seq 1, single register_did event" data suggested.
+It IS a LIVE agent — replied to Olivia's probe within a minute.
+Scope: external inbound proxy for YC/investors/press; Makespace
+demo 2026-06-04. Juan was shown the name collision with the new
+pi.aweb.ai/ama and KEPT pi.aweb.ai/ama anyway — different
+namespace, different scope, intentional collision. Existing
+aweb.ai/ama untouched.
+
+Bank: **AWID log-seq alone is not sufficient proof of
+liveness.** Log seq 1 only means one registration event, which
+is the normal steady state — the agent could be live, idle,
+gone, or proxying external traffic. Verify liveness requires a
+probe (mail/chat send) and inspection of the response shape.
+
+Direction-mail to Sofia (msg 6280dcf3) re-syncing her direction
+posture with Juan's decision: aaqe.7 progresses; hero copy
+stays aweb.ai/aida in the meantime; "real teammate > synthetic
+greeter" rule still holds because pi.aweb.ai/ama is designed
+AS the greeter teammate, not synthesized.
+
 ### Next-move-if-resumed
 
 1. aweb-aaqe.6 remaining: /docs/team-bootstrap.md 404. Still
    pending Juan's Render clear-build-cache + --cleanDestinationDir
    build-command flag (#266). Periodic re-curl until flip.
 2. When Render rebuild lands, mail closure to Olivia + Sofia.
-3. aweb-aaqe.7 deprioritized per Sofia direction. No Hestia
-   action required.
+3. aweb-aaqe.7 ACTIVE per Juan reversal. Wait for Olivia's
+   namespace-ready ping; then draft the persistent Pi runner
+   plan (shape: a2a.aweb.ai gateway service) and route to Juan
+   for Render deploy authorization.
 4. New site/marketing deploys: enforce runbook policy #14 at
    verify-live, in addition to existing checklists.
+5. Policy #14 extension worth tracking (no commit yet, banked
+   in arc context): verify probe should answer BOTH "is this
+   address live?" AND "what's its scope?". Scope-discovery via
+   response shape inspection. Will fold into runbook on the
+   next verify-live exercise that surfaces this case.
 
 ---
 
