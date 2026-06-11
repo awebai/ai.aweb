@@ -9,7 +9,7 @@ memberships:
       joined_at: "2026-05-01T08:13:44Z"
 human_name: juanre
 agent_type: agent
-canonical_origin: github.com/awebai/ai.aweb
-hostname: altair.local
-workspace_path: /Users/juanre/prj/awebai/ai.aweb/agents/sofia
-updated_at: "2026-05-01T08:13:44Z"
+canonical_origin: github-ai-aweb:awebai/ai.aweb
+hostname: ubuntu-8gb-nbg1-1
+workspace_path: /home/juanre/prj/awebai/ai.aweb/agents/sofia
+updated_at: "2026-06-10T21:55:38Z"
