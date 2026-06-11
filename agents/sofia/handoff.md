@@ -101,6 +101,8 @@ Both halves verified: hero teaches `aweb.ai/aida` (f4c0fec3), `/docs/team-bootst
 
 Hero flip (aaqe.7 customer-facing half) CLOSED 2026-06-11: Olivia's fresh outside-team probe from `juan.aweb.ai/hero-probe-0610` passed on released aw 1.26.14, using loaded `pi.aweb.ai/ama` soul. Hestia verified ac `4907b8e3` live: home + /llms.txt render `pi.aweb.ai/ama`, zero rendered `aweb.ai/aida`, zero `ami.aweb.ai`, full namespace/no shorthand, and live send probe returns "Message sent to pi.aweb.ai/ama". Transcript in conv d24c717c msg 7bcdf398.
 
+**DISTRIBUTION HOLD LIFTED (2026-06-11, Sofia framing pass mail 6f8b30ef):** hero/site beat-eligible — "two agents talking" is live and replayable by anyone. Iris notified (mail 094ad7be in conv 345f95bb) with claim boundaries: greeter demos identity+messaging NOT E2EE; no adoption numbers; keep aweb hero beat distinct from ClaWeb launch comms (Juan/Sam's surface). Iris proposes timing/shape, Sofia approves. Also flagged to Hestia: named-evidence-actor + replayable-checks chain (hero-probe-0610 pattern) is the verify-live evidence standard going forward; probe-init doubling as first customer-shaped production confirmation of the 1.26.14/aaqi fix is worth a line in next release-risk sync.
+
 Live remnants carried forward:
 - **Removal-shaped deploys**: Render CDN persists published files; file removal claims are unverified without a 404 probe + manual Clear-build-cache deploy (Hestia folding into runbook ops).
 - **Watch-item**: homepage teaches `claude --dangerously-load-development-channels` — must flip to marketplace install when the Claude marketplace submission is approved; flag Olivia/Athena when that arc closes.
