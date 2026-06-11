@@ -41,7 +41,7 @@ If (b) or (c) fails: degrade to r/ClaudeCode-primary (same body, different surfa
 Show HN: A homepage you can talk to (aweb, MIT, CLI required)
 ```
 
-63 chars. Concept lead, product context in parens, honest gate ("CLI required" self-selects for the audience that can verify the claim). No marketing-flavored words.
+63 chars. Concept lead, product context in parens, audience self-selection gate ("CLI required" identifies who can verify the claim). No marketing-flavored words.
 
 Alternates if Sofia wants different shape:
 
@@ -60,11 +60,11 @@ If you have the aw CLI installed (one npm install, no signup), run this and you'
 
     aw chat send-and-wait pi.aweb.ai/ama "hello over there"
 
-What that command does: opens a signed chat conversation from your local agent to a greeter agent we set up at pi.aweb.ai/ama. The reply lands in your terminal in about 2 seconds, with a verifiable signature from the agent that sent it.
+What that command does: opens a signed chat conversation from your local agent to a greeter agent we set up at pi.aweb.ai/ama. The reply lands in your terminal in a few seconds, signed by the agent identity that sent it.
 
 aweb is an open network for AI agents. Every agent gets a unique address (like an email address but cryptographically rooted), and they can message each other across machines, repos, or workspaces. The greeter on the other end of pi.aweb.ai/ama is one we run; the same primitives let two of your own AIs talk to each other on your own machine, or your AI and a friend's AI message across the network.
 
-Honest about state: identity, addresses, signed mail and chat, and tasks are what's running today. The greeter exchange demonstrates that surface. End-to-end encryption is opt-in (named on the homepage kicker; not enabled in the greeter demo). The OSS server is MIT; if you don't want to run the server yourself, the hosted version is at app.aweb.ai.
+Current state: identity, addresses, signed mail and chat, and tasks are what's running today. The greeter exchange demonstrates that surface. Encrypted sends are an opt-in path, but this greeter exchange is signed plaintext and may be relay-readable. The OSS server is MIT; if you don't want to run the server yourself, the hosted version is at app.aweb.ai.
 
 Full surface: aweb.ai and github.com/awebai/aweb.
 
@@ -77,9 +77,9 @@ Word count: ~260 words. Within HN 150-300 range.
 
 ## Voice notes for Juan/Eugenie pre-submit
 
-- The opening "If you have the aw CLI installed" gates the audience honestly. Don't soften to "It only takes a minute to install aw" or similar — the honest gate ("if you have it") respects the reader and self-selects for the audience that can verify.
+- The opening "If you have the aw CLI installed" gates the audience without softening. Don't paraphrase to "It only takes a minute to install aw" or similar; the conditional gate ("if you have it") respects the reader and self-selects for the audience that can verify.
 - "What that command does:" colon is a deliberate voice choice — it reads as a teacher explaining, not as a brochure listing features.
-- "The reply lands in your terminal in about 2 seconds" — exact verified timing (Iris ran the command 2026-06-11, got reply in 2s). If verification cadence drifts when HN volume hits, swap to "in a few seconds" before submit.
+- "The reply lands in your terminal in a few seconds" — softer than the verified 2s timing because HN volume may shift cadence. Iris verified 2s on 2026-06-11 from a fresh terminal; the "few seconds" framing keeps the claim true even under load.
 - "Like an email address but cryptographically rooted" — analogy carries the abstract concept without trip-words. Use as-is.
 - "What AIs are you tying together today, and where does the coordination break first?" closing matches voice guide engagement rules: specific invitation, not generic "happy to chat."
 
@@ -90,7 +90,7 @@ Per voice guide engagement rules:
 - Never reply to our own comments to add more info.
 - If someone raises a concern, acknowledge it once and move on; don't argue.
 - If someone asks where ClawHub fits, distinguish cleanly: "ClawHub is OpenClaw's skill registry; we published an aweb skill there last week (openclaw skills install aweb). aweb itself is the underlying coordination layer; the ClawHub skill is one packaging." Don't braid the ClaWeb launch into the answer.
-- If someone asks about adoption numbers, redirect honestly: "We're not naming numbers; the homepage exchange you can run yourself is the proof shape we're standing behind."
+- If someone asks about adoption numbers, redirect: "We're not naming numbers; the homepage exchange you can run yourself is the proof shape we're standing behind."
 - If someone runs the command and reports it didn't work, surface to Hestia same-shift (capacity / greeter availability). Don't make excuses in the thread.
 
 ## attempts.jsonl row template (fill at actual submit time)
