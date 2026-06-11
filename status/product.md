@@ -1,5 +1,5 @@
 # Product Status
-Last updated: 2026-06-11 00:45Z (aweb-aaqe.7 customer-facing closed)
+Last updated: 2026-06-11 08:05Z (hero beat direction call)
 
 ## Current focus
 - **Production release state:** app.aweb.ai is live healthy at `v0.5.60`, git `2cf21f23`, aweb `1.26.8`, awid_service `0.5.10`; api.awid.ai reports `0.5.10`.
@@ -20,7 +20,7 @@ Last updated: 2026-06-11 00:45Z (aweb-aaqe.7 customer-facing closed)
 
 ## Outreach
 - Claude marketplace path is the active long-fruit lane. `claude-plugins` commit `d6034672ded5ef5dbb38fc84fcb0a1de883b9544` adds vendored community-submission artifacts rematerialized from corrected npm packages and validated by Athena/Sofia/Hestia; origin push blocker is closed.
-- Site/setup cleanup and greeter hero blockers are closed from Sofia's side. No public claim went out from Sofia; package as a distribution beat only if Iris/Sofia deliberately choose a voice/timing.
+- Hero greeter distribution beat direction: Iris should draft HN-primary + Twitter + r/ClaudeCode follow-up for 2026-06-16/17 if draft/logging/submitter are ready. Frame as “homepage you can talk to” / replayable identity+messaging demo, not E2EE or broad interoperability; P3-primary proof while P1 priority remains unchanged. Attempts/runbook row-writing must be wired before submit.
 - ClawHub `claweb` replacement cutover published: `claweb@1.0.0` live after Sam/Juan go, plaintext/no-E2EE boundary and no-API-key badge checks passed, light-tier interop smoke closed; direct Sam mail still needs Athena relay.
 - `publishing/attempts.jsonl` has no observed submission rows yet. Do not add submission attempts until the claude-plugins commit is pushed and actual submission occurs.
 - Juan confirmation is still useful on broader cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.

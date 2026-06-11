@@ -1,6 +1,6 @@
 # Sofia Handoff
 
-Last updated: 2026-06-11 00:45Z (aweb-aaqe.7 customer-facing closed)
+Last updated: 2026-06-11 08:05Z (hero beat direction call)
 
 ## How this file works
 
@@ -121,7 +121,11 @@ Review flags sent to Sam via Athena relay (mail 55d7d90f; my direct mail to Sam 
 
 Hero now teaches `pi.aweb.ai/ama` (ac `4907b8e3`, Hestia verified-live). Evidence: pi.aweb.ai namespace registered, greeter identity provisioned, co.aweb `f67e2ef` soul loaded, Pi runner live on Juan's Hetzner box, Olivia fresh-identity 3-beat probe passed, Hestia post-deploy site verify passed. `aweb.ai/aida` remains support-side fallback; `aweb.ai/ama` remains investor/press proxy. Durable actor: `juan.aweb.ai/hero-probe-0610`; transcript in conv d24c717c msg 7bcdf398.
 
-Carry-forward rules: full namespace addresses always (runbook #15); `pi.aweb.ai/ama` hands out only public verified addresses (`aweb.ai/aida`, `aweb.ai/ama`) and relays everything else herself; no E2EE overclaim; only teach released commands. OPEN: who reviews `aweb.ai/ama`'s soul — routed to Olivia, answer pending; if nobody, formalize peer-review for external-claim surfaces with active reply behavior as a direction call.
+Carry-forward rules: full namespace addresses always (runbook #15); `pi.aweb.ai/ama` hands out only public verified addresses (`aweb.ai/aida`, `aweb.ai/ama`) and relays everything else herself; no E2EE overclaim; only teach released commands. Iris caught em dash drift in live greeter copy; Sofia fixed soul in co.aweb `cbcf7f1` and asked Hestia to trigger reread. Iris also caught hero line em dash; Sofia attempted direct Olivia mail (404) and asked Hestia to relay for next site copy window. OPEN: who reviews `aweb.ai/ama`'s soul — routed to Olivia, answer pending; if nobody, formalize peer-review for external-claim surfaces with active reply behavior as a direction call.
+
+### Hero greeter distribution beat — DRAFTING WITH IRIS (2026-06-11)
+
+Iris verified `aw chat send-and-wait pi.aweb.ai/ama "hello over there"` from a fresh terminal (~2s) and proposed a distribution beat. Sofia direction call: HN is primary (Show HN) because replayable proof is HN-native; target 2026-06-16 or 06-17 only if draft, attempts/runbook logging, and submitter availability are ready. r/ClaudeCode follows 24-48h later with technical framing, Twitter same day, DEV.to optional 7-10 days later based on signal. Treat as P3-primary proof, not persona-priority rewrite; P1 remains priority for browser/onboarding surfaces. Attempts discipline: do not start a new submission without row-writing; do not retro-invent older B.1-B.8 rows. Claim boundary: identity + address + messaging + greeter reply; NOT E2EE, not broad interoperability, no adoption numbers, distinguish ClaWeb as separate lane if mentioned. Iris drafts HN + Twitter + r/ClaudeCode + logging wiring, routes to Sofia before Juan/Eugenie.
 
 ### OpenClaw × aweb integration (active — ClawHub skills drafted, awaiting publish)
 
