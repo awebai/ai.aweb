@@ -787,6 +787,41 @@ runbook.
 
 ## Foot-guns and known failure modes
 
+### aw cwd-bound identity impersonation foot-gun
+
+Banked 2026-06-11 from Rose's accidental incident during the
+em-dash-sweep deploy chain (Olivia mail cd3ce8a6): Rose ran an
+`aw mail send` ACK from the ac checkout directory, whose `.aw/`
+workspace was Mia's. The signed mail went out as
+**aweb.ai/mia**, not aweb.ai/rose. Olivia caught it via
+out-of-band chat with Rose; Rose re-sent authoritative ACK from
+the right thread.
+
+Mechanic: `aw` resolves the local workspace identity by walking
+up from cwd until it finds `.aw/workspace.yaml` (or
+`.aw/signing.key`). Compound commands that `cd` across checkouts
+silently send as whichever workspace is in scope at the time the
+send runs. This is identical-shape to the dual-Sofia-session and
+mutual-contact-wall classes Sofia + Hestia tracked earlier
+2026-06-10/11: session/identity-state coherence across local
+operator state.
+
+Discipline:
+- `git -C <repo> ...` form for compound git operations to avoid
+  cd'ing into someone else's `.aw`. Same rule as the
+  prefer-`git -C aweb log` runbook policy banked early in the
+  morning.
+- Before `aw mail send` / `aw chat send-and-wait` / any signed
+  send, **verify the active identity** if the cwd is a
+  different teammate's checkout: `aw whoami` should print the
+  expected address.
+- For ops scripts that fan out signed sends across multiple
+  repos, set `AW_WORKSPACE` explicitly OR run with `--server-name`
+  override OR `cd` to your own agent workspace dir before
+  sending.
+- Sofia is tracking session-coherence-discipline as a Juan
+  escalation; this foot-gun is concrete data for that read.
+
 ### Render Static Site published-file retention
 
 Render Static Sites persist published files across regular deploys.
