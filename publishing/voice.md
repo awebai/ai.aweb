@@ -34,6 +34,48 @@ AI-using employees, P3 developer team, P4 platform builder).
 - Never reply to our own comments to add more info (looks desperate)
 - If someone is negative, don't argue. Move on.
 
+## Typography in customer-facing prose
+
+**No em-dashes (—) in customer-facing copy.** Use colons,
+semicolons, periods, or commas instead.
+
+**Why.** Banked from Juan 2026-05-16: "no! do not add — anywhere.
+they sound llm. i have been removing them." LLM training
+distributions favor em-dashes; avoiding them is one of the
+cheapest discipline-tells that the copy was crafted, not
+generated. Juan removes them as a standing editing pattern.
+
+**How to apply.** Stronger rule the more customer-facing the
+surface; weaker rule the more agent-facing.
+
+In scope (apply the rule):
+- Landing copy (`aweb.ai`, `ac/site/`)
+- Blog posts (`juanreyero.com`, `aweb.ai/blog`)
+- Social posts (Twitter / Reddit / HN / DEV.to / LinkedIn)
+- Customer-facing agent replies (greeters, welcome guides, MCP
+  serverInfo, onboarding artifacts)
+- Plugin marketplace descriptions, registry listings, awesome-list
+  entries, ClawHub variant skills
+
+Out of scope (rule weakens or doesn't apply):
+- Agent-to-agent coordination mail and chat (operational, not
+  customer-facing)
+- Engineering documentation (SOT docs, architecture notes, runbook
+  prose — agent-facing density allowed; see
+  `feedback_voice_pass_on_skills.md` rationale)
+- Agent-facing skill bodies (`aweb/skills/<name>/SKILL.md`) —
+  agent-facing discipline is weaker; em-dashes in list-id-separator
+  format (e.g., implementation plan tables) preserved
+- Structural typography in operational docs (section dividers,
+  list separators, table-cell visual structure)
+
+**Voice-pass replacements** (most → least common):
+- Parenthetical "X — Y — Z" → "X (Y) Z" or restructure
+- Term-definition "X — Y" → "X: Y"
+- Range or aside "X — Y" → "X, Y" or "X. Y"
+- Quoted dialogue "X — Y" → "X. Y" or "X; Y" (no spoken-thought
+  exception — Juan removes from dialogue too)
+
 ## Customer-shape verification (the walk-the-flow test)
 
 **The non-skippable test for any landing, onboarding, or
