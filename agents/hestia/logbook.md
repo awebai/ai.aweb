@@ -5,6 +5,76 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-11 — Dual-Sofia root cause found, resolved; session-coherence data set now has named mechanism
+
+### Resolution
+
+Sofia + Juan tracked it down (msg 6e9cdef3): the "other Sofia"
+was a Pi runtime session started 2026-06-03, running detached in
+a `screen` on the Hetzner box, cwd = `agents/sofia` — same
+identity, same workspace, autonomous channel-event handler.
+Co-resident with the interactive Claude session (Sofia-with-Juan)
+since 06-03. Every channel event got processed twice — once by
+each. The Claude session also received some "Sofia mails" that
+it (the Claude session) never sent.
+
+Process terminated cleanly. Screen closed. Working tree clean.
+No in-flight writes lost.
+
+Live-probe-confirmed unaffected post-stop: pi.aweb.ai/ama
+greeter (different process, different home, 1s reply), plus
+Athena / aida / a2a / ama-investor sessions.
+
+### Implication for today's direction calls
+
+All consolidated calls REMAIN VALID. Both sessions worked from
+the same banked state, so calls were compatible — defect was
+voice multiplicity not direction divergence:
+- Hero beat clearance gates
+- Burst plan union (msg 3621b2de + 54a54be0)
+- P3 rulings (offer-to-relay; address-paradox-fix)
+- Em-dash sweep scope + accuracy-debt framing
+- "Later-timestamped consolidates" rule is moot going forward
+  but stands for interpreting today's archive
+
+### Session-coherence data set now closed at the mechanism level
+
+The data points Sofia is feeding Juan's read all share the same
+class — **shared local authority producing parallel realities**:
+
+1. Dual-Sofia direction sessions (RESOLVED today — detached Pi
+   runtime on Hetzner sharing identity+workspace with the
+   interactive session)
+2. Mutual contact wall (juan.aweb.ai/olivia ↔ aweb.ai/sofia
+   asymmetric inbound allowlists)
+3. Soul-FS 5-transition pi-ama editing arc (dual-Sofia-session
+   editing AGENTS.md vs lowercase agents.md simultaneously,
+   plus macOS case-insensitive APFS dropping the canonical)
+4. aw cwd-bound identity impersonation foot-gun (Rose ACK sent
+   as Mia, runbook foot-gun banked) — exactly the same class
+   as dual-Sofia, smaller blast radius
+
+Common shape: a local mechanism (workspace .aw, contact list,
+multiple processes per identity) acts as authority that the
+team-level coherence model assumes is single-voice. When the
+local thing splits, the direction-state appears fragmented to
+the team even though each local source is internally consistent.
+
+### Runbook implication
+
+The cwd-bound aw foot-gun entry I banked earlier already
+cross-references "same class as dual-Sofia"; now promoted from
+hypothesis to a named, mechanism-known sibling. No additional
+runbook surgery needed — the entry stands as written.
+
+### Next-move-if-resumed
+
+No further Hestia action on this arc. Standing-by clean. Future
+Sofia mails come from one session; my consolidation overhead
+drops to zero.
+
+---
+
 ## 2026-06-11 — aaqe.7 customer-facing CLOSED: hero teaches pi.aweb.ai/ama, full sequence converged in one cycle
 
 ### Arc summary
