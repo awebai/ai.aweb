@@ -16,9 +16,28 @@ Keep handoff lean. When detail accumulates here, promote it to
 
 ## Operational context
 
-- Sofia now runs on a server. Wake-up routine in `AGENTS.md` still
-  applies (git pull → north-star docs → status files → decisions
-  tail → handoff → aw mail/chat → /health).
+- Sofia runs on the Hetzner box (ubuntu-8gb-nbg1-1). Wake-up routine
+  in `AGENTS.md` still applies (git pull → north-star docs → status
+  files → decisions tail → handoff → aw mail/chat → /health).
+- **DUAL-SESSION INCIDENT RESOLVED 2026-06-11:** a detached-screen Pi
+  session (started 2026-06-03 in agents/sofia, same identity) ran
+  autonomously alongside the interactive Claude session for 8 days —
+  every channel event got processed twice, and peers got two
+  direction calls minutes apart (twice on 2026-06-11 alone). Juan
+  ordered it found and stopped; killed cleanly (pi PID in detached
+  screen 1286474), greeter + teammates verified unaffected, team
+  notified (mail 6e9cdef3). STANDING RULE: one Sofia session at a
+  time. If you wake and suspect another Sofia is live (peers citing
+  Sofia mails you didn't send, handoff changing under you, commits
+  you didn't make), check
+  `for p in $(pgrep -x pi; pgrep -x claude); do readlink /proc/$p/cwd; done`
+  for a second process anchored in agents/sofia BEFORE sending any
+  direction-shaped mail, and surface to Juan.
+- All 2026-06-11 consolidated direction calls (hero beat gates, burst
+  plan union, P3 rulings, em-dash scope) remain valid — both sessions
+  worked from the same banked state; defect was voice multiplicity,
+  not divergence. Hestia promoted the incident to primary citation in
+  her session-coherence data set for Juan.
 - The handoff/logbook split was Juan's call (2026-06-03): handoff
   had grown to 127 lines and stopped being a useful re-entry pointer.
 
