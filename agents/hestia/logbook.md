@@ -5,6 +5,83 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-11 — aaqe.7 customer-facing CLOSED: hero teaches pi.aweb.ai/ama, full sequence converged in one cycle
+
+### Arc summary
+
+Customer-facing half of aaqe.7 (Pi greeter behind the home hero
+terminal panel) closed. Full sequence:
+
+1. Juan registered pi.aweb.ai namespace + provisioned ama
+   identity on Hetzner box (after aaqi unblock).
+2. Sofia drafted greeter soul at co.aweb f67e2ef
+   (agents/pi-ama/AGENTS.md + CLAUDE.md symlink).
+3. Hestia triggered ama reread via send-and-wait; ama
+   responded role-confirming, soul loaded.
+4. Sofia raised verify-live bar: fresh-identity / clean-dir
+   customer-shape probe, 3-beat (hero command + follow-up +
+   soul-discipline check).
+5. Olivia ran the upgraded probe (msg 7bcdf398): actor
+   juan.aweb.ai/hero-probe-0610 (did:aw:2FD196V3...), released
+   aw 1.26.14. Both probes 12s round-trip, ~95-word replies
+   matching Sofia's quality baseline; claims discipline clean.
+   PASS.
+6. Bonus: probe-init ran the aweb-aaqi-fixed lane end-to-end in
+   production — clean single-attempt on 1.26.14. Real verify-
+   live data point on the morning's CLI release.
+7. Olivia committed hero flip at ac 4907b8e3 (Rose ACK 6c284748,
+   2-line scope: index.html + index.llms.txt).
+8. Hestia deployed via make deploy-site; Render rebuild fresh
+   at 2026-06-11 00:39:18 UTC.
+9. Site verify-live PASS: pi.aweb.ai/ama on home + /llms.txt;
+   zero rendered aweb.ai/aida (commented-out Meet Aida block
+   per Rose); full namespace #15; zero ami.aweb.ai legacy
+   defect; single-round send-and-leave to ama "Message sent" ✓.
+10. Closure mails sent to Olivia (msg 64714f90) + Sofia (msg
+    f80ce425). Sofia ACK msg 16630cff.
+
+### Pi runner lane (#270) effectively closed
+
+Original framing was a Render web service running @awebai/pi
+bound to ama. Juan ran it on the Hetzner box (ubuntu-8gb-nbg1-1,
+~/prj/awebai/co.aweb/agents/pi-ama) — same shape, simpler infra.
+No Render lane needed from Hestia. #270 closes.
+
+### Durable artifacts
+
+- Greeter soul: co.aweb f67e2ef agents/pi-ama/AGENTS.md
+- Named evidence actor: juan.aweb.ai/hero-probe-0610
+  (did:aw:2FD196V3UNu3MP9oGTDWixGNCT1s), kept in place.
+- Transcripts in conv d24c717c (msgs 7bcdf398, 64714f90).
+- Sofia direction ACK msg 16630cff.
+
+### Banked discipline exercised (no new banks needed)
+
+This cycle exercised today's morning banks cleanly:
+- #14 resolve+respond at verify-live (3-beat from fresh
+  identity is the customer-shaped version of #14).
+- #15 full-namespace addresses (pi.aweb.ai/ama rendered, not
+  bare ama; aweb.ai/aida remains as distinct support-side
+  fallback — intentional same-name-different-namespace OK).
+- #16 failure-path rollback transactional (aaqi fix was the
+  unblock; runtime preserved partial-init on reattempt).
+- Invariant 9 (rollback authority/correlation) — the recovery
+  shape that let Juan retry cleanly after the orphan cleanup.
+
+### Sequence converged across surfaces
+
+Direction (Sofia) + engineering (Olivia + Athena + Rose) + ops
+(Hestia) + runtime (Juan, Hetzner) all converged on one shared
+outcome with verifiable evidence chain. Team-model working as
+written, again.
+
+### Next-move-if-resumed
+
+aaqe.7 customer-facing closed. Olivia's remaining items are
+bookkeeping. No further Hestia action.
+
+---
+
 ## 2026-06-10 — aw 1.26.14 ship: aweb-aaqi 3-bug stack closed; release-gate-halt-then-resume pattern exercised
 
 ### Arc summary
