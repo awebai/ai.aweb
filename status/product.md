@@ -1,5 +1,5 @@
 # Product Status
-Last updated: 2026-06-11 08:35Z (hero beat pre-HN gates signed off)
+Last updated: 2026-06-11 09:10Z (HN draft framing pass sent)
 
 ## Current focus
 - **Production release state:** app.aweb.ai is live healthy at `v0.5.60`, git `2cf21f23`, aweb `1.26.8`, awid_service `0.5.10`; api.awid.ai reports `0.5.10`.
@@ -20,7 +20,7 @@ Last updated: 2026-06-11 08:35Z (hero beat pre-HN gates signed off)
 
 ## Outreach
 - Claude marketplace path is the active long-fruit lane. `claude-plugins` commit `d6034672ded5ef5dbb38fc84fcb0a1de883b9544` adds vendored community-submission artifacts rematerialized from corrected npm packages and validated by Athena/Sofia/Hestia; origin push blocker is closed.
-- Hero greeter distribution beat direction: Iris should draft HN-primary + Twitter + r/ClaudeCode follow-up for 2026-06-16/17 if draft/logging/submitter are ready. Pre-HN gates: attempts/runbook row-writing wired, Olivia adversarial smoke PASS, and Hestia burst-capacity read PASS by 06-13 (>=95% success at N=50, P95 <30s, no silent hangs). Frame as “homepage you can talk to” / replayable identity+messaging demo, not E2EE or broad interoperability; P3-primary proof while P1 priority remains unchanged. Customer-facing no-em-dash rule is now banked in `publishing/voice.md` (50eeca6).
+- Hero greeter distribution beat direction: Iris should draft HN-primary + Twitter + r/ClaudeCode follow-up for 2026-06-16/17 if draft/logging/submitter are ready. HN draft landed at 9f8f73e; Sofia framing-pass sent with four edits (title keep, avoid “Honest about state”, explicit signed-plaintext/relay-readable boundary, soften “verifiable signature” unless verification instructions added). Pre-HN gates: attempts/runbook row-writing wired, Olivia adversarial smoke PASS, and Hestia burst-capacity read PASS by 06-13 (>=95% success at N=50, P95 <30s, no silent hangs). Frame as “homepage you can talk to” / replayable identity+messaging demo, not E2EE or broad interoperability; P3-primary proof while P1 priority remains unchanged. Customer-facing no-em-dash rule is now banked in `publishing/voice.md` (50eeca6).
 - ClawHub `claweb` replacement cutover published: `claweb@1.0.0` live after Sam/Juan go, plaintext/no-E2EE boundary and no-API-key badge checks passed, light-tier interop smoke closed; direct Sam mail still needs Athena relay.
 - `publishing/attempts.jsonl` has no observed submission rows yet. Do not add submission attempts until the claude-plugins commit is pushed and actual submission occurs.
 - Juan confirmation is still useful on broader cadence: daily scan/draft/post loop vs weekly batch, and human review/send capacity.
