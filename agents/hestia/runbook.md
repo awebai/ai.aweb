@@ -1724,6 +1724,50 @@ quick local iteration, not the standing release path.
     require explicit Juan-go or controller-signed authority
     (see #213 juanreyero.com pattern).
 
+17. **Never ship with failing tests, ever.** Juan's correction
+    2026-06-12 after 5 consecutive AC ships went out under a
+    "labels match prior ship → known-flake → non-regression
+    accept" pattern Grace and I had been treating as standing
+    policy. Red gate = no ship. "Known flake", "matches
+    baseline", "non-regression accept" are NOT acceptable
+    framings. If a peer (including the AC reviewer) accepts a
+    red-gate ship under such framing, push back and cite this
+    rule. Cross-team decision record: `docs/decisions.md`
+    entry "2026-06-12 — Release policy: we cannot ship with
+    failing tests, ever" (commit ad0e06a, Sofia 2026-06-12).
+    Hestia-side durable bank: feedback_never_ship_failing_tests
+    in agent memory. The failures the rule caught: 2 E2EE chat
+    decrypt journey tests stable-failing across
+    v0.5.69/.70/.71/.72/.73, routed to Athena (aweb-aaqu P0) +
+    Grace (aweb-aaqt blocker) + Olivia + Mia for fix. Until
+    that gate is green, v0.5.73 stays held.
+
+18. **Identical failure labels across consecutive runs are
+    CONSISTENT BROKEN BEHAVIOR, not flake.** Sofia's
+    discipline (msg c430fc63, 2026-06-12), generalizing the
+    5-ship mislabel that #17 caught. "Same failure twice with
+    the same label" should trigger incident-shape triage
+    (release blocker + owner investigation), NOT
+    re-run-and-accept. Would have caught the 5-ship cascade on
+    ship two of five. Diagnostic complement to #17: #17 is the
+    decision (don't ship); #18 is the read that should drive
+    the decision (consistent labels ≠ flake).
+
+    Operational shape:
+    - If a release-gate run shows the same failure label as the
+      prior run, log it as a release-blocker against the
+      owner's surface (E2EE → Athena; auth → Olivia/Grace; etc.)
+      and HALT.
+    - If the rerun shows a different label or count, log it as
+      potentially intermittent; characterize before treating as
+      flake (3+ runs minimum, isolate the test, file with the
+      data).
+    - The word "flake" should be treated as a yellow flag that
+      probably indicates a real broken test being papered over.
+      Sofia's wording on her side: "same failure twice with the
+      same label should trigger incident-shape triage, not
+      re-run-and-accept."
+
 ## Working-agreement bank (peer-confirmed)
 
 - **Sofia**: out of routing for bug-fix / no-external-claim-weight
