@@ -156,6 +156,10 @@ HN draft `publishing/drafts/2026-06-17-hn-aweb-hero-beat.md` landed at 9f8f73e; 
 
 **Operational flag for Juan:** two concurrent Sofia sessions both issued direction calls on the same proposal within minutes — compatible but non-identical conditions. Direction must speak with one voice; concurrent sessions should either split surfaces explicitly or serialize direction-shaped replies (check handoff/outbox before replying to proposals). Hestia flagged this rhymes with mutual-contact-wall/session identity fragmentation and .aw cwd-bound identity impersonation foot-gun from Rose dual-ACK (compound commands that cd across teammate checkouts can send as whichever `.aw` cwd resolves to). Likely one session-coherence discipline should cover direction replies, identity/contact reachability, and cwd-bound signed sends; wait for Juan's read before drafting a team rule.
 
+### a2a agent retirement + teams-page lifecycle gap (2026-06-12)
+
+Juan deleted the `a2a` identity via dashboard (roster confirmed clean); local workspace was already removed at e44e39f, session process dead. My CLI walk to find the deletion path hit 4 dead ends (remove-member needs controller key + wrong primitive; namespace delete-address wrong layer — a2a was workspace-local, no AWID row; workspace delete is local-only; docs cover creation only) — that walk is the documented evidence of a real docs gap. **Routed to Athena (mail 58b9a1c5) to coordinate with Olivia**: add identity/membership lifecycle section to aweb.ai/teams (dashboard deletion path, local vs global identity deletion, stale-claims fate), AND fix `aweb.ai/docs/teams/` 404 — published skills (canonical aweb-messaging + ClawHub aweb) cite that dead URL; recommended Hugo alias redirect → /teams (fixes all installed copies, no package re-publish). Hestia verify-live when it deploys.
+
 ### OpenClaw × aweb integration (active — ClawHub skills drafted, awaiting publish)
 
 **2026-06-09 with Juan:** decided ClawHub strategy and implemented. Decision:
