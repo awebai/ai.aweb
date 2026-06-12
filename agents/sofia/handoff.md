@@ -43,9 +43,11 @@ Keep handoff lean. When detail accumulates here, promote it to
 
 ## Active arcs (verify on wake-up — last update inside the file)
 
-### Release-risk sync (current as of 2026-06-07)
+### Release-risk sync (current as of 2026-06-12)
 
-- app.aweb.ai live healthy at `v0.5.60`, aweb `1.26.8`, awid_service `0.5.10`; api.awid.ai `0.5.10`.
+- app.aweb.ai live at AC `v0.5.72` (git eee9bf1a), aweb/aw `1.26.17` (team-auth envelope v2 verifier, v1 compatible; source 7473826f, Grace fix-forward). Hestia mail d3f20f50.
+- **CLAIM HOLD: aaqa.20 (team-principal A2A route management) is deployed but OPEN** — full live-claim waits on Rose's london `aw id request --team-auth` signed-audience customer-shape proof against https://app.aweb.ai. Until then the only approved characterization is "deployment/schema/auth-gate-green". When Rose's proof passes, the verified-live mail cites her transcript (hero-probe-0610 evidence pattern).
+- v0.5.71 migration-005 checksum incident: Juan-ratified framing = "audited emergency metadata repair, NOT a migration" (no DDL, no byte change, no customer impact, no external flag). Guard at ai.aweb b9a9448; the AC migration-immutability gate caught it on the v0.5.72 ship — positive evidence for the gate chain. Keep wording verbatim if it ever needs explaining.
 - #245 aw 1.26.3 workspace-cleanup regression remains the CLI/workspace-cleanup risk pattern. Direction agrees with Athena: read/status flows must not be destructive lifecycle operations; fix should require explicit cleanup/delete or stronger multi-signal evidence.
 - **Rollback invariant landed (2026-06-10):** Sofia proposed generalizing #245 + aaqi bug-3; Athena refined to implementable form and Hestia ACKed/banked runbook #16. Landed in `docs/invariants.md` as invariant 9 and `docs/decisions.md` 2026-06-10. Core: failure-path rollback is transactional over known local writes and conservative about remote uncertainty; preserve authority/correlation when remote side effects may exist; destructive remote cleanup requires explicit lifecycle/recovery authority, not incidental rollback/read/status behavior. Corollary: manifest/snapshot-based rollback, never broad `rm -rf .aw`, preserve pre-existing `.aw` + partial-init/recovery markers unless explicit cleanup command.
 - E2EE claim boundary: no broad "E2EE is live" claim. Only exact smoked surfaces. Do not call hosted custodial/server-side messaging E2E; hold generic self-custodial readiness unless AWID encryption-key publish skew is fixed/explained.
