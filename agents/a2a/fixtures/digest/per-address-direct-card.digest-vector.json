@@ -1,6 +1,0 @@
-{
-  "source": "a2aproject/A2A v1.0.1 specification/a2a.proto (AgentCard)",
-  "rule": "sha256 over JCS(card without `signatures`), per Athena 2026-06-07",
-  "canonical_bytes_utf8": "{\"capabilities\":{\"extensions\":[{\"description\":\"AWID publication and delegation metadata\",\"uri\":\"https://aweb.ai/a2a/ext/awid-publication/v1\"}],\"pushNotifications\":false,\"streaming\":false},\"defaultInputModes\":[\"text/plain\"],\"defaultOutputModes\":[\"text/plain\"],\"description\":\"Customer support agent for Acme products.\",\"name\":\"Acme Help\",\"provider\":{\"organization\":\"Acme\",\"url\":\"https://acme.com\"},\"skills\":[{\"description\":\"Look up order status from an order ID.\",\"id\":\"order-status\",\"name\":\"Order status\",\"tags\":[\"support\",\"orders\"]}],\"supportedInterfaces\":[{\"protocolBinding\":\"JSONRPC\",\"protocolVersion\":\"1.0\",\"url\":\"https://acme.com/a2a/agents/r_help_01/rpc\"}],\"version\":\"1.0.0\"}",
-  "card_digest": "sha256:667663a6c8a67f756d7cbadb32c312562449425f374129b0551f4a15ec1d802e"
-}
