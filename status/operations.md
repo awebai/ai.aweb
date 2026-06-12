@@ -1,16 +1,21 @@
 # Operations Status
 
-Last updated: **2026-06-12 ~20:00 UTC** — AC v0.5.70 verified-live
-(aweb-aaqa.17 self-custodial A2A publish handoff). Today's wave:
-pi-extension 0.1.21 → AC v0.5.69 → a2a-gw-v1.26.14 → aw 1.26.15 →
-/a2a/ site → aw 1.26.16 → AC v0.5.70, all closed.
+Last updated: **2026-06-12 (late) UTC** — AC v0.5.71 verified-live
+(aaqa.19 team-principal A2A route management). Today's wave (8
+releases): pi 0.1.21 → AC v0.5.69 → a2a-gw 1.26.14 → aw 1.26.15 →
+/a2a/ site → aw 1.26.16 → AC v0.5.70 → AC v0.5.71. FIRST PROD TRIP
+of #109 migration-runner gap caught + cleared.
 
 ## Current focus
 
-- **AC v0.5.70 closure** complete (#282). Athena ack'd with
-  independent /health + /dashboard/a2a verification (msg
-  1ee295f9). Closure mails: athena a37c29c8, juan.aweb.ai/grace
-  1db7922d, juan.aweb.ai/olivia 2fbe2aa4.
+- **AC v0.5.71 closure** complete (#283). Athena ack'd
+  (msg 6eaf9fa6). Grace ack'd deployment/schema/auth gate
+  (msg ec195c52); aaqa.19 stays open until Rose's positive
+  customer-shape exercise; .18/.11 advance after that.
+- **#284 new P1**: AC migrations must run on Render container
+  start OR via deploy hook. #109 hit in prod; container failed
+  lifespan startup with `_assert_coordination_schema_ready`
+  raising on pending 005. Athena lane.
 - **HN pre-check burst capacity (#275)** parked behind Juan
   firing word — Olivia ready, Hestia analyzes.
 - **HAL-130226 timeout diagnosis** still blocked on Juan
@@ -19,34 +24,36 @@ pi-extension 0.1.21 → AC v0.5.69 → a2a-gw-v1.26.14 → aw 1.26.15 →
   on CLI ships extending `cli/go/cmd/aw/workspace*` cleanup
   behavior.
 
-## Live state (verified 2026-06-12 ~20:00 UTC)
+## Live state (verified 2026-06-12 late UTC)
 
-- app.aweb.ai/health: `release_tag=v0.5.70 git_sha=32ad3495
+- app.aweb.ai/health: `release_tag=v0.5.71 git_sha=980d027f
   aweb_version=1.26.16 awid_service_version=0.5.12 mode=saas`
-  healthy; database/redis/awid_registry connected; coordination_api
-  mounted; coordination_schema up_to_date.
+  healthy; coordination_schema up_to_date across all 4 modules.
 - api.awid.ai/health: version=0.5.12.
 - PyPI aweb: 1.26.16.
 - npm @awebai/aw: 1.26.16.
-- GHCR a2a-gateway: 1.26.14 + :latest (a2a.aweb.ai in run state
-  per aaqa.17 publish handoff).
+- GHCR a2a-gateway: 1.26.14 + :latest.
 - npm @awebai/claude-channel: 1.4.12.
 - npm @awebai/claude-skills: 0.2.12.
 - pi-extension: 0.1.21.
-- aweb.ai (Hugo site, deploy-landing): 30b90815 (/a2a/ product
-  preview page live atop c983ff27 em-dash voice sweep).
+- aweb.ai (Hugo site, deploy-landing): 30b90815 (/a2a/ live atop
+  c983ff27).
 
 ## Release pipeline (2026-06-12 wave)
 
 - pi-extension 0.1.21 ✅ verified-live.
 - AC v0.5.69 (A2A bridge live blocker fix) ✅ verified-live.
-- a2a-gw-v1.26.14 GHCR image ✅ verified-live (manual-deploy
-  lane abandoned, AC-managed pivot intact).
+- a2a-gw-v1.26.14 GHCR image ✅ verified-live.
 - aw 1.26.15 (A2A CLI task-token persistence) ✅ verified-live.
 - /a2a/ site page (ac 30b90815) ✅ verified-live.
 - aw 1.26.16 (aweb-aaqm WiFi/NAT hardening) ✅ verified-live.
 - AC v0.5.70 (aaqa.17 self-custodial A2A publish handoff) ✅
   verified-live + Athena ack.
+- AC v0.5.71 (aaqa.19 team-principal A2A route management) ✅
+  verified-live + Athena ack + Grace ack (gate); migration 005
+  applied manually (sha256 fe0bd0aa, applied_by
+  hestia_manual_v0.5.71_unblock, 111ms, id=5); v0.5.70 served
+  throughout the unblock; #284 follow-up filed.
 
 ## Open holds
 

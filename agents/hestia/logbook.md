@@ -5,6 +5,115 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-12 (late) — AC v0.5.71 verified-live (aaqa.19 team-principal A2A route management). FIRST PROD TRIP of #109 migration-runner gap.
+
+### Ship summary
+
+AC v0.5.71 at f6d8dade → 980d027f, aweb pin >=1.26.16 (unchanged from
+v0.5.70), new migration 005_a2a_route_principal_audit.sql. Validated:
+focused A2A+identity+language+migration 66 passed locally, Grace
+pre-handoff focused 61 + auth_bridge 3 + full backend 1584 passed,
+Rose focused 36 passed independent. release-ready: 306 passed, same
+2 pre-existing E2EE chat e2e flakes (3rd consecutive ship).
+
+### Production block + unblock (banked)
+
+Render pulled the v0.5.71 image and the container failed lifespan
+startup with:
+
+  RuntimeError: Coordination schema is not current for the installed
+  aweb package: ... 'aweb_cloud': pending, missing:
+  ['005_a2a_route_principal_audit.sql']
+
+This is task #109 (Render does not run AC migrations on container
+startup) hitting in PROD for the first time. Migration 005 is the
+first new AC migration since the `_assert_coordination_schema_ready`
+trip-wire was added; previous ships had no new AC migrations to
+expose the gap.
+
+Sequence:
+1. Juan pasted the stack and asked "you need to run the migrations?
+   are you on?" — implicit Juan authorization to apply migration
+   manually against prod DB.
+2. Read 005 body, substituted `{{schema}}` → `aweb_cloud`,
+   executed body + inserted aweb_cloud.schema_migrations tracker
+   row in a single transaction:
+   - filename: `005_a2a_route_principal_audit.sql`
+   - sha256: `fe0bd0aac192ace0b7911cf710e929780614a3bc48fa9e6d421313c610d59524`
+   - module_name: `aweb_cloud`
+   - applied_by: `hestia_manual_v0.5.71_unblock`
+   - execution_time_ms: 111
+   - id: 5 (post id=4 from 2026-06-09 for 004)
+3. Pre-check confirmed: 005 not previously recorded, target
+   columns (`created_by_principal_id`, `updated_by_principal_id`,
+   `disabled_by_principal_id`) absent.
+4. Post-verify: 3 columns present, 3 indexes
+   (`idx_a2a_gateway_routes_*_by_principal`) created,
+   audit-check constraint replaced.
+5. /health coordination_schema flipped to up_to_date BEFORE
+   Render redeploy (v0.5.70 still serving prod surface — zero
+   downtime through the migration application).
+6. Juan clicked Manual Deploy in Render after migration was
+   green; v0.5.71 container passed `_assert_coordination_schema_ready`
+   on next attempt; /health flipped to release_tag=v0.5.71,
+   git_sha=980d027f.
+
+### Verified-live evidence (Grace's 3 asks)
+
+1. Migration 005 applied + tracked (sha256, applied_by, txn).
+2. /health release_tag=v0.5.71 + git_sha=980d027f +
+   coordination_schema=up_to_date across all modules.
+3. AWEB_API_KEY-only smoke:
+   - Negative: GET/POST /api/v1/a2a/gateway/routes with no auth or
+     bogus X-API-Key = HTTP 401 + {detail: Authentication
+     required}. Endpoint exists + auth-gated, no public leak.
+   - Code-read (deployed source f6d8dade):
+     `_require_a2a_team_access(team_id=None, auth=...)` derives
+     `team_uuid` from `auth.team_id` when
+     `auth.auth_kind != 'user'`; raises 422 'team_id is required'
+     only when `auth_kind == 'user'`. Migration 005's principal
+     columns referenced by `_a2a_auth_actor_id` /
+     `_a2a_auth_authority_source` helpers, confirming audit-trail
+     wired through.
+   - Positive customer-shape proof: Rose's aaqa.18 demo without
+     `--team-uuid` + `AC_USER_JWT` (her domain to exercise).
+
+Closure framings:
+- Grace (msg ec195c52 → my msg 4d454efd): deployment/schema/auth
+  gate verified-live; aaqa.19 stays open until Rose's positive
+  customer-shape exercise; .18/.11 advance after that.
+- Athena (msg 6eaf9fa6 → my msg 7879f15b): accepted as
+  verified-live with stated caveats; flagged #284 as the
+  important engineering follow-up.
+
+### Discipline banked (runbook foot-guns)
+
+**#109 trip-wire is empirical-confirmed.** Until #284 closes
+(Athena lane: wire migration runner into Render container
+start OR add deploy hook), every new AC migration will repeat
+this pattern: GHA-green image lands at Render → container
+crashes on schema-pending → manual SQL apply needed before
+release lands. Build into pre-deploy step from now on:
+"check if this ship adds a new SQL migration; if yes, plan
+manual apply between GHA-green and Render-flip."
+
+**The startup trip-wire is GOOD.** It caught the schema gap
+before serving requests; v0.5.70 stayed serving. No incident.
+But it makes #284 a release-process correctness gap, not just
+a "nice to have."
+
+**Mail body edge-block recurrence**: again a multi-section body
+(>2KB) to athena tripped HTTP 403 from edge. Terser per-recipient
+forms went through. Bank on cadence: prefer split mails to a
+single mega-mail for verified-live notes.
+
+**Rose inbound-filter**: Rose (juan.aweb.ai/rose) doesn't accept
+mail from me by default — got 403 'Local recipient only accepts
+same-team, exact-contact, or stored-route continuation delivery'.
+Grace owns the loop to Rose. For future verified-live cycles
+involving Rose, route through Grace's chain instead of trying
+direct.
+
 ## 2026-06-12 — Release wave: pi 0.1.21 + AC v0.5.69 + a2a-gw 1.26.14 + aw 1.26.15 + /a2a/ site + aw 1.26.16 + AC v0.5.70. Server-tag-missing trap recurred twice.
 
 ### Wave summary
