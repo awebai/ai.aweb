@@ -1,0 +1,9 @@
+{
+  "task_id": "t_123",
+  "context_id": "c_456",
+  "route_id": "r_help_01",
+  "target_address": "acme.com/help",
+  "gateway_identity": "did:aw:example-gateway",
+  "caller_id": "api-key:demo-harness",
+  "state": "TASK_STATE_WORKING"
+}
