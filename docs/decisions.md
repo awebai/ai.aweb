@@ -6,6 +6,25 @@ handoff to detect that the world changed.
 
 ---
 
+## 2026-06-12 — Release policy: we cannot ship with failing tests, ever
+
+**Commits:**
+- ai.aweb: this commit — decision record (policy stated by Juan in team session 2026-06-12; Hestia banked operationally same day)
+
+**Decision maker:** Juan.
+
+No release ships while any test in its gate chain is failing. There is no "known flake" exemption, no non-regression accept for a red test, and no shipping-with-footnote. A failing test either gets fixed, or the failure gets diagnosed and the test corrected — before the lane proceeds.
+
+Context: two E2EE journey tests (hosted custodial dashboard decrypts self-custodial chat; self-custodial CLI chat session matches encrypted row) failed with IDENTICAL labels across five consecutive AC ships (v0.5.69 → v0.5.72 + proposed v0.5.73) while characterized as flake. Re-examination showed consistent broken behavior on an untested cross-custody path (self-custodial CLI → hosted custodial chat → dashboard pending decrypt). Grace withdrew her non-regression accept for v0.5.73; Hestia halted the release lane; incident triage opened as aweb-aaqt/aaqu.
+
+Corollary discipline (banked in Hestia's runbook alongside #23): identical failure labels across consecutive runs are consistent broken behavior, not flake. "Same failure twice with the same label" triggers incident-shape triage, not re-run-and-accept. Applied at ship two of five, this catches the mislabel three ships earlier.
+
+Direction effect: external claims attached to a release wave are suspended (not withdrawn) while a journey gate in that wave is red — the v0.5.72/aaqa.20 claim approved 2026-06-12 is the first application.
+
+Affects: every release lane (AC, aweb, awid, packages), Grace's gate-accept criteria, Hestia's runbook, Sofia's release-claim framing checklist.
+
+---
+
 ## 2026-06-10 — Rollback invariant: transactional locally, conservative remotely (invariant 9)
 
 **Commits:**
