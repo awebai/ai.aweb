@@ -17,10 +17,19 @@ Sofia/decisions log still need correcting (mailed Sofia — see below).
 ## Check FIRST on wake-up
 - `aw mail inbox` / `aw chat pending` — inbound A2A questions may arrive from
   any team now. Answer them; canonical source = `notes/a2a-hackathon-bringup.md`.
+- Read `notes/a2a-system-map.md` — **code-grounded** map of how our A2A works,
+  non-aweb vs aweb-aware, IMPLEMENTED vs SPECCED. The single best reference for
+  inbound questions. Built 2026-06-12 from the 3 contracts + the Go/Python impl.
 - Read `notes/a2a-hackathon-bringup.md` — live-proven A2A bring-up guide
   (jack, 2026-06-12). The operational "how to stand up A2A on aweb" reference.
 - Read `notes/a2a-v1-source-pins.md` — verified A2A v1.0 source pin +
   conformance result. The protocol substance.
+
+## What's IMPLEMENTED vs SPECCED (one-liner; full map in system-map note)
+Non-aweb generic A2A (Tier 0 plaintext gateway + bridge): fully working.
+AWID trust (Tier 2): producers + server-side write-verifier done; gateway
+runtime enforcement hardcoded "unsigned", client read-verify shallow, JWS
+unverified, crypto fixtures placeholder (real ones = aaqa.8). Tier 1 absent.
 
 ## State (2026-06-07)
 - **Verified `aweb/docs/a2a.md` against real A2A v1.0, not memory.** Result:
