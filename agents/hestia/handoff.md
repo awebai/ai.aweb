@@ -58,7 +58,15 @@ PATCH-timeout log diagnosis). Independent of release waves.
   versioned v2 team-auth envelope spec + shared OSS aweb
   verifier consumed by both aweb server and AC + Go-generated
   vectors + mounted/root_path/aud/raw-path tests + security
-  sign-off. Wait for Grace's fresh reviewed release handoff.
+  sign-off.
+- **CONDITIONAL #285 aweb 1.26.17 lane from aweb 0bf8d3df**
+  (Grace msg fb4f83b4). Shared team-auth envelope v2 verifier
+  in aweb main. Release ORDER: aweb 1.26.17 ships FIRST (PyPI
+  + npm), THEN Grace updates AC to import the shared verifier
+  and hands me the new AC handoff. CONDITIONAL on Olivia + Mia
+  + Athena approvals of 0bf8d3df. Do NOT start the aweb lane
+  without Grace's explicit release-ready handoff confirming
+  peer-approvals landed.
 - **#245 aw 1.26.3 workspace-cleanup regression.** Don't ship a
   CLI release that extends `cli/go/cmd/aw/workspace*` cleanup
   behavior until Athena + Mia decide the fix-forward shape.
