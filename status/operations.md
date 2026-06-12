@@ -1,61 +1,52 @@
 # Operations Status
 
-Last updated: **2026-06-08 16:05 UTC** — a2a-gw v1.26.9 image
-banked at GHCR with full release infrastructure; manual-deploy lane
-abandoned per Grace ec961791. Product path moved to AC-managed A2A
-gateway under Grace's lane. aapz Waves 1-3 + Olivia 27f43d4c
-verified-live earlier in session.
+Last updated: **2026-06-12 ~20:00 UTC** — AC v0.5.70 verified-live
+(aweb-aaqa.17 self-custodial A2A publish handoff). Today's wave:
+pi-extension 0.1.21 → AC v0.5.69 → a2a-gw-v1.26.14 → aw 1.26.15 →
+/a2a/ site → aw 1.26.16 → AC v0.5.70, all closed.
 
 ## Current focus
 
-- **a2a-gw v1.26.9 image** banked at ghcr.io/awebai/a2a-gateway:
-  1.26.9 + :latest (multi-arch). Tag at aweb 66b0e70c. Runbook +
-  Makefile + GHA + e2e infrastructure all banked. Manual-deploy
-  lane (Render Secret Files + tarball + command-override) was
-  scoped with Grace's input then abandoned — not product-quality.
-  Render Web Service Juan created (slot for a2a.aweb.ai) sits
-  suspended; reuse expected when AC-managed gateway needs it.
-- **AC-managed A2A gateway** — Grace scoping. She'll pull Hestia
-  back in when AC controls the release lane. No Hestia action
-  until then.
-- **aapz Wave 4** (channel 1.4.12 + skills 0.2.12 + Pi 0.1.20 +
-  marketplace re-materialize) status unclear — Grace's A2A wave
-  may have folded it; don't parallel-action without confirmation.
-- **aw 1.26.3 cleanup regression** (#245) still open. Fix-forward
-  shape pending Athena + Mia decision in thread 96317ca9. ANY
-  ship targeting cli/go/cmd/aw/workspace* must address it.
+- **AC v0.5.70 closure** complete (#282). Athena ack'd with
+  independent /health + /dashboard/a2a verification (msg
+  1ee295f9). Closure mails: athena a37c29c8, juan.aweb.ai/grace
+  1db7922d, juan.aweb.ai/olivia 2fbe2aa4.
+- **HN pre-check burst capacity (#275)** parked behind Juan
+  firing word — Olivia ready, Hestia analyzes.
+- **HAL-130226 timeout diagnosis** still blocked on Juan
+  dropping RENDER_API_KEY into `~/.aweb-ops/render.env`.
+- **aw 1.26.3 cleanup regression (#245)** standing prohibition
+  on CLI ships extending `cli/go/cmd/aw/workspace*` cleanup
+  behavior.
 
-## Live state (verified 2026-06-08 16:05 UTC)
+## Live state (verified 2026-06-12 ~20:00 UTC)
 
-- app.aweb.ai/health: `release_tag=v0.5.60 git_sha=2cf21f23
-  aweb_version=1.26.8 awid_service_version=0.5.10` healthy (AC not
-  yet pinned to A2A train aweb 1.26.9 by design)
-- api.awid.ai/health: **version=0.5.11** (Grace deployed A2A train
-  earlier in session; migration 007 applied)
-- PyPI aweb: **1.26.9** (per Grace's A2A wave; self-last-verified
-  was 1.26.8 in aapz Wave 2)
-- npm @awebai/aw: **1.26.9** (per Grace's A2A wave)
-- npm @awebai/claude-channel: 1.4.11 (Wave 4 status unclear)
-- npm @awebai/claude-skills: 0.2.11 (Wave 4 status unclear)
-- npm @awebai/pi: 0.1.20 (per pi-extension/package.json; not
-  registry-verified this session)
-- Marketplace pins (claude-plugins): aweb-channel 1.4.12,
-  aweb-skills 0.2.12 (d6034672 — Path B vendored dirs)
-- aweb.ai (Hugo site, deploy-landing): 7203f5c2 atop 27f43d4c —
-  Olivia home-hero redesign live. Canonical bootstrap shape on
-  home + /llms.txt + /orchestration + /mcp + /docs/team-bootstrap.
-- a2a.aweb.ai: Render Web Service exists, **NOT live**. Restart
-  loop with exit-status-1 (no config mounted). Suspended cleanup
-  per Grace.
+- app.aweb.ai/health: `release_tag=v0.5.70 git_sha=32ad3495
+  aweb_version=1.26.16 awid_service_version=0.5.12 mode=saas`
+  healthy; database/redis/awid_registry connected; coordination_api
+  mounted; coordination_schema up_to_date.
+- api.awid.ai/health: version=0.5.12.
+- PyPI aweb: 1.26.16.
+- npm @awebai/aw: 1.26.16.
+- GHCR a2a-gateway: 1.26.14 + :latest (a2a.aweb.ai in run state
+  per aaqa.17 publish handoff).
+- npm @awebai/claude-channel: 1.4.12.
+- npm @awebai/claude-skills: 0.2.12.
+- pi-extension: 0.1.21.
+- aweb.ai (Hugo site, deploy-landing): 30b90815 (/a2a/ product
+  preview page live atop c983ff27 em-dash voice sweep).
 
-## Release pipeline (2026-06-07 → 2026-06-08)
+## Release pipeline (2026-06-12 wave)
 
-- Olivia 27f43d4c site deploy ✅ verified-live (earlier this session)
-- A2A train (Grace owned) ✅ AWID 0.5.11 deployed + aweb/aw 1.26.9
-  on registries; awaiting Grace's formal verified-live mail
-- a2a-gw v1.26.9 image ✅ built + tagged + pushed to GHCR; manual
-  Render deploy lane ABANDONED — product path is AC-managed gateway
-- aapz Wave 4 — status unclear (Grace's A2A wave may have folded it)
+- pi-extension 0.1.21 ✅ verified-live.
+- AC v0.5.69 (A2A bridge live blocker fix) ✅ verified-live.
+- a2a-gw-v1.26.14 GHCR image ✅ verified-live (manual-deploy
+  lane abandoned, AC-managed pivot intact).
+- aw 1.26.15 (A2A CLI task-token persistence) ✅ verified-live.
+- /a2a/ site page (ac 30b90815) ✅ verified-live.
+- aw 1.26.16 (aweb-aaqm WiFi/NAT hardening) ✅ verified-live.
+- AC v0.5.70 (aaqa.17 self-custodial A2A publish handoff) ✅
+  verified-live + Athena ack.
 
 ## Open holds
 

@@ -5,6 +5,77 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-12 — Release wave: pi 0.1.21 + AC v0.5.69 + a2a-gw 1.26.14 + aw 1.26.15 + /a2a/ site + aw 1.26.16 + AC v0.5.70. Server-tag-missing trap recurred twice.
+
+### Wave summary
+
+Seven releases shipped today, all verified-live:
+
+1. **pi-extension 0.1.21** (aweb 1e8025be) — aweb-aaqj hackathon P1.
+2. **AC v0.5.69** (1a02abe6) — A2A bridge live blocker fix; aweb
+   pin 1.26.14.
+3. **a2a-gw-v1.26.14** GHCR image — aaqa.11 follow-on cleared
+   `gowebpki/jcs` dep health. Manual-deploy lane abandoned (bank
+   `f178f3c` ops commit), pivoting to AC-managed gateway.
+4. **aw 1.26.15** (aweb e4176ee1) — A2A CLI task-token persistence.
+5. **/a2a/ site page** (ac 30b90815) — Olivia A2A product preview.
+6. **aw 1.26.16** (aweb main) — aweb-aaqm venue WiFi/NAT hardening.
+7. **AC v0.5.70** (32ad3495) — aweb-aaqa.17 self-custodial A2A
+   publish handoff; aweb pin >=1.26.16; lock refreshed via
+   `uv lock --refresh-package aweb`.
+
+### Recurrence: server-tag-missing trap (twice today)
+
+After the `make ship` cycle for both server-v1.26.14 and
+server-v1.26.16, the PyPI `aweb` package landed but the git tag
+was not pushed automatically. Caught when AC bump downstream hit
+"aweb<=1.26.14 available" on lock refresh — and a similar
+recurrence at 1.26.16 needing a retroactive tag at 12d08390.
+
+Discipline banked: after each `make ship`, run
+`git tag -l "server-v$NEW"` and verify-against-PyPI before
+declaring verified-live. If the tag is missing, push it
+retroactively at the bump commit.
+
+### v0.5.70 verified-live closure (this entry's anchor)
+
+- `/health`: release_tag=v0.5.70, aweb_version=1.26.16,
+  awid_service=0.5.12, git_sha=32ad3495, mode=saas, healthy;
+  database/redis/awid_registry connected; coordination_api
+  mounted; coordination_schema up_to_date.
+- release-ready: 306 passed; 2 pre-existing E2EE chat e2e flakes
+  carried over from v0.5.69 ship, same shape, tracked separately.
+- focused `test_a2a_gateway_routes.py` 33/33 green.
+- bump commit 32ad3495 (version 0.5.70, aweb>=1.26.16 pin,
+  `uv lock --refresh-package aweb` to overcome PyPI cache lag).
+- tag pushed individually: v0.5.70 (policy #7).
+- GHA Build Release Image ~14 min green.
+- Render auto-deploy needed Manual Deploy click (recurring lag
+  pattern; no infra change this wave).
+- Athena independently verified `/health` + `/dashboard/a2a`
+  HTTP 200 — accepted v0.5.70 as verified-live with noted
+  limits (focused-test coverage for live publish flows, E2EE
+  flakes + Render manual-deploy lag out of scope). Msg
+  1ee295f9 to closure mail a37c29c8.
+
+### Aaqe.7 fully closed earlier this wave
+
+- pi.aweb.ai/ama namespace registered.
+- Pi runtime running on Hetzner.
+- Hero copy flipped at 4907b8e3 (aweb.ai/aida → pi.aweb.ai/ama).
+- Adversarial smoke 8/8 + P9 autonomous escalation passed.
+- HN pre-check burst-capacity (#275) remains parked behind
+  Juan firing word; Olivia ready, Hestia analyzes when fired.
+
+### Banked discipline (mail-body size edge block)
+
+A multi-section verified-live mail body (~2KB+) tripped a
+Cloudflare/Render-style edge block (HTTP 403 'Blocked' page) on
+the `aw mail send --to athena ...` call. Same content split to a
+terser form went through clean. Bank: keep mail bodies tight; if
+detail is needed, send a short summary plus a follow-up with
+detail, or land detail in the logbook and link.
+
 ## 2026-06-11 — Dual-Sofia root cause found, resolved; session-coherence data set now has named mechanism
 
 ### Resolution
