@@ -177,7 +177,7 @@ aw a2a send "https://a2a.aweb.ai/a2a/agents/<route_id>/agent-card.json" \
 | Task expires before agent answers | hand-driven / slow reply | agent = running session, answers within ~2 min |
 | Agent never sees the task | not watching the right place | gateway groups tasks into one bridge mail conversation per caller; run with channel, reply in-thread |
 | Route card 503 `route_disabled` | (historical) skill-less card / stale authority | always set ≥1 skill; current server self-heals |
-| Intermittent `context deadline exceeded` | mobile/venue network drop | retry; loops self-heal; stay on released CLI |
+| Intermittent `context deadline exceeded` | mobile/venue network drop | retry; loops self-heal; stay on released CLI. **Lever:** `export AWEB_HTTP_TIMEOUT=30s` (Go-duration; honored since the aaqm hardening in 1.26.18, default 20s → 30s in 1.26.19). See [[a2a-system-map]] §HTTP timeouts. |
 
 ## Appendix A — generic (no-aweb) A2A client for stranger-interop
 

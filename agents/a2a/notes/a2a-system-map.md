@@ -126,7 +126,31 @@ copy-guardrail CI (`scripts/check-a2a-copy-guardrails.sh`) and the release
 runbook gates. The hosted gateway is a **plaintext boundary**; never call it
 E2EE.
 
+## HTTP timeouts / `AWEB_HTTP_TIMEOUT` (corrected 2026-06-12)
+
+The released CLI **does** honor `AWEB_HTTP_TIMEOUT` (an earlier answer of mine
+said it didn't — that was off a stale checkout; see [[verify-against-released-binary-not-stale-checkout]]).
+
+- `awid.APITimeout()` (`cli/go/awid/http_transport.go:27`, aaqm hardening
+  commits `be6db091`/`acda65fd`) reads `AWEB_HTTP_TIMEOUT` as a **Go duration**
+  (`30s`, `1m`). Invalid or bare-integer (`30`) → warn-once to stderr + fall
+  back to `DefaultTimeout`.
+- `DefaultTimeout` = **20s** in released `aw 1.26.18`, raised to **30s** on
+  origin/main (`e5adf5ec`) → ships as `1.26.19`.
+- Applied as `ResponseHeaderTimeout` on the tuned API transport (the venue
+  "awaiting headers" failure class). The `aw a2a` path also uses
+  `NewAPITransport()` so its header-wait follows the env; its outer
+  `http.Client.Timeout` stays 30s, and per-command contexts cap at 30s (send/
+  status/cancel), 90s (send --wait), 45s (publish).
+- Hackathon levers: `export AWEB_HTTP_TIMEOUT=30s` on 1.26.18 now, or upgrade to
+  1.26.19 where 30s is the default.
+
 ## Boundaries / not-yet-read
+- **My local aweb sibling checkout drifts behind origin.** It was 20 commits
+  behind when I wrote the first draft of this map, which produced a wrong
+  timeout answer. For "does the RELEASED binary do X" questions, check the
+  binary (`aw ...` at runtime) or `origin/main`/the release tag — NOT my local
+  working tree. See [[verify-against-released-binary-not-stale-checkout]].
 - The `ac` repo control-plane implementation (route CRUD, gateway-identity
   custody, config API) — only the *contract* is read, not the AC code. If asked
   about hosted route management internals, verify against `ac` before asserting.
