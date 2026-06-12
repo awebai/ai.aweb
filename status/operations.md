@@ -1,13 +1,11 @@
 # Operations Status
 
-Last updated: **2026-06-12 (later) UTC** — aweb/aw 1.26.17
-verified-live (team-auth envelope v2 verifier). Today's wave (9
+Last updated: **2026-06-12 (evening) UTC** — AC v0.5.72 verified-live
++ aaqa.20 + .19 CLOSED LIVE via Rose's london proof. Today's wave (10
 releases): pi 0.1.21 → AC v0.5.69 → a2a-gw 1.26.14 → aw 1.26.15 →
-/a2a/ site → aw 1.26.16 → AC v0.5.70 → AC v0.5.71 → aweb/aw 1.26.17.
-FIRST PROD TRIP of #109 migration-runner gap caught + cleared on
-v0.5.71. aweb 1.26.17 caught a Grace narrow-pre-flight gap (full
-make ship found 42 failures in 0bf8d3df, fix-forward at 7473826f
-green).
+/a2a/ site → aw 1.26.16 → AC v0.5.70 → AC v0.5.71 → aweb/aw 1.26.17 →
+AC v0.5.72. Sofia approved full external claim shape: v0.5.72 + aweb
+1.26.17 + v2 envelope verifier as one customer-facing surface.
 
 ## Current focus
 

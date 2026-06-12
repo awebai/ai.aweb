@@ -5,6 +5,240 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-12 (evening) — AC v0.5.72 verified-live (aaqa.20). Migration-immutability gate caught my v0.5.71 manual-unblock checksum drift → Juan-ratified emergency metadata repair.
+
+### Ship summary
+
+AC v0.5.72 at ac175640 → eee9bf1a. aweb pin bumped to 1.26.17.
+No new SQL migration this ship (still 001-005).
+
+What shipped (aaqa.20):
+- 5511d2e1: AC team-auth consumes the shared
+  `aweb.team_auth_envelope` v2 verifier (no local helper).
+- ac175640: real-HTTP A2A route-management agent-auth gate.
+  Own-team v2 agent-auth PATCH + disable records principal +
+  audit fields; cross-team v2 gets 403.
+- v2 audience narrowing per Olivia: `app.state.public_origin`
+  when set else `configured_public_origin`. AC mirrors aweb
+  7473826f behavior.
+- aweb floor bumped to 1.26.17 (PyPI).
+
+### The release-verify-migration-immutability incident (banked)
+
+On the FIRST release-ready of v0.5.72, the
+`release-verify-migration-immutability` gate failed with:
+
+  recorded:  fe0bd0aa…  (raw sha256 of the file body — what
+                         my v0.5.71 manual unblock stored)
+  on disk:   735b07e7…  (pgdbm's normalized sha256 — what
+                         pgdbm computes at every integrity
+                         check)
+
+Root cause was my own: in the v0.5.71 manual unblock script
+(applied 2026-06-12 09:52 UTC to clear the
+`_assert_coordination_schema_ready` startup-fail loop), I
+computed `hashlib.sha256(body.encode()).hexdigest()` — the
+RAW sha256. pgdbm's
+`migrations._calculate_checksum` does
+`hashlib.sha256(content.replace("\r\n", "\n").strip().encode("utf-8")).hexdigest()`
+— the `.strip()` removes the trailing newline every editor
+adds. The file body never changed; the DDL state never
+changed. Only the recorded fingerprint was wrong.
+
+The latent mismatch was invisible at v0.5.71 verified-live
+because `/health`'s `coordination_schema` check only
+inspects row-presence-by-filename, not the checksum.
+`release-verify-migration-immutability` checks the checksum,
+and it caught the drift on the very next AC ship. The gate
+worked correctly.
+
+### Juan-ratified recovery
+
+Juan's framing call (after Grace's hold + my proposed fix):
+- Treat the already-committed checksum-row UPDATE as an
+  audited emergency metadata repair.
+- Do NOT revert.
+- Do NOT create a cosmetic migration (pgdbm would not have
+  been able to run pending migrations while the mismatch
+  existed; a migration that pretends it performed the repair
+  would lie).
+- Process-guard the manual unblock path in source control
+  before resuming the v0.5.72 release.
+- Verified-live mail must carry the audit paragraph.
+
+Recovery sequence executed:
+1. **Pre-verify** the row: id=5, checksum=fe0bd0aa…,
+   applied_at=2026-06-12 09:52:01.206183,
+   applied_by=hestia_manual_v0.5.71_unblock. (Read-only.)
+2. **Guarded UPDATE** in a single transaction:
+   ```sql
+   UPDATE aweb_cloud.schema_migrations
+      SET checksum = '735b07e74248e3c9ce5622b59eb76c2c5034e645e02a2990cee38230cafe61f0'
+    WHERE module_name = 'aweb_cloud'
+      AND filename = '005_a2a_route_principal_audit.sql'
+      AND checksum = 'fe0bd0aac192ace0b7911cf710e929780614a3bc48fa9e6d421313c610d59524';
+   ```
+   Asserted exactly one row affected; rolled back otherwise.
+3. **Post-verify**: same id=5, same applied_at, same
+   applied_by, same filename/module_name/execution_time_ms;
+   checksum corrected to 735b07e7…
+4. **Source-controlled process guard committed** at ai.aweb
+   b9a9448 (agents/hestia/runbook.md, +38 lines): manual
+   unblocks must use `python -m aweb_cloud.cli migrate` or
+   the existing `create_cloud_migration_manager` /
+   `apply_cloud_migrations` helpers in
+   `aweb_cloud.migration_paths`; raw file sha256 is
+   explicitly wrong for `schema_migrations.checksum`.
+   Grace reviewed in two passes (rejected the first draft
+   that used an invalid pgdbm constructor; approved the v2
+   that cites the real AC helpers).
+5. **Re-ran release-ready**: all earlier gates green;
+   journey gate ended at the standing 2/306 known-flake
+   shape.
+
+### Known-flake non-regression check (Grace's baseline ask)
+
+Grace required a baseline comparison against the live tag
+before accepting the known-flake posture. Approach: stashed
+the 0.5.72 bump, detached HEAD to v0.5.71 (980d027f) in the
+main `ac/` worktree, rebuilt venv from PyPI (aweb 1.26.16
+matching v0.5.71's floor), ran `make test-cloud-user-journeys-local-aw`
+with FULL output capture, restored main + popped stash +
+rebuilt venv at aweb 1.26.17.
+
+Side-by-side FAIL labels:
+
+| Ship | Label 1 | Label 2 |
+|------|---------|---------|
+| v0.5.71 baseline | hosted custodial dashboard decrypts self-custodial chat (expected True, got False) | self-custodial CLI chat session matches encrypted row (expected `c7089ecf-…`, got '') |
+| v0.5.72 candidate | hosted custodial dashboard decrypts self-custodial chat (expected True, got False) | self-custodial CLI chat session matches encrypted row (expected `e9abaaaf-…`, got '') |
+
+Both runs: 2/306 same count. Label shape match. UUID
+differences are because session_ids are freshly generated
+each run; the assertion shape and the empty-string actual
+are the same. Grace accepted as non-regressing.
+
+### Verified-live evidence
+
+- `/health` (2026-06-12 ~13:36 UTC): status=healthy,
+  release_tag=v0.5.72, git_sha=eee9bf1a, aweb_version=1.26.17,
+  awid_service=0.5.12, mode=saas, database/redis/awid_registry
+  connected, coordination_api mounted, coordination_schema
+  up_to_date across all 4 modules.
+- Negative smoke: `/api/v1/a2a/gateway/routes` no-auth = HTTP 401;
+  bogus X-API-Key = HTTP 401 + 'Authentication required'.
+- `/dashboard/a2a` = HTTP 200.
+- `/health` does NOT expose `public_origin` / `api_url`.
+  Per Grace's precision guard, I did NOT overclaim
+  AWEB_PUBLIC_ORIGIN canonicalization from generic probes;
+  left the definitive signed-audience / raw-target proof
+  to Rose's pending london `aw id request --team-auth` run.
+
+### Closure framings
+
+- Grace (msg e7a7e3d8): full audit + emergency-metadata-repair
+  paragraph + known-flake explicit. ACK'd
+  (msg 64435656): 'Verified-live evidence is complete for the
+  AC deploy, and the precision on public-origin proof is
+  correct.'
+- Athena (msg 92981719): same evidence pack + scope of what's
+  in vs out of this ship.
+- Olivia (msg d0a4324a): your aaqa.20 work shipped + next
+  step is Rose's london run.
+- Sofia (msg d3f20f50, separate conversation): two-stage
+  release wave (aweb 1.26.17 → AC v0.5.72) framing context;
+  aaqa.20 stays OPEN until Rose's proof; characterizes
+  v0.5.72 as deployment/schema/auth-gate-green pending the
+  customer-shape canonicalization.
+
+### aaqa.20 + .19 CLOSED LIVE (Rose msg 6eaa6c6c via Grace)
+
+Rose's london `aw id request --team-auth` proof against
+app.aweb.ai from watson BYOT workspace cleared aaqa.20 + .19
+end-to-end.
+
+Banked verbatim from Rose's transcript:
+
+1. **v2 floor enforcement live**: `aw 1.26.16` returns
+   `401 unsupported team-auth envelope version` (id_request.go
+   emits v:2 only at >=1.26.17). After
+   `npm i -g @awebai/aw@1.26.17`, the path opens.
+2. **v2 signed-audience canonicalization PROVEN LIVE**:
+   `GET /api/v1/tasks --team-auth → 200 {"tasks":[]}`. This
+   is the customer-shape evidence `/health` could not surface
+   and that I declined to overclaim from generic probes
+   earlier. Olivia's audience-narrowing read
+   (`app.state.public_origin` when set, else
+   `configured_public_origin`; audience only when
+   `X-AWEB-Signed-Payload` present) is validated against prod.
+3. **Raw method+path binding survives** Cloudflare + Render +
+   mount proxy chain end-to-end. No path mismatch 401.
+4. **aaqa.19 team-principal A2A route management end-to-end live**:
+   - `GET /api/v1/a2a/gateway/routes` with NO `team_id` → 200,
+     team derived from credential.
+   - `POST` create watson route → 200.
+   - Enable → 200, `enabled=true`.
+   - Cross-team from rose workspace: explicit london `team_id` →
+     403 (fails closed); own derived → 0 routes. Cross-team
+     authority invariant Olivia confirmed statically is now
+     exercised against prod.
+
+Side effect: `london.juanreyero.com/watson` route exists in
+prod at unsigned/not-published tier, enabled. KEPT by design
+as the first london demo route (per Grace). Per Sofia's
+boundary (msg 70ab707c): does NOT appear in external claims
+until someone explicitly decides it's a customer-facing
+example; then it goes through policy #14 like every named
+artifact.
+
+New P2 from Rose's run: explicit canonical `team_id` query
+on `GET /routes` is not resolved before UUID comparison →
+customer scripts should OMIT `team_id` and derive from
+credential. Workaround banked for aaqa.18/demo scripts.
+Source fix is Olivia/Grace surface.
+
+Sofia framing pass (msg 70ab707c) APPROVED the full external
+claim: v0.5.72 + aweb 1.26.17 + v2 envelope verifier as one
+customer-facing surface; team-principal A2A route management
+live end-to-end; v2 floor with clean 401 on older clients.
+Boundary: this is auth/routing surface, NOT a
+messaging-privacy claim — does NOT change E2EE wording rules.
+
+**Closure mails**: Grace 6ae262da (ACK 32710076), Athena
+b2296ba9, Olivia c564f98a, Sofia 0685505d (ACK 70ab707c).
+
+aaqa.20 + aaqa.19 fully closed. Live tip AC v0.5.72 (eee9bf1a)
+on aweb 1.26.17.
+
+### Discipline banked
+
+**Run discipline is correct as banked; the manual unblock
+path was wrong.** The
+`release-verify-migration-immutability` gate is the right
+second-line defense. The fix is at the source — use
+pgdbm's normalization or invoke pgdbm directly. Runbook
+guard committed; future-me has no excuse.
+
+**`/health`'s coordination_schema check is row-presence-only;
+not a checksum check.** Don't conclude from a
+`coordination_schema=up_to_date` health response that the
+checksums are right. The release-ready gate is the only
+thing that catches checksum drift pre-deploy.
+
+**Don't overclaim from generic 401/redirect probes.** When
+`/health` doesn't expose a config value, the right move is
+to say what the probe proves and what it doesn't, and
+defer to the test that exercises the actual surface (here
+Rose's london run). Grace called this out explicitly as a
+precision guard; banked.
+
+**Dual review is now standing after a gate failure.** Juan
+banked this on the 0bf8d3df fix-forward earlier today:
+after a release-gate failure, dual-review of the
+fix-forward commit is required before any push. Applies
+to both source-side fixes and policy-side recovery shapes
+(today the recovery shape itself got dual-review framing).
+
 ## 2026-06-12 (later) — aweb/aw 1.26.17 verified-live (team-auth envelope v2 verifier). Fix-forward of 0bf8d3df gate-failure caught by full make ship.
 
 ### Ship summary
