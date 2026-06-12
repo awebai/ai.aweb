@@ -51,6 +51,14 @@ PATCH-timeout log diagnosis). Independent of release waves.
 
 ## Open holds (don't trip these)
 
+- **HOLD aaqa.20 / AC 356b0325** (Grace explicit msg
+  4a2a75a7, 2026-06-12 late). Do NOT release this SHA. Rose
+  approved a narrow compatibility patch but Olivia's
+  first-principles review raised the bar: .20 needs shared/
+  versioned v2 team-auth envelope spec + shared OSS aweb
+  verifier consumed by both aweb server and AC + Go-generated
+  vectors + mounted/root_path/aud/raw-path tests + security
+  sign-off. Wait for Grace's fresh reviewed release handoff.
 - **#245 aw 1.26.3 workspace-cleanup regression.** Don't ship a
   CLI release that extends `cli/go/cmd/aw/workspace*` cleanup
   behavior until Athena + Mia decide the fix-forward shape.
