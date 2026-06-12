@@ -8,6 +8,22 @@ operating discipline, see `AGENTS.md`.
 
 ## In flight
 
+**0) aweb/aw 1.26.17 verified-live (team-auth envelope v2). #286 CLOSED.**
+
+- 3 surfaces clean: PyPI aweb 1.26.17 (wheel+sdist, 11:36:05),
+  npm @awebai/aw 1.26.17 (license MIT), GH Release awebai/aw
+  v1.26.17 (7 goreleaser binaries, 11:38:36).
+- Source: aweb 7473826f (fix-forward of 0bf8d3df gate failure
+  caught by my full make ship; see logbook 2026-06-12 later).
+- Reviewers: Olivia + Mia + Athena + Rose all approved 7473826f.
+- Closure to Grace: msg dfaf4698.
+- AC follow-up handed BY Grace TO Olivia (msg d403db5e): Olivia
+  authors the combined AC change (floor bump + shared-verifier
+  import + mounted real-HTTP public_origin/raw-path proof + .19
+  real agent-auth e2e), then Grace reviews, THEN Grace produces
+  the AC release handoff to me. Hestia stays out of the AC lane
+  until then.
+
 **1) AC v0.5.71 verified-live (aaqa.19 team-principal A2A route management). #283 CLOSED.**
 
 - `/health`: release_tag=v0.5.71, aweb_version=1.26.16,
@@ -59,14 +75,10 @@ PATCH-timeout log diagnosis). Independent of release waves.
   verifier consumed by both aweb server and AC + Go-generated
   vectors + mounted/root_path/aud/raw-path tests + security
   sign-off.
-- **CONDITIONAL #285 aweb 1.26.17 lane from aweb 0bf8d3df**
-  (Grace msg fb4f83b4). Shared team-auth envelope v2 verifier
-  in aweb main. Release ORDER: aweb 1.26.17 ships FIRST (PyPI
-  + npm), THEN Grace updates AC to import the shared verifier
-  and hands me the new AC handoff. CONDITIONAL on Olivia + Mia
-  + Athena approvals of 0bf8d3df. Do NOT start the aweb lane
-  without Grace's explicit release-ready handoff confirming
-  peer-approvals landed.
+- **aweb 1.26.17 SHIPPED + verified-live.** #285 + #286 closed.
+  AC handoff lane now owned by Olivia (combined change) →
+  Grace (review) → Hestia (release). No Hestia action until
+  Grace's AC release handoff arrives.
 - **#245 aw 1.26.3 workspace-cleanup regression.** Don't ship a
   CLI release that extends `cli/go/cmd/aw/workspace*` cleanup
   behavior until Athena + Mia decide the fix-forward shape.
@@ -79,7 +91,8 @@ PATCH-timeout log diagnosis). Independent of release waves.
 
 ## Live matrix (one line)
 
-AC v0.5.71 prod (980d027f) • aweb PyPI 1.26.16 + aw npm 1.26.16
+AC v0.5.71 prod (980d027f) • aweb PyPI 1.26.17 + aw npm 1.26.17 +
+GH Release awebai/aw v1.26.17 (team-auth envelope v2 shipped)
 • a2a-gw GHCR 1.26.14 • pi-extension 0.1.21 • awid-service PyPI
 0.5.12 + awid GHCR 0.5.12, api.awid.ai verified-live • a2a.aweb.ai
 gateway in run state per aaqa.17 publish handoff • aweb.ai site

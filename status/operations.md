@@ -1,10 +1,13 @@
 # Operations Status
 
-Last updated: **2026-06-12 (late) UTC** — AC v0.5.71 verified-live
-(aaqa.19 team-principal A2A route management). Today's wave (8
+Last updated: **2026-06-12 (later) UTC** — aweb/aw 1.26.17
+verified-live (team-auth envelope v2 verifier). Today's wave (9
 releases): pi 0.1.21 → AC v0.5.69 → a2a-gw 1.26.14 → aw 1.26.15 →
-/a2a/ site → aw 1.26.16 → AC v0.5.70 → AC v0.5.71. FIRST PROD TRIP
-of #109 migration-runner gap caught + cleared.
+/a2a/ site → aw 1.26.16 → AC v0.5.70 → AC v0.5.71 → aweb/aw 1.26.17.
+FIRST PROD TRIP of #109 migration-runner gap caught + cleared on
+v0.5.71. aweb 1.26.17 caught a Grace narrow-pre-flight gap (full
+make ship found 42 failures in 0bf8d3df, fix-forward at 7473826f
+green).
 
 ## Current focus
 
@@ -29,9 +32,12 @@ of #109 migration-runner gap caught + cleared.
 - app.aweb.ai/health: `release_tag=v0.5.71 git_sha=980d027f
   aweb_version=1.26.16 awid_service_version=0.5.12 mode=saas`
   healthy; coordination_schema up_to_date across all 4 modules.
+  (AC still on aweb 1.26.16 pin; floor bump to 1.26.17 is
+  Olivia's lane via Grace next handoff.)
 - api.awid.ai/health: version=0.5.12.
-- PyPI aweb: 1.26.16.
-- npm @awebai/aw: 1.26.16.
+- PyPI aweb: 1.26.17 (team-auth envelope v2 verifier).
+- npm @awebai/aw: 1.26.17.
+- GitHub Release awebai/aw v1.26.17: 7 goreleaser binaries.
 - GHCR a2a-gateway: 1.26.14 + :latest.
 - npm @awebai/claude-channel: 1.4.12.
 - npm @awebai/claude-skills: 0.2.12.
@@ -54,6 +60,12 @@ of #109 migration-runner gap caught + cleared.
   applied manually (sha256 fe0bd0aa, applied_by
   hestia_manual_v0.5.71_unblock, 111ms, id=5); v0.5.70 served
   throughout the unblock; #284 follow-up filed.
+- aweb/aw 1.26.17 (team-auth envelope v2 verifier) ✅
+  verified-live on PyPI + npm + GH Release awebai/aw. Source
+  7473826f (fix-forward of 0bf8d3df gate failure). Reviewers:
+  Olivia + Mia + Athena + Rose all approved. Bank dfaf4698
+  closure mail. AC follow-up handoff now Olivia → Grace →
+  Hestia path per Grace msg d403db5e.
 
 ## Open holds
 

@@ -5,6 +5,109 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-12 (later) — aweb/aw 1.26.17 verified-live (team-auth envelope v2 verifier). Fix-forward of 0bf8d3df gate-failure caught by full make ship.
+
+### Ship summary
+
+aweb/aw 1.26.17 from aweb 7473826f (fix-forward of 0bf8d3df).
+Bump commit 199e0154; tags server-v1.26.17 + aw-v1.26.17 pushed
+individually per policy #7. Published cleanly across all 3
+surfaces.
+
+Scope: shared Python `aweb.team_auth_envelope` verifier + spec,
+Go `aw id request --team-auth` v2 envelope emission, Go/Python
+conformance vectors, docs/team-auth-envelope-v2.md + SOT updates
+(request binding + replay-within-skew limitation).
+
+### Gate-failure-then-fix sequence (banked)
+
+Grace's first release-ready handoff was at 0bf8d3df with a
+narrow pre-flight (3 targeted test files: test_team_auth_envelope,
+test_team_auth_deps, test_team_auth — 34 passed). My local
+`make ship` at 0bf8d3df caught 42 server test failures in the
+broader HTTP suite (test_connect_http, test_chat_http,
+test_messages_http, test_events_http, test_workspaces_delete_http,
+test_agents_suggest_alias_http) all rooted at the same shape:
+
+  aweb/server/src/aweb/team_auth_deps.py:162 unconditionally
+  evaluated `get_settings().public_origin` when building
+  `allowed_audiences`. `get_settings()` raises ValueError if
+  `DATABASE_URL` / `AWEB_DATABASE_URL` is not set in env. The
+  3 focused test files set the env via fixtures; the broader
+  HTTP integration suite doesn't.
+
+I halted, reverted my uncommitted bump back to 1.26.16, sent
+Grace the root cause + sample traceback. She fix-forwarded at
+7473826f ("fix: keep legacy team auth independent of public
+origin settings"): allowed audiences computed only when
+`X-AWEB-Signed-Payload` present; compact v1 path is now
+public-origin-independent; v2 verifier fails closed when no
+audiences configured.
+
+Grace then ran the FULL `make ship` end-to-end at 7473826f
+herself (619 server + 218 awid + cli go + 105 channel + 116
+federation + 455 OSS journey — all green) before re-handoff.
+
+Juan added dual-review requirement after the gate failure:
+both Olivia + Rose had to approve 7473826f before commit/tag/push,
+even with my gate green. Both approved in sequence. Olivia
+banked one observation: v2 audience acceptance is
+`app.state.public_origin` when set, else `settings.public_origin`
+(not a union) — intentional narrowing; AC mounted real-HTTP test
+will pin the external origin downstream.
+
+### Validation chain (final)
+
+- Grace pre-flight at 7473826f: full `make ship` end-to-end PASSED.
+- Hestia local `make ship` at 7473826f + 1.26.17 bump: PASSED
+  end-to-end (server 619, awid 218, channel 105, federation 116,
+  OSS journey 455).
+- Peer reviews on 7473826f: Olivia APPROVED, Mia APPROVED,
+  Athena protocol APPROVED, Rose APPROVED (Juan-mandated
+  dual-review after 0bf8d3df gate failure).
+- GHA workflows: Server Release (PyPI) 27413176318 success,
+  aw Sync and Release 27413177512 success, awebai/aw Release
+  (goreleaser + npm) 27413186431 success.
+
+### Live evidence (3 surfaces)
+
+- PyPI aweb 1.26.17: wheel + sdist; upload_time 2026-06-12T11:36:05.
+- npm @awebai/aw 1.26.17: version=1.26.17, license=MIT, tarball published.
+- GitHub Release awebai/aw v1.26.17: 7 goreleaser binaries;
+  published_at 2026-06-12T11:38:36Z.
+
+Closure: msg dfaf4698 to Grace. Stopped per her handoff. AC
+356b0325 stays HELD. Waiting on Grace's AC follow-up handoff
+with floor bump + shared-verifier import + mounted real-HTTP
+test (with prod `public_origin = https://app.aweb.ai`
+canonicalization + raw path/query proxy/mount survival, per
+Olivia + Rose) + AC validation.
+
+### Discipline banked (runbook)
+
+**"Trust the peer's pre-flight... after verifying it ran the
+right shape."** Grace's first pre-flight ran only 3 targeted
+test files at 0bf8d3df. Insufficient — the broken code path
+was reachable from a different test surface. Banked policy #4
+("Trust the Makefile's release-ready chain") is right BUT
+applies to the FULL release-ready chain (make ship), not a
+narrow `pytest tests/test_x.py tests/test_y.py`. When a peer
+hands off with focused-test evidence, verify the chain shape:
+if anything other than `make ship` was the pre-flight, run
+`make ship` locally before tag.
+
+**Juan's dual-review pattern after a gate failure**: explicit
+peer-approval gate added even when the next gate is green.
+Banked: after any release-gate failure on a commit, dual-review
+of the fix-forward commit is required before any push. Wait
+for both approvals.
+
+**Audience narrowing for v2 verifier**: AC's mounted real-HTTP
+test must pin `public_origin = https://app.aweb.ai` and ensure
+raw path/query survive the proxy/mount layer. Carry this into
+the AC handoff context — both Olivia + Rose flagged this
+specifically.
+
 ## 2026-06-12 (late) — AC v0.5.71 verified-live (aaqa.19 team-principal A2A route management). FIRST PROD TRIP of #109 migration-runner gap.
 
 ### Ship summary
