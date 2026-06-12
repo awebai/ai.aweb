@@ -606,6 +606,44 @@ to fix a failure trips the checksum guard on every future
 deploy and forces a destructive dump-restore cutover (banked
 from awid 0.3.1 → 0.5.1 prod cutover; same shape, same pain).
 
+**[banked from v0.5.71/v0.5.72 incident 2026-06-12 — Juan-ratified emergency-metadata-repair framing] Manual `schema_migrations` metadata recording MUST use pgdbm's checksum normalization, NOT a raw file SHA.** When an emergency unblock requires applying a migration's DDL out-of-band (the only currently-known case is the `_assert_coordination_schema_ready` startup-fail loop on Render when AC ships a new migration — see #109/#284), the `schema_migrations` row you insert MUST carry the checksum that pgdbm will compute at the NEXT deploy, otherwise pgdbm's integrity check will reject the next container start with a recorded-vs-on-disk mismatch.
+
+pgdbm's exact normalization (`pgdbm.migrations.AsyncMigrationManager._calculate_checksum`):
+
+```python
+def _calculate_checksum(self, content: str) -> str:
+    normalized_content = content.replace("\r\n", "\n").strip()
+    return hashlib.sha256(normalized_content.encode("utf-8")).hexdigest()
+```
+
+**Raw `sha256sum file.sql` is WRONG for `schema_migrations.checksum`.** The CRLF→LF normalization is usually a no-op on macOS/Linux working trees, but the trailing `.strip()` is load-bearing: it removes the trailing newline that almost every editor adds. In the v0.5.71 incident, the trailing strip changed the checksum because the file had a trailing newline.
+
+Two acceptable shapes for an emergency manual unblock:
+
+1. **(Preferred)** Run AC's product migration command, which constructs the migration manager correctly and records the pgdbm-computed checksum by construction:
+   ```sh
+   python -m aweb_cloud.cli migrate
+   ```
+   or programmatically via the existing helpers in `aweb_cloud.migration_paths`: `create_cloud_migration_manager(db)` and `apply_cloud_migrations(db=api_db)`. Both construct `AsyncMigrationManager` with `module_name=CLOUD_MODULE` ("aweb_cloud") and `migrations_table="schema_migrations"`. The pgdbm `apply_pending_migrations()` call inside substitutes the `{{schema}}` template, executes DDL, and inserts the `schema_migrations` row with the pgdbm-computed checksum in one transaction per migration. No room for a checksum drift.
+
+2. **(Only if #1 is not possible)** Hand-rolled apply + insert MUST recompute the checksum using the exact pgdbm normalization above:
+   ```python
+   content = open(migration_path).read()
+   normalized = content.replace("\r\n", "\n").strip()
+   checksum = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+   # then INSERT with this checksum, NOT with hashlib.sha256(content.encode()).hexdigest()
+   ```
+
+**Why the gate catches this and why it's the correct second-line defense.** The AC `make release-ready` chain includes `release-verify-migration-immutability`, which calls `backend/scripts/verify_migration_immutability.py`. That script computes the pgdbm-normalized checksum for every migration on disk and compares against the `schema_migrations.checksum` column for every applied row, refusing to ship if any pair disagrees. The gate caught the v0.5.71 manual-unblock checksum drift on the very next AC ship (v0.5.72 release-ready, 2026-06-12). Trust the gate. Fix the manual path.
+
+**Incident shape (2026-06-12, banked verbatim):**
+- v0.5.71 manual unblock used `hashlib.sha256(body.encode()).hexdigest()` — raw SHA of file bytes.
+- DB recorded `fe0bd0aa…` for migration 005; pgdbm at next deploy would compute `735b07e7…` for the same file.
+- v0.5.72 release-ready caught the mismatch pre-deploy.
+- Recovery (Juan-ratified): one guarded `UPDATE aweb_cloud.schema_migrations SET checksum=<pgdbm-normalized> WHERE id=5 AND checksum=<raw>` — treated as audited emergency metadata repair, NOT represented as a migration. The migration file body and applied DDL were unchanged; only the recorded fingerprint was corrected.
+
+This pattern (emergency metadata repair) is intentionally a one-off shape: it is NOT a release step, NOT a process to rehearse, NOT something to fold into the runbook checklist. It only exists because v0.5.71 happened. The guard above prevents the next occurrence.
+
 Recovery scenarios for any constraint-adding migration that
 fails or partially applies:
 
