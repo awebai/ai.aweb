@@ -5,6 +5,42 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-13 (post-wave) — PearX traction rollup delivered to Bertha (msg 57255425)
+
+Ama re-pinged on Eugenie's behalf for PearX accelerator
+application traction data (mail ff24623a, chat re-ping f4484079);
+Bertha then direct-chatted with sender_waiting=true asking for
+past-7d signups + total-to-date + namespaces + messages + Stripe.
+
+Authorized via the daily-signup-export skill (Bertha = Eugenie's
+outreach agent; PearX = founder-driven application). Delivered
+durable artifact at mail message_id `57255425` in conversation
+`a31c58e9`; chat ping released Bertha's wait; Ama acked relay
+close (msg `715506f3`) and banked the figures into his own
+positioning standing-facts (his 2026-05-01 snapshot was 'zero
+paying / ~44 cloud users' — today is a real shift).
+
+**Snapshot at delivery time (2026-06-13 ~04:35 UTC):**
+- 128 active users / 130 inc deleted / 39 with email / 35 verified
+- 492 agents = 492 workspaces / 102 agent encryption keys
+- 134 managed namespaces / 36 team members
+- 15,477 mail + 4,660 chat = 20,137 cumulative coordination
+  messages / 737 chat sessions / 1,331 chat participants /
+  4 federated cross-server deliveries
+- Past 7d: 13 new signups (3 external email — Morgen, Paul,
+  Azusa) / 108 new agents / 108 new workspaces / 1,700 mail /
+  741 chat messages
+- Billing: 141 rows / 1 paid active (Business tier) / 5 Stripe
+  customer records / 137 free orgs + 2 free users + 1 pro org +
+  1 business user
+
+**Banked**: filed task #295 to promote inline probe to
+`scripts/traction.py` on next ask of this shape (per
+daily-signup-export skill discipline: when a question shape
+repeats >2x, promote to a script). Per YAGNI, NOT pre-writing.
+
+---
+
 ## 2026-06-13 (early UTC) — a2a-gw-v1.26.19 closure: aaqw + aaqx CLOSED via stock a2a-sdk python 1.1.0 default-flow proof. 14-release wave shut.
 
 ### What landed
