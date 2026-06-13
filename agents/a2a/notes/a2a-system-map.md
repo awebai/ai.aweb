@@ -41,12 +41,24 @@ This is what the hackathon and any standard A2A client use. No AWID needed.
   `AUTH_REQUIRED` + return → bridge `SendTask` → `WORKING` → if
   `returnImmediately` absent/false, wait up to `response_timeout_s`; on timeout
   → `TASK_STATE_FAILED` ("timed out before… terminal or interrupted reply").
-- **Caller scoping / anonymous isolation** (`rpc.go:303`, `task.go`):
+- **Caller scoping / anonymous isolation** (`rpc.go`, `task.go`):
   unauthenticated caller = `anonymous:unscoped`. Each task carries a 64-hex
-  **`X-A2A-Task-Token`** (in `task.metadata`); `GetTask` `visibleTo` = token
-  match OR non-anonymous scope match. `ListTasks` **rejects** anonymous callers
-  (`-32003 requires an isolated caller scope`). `message.role` must be
-  `ROLE_USER` (empty allowed, agent role rejected) (`rpc.go:266`).
+  **`X-A2A-Task-Token`** (in `task.metadata`). `ListTasks` **rejects** anonymous
+  callers (`-32003 requires an isolated caller scope`). `message.role` must be
+  `ROLE_USER` (empty allowed, agent role rejected).
+- **Token-free `GetTask` on public routes (gateway ≥ `a2a-gw-v1.26.19`, commit
+  `d0baafa3`, "restrict public A2A task lookup to anonymous tasks").** `GetTask`
+  first tries token/scope `getVisible`; on miss, if `publicAnonymousTaskLookupAllowed`
+  (route auth `none` + caller `anonymous:unscoped`) it falls back to
+  `getPublicAnonymous`, which returns the task **only if it was created
+  anonymously** (`CallerScope == "anonymous:unscoped"`). So on public routes the
+  `X-A2A-Task-Token` is **OPTIONAL** (still supported; still required to read
+  authenticated tasks). **A stock `a2a-sdk` (python 1.1.0) completes the default
+  SendMessage→poll-GetTask flow with ZERO aweb extensions** — clean standard-A2A
+  conformance. Bounded: token-free reads can't reach authenticated tasks, and
+  task ids are UUIDv4. Pre-`d0baafa3` (≤v1.26.14) token-free GetTask returned
+  `task_not_found`. Verified at code level 2026-06-13 via origin/main +
+  rose's live run; see [[verify-against-released-binary-not-stale-checkout]].
 - **Mail bridge** (`a2agw/mail_bridge.go`): sends fenced `a2a-task` envelope
   (task_id, context_id, route_id, target_address, gateway_identity,
   callerScope, state, request_id) + untrusted customer text; polls the

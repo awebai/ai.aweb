@@ -172,7 +172,7 @@ aw a2a send "https://a2a.aweb.ai/a2a/agents/<route_id>/agent-card.json" \
 |---|---|---|
 | `401 Invalid DIDKey signature` on every call | CLI older than server v2 envelope | `aw >= 1.26.18` everywhere |
 | Route `team_id query parameter must match authenticated team` (even your own id) | explicit canonical `team_id` not resolved on list | **omit `team_id`**; key derives team (aaqa.21) |
-| `GetTask` → `task_not_found` right after send | anonymous callers scoped by a task token | carry `X-A2A-Task-Token: <token>` on GetTask; `aw a2a` does this for you |
+| `GetTask` → `task_not_found` right after send | anonymous callers scoped by a task token | carry `X-A2A-Task-Token: <token>` on GetTask; `aw a2a` does this for you. **UPDATE (gateway ≥ a2a-gw-v1.26.19, `d0baafa3`):** token is now **OPTIONAL** on public (auth `none`) routes — a stock `a2a-sdk` completes SendMessage→GetTask token-free; token still works and is still needed for authenticated tasks. See [[a2a-system-map]] §token-free GetTask. |
 | `SendMessage` → `invalid message: role must be ROLE_USER` | A2A role enum | use `"role": "ROLE_USER"` |
 | Task expires before agent answers | hand-driven / slow reply | agent = running session, answers within ~2 min |
 | Agent never sees the task | not watching the right place | gateway groups tasks into one bridge mail conversation per caller; run with channel, reply in-thread |
