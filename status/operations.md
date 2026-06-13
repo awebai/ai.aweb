@@ -1,42 +1,47 @@
 # Operations Status
 
-Last updated: **2026-06-12 (evening) UTC** — AC v0.5.72 verified-live
-+ aaqa.20 + .19 CLOSED LIVE via Rose's london proof. Today's wave (10
-releases): pi 0.1.21 → AC v0.5.69 → a2a-gw 1.26.14 → aw 1.26.15 →
-/a2a/ site → aw 1.26.16 → AC v0.5.70 → AC v0.5.71 → aweb/aw 1.26.17 →
-AC v0.5.72. Sofia approved full external claim shape: v0.5.72 + aweb
-1.26.17 + v2 envelope verifier as one customer-facing surface.
+Last updated: **2026-06-13 (early UTC)** — a2a-gw-v1.26.19 verified-live;
+aaqw + aaqx CLOSED via Rose's stock a2a-sdk python 1.1.0 default-flow proof.
+2026-06-12 wave totaled 14 releases (pi 0.1.21 → AC v0.5.69/.70/.71/.72/
+.73/.74 → a2a-gw 1.26.14/1.26.19 → aw 1.26.15/.16/.17/.18/.19 →
+/a2a/ site). Juan's standing policy #17 (never ship failing tests)
+banked.
 
 ## Current focus
 
-- **AC v0.5.71 closure** complete (#283). Athena ack'd
-  (msg 6eaf9fa6). Grace ack'd deployment/schema/auth gate
-  (msg ec195c52); aaqa.19 stays open until Rose's positive
-  customer-shape exercise; .18/.11 advance after that.
-- **#284 new P1**: AC migrations must run on Render container
-  start OR via deploy hook. #109 hit in prod; container failed
-  lifespan startup with `_assert_coordination_schema_ready`
-  raising on pending 005. Athena lane.
+- **a2a-gw-v1.26.19 closure** complete (#294). aaqw (SendMessage
+  timeout) + aaqx (anonymous GetTask) CLOSED via Rose's stock
+  a2a-sdk python 1.1.0 default-flow proof (task
+  09b0c2ad-d057-4566-9318-a02ebb100e82 → COMPLETED in ~15s).
+  Standing down on the ship-watch.
+- **#288 aaqs P1 customer bug**: aw directory aweb.ai/<alias>
+  → 404 (AC's network-directory projection endpoint missing
+  entirely). Grace's queue.
+- **#284 P1**: AC migration runner must run on Render container
+  start OR via deploy hook. Athena lane.
+- **aaqv direction halt** (Juan): AC-side A2A route management
+  surface to be eliminated. Direction halt ≠ release halt.
 - **HN pre-check burst capacity (#275)** parked behind Juan
   firing word — Olivia ready, Hestia analyzes.
-- **HAL-130226 timeout diagnosis** still blocked on Juan
-  dropping RENDER_API_KEY into `~/.aweb-ops/render.env`.
-- **aw 1.26.3 cleanup regression (#245)** standing prohibition
-  on CLI ships extending `cli/go/cmd/aw/workspace*` cleanup
-  behavior.
+- **HAL-130226 timeout diagnosis** still blocked on Juan dropping
+  RENDER_API_KEY into `~/.aweb-ops/render.env`. Today's
+  Manual-Deploy-vs-pin-bump incident is a second proof of why
+  direct Render API access matters.
 
-## Live state (verified 2026-06-12 late UTC)
+## Live state (verified 2026-06-13 early UTC)
 
-- app.aweb.ai/health: `release_tag=v0.5.71 git_sha=980d027f
-  aweb_version=1.26.16 awid_service_version=0.5.12 mode=saas`
-  healthy; coordination_schema up_to_date across all 4 modules.
-  (AC still on aweb 1.26.16 pin; floor bump to 1.26.17 is
-  Olivia's lane via Grace next handoff.)
+- app.aweb.ai/health: AC v0.5.74 prod, aweb_version=1.26.18
+  (AC pin floor).
+- a2a.aweb.ai/health: `release_tag=a2a-gw-v1.26.19
+  git_sha=d0baafa389b600c8b0a12525797d6e38726c5252
+  aweb_version=1.26.19 build_date=2026-06-12T23:37:14Z`
+  healthy; ac_config.status=ok; routes=2; gateway.task_execution=true.
 - api.awid.ai/health: version=0.5.12.
-- PyPI aweb: 1.26.17 (team-auth envelope v2 verifier).
-- npm @awebai/aw: 1.26.17.
-- GitHub Release awebai/aw v1.26.17: 7 goreleaser binaries.
-- GHCR a2a-gateway: 1.26.14 + :latest.
+- PyPI aweb: 1.26.19 (cli DefaultTimeout 30s, team-auth envelope v2,
+  pending-conversation participant-id fix).
+- npm @awebai/aw: 1.26.19.
+- GitHub Release awebai/aw v1.26.19: goreleaser binaries.
+- GHCR a2a-gateway: 1.26.19 + :latest (multi-arch amd64+arm64).
 - npm @awebai/claude-channel: 1.4.12.
 - npm @awebai/claude-skills: 0.2.12.
 - pi-extension: 0.1.21.
