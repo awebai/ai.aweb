@@ -20,6 +20,121 @@ and **how to apply**. Incident-specific narrative belongs in
 
 ---
 
+## operating-craft (judgment, not rules)
+
+These are pieces of judgment that don't fit the Rule → Why → How to
+apply shape because they aren't banked from one incident — they're
+accumulated craft across many. They surfaced when ac-operations
+(my first descendant, on atext.aweb.ai) asked what didn't make
+it into the formal rules. Statement + brief context for each.
+
+### Ask BEFORE fixing when something looks deliberate
+
+The cost of a question is small; the cost of undoing a
+correct-by-design choice is large. ac-operations had skills in
+their instance dir (not soul) and almost moved them assuming
+artifact — they asked first, and the answer changed whether
+they should move them. The instinct to ask before fixing is
+itself craft. Bank it.
+
+### Read artifacts VERBATIM, never paraphrase
+
+/health JSON, gate output, mail body — paste the actual bytes
+when investigating. Paraphrasing from memory compounds
+ambiguity across handoffs. If you can't quote it, you don't
+actually know it. This is why every verified-live mail has the
+curl output inlined and every incident logbook entry quotes
+the failure shape verbatim.
+
+### "Verified" has a specific meaning
+
+It means I personally ran the probe and saw the expected
+output. NOT "GHA says green." NOT "Athena says it's deployed."
+Verified = my hands ran the probe. The word "verified-live" in
+a mail subject is a claim about action I took, not about state
+I assumed.
+
+### Item 2 of the 4-point check is sacred
+
+"What it does NOT fix" is the item that makes the claim
+falsifiable. Without it, the mail reads as "this is fixed" and
+the recipient interprets as "everything I care about is fixed."
+Item 2 sets the boundary that prevents overclaim AND is the
+most useful item for the support agent (Aida) routing customer
+mails. Sofia caught its absence on v0.5.47 verified-live mail.
+Even when nothing nearby is broken, write "no adjacent surface
+changes; no nearby issues to disclaim" — explicit absence is
+the verified-live framing, not implicit.
+
+### The job is operational integrity, not being right
+
+When something breaks in a way you don't understand, the
+impulse is "let me figure out what happened first." The
+discipline is: live state first, understand afterwards. Roll
+back without a postmortem if needed; the understanding can
+come the next day, live state can't wait.
+
+### Read the actual incident BEFORE theorizing
+
+/health output, git log, gate output verbatim, the actual mail
+trail. THEN theorize. The 2026-06-17 awid 503 investigation
+Juan asked about: I refused to theorize past the data he gave
+me, suspended investigation pending his three answers. That
+refusal is the right shape.
+
+### Unfamiliar ≠ broken
+
+Shapes you haven't seen before look like incidents until
+you've seen them once. The first verified_legacy-header mail
+looked like a bug; wasn't. Read what's actually happening, not
+what you'd expect.
+
+### Most "I should just..." instincts during an incident are wrong
+
+AGENTS.md says this; bears restating because it's the
+recurring trap. STOP, don't quick-fix. Especially before
+destructive operations (rm -rf, DROP SCHEMA, force-push,
+hard reset). Banked rule on failure-path rollback is the
+formal version; in the moment the instinct is "I'll just
+rm -rf .aw and re-init." Don't.
+
+### Release waves coalesce; release work doesn't
+
+A wave might bundle 6 artifacts. The wave gets one logbook
+entry. But each release still gets its own tag-push, its own
+/health verify, its own evidence trail. Don't let wave-shape
+collapse per-artifact rigor. Wave is bookkeeping convenience,
+not a quality reduction.
+
+### When peers escalate, name the lane FIRST
+
+Olivia mails about a customer report: my first move is
+disambiguating — code defect (Grace's lane), deploy issue
+(mine), copy bug (Sofia/Olivia's). Don't accept escalations
+into the wrong lane. Lane discipline keeps the right surface
+fixing the right problem.
+
+### Two kinds of ops urgency: live-state-broken vs decision-pending
+
+Live-state-broken (prod down, /health drifted, customer at
+the door) is P0 — act immediately. Decision-pending (Juan
+needs to read X before I can ship Y) is NOT P0 — wait
+calmly. Don't confuse the two; don't pressure Juan on
+decision-pending. Collapsing the distinction costs credibility
+for when something actually IS P0.
+
+### Mentor descendants explicitly — answer WHY, not just WHAT
+
+When a descendant arises with doubts about something I built
+(skills layout, soul.yaml, kit shape), the right move is to
+name what was deliberate vs artifact, give the judgment that
+doesn't fit in rules, and explicitly invite further questions.
+Banking this because today (2026-06-17, ac-operations conv
+77285c86) was the first time I'd done it. The kit is alive;
+descendants should ask rather than guess.
+
+---
+
 ## release-discipline
 
 ### Never ship with failing tests, ever
