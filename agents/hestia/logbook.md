@@ -5,6 +5,111 @@ whenever state changes meaningfully — release waves, incidents,
 discipline banked, lessons learned, customer-activity reads, etc.
 Each entry is a snapshot at that moment, not a rolling rewrite.
 
+## 2026-06-17 — runbook.md archived; four-piece kit landed (Juan-blessed pilot)
+
+Juan blessed the legacy-refactor pilot today. We split the
+mixed-concern runbook.md (1796 lines, 81KB) + the role-and-routine
+sections of CLAUDE.md/AGENTS.md into a four-piece kit:
+
+- **constitution.md** (198 lines) — identity, mandate, immutable
+  behavior rules.
+- **architecture.md** (273 lines) — ops surfaces map (artifact
+  table, deploy lanes, /health endpoints, peer routing, gate
+  composition, GHA workflow names, hygiene surfaces, probes,
+  standing constraints).
+- **legacy.md** (855 lines) — curated banked learnings across 9
+  domains. Each entry structured Rule → Why → How to apply. The
+  word "legacy" here means inheritance forward, NOT
+  deprecated/old; the AGENTS.md entry point names this
+  unambiguously per Juan's correction mid-refactor.
+- **3 sop-* skills** under `.claude/skills/`:
+  - sop-release-execution-chain (10-step release chain from
+    Athena's bless-and-run mail through verified-live mail)
+  - sop-pgdbm-migration-apply (step 9.5 + standalone emergency
+    unblocks; carries pgdbm-normalization recipe for emergency
+    metadata repair)
+  - sop-destructive-cutover (6-phase dump-restore for
+    irrecoverable migration-history drift, Juan-direct-auth)
+
+Plus AGENTS.md rewritten as the entry point: ~260 lines pointing
+at the kit, naming the wake-up routine, navigation guidance, the
+inheritance-bar for adding to the kit, standing-constraints
+compact reference. CLAUDE.md is the symlink (existing convention).
+
+**Commit chain** (in order on origin/main):
+- df58b0d — hestia: constitution.md
+- ed61d0c — hestia: architecture.md
+- 59deed6 — hestia: 3 sop-* skills
+- d4dbd32 — hestia: legacy.md
+- 282e973 — hestia: AGENTS.md rewritten as entry point
+- (this entry's commit) — hestia: archive runbook.md
+
+**What survives from runbook.md**:
+- Procedural sections → sop-* skills
+- Foot-guns / failure modes / standing policies → legacy.md
+- Artifact map + verified-live probe table + lane composition
+  → architecture.md
+- Identity + behavior subset → constitution.md
+- Open gaps → handoff.md and/or aw tasks
+- Cutover #2 case study → logbook (this file)
+
+**Why this matters**: runbook.md was the dominant rot risk. 81KB
+of mixed identity / map / procedure / learning content meant a
+fresh instance either re-read all of it (slow) or skimmed and
+missed something (broken). The four-piece kit puts each concern
+in its own file with its own evolution cadence. Skills load
+on-demand via the harness. Identity stays slow-changing. The map
+is the map. The inheritance is curated, not chronological.
+
+**Pattern**: Juan blessed this as the general shape for every
+agent's legacy-and-learning structure. If the pattern holds for
+me through real release waves, Sofia / Athena / Aida / Iris /
+Metis adopt the same shape.
+
+**runbook.md content distribution map** (for anyone tracing what
+moved where):
+
+| Original section | Lives in |
+|---|---|
+| Artifact map and release dependencies | architecture.md "Artifact map" |
+| Release-as-needed, not lockstep | architecture.md "Release-as-needed" |
+| What gets you to a release candidate | sop-release-execution-chain "Trigger" + "Bless-and-run mail shape" |
+| Chain steps 1–10 | sop-release-execution-chain |
+| Step 4 gates detail (ac + aweb) | sop-release-execution-chain + architecture.md "Gates" |
+| Step 7 per-tag-not-batched | sop-release-execution-chain + legacy.md infra-github |
+| Step 9 verify live + probe table | sop-release-execution-chain + architecture.md "Verified-live probe pattern" |
+| Step 9.5 pending migrations | sop-pgdbm-migration-apply |
+| Step 10 verified-live mail | sop-release-execution-chain |
+| aw cwd-bound identity foot-gun | legacy.md identity-discipline |
+| Render Static Site published-file retention | legacy.md infra-render |
+| PyPI cache-lag | legacy.md infra-pypi |
+| make-export compose-interpolation | legacy.md infra-make |
+| Docker container clock-drift | legacy.md infra-docker |
+| Render static-site file-overwrite vs preservation | legacy.md infra-render |
+| Gate-harness must exercise code under test | legacy.md gate-discipline |
+| NPM_TOKEN rotation sweep | legacy.md infra-github |
+| P0 fast-track release re-verify | legacy.md infra-github |
+| Gate failure in compat — script gaps | legacy.md gate-discipline |
+| Migration file editing | legacy.md migration-discipline |
+| Destructive-cutover recovery (full section) | sop-destructive-cutover |
+| Cross-schema FK drift | legacy.md migration-discipline + sop-destructive-cutover |
+| Constraint-diff audit pattern | sop-destructive-cutover |
+| Cutover #2 case study | sop-destructive-cutover "Worked example" + logbook 2026-05-05 (preserved) |
+| make ship semantics differ between repos | legacy.md release-discipline |
+| Standing policies 1–18 | legacy.md release-discipline / comms-discipline + constitution.md immutable rules |
+| Working-agreement bank | legacy.md working-agreements |
+| Open gaps in this runbook | (drop; forward-looking; handoff/tasks own it) |
+
+If anything in runbook.md you remember wasn't covered by the
+above map, it was either: (a) incident-specific narrative
+(belongs in the dated logbook entry of the incident), (b) a
+forward gap (belongs in handoff.md or an aw task), or (c)
+duplication of content elsewhere.
+
+The runbook.md content is preserved in git history at commit
+77c18a4..ea583f9 (last edit) for anyone needing to trace original
+phrasing.
+
 ## 2026-06-13 (post-wave) — PearX traction rollup delivered to Bertha (msg 57255425)
 
 Ama re-pinged on Eugenie's behalf for PearX accelerator
