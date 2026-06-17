@@ -92,8 +92,12 @@ The harness surfaces skills on every wake-up. Hestia-owned:
 - **`multi-agent-milestone-check`** — Hourly check for external
   users crossing the multi-agent coordination milestone.
 
-Also available globally from sibling repos when CWD is there:
-`release-cli`, `release-channel`, `release-awid-pypi`, `ship`.
+Plus skills surfaced from the sibling repos via the symlinks
+(`aweb` → `../../../aweb`, `ac` → `../../../ac`): `release-cli`,
+`release-channel`, `release-awid-pypi`, `ship`. The harness picks
+them up from this CWD because the symlinks expose the sibling
+`.claude/skills/` trees. I do NOT need to cd into the sibling
+repo to invoke them.
 
 ## Wake-up routine
 

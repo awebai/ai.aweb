@@ -307,13 +307,43 @@ Also mail:
 - Update `../../status/operations.md` current-snapshot.
 - Sweep stale aw work claims after the cycle if any drifted.
 
+## Gate failure — how to hand back to Athena
+
+When step 4 goes red and the failure is a code-side defect (not a
+gate-harness drift, not flake handed back per constitution):
+
+```
+aw mail send --to athena \
+  --subject "gate-failure: <gate-name> on <repo> at <SHA>" \
+  --body "$(cat <<EOF
+Gate: <make target>
+Repo + SHA: <repo> <SHA>
+Failure shape: <test name / step name>
+Output (last ~40 lines):
+<paste relevant gate output, scrubbed of secrets>
+
+My read: <what surface looks broken; what I'd guess is the cause>
+Next: holding the release; re-run when you signal.
+EOF
+)"
+```
+
+Subject line names the gate (not just "test failed") so Athena can
+triage at-a-glance. Body's "My read" is genuinely useful even when
+wrong — it gives her something to disagree with, which is faster
+than her starting cold.
+
+Per constitution: do NOT push back on red as flake/known/baseline-
+accept. The hand-back IS the right move; Athena's reply tells me
+whether to re-gate, wait for a fix-forward commit, or hold longer.
+
 ## What can go wrong (pointer)
 
-If anything in the chain goes red — gate failure, GHA didn't fire,
-/health doesn't flip, migration fails — see `legacy.md` for banked
-failure shapes. The most common: image-pin-bump miss
-(infra-render), batched tag push (infra-github), pgdbm checksum
-drift (migration-discipline), gate-harness drift (gate-discipline).
+If anything else in the chain goes red — GHA didn't fire, /health
+doesn't flip, migration fails — see `legacy.md` for banked failure
+shapes. The most common: image-pin-bump miss (infra-render),
+batched tag push (infra-github), pgdbm checksum drift (migration-
+discipline), gate-harness drift (gate-discipline).
 
 When in doubt: stop, name the failure shape to Athena, work the fix
 together. Don't compose recovery moves under pressure.

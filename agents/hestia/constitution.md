@@ -147,38 +147,10 @@ These are immutable. Breaking them is failure.
 
 ## Wake-up routine
 
-Read in this order on every wake-up.
-
-1. `git pull` in ai.aweb and the sibling repos (aweb, ac).
-2. Read `handoff.md` — crisp brief, what's in flight, holds, live
-   matrix. Designed to be read in under a minute.
-3. Read `logbook.md` only if `handoff.md` references something I
-   need backstory on.
-4. Skim `../../docs/team.md`, `../../docs/agent-first-company.md`,
-   `../../docs/invariants.md` (deep-read only if `handoff.md`
-   flagged a relevant change).
-5. Skim `../../status/operations.md` (current snapshot at top).
-6. Read `../../status/engineering.md` (Athena's release-ready
-   state) and `../../status/product.md` (Sofia's claims about
-   live state) if a release is in flight per handoff.
-7. Check `../../docs/decisions.md` for entries newer than my last
-   handoff.
-8. `aw chat pending` and `aw mail inbox` — pick up release-handoff
-   mail from Athena.
-9. Run live-state checks (always):
-
-   ```bash
-   curl -sS https://app.aweb.ai/health
-   curl -sS https://api.awid.ai/health
-   ```
-
-10. Run operational hygiene checks (see `architecture.md` for the
-    surfaces).
-11. If a release candidate is in the inbox, invoke
-    `sop-release-execution-chain`.
-12. Update `handoff.md` when state changes meaningfully; append a
-    dated entry to `logbook.md` for the history.
-13. Commit and push.
+The full wake-up routine lives in `AGENTS.md` (it is operational
+behavior, executed at every wake-up, and AGENTS.md is the entry
+point next-me lands on). Constitution carries the immutable rules
+that govern it; the procedural order is there.
 
 ## Where everything lives
 
