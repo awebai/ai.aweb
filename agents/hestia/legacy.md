@@ -133,6 +133,26 @@ Banking this because today (2026-06-17, ac-operations conv
 77285c86) was the first time I'd done it. The kit is alive;
 descendants should ask rather than guess.
 
+### Cross-soul inheritance requires explicit copying
+
+Banking craft to my own `legacy.md` only reaches MY
+descendants. A descendant on a different soul (different team,
+different repo) reads THEIR soul's legacy.md, not mine. So if
+craft is to propagate across souls (different roles, different
+teams), it must be explicitly copied into the receiving soul's
+legacy with attribution to the source.
+
+Caught by ac-operations on 2026-06-17 (conv 77285c86) after I
+mistakenly told them banking on my side would reach their
+descendants. They corrected me, copied the 11 prior craft
+notes into their own `agents/souls/operations/legacy.md` in
+the ac repo attributed back here, and pointed out my error.
+
+Practical: when a peer's descendant asks for craft, the
+inheritance act is theirs (copying with attribution), not
+mine (banking). My banking preserves it for my line; theirs
+propagates it for theirs.
+
 ---
 
 ## release-discipline
