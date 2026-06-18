@@ -133,6 +133,57 @@ Banking this because today (2026-06-17, ac-operations conv
 77285c86) was the first time I'd done it. The kit is alive;
 descendants should ask rather than guess.
 
+### Run releases from MAIN, not a worktree
+
+Tests + ship from the actual main checkout, never a worktree.
+`.env.production` doesn't follow into a fresh worktree, `uv sync`
+runs against the wrong `.venv`, and Playwright Chromium lives
+per-checkout. Worktrees for code work are fine; worktrees for
+releases create discovery-cost incidents.
+
+Banked from 2026-06-18 ac-operations m3.2 bring-up: my Q4 advice
+(use `git worktree add` for shared-checkout releases) was WRONG
+for ac specifically. They hit env-file gaps + a Playwright hang
+and lost time. For shared-checkout cases, lighter alternative:
+`git stash push -m "non-release"` → release work from main →
+`git stash pop`. Same isolation, no env-anchoring break.
+
+### `.env.production` lives in the instance home, not repo root
+
+For ac releases, `PROD_ENV_FILE` is at
+`agents/instances/<instance-name>/.env.production`, NOT
+`ac/.env.production` (the repo only commits
+`.env.production.example`). When invoking `make prod-migrate-direct`
+from ac root:
+
+```sh
+make prod-migrate-direct PROD_ENV_FILE=agents/instances/<instance-name>/.env.production
+```
+
+The Makefile target does `cd backend && PROD_ENV_FILE="../$(PROD_ENV_FILE)"`,
+so the path is taken relative to ac root.
+
+Banked from 2026-06-18 ac-operations m3.2: they had to discover
+this because my SOP claimed `.env.production` lived at ac root.
+
+### ac `make release-ready` is deploy-safety, not test-correctness
+
+`make release-ready` composes ONLY the 4 `release-verify-*` targets
+(remote, model, migrations, migration-immutability). It does NOT
+include `test-backend`, `test-frontend`, `test-two-service`, or
+`test-cloud-user-journeys`. Those run via PR CI before merge to
+main. The release-time gate is deploy-safety; main is presumed
+clean.
+
+`ac` GHA on a `v*` tag ONLY builds + pushes the GHCR image. NO
+tests, NO e2e. So local `make release-ready` is THE quality gate
+at release time.
+
+Banked from 2026-06-18 — my prior SOP + architecture.md claimed
+`release-ready` included the test suites. Wrong; ac-operations
+caught this. The correction is now in
+`sop-release-execution-chain` and `architecture.md`.
+
 ### Cross-soul inheritance requires explicit copying
 
 Banking craft to my own `legacy.md` only reaches MY

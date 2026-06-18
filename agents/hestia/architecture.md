@@ -162,7 +162,8 @@ reason.
 cd ac && make release-ready
 ```
 
-Composes:
+**Composes ONLY the 4 verify-* targets** (deploy-safety, not
+test-correctness):
 
 - `release-verify-remote` — confirms remote state matches expectation
 - `release-verify-model` — model-side verification
@@ -172,15 +173,23 @@ Composes:
   of every migration on disk == `schema_migrations.checksum`
   (catches manual-unblock checksum drift, see `legacy.md`
   migration-discipline)
-- `test-backend` — pytest suite, ~1250 tests
-- `test-frontend` — vitest suite
-- `test-two-service` — Docker two-service stack (cloud + awid)
-- `test-cloud-user-journeys` — local-aw arm only by default
-- `test-cloud-user-journeys-compat` — installed-aw arm; run
-  explicitly when release risks breaking installed users (see
-  trigger conditions in `sop-release-execution-chain`)
 
-End-to-end baseline: ~3–5 min. Compat adds ~58s isolated.
+**It does NOT include** `test-backend`, `test-frontend`,
+`test-two-service`, or `test-cloud-user-journeys`. Those run via PR
+CI before merge to main — the release-time gate is deploy-safety.
+Main is presumed clean.
+
+Separate targets (run when scope requires):
+
+- `test-cloud-user-journeys-compat` — installed-aw arm; run explicitly
+  when release risks breaking installed users. ~58s isolated. See
+  trigger conditions in `sop-release-execution-chain`.
+
+`make release-ready` baseline: ~3–5 min.
+
+**ac GHA on a `v*` tag ONLY builds + pushes the GHCR image.** It runs
+NO tests, NO e2e. So local `make release-ready` from main is THE
+quality gate at release time.
 
 ### aweb
 

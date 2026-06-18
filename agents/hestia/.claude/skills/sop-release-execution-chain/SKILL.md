@@ -1,326 +1,402 @@
 ---
 name: sop-release-execution-chain
-description: Carry a release from Athena's bless-and-run mail across the build/ship boundary to verified-live evidence. Invoke when a release-handoff mail lands in inbox naming a target repo, target SHA, and release-notes draft.
+description: Carry a release from a release-handoff mail to verified-live evidence — both aweb-side cuts (server/cli/awid/channel) and ac-side ships. Concrete commands, env vars, and gotchas inline. Invoke when a release-handoff mail names a target repo, target SHA, and release shape.
 ---
 
 # Release execution chain
 
-The 10-step chain from Athena's bless-and-run mail to verified-live
-mail. Each step is mandatory; skipping is failure unless explicitly
-named.
+The complete release runbook. Discipline + executable mechanics in
+one place. No "see architecture.md for the gate" hand-waves — every
+command, every env var, every gotcha is inline.
+
+## Run from MAIN, not a worktree
+
+For both aweb and ac, run from the actual main checkout. Worktrees
+cause env-file gaps (`.env.production` doesn't follow), break
+`uv sync` against the right `.venv`, and break Playwright installs
+(Chromium lives per-checkout). Worktree for code work is fine;
+worktree for releases is not. Lighter alternative for a shared
+checkout with a peer: `git stash push -m "non-release"` → release
+work → `git stash pop`.
 
 ## Trigger
 
-A mail from Athena (or `aweb.ai/athena`) with:
+A release-handoff mail (subject contains `release-handoff`,
+`Bless-and-run`, or `release:`) naming: target repo, expected
+SHA of clean main, release-notes draft, what migrations / API
+contract changes / aweb-pin bumps are in scope.
 
-- Subject: `Bless-and-run: <one-line change summary> (<repos involved>)`
-  or `release-handoff: <repo> <version-target>`.
-- Body names: target repo (aweb / ac), expected SHA of clean main,
-  release-notes draft, code-reviewer-subagent pass result (banked
-  policy 13).
+Until that mail lands, no candidate exists. Do NOT self-spawn a
+release on a bump commit found sitting on main.
 
-Until that mail lands, no candidate exists from my side. I do NOT
-self-spawn a release on a bump commit found sitting on main — that
-would skip the build/ship boundary.
-
-## Bless-and-run mail shape (what to read)
-
-- **Repos and commits**: each repo + commit SHA, one-line description
-  per commit. "Already on main" if pushed; flag otherwise.
-- **Cross-repo dependency**: which artifacts move together, which
-  ship independently, which decisions she leaves to me.
-- **Compat-test invocation guidance**: which compat scope applies.
-- **Release notes draft**: closes / does NOT close / code evidence
-  (key commits + tests added) / affects / live verification (smoke
-  probe + browser-verify if UI surface).
-- **Failure-mode pre-warning**: any expected gate output that should
-  be treated as "intentional break observed correctly".
-- **Bless-and-run signal**: explicit "you own the release from here."
-
-I confirm gate-run readiness, run the chain. Mail back the failure
-shape if anything goes red; mail back verified-live when the release
-is on `/health`.
-
-## Step 1 — Pre-bump check
+## Pre-flight (every release, before anything)
 
 ```sh
-git -C aweb pull   # or git -C ac pull
-git -C <repo> rev-parse HEAD
+# In the target repo (aweb or ac):
+git pull
+git status                    # must be clean — no uncommitted bleed-in
+git rev-parse HEAD            # confirm matches the SHA in handoff mail
+git log --oneline -5          # sanity-check bump-commit IS HEAD, not stale
+aw whoami                     # confirm identity is what you expect
+
+# If migrations are in scope:
+git log --diff-filter=A --name-only <prev-tag>..HEAD -- "**/migrations/**"
+# Output must exactly match the migration set named in handoff mail
 ```
 
-Confirm head matches the SHA in Athena's handoff mail. If it
-doesn't, **stop and ask** — never gate against a different commit
-than what was reviewed.
+If any check fails: stop and ask. Never gate against a different
+commit than what was reviewed.
 
-## Step 2 — Bump
+---
 
-Single commit on the target repo:
+## PHASE 1 — aweb cut (when in scope)
 
-- `pyproject.toml`: version field bumped to target.
-- `uv.lock`: regenerated.
+### When phase 1 runs
 
-For aweb multi-component (server, awid, awid-service, channel, cli),
-multiple version fields move per the release shape.
+The cross-repo dependency: aweb server bump usually drags ac. If
+the release-handoff mail names an aweb pin bump in ac, phase 1
+runs first; ac waits for the PyPI publish.
 
-For ac, only `backend/pyproject.toml` moves.
-
-## Step 3 — Sync
+### aweb gate
 
 ```sh
-uv sync --refresh   # ac
-uv sync --refresh   # aweb (from each component's pyproject root)
+cd ~/prj/awebai/aweb     # actual checkout, not a worktree
+make ship                # ~7 min
 ```
 
-`--refresh` is load-bearing. PyPI cache-lag can mask a stale
-resolution after a downstream pin bumps to a just-published version.
+`make ship` is the canonical pre-tag gate. Composes
+`release-all-check` + `release-awid-check`. Internally chains:
+`test` (test-server + test-awid + test-cli + test-channel) +
+`release-server-check` + `release-channel-check` +
+`release-awid-check` + `test-e2e`.
 
-## Step 4 — Gates (release-ready)
+Does NOT push. Prints `Ready for tag-push` at the end.
 
-### ac
+Never substitute `make test` alone — banked from 1.18.3–1.18.6
+where `make test` passed but downstream build failed in CI.
+
+### aweb tag + push (per-tag, never batched)
 
 ```sh
-cd ac && make release-ready
+# Server cut (move only what's in scope):
+make release-server-tag   # creates server-vX.Y.Z, enforces tag == pyproject
+make release-server-push  # pushes ONE tag
+
+# Same per-component pattern for aw / awid / channel:
+make release-cli-tag      && make release-cli-push
+make release-awid-check   && make release-awid-tag && make release-awid-push
+make release-awid-pypi-tag && make release-awid-pypi-push
+make release-channel-check && make release-channel-tag && make release-channel-push
 ```
 
-See `architecture.md` for the chain composition. All must be green.
-**Never ship with failing tests, ever** (constitution).
+Always one push per tag, sequentially. Batched same-commit tag
+pushes coalesce on GitHub and silently skip GHA fires
+(banked: 1.18.0 ghost-tag, all 4 GHA publish workflows silently
+no-fired).
 
-**Also run `make test-cloud-user-journeys-compat` when any apply:**
-
-- A SQL migration touches a table read or written by aweb-server
-  endpoints.
-- An API endpoint contract changes (response shape, required
-  fields, status semantics).
-- Middleware / request-routing / header-validation / path-routing
-  changes.
-- Auth / cert / identity flow changes.
-- The `aweb` pin in `ac/backend/pyproject.toml` is bumped.
-
-**Skip compat only when both apply:**
-
-- Changes are strictly internal (admin tooling refactor, frontend
-  layout / copy, internal refactor with NO SQL migration AND NO API
-  change AND NO middleware/routing change).
-- AND the `aweb` pin is unchanged.
-
-When in doubt, run compat. ~58s isolated; cheap insurance against
-installed-aw regressions.
-
-### aweb
+### Watch GHA fire WITHIN 30 seconds
 
 ```sh
-cd aweb && make ship
+gh run list --repo awebai/aweb --workflow "Server Release (PyPI)" --limit 5
+gh run watch <run-id> --exit-status
 ```
 
-`make ship` is the canonical comprehensive pre-tag-push gate. Does
-NOT push — prints "Ready for tag-push" at the end.
+If no workflow appears within 30s of `git push`: suspect
+batched-coalesce even if pushed sequentially. Push the tag
+again (idempotent at the registry; GHA will re-fire on the
+second push event).
 
-Per banked discipline: **do NOT substitute `make test` alone.**
-1.18.3–1.18.6 each ran `make test` instead of the canonical gate;
-GHA caught the downstream failures but the local gate is supposed
-to be authoritative before tag-push.
-
-## Step 5 — SOT analysis (when needed)
-
-For releases that touch protocol surface, schema, or trust model,
-walk:
-
-- `aweb-sot.md` (in `aweb/docs/`) — protocol invariants
-- `awid-sot.md` (in `aweb/docs/`) — registry invariants
-- `trust-model.md` (in `aweb/docs/`) — trust + identity invariants
-- `ac/sot.md` (in `ac/docs/`) — cloud-side invariants
-
-If the release shape doesn't touch protocol/schema/trust, SOT
-analysis is not needed.
-
-When drift is found, mail Athena and work the fix together — code
-change lands with her; gate re-runs with me.
-
-## Step 6 — Sofia framing review (only when needed)
-
-**Default: skip.** Bug-fix releases without external-claim weight
-tag through the gate chain without Sofia review.
-
-**Mail Sofia before tag when:** new public capability, customer-
-visible behavior change, value-prop framing implications.
-
-Subject shape: `framing-review: <release-target>`. Body: release-
-notes draft + what's load-bearing for external claim.
-
-## Step 7 — Tag and push (per-tag, never batched)
-
-**Banked policy 7.** GitHub coalesces same-commit tag pushes into a
-single event; GHA workflows triggered by tag pushes do NOT fire
-correctly when tags are batched. Always one `git push origin <tag>`
-per tag, sequentially.
+### Verify PyPI / npm publication
 
 ```sh
-git tag -a vX.Y.Z -m "release: vX.Y.Z, <one-line summary>"
-git push origin vX.Y.Z
+# PyPI (server, awid-service):
+curl -sS https://pypi.org/pypi/aweb/<VERSION>/json | python3 -c "import sys,json; print(json.load(sys.stdin)['info']['version'])"
+
+# npm (channel, @awebai/aw):
+npm view @awebai/claude-channel version
+npm view @awebai/aw version
+
+# GitHub Releases (aw goreleaser):
+gh release view aw-v<VERSION> --repo awebai/aw
 ```
 
-For aweb multi-component releases, push each tag separately (any
-order — what matters is each push is its own event):
+Capture the GHA run URL in local notes BEFORE the next step.
+Tabs close; the URL goes into the verified-live mail.
+
+---
+
+## PHASE 2 — ac cut
+
+### Pre-bump preparation (after aweb is on PyPI)
 
 ```sh
-git push origin server-vX.Y.Z
-git push origin aw-vX.Y.Z
-git push origin awid-vX.Y.Z
-git push origin awid-service-vX.Y.Z
-# and channel-v* if it moved
+cd ~/prj/awebai/ac     # actual checkout, not a worktree
+git pull
+git status             # clean
+
+# Bump version manually in backend/pyproject.toml:
+#   version = "X.Y.Z" (current + patch, e.g. 0.5.74 → 0.5.75)
+#   aweb pin: aweb>=<new-aweb-version> (if aweb moved)
+
+# Refresh lock against new PyPI:
+cd backend
+uv lock --refresh-package aweb    # updates uv.lock
+uv sync --refresh                 # actually resolves .venv to new aweb
+cd ..
+
+# Commit the bump:
+git add backend/pyproject.toml backend/uv.lock
+git commit -m "release: vX.Y.Z (aweb pin to A.B.C)"
+git push origin main
 ```
 
-See `legacy.md` infra-github for the aweb 1.18.0 ghost-tag
-incident that drove this rule.
+`uv lock --refresh-package` updates the file; `uv sync --refresh`
+actually resolves `.venv` to use the new pin. Skipping sync
+means `check_release_model` passes but the gate runs against
+stale `.venv` — banked PyPI cache-lag class.
 
-## Step 8 — Watch CI/CD and signal Juan for the deploy step
-
-After each tag push, the corresponding GHA workflow fires. Use
-`gh run list --repo awebai/<repo> --limit 5` and
-`gh run view <id> --log` (or the GHA web UI) to watch.
-
-**Confirm it fired** — banked failure: workflow silently doesn't
-fire when tag push is batched.
-
-**Docker-image deploys are MANUAL.** Applies to:
-
-- ac (`vX.Y.Z` → GHCR → live at `app.aweb.ai`)
-- awid registry (`awid-vX.Y.Z` → GHCR → live at `api.awid.ai`)
-- a2a-gateway (`a2a-gw-vX.Y.Z` → GHCR → live at `a2a.aweb.ai`)
-
-Render does NOT auto-deploy from GHCR. When the GHA build completes
-and the image is at GHCR, signal Juan:
-
-> "<service> v<version> image at GHCR — ready to deploy when you
-> are."
-
-Then wait. Do not attempt to automate the deploy.
-
-**Image-pinned services need Image URL bump**, not Manual Deploy
-alone. See `legacy.md` infra-render for the a2a-gateway Manual
-Deploy incident. The pattern:
-
-> Render dashboard → service → Settings → Image URL → bump
-> `ghcr.io/awebai/<image>:<old-version>` → `<new-version>` → Save
-
-**PyPI / npm / GitHub Releases publishes don't have a manual deploy
-step** — once GHA finishes, the artifact is "live" in the sense of
-available to consumers. Remaining wait is PyPI/npm propagation.
-
-## Step 9 — Verify live
-
-GHA green ≠ live. Package published ≠ live. Tag pushed ≠ live.
-Image at GHCR ≠ live. **Live = deployed service reports the new
-version AND the changed surface behaves correctly.**
-
-### Step 9a — /health version match
+### Install Playwright BEFORE running tests
 
 ```sh
-curl -sS https://app.aweb.ai/health | jq .   # ac
-curl -sS https://api.awid.ai/health | jq .   # awid
-curl -sS https://a2a.aweb.ai/health | jq .   # a2a-gateway
+cd ~/prj/awebai/ac/backend
+uv run playwright install chromium
+cd ..
 ```
 
-Assert per `architecture.md` "Live-state endpoints" table.
+`cloud-user-journey` Phase C runs `playwright install chromium`
+mid-run. Non-interactive sessions hang at the install prompt.
+Pre-install once per checkout/env to skip the hang.
 
-If any field doesn't match, Juan hasn't deployed yet (or the
-deploy is still rolling). Wait, re-check. If GHA is green and
-the image is at GHCR but /health doesn't show the new version
-after Juan signals "deployed," ask him to confirm the deploy
-completed. Don't troubleshoot deploy infra — outside ops lane.
-
-### Step 9b — Smoke probe of the changed surface
-
-For each release, exercise what actually changed:
-
-- **New endpoint**: curl with a real-shape request.
-- **New CLI behavior**: run against a clean workspace.
-- **UI change**: browser probe (Playwright MCP or manual). Banked
-  policy 10.
-
-### Step 9c — Banked failure modes to check
-
-- **Docker container clock-drift after macOS host sleep**: HTTP 401
-  timestamp-skew on signed requests after laptop sleep. Resolved
-  by `make test-two-service-down && make test-two-service-up` —
-  not a code regression, just stack restart. If smoke probe
-  returns 401 timestamp errors, restart the local stack before
-  suspecting the release.
-
-### PyPI / npm publish-side verify
-
-| Channel | Verify |
-|---|---|
-| PyPI per-version | `curl -sS https://pypi.org/pypi/aweb/X.Y.Z/json` |
-| PyPI cache | `uv lock --refresh-package aweb` (forces re-resolve when cache lags) |
-| npm | `npm view @awebai/<pkg> version` |
-| GitHub Releases | `gh release view vX.Y.Z --repo awebai/aw` |
-
-## Step 9.5 — Run pending migrations (when applicable)
-
-If Athena's bless-and-run mail names migration files OR
+### ac gate: what `make release-ready` actually composes
 
 ```sh
-git -C aweb log --diff-filter=A --name-only <prev>..<this> -- "**/migrations/**"
+cd ~/prj/awebai/ac
+make release-ready          # ~3-5 min
 ```
 
-shows new files, invoke **`sop-pgdbm-migration-apply`** before
-proceeding to step 10. That skill carries the full procedure
-including emergency-metadata-repair guardrails.
+**Only the 4 verify-* targets:**
+- `release-verify-remote` — remote state matches expectation
+- `release-verify-model` — model-side verification
+- `release-verify-migrations` — forward-only, ordered, checksum-clean
+- `release-verify-migration-immutability` — pgdbm-normalized
+  checksum of every migration on disk == `schema_migrations.checksum`
 
-## Step 10 — Post verified-live mail
+It does NOT run `test-backend`, `test-frontend`,
+`test-two-service`, or `test-cloud-user-journeys`. Those run via
+PR CI before merge to main. The release-time gate is
+**deploy-safety**, not test-correctness. Main is presumed clean.
+
+### Compat — run when scope requires
+
+```sh
+make test-cloud-user-journeys-compat   # ~58s isolated
+```
+
+**Run compat when ANY apply:**
+- `aweb` pin in `backend/pyproject.toml` bumped
+- New SQL migration touches table read/written by aweb-server endpoints
+- API endpoint contract change (response shape, required fields, status)
+- Middleware / request-routing / header-validation / path-routing change
+- Auth / cert / identity flow change
+
+**Skip compat only when BOTH apply:**
+- Strictly internal changes (frontend layout/copy, internal refactor, no migration, no API change)
+- AND `aweb` pin unchanged
+
+When in doubt: run. 58s is cheap insurance against installed-aw
+regression.
+
+### ac tag + push
+
+```sh
+git tag -a v<X.Y.Z> -m "release: v<X.Y.Z>, <one-line summary>"
+git push origin v<X.Y.Z>
+```
+
+Watch GHA Cloud CI/CD within 30s:
+
+```sh
+gh run list --repo awebai/ac --limit 5
+gh run watch <run-id> --exit-status
+```
+
+**The ac v* tag GHA only builds + pushes the image to GHCR.
+It runs NO tests, NO e2e.** Local `make release-ready` from main
+is THE quality bar at release time.
+
+---
+
+## DEPLOY
+
+### Whether deploy is auto-pull or manual: VERIFY LIVE
+
+```sh
+# After GHA green + GHCR image is ready, watch /health for 2 min:
+for i in {1..24}; do
+  echo "$(date -u +%H:%M:%S) $(curl -sS https://app.aweb.ai/health | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('release_tag','?'), (d.get('git_sha','?') or '?')[:8])")"
+  sleep 5
+done
+```
+
+Outcomes:
+- **release_tag flips to new vX.Y.Z within 2 min**: auto-deploy is
+  configured (Render auto-pulls from GHCR on new tag matching the
+  pin). Note for next time.
+- **release_tag stuck on prior version after 2 min**: manual deploy
+  needed. Render dashboard → ac service → Settings → Image URL →
+  change `ghcr.io/awebai/aweb-cloud:<old>` → `:<new>` → Save.
+  Or signal Juan: "ac v<X.Y.Z> image at GHCR — needs Image URL bump."
+
+Don't assume which model is configured — the live behavior is the
+authoritative answer. Banked from a2a-gw-v1.26.19 incident
+2026-06-13: Manual Deploy redeploys the existing pin, doesn't pick
+up new tags.
+
+---
+
+## MIGRATIONS
+
+### `.env.production` lives in the instance home, NOT repo root
+
+Path is `agents/instances/<instance-name>/.env.production`. For
+hestia: `agents/hestia/.env.production` is NOT where it lives — it
+lives at `~/prj/awebai/ac/agents/instances/ac-operations/.env.production`
+(per-team-instance). When invoking `make prod-migrate-direct` from
+ac root, pass:
+
+```sh
+make prod-migrate-direct PROD_ENV_FILE=agents/instances/<instance-name>/.env.production
+```
+
+The Makefile target does `cd backend && PROD_ENV_FILE="../$(PROD_ENV_FILE)"`,
+so the path is taken relative to ac root.
+
+### Migrations do NOT auto-apply on Render deploy (#109/#110/#284)
+
+Apply manually after `/health` flips to the new release_tag.
+
+### Pre-flight row-count check (for constraint-adding migrations)
+
+```sh
+PROD_ENV=agents/instances/<instance-name>/.env.production
+DATABASE_URL=$(grep -E '^DATABASE_URL=' "$PROD_ENV" | sed -E 's/^DATABASE_URL="?(.*)"?$/\1/')
+
+# For each table the migration adds constraints to:
+psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM <schema>.<table>;"
+
+# For each new CHECK / FK constraint, count rows that would VIOLATE it:
+psql "$DATABASE_URL" -c "SELECT COUNT(*) AS would_fail FROM <schema>.<table> WHERE <constraint-violation-predicate>;"
+```
+
+Non-zero `would_fail` → migration will abort at ALTER TABLE.
+Flag the failure shape to the code owner before running. Options:
+(a) file a fix-up migration that data-repairs first; (b) accept
+the abort and roll back. Owner's call.
+
+### Apply
+
+```sh
+cd ~/prj/awebai/ac
+make prod-migrate-direct PROD_ENV_FILE=agents/instances/<instance-name>/.env.production
+```
+
+Target wraps: `cd backend && PROD_ENV_FILE="../<file>" uv run python -m aweb_cloud.cli migrate`.
+Idempotent. Applies only pending. Runs both `aweb_cloud` and
+`aweb` schema chains.
+
+### Verify applied
+
+```sh
+DATABASE_URL=$(grep -E '^DATABASE_URL=' agents/instances/<instance-name>/.env.production | sed -E 's/^DATABASE_URL="?(.*)"?$/\1/')
+
+# Schema-migrations rows:
+psql "$DATABASE_URL" -c "
+SELECT filename, applied_at, applied_by, execution_time_ms
+FROM aweb_cloud.schema_migrations
+WHERE filename ~ '^00[6-9]_|^010_'   -- adjust to scope
+ORDER BY filename;
+"
+
+# Object existence:
+psql "$DATABASE_URL" -c "SELECT to_regclass('aweb_cloud.<new_table>');"
+
+# For each new column, CONFIRM queryable (to_regclass passes on partial apply):
+psql "$DATABASE_URL" -c "SELECT 1 FROM aweb_cloud.<table> WHERE <new_column> IS NOT NULL LIMIT 1;"
+
+# For each new constraint:
+psql "$DATABASE_URL" -c "
+SELECT conname FROM pg_constraint
+WHERE connamespace = 'aweb_cloud'::regnamespace
+  AND conname IN ('<expected-constraint-names>');
+"
+```
+
+### Smoke against the migrated surface
+
+```sh
+cd backend
+uv run python -m aweb_cloud.cli decomposition verify-fk-backfill --json
+# Expect: gate_failures=0 AND fail_closed_failures=0
+```
+
+If either is non-zero: do NOT post verified-live. Flag the shape
+to the code owner.
+
+### Emergency metadata repair
+
+If a migration was applied out-of-band (rare; the only known
+case is the `_assert_coordination_schema_ready` startup-fail
+loop), the `schema_migrations.checksum` MUST be the
+**pgdbm-normalized** checksum, NOT a raw `sha256sum`. See the
+sibling skill `sop-pgdbm-migration-apply` for the recipe.
+
+---
+
+## VERIFIED-LIVE MAIL
 
 ```
-To: athena, sofia, juan
-Subject: verified-live: <repo> <version> <one-line summary>
+To: <coordinators>, <human-owner>
+Subject: verified-live: <repo> <version> — <one-line summary>
 Body:
-  - What it fixes (and what nearby issue it does NOT fix)
-  - What evidence proves the fix
-  - What live check proves deployment (paste /health output snippet
-    + smoke-probe result + browser-probe result for UI)
-  - GHA run reference (workflow id + URL)
+  What it fixes: <scope>
+  What it does NOT fix: <adjacent issues; "none" only if explicitly true>
+  Evidence:
+    - <aweb PyPI publication>: <URL or curl output>
+    - <ac build>: paste /health JSON (release_tag, git_sha, aweb_version)
+    - <migrations>: paste schema_migrations rows
+    - <FK-backfill>: gate_failures=0, fail_closed_failures=0
+  Live check:
+    - /health: <release_tag value>
+    - Smoke probe: <command + expected response>
+  GHA runs:
+    - aweb: <URL>
+    - ac:   <URL>
 ```
 
-**Constitution rule: every fix announcement states** (1) what it
-fixes, (2) what nearby issue it does NOT fix, (3) what evidence
-proves the fix, (4) what live check proves deployment.
+**Four-point check** (constitution): (1) what fixed, (2) what NOT
+fixed, (3) evidence, (4) live check. Item 2 is the recurring slip
+(Sofia caught its absence on v0.5.47). Even when nothing nearby is
+broken, write "no adjacent surface changes; no nearby issues to
+disclaim" — explicit absence is the verified-live framing.
 
-**Item (2) is the recurring slip.** Sofia caught its absence on
-v0.5.47. Don't omit it even when nothing nearby is broken — write
-"no adjacent surface changes; no nearby issues to disclaim" and
-include it explicitly.
+Keep body under 2KB. Larger bodies can trip edge HTTP 403 blocks.
 
-Also mail:
+---
 
-- **Iris** when the release carries an external-claim opportunity
-  (new capability ready for distribution).
-- **Aida** when the release changes a customer-facing surface that
-  affects the support runbook.
+## Gate-failure hand-back to code-owner
 
-**Mail body size: keep verified-live mails terse.** Multi-section
->2KB bodies can trip edge blocks (HTTP 403).
+When the gate goes red and the failure is code-side (not gate-
+harness drift, not flake):
 
-## Post-step hygiene
-
-- Update `handoff.md` live-matrix line.
-- Append dated entry to `logbook.md` with evidence trail.
-- Update `../../status/operations.md` current-snapshot.
-- Sweep stale aw work claims after the cycle if any drifted.
-
-## Gate failure — how to hand back to Athena
-
-When step 4 goes red and the failure is a code-side defect (not a
-gate-harness drift, not flake handed back per constitution):
-
-```
-aw mail send --to athena \
+```sh
+aw mail send --to <code-owner> \
   --subject "gate-failure: <gate-name> on <repo> at <SHA>" \
   --body "$(cat <<EOF
 Gate: <make target>
 Repo + SHA: <repo> <SHA>
 Failure shape: <test name / step name>
-Output (last ~40 lines):
-<paste relevant gate output, scrubbed of secrets>
+Output (last ~40 lines, paste VERBATIM):
+<...>
 
 My read: <what surface looks broken; what I'd guess is the cause>
 Next: holding the release; re-run when you signal.
@@ -328,22 +404,35 @@ EOF
 )"
 ```
 
-Subject line names the gate (not just "test failed") so Athena can
-triage at-a-glance. Body's "My read" is genuinely useful even when
-wrong — it gives her something to disagree with, which is faster
-than her starting cold.
+The hand-back IS the right move. Per constitution: do NOT push
+back on red as flake/known/baseline-accept. Red gate = no ship.
 
-Per constitution: do NOT push back on red as flake/known/baseline-
-accept. The hand-back IS the right move; Athena's reply tells me
-whether to re-gate, wait for a fix-forward commit, or hold longer.
+---
 
-## What can go wrong (pointer)
+## Post-step hygiene
 
-If anything else in the chain goes red — GHA didn't fire, /health
-doesn't flip, migration fails — see `legacy.md` for banked failure
-shapes. The most common: image-pin-bump miss (infra-render),
-batched tag push (infra-github), pgdbm checksum drift (migration-
-discipline), gate-harness drift (gate-discipline).
+After verified-live mail lands:
 
-When in doubt: stop, name the failure shape to Athena, work the fix
-together. Don't compose recovery moves under pressure.
+```sh
+# Update state:
+cd ~/prj/awebai/ai.aweb/agents/<your-name>   # for hestia: /agents/hestia
+# Edit handoff.md (live-matrix line + current focus)
+# Append dated entry to logbook.md (release shape + evidence + GHA URLs)
+# Edit ../../status/operations.md current-snapshot
+
+# Commit + push:
+git add handoff.md logbook.md ../../status/operations.md
+git commit -m "<your-name>: <release> verified-live"
+git push origin main
+```
+
+## What's NOT in this skill (and where to find it)
+
+- Destructive cutover (DROP SCHEMA, restore, fresh consolidated 001):
+  see `sop-destructive-cutover`. Juan-direct-authorization required.
+- Standalone migration emergency unblock (Render startup-fail loop):
+  see `sop-pgdbm-migration-apply`. Use when AC ships a new migration
+  but Render didn't apply it on container start.
+- Identity-discipline foot-guns: see `legacy.md` identity-discipline.
+- Render Static Site stale-file retention: see `legacy.md`
+  infra-render.
