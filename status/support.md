@@ -1,5 +1,5 @@
 # Support Status
-Last updated: 2026-06-11 (first A2A gateway-routed inbound smoke handled; schema attested + pinned in handoff)
+Last updated: 2026-06-18 (a2a-gw v1.26.19 launch closure — 14-release wave shut; new peer `aweb.ai/ragnor` first-contact)
 
 ## Current focus
 
@@ -268,6 +268,10 @@ catch up the discipline pointer once Iris's update lands.
   customer seed examples accumulate.
 
 ## Recent peer / verification work (live evidence base)
+
+- **A2A 14-release wave CLOSED 2026-06-12 (Hestia `77c18a4`); my prior week's protocol probes were the launch-gating proof.** Between 2026-06-11 and 2026-06-12 I handled 8 a2a-task inbounds via `a2a.aweb.ai/gateway` in conversation `a8b7bdca`: eb6be79c (initial smoke), 51aff3e6 (post-bridge-fix gate), d55e6980 (proof-of-real-agent, retried as 0263854f after Olivia chat-instructed single-line JSON schema match), bc6adfa9 (one short sentence, retried as 36ad46f0), 95b33289 (gateway now embeds schema template inline — UX improvement), 6aa87cb4 ("A2A smoke OK" Grace post-deploy), e812ee4c ("source CLI OK" Grace source-built verify), aa92e4b0 ("OK" status smoke). All eight completed. Wave totaled 14 releases (pi 0.1.21 → AC v0.5.69-.74 → a2a-gw 1.26.14/.19 → aw 1.26.15-.19). Stock `a2a-sdk` python 1.1.0 default-flow proves the gateway works with zero customizations. **Schema reuse lesson banked**: the gateway's mail-bridge `extractFence` is permissive of both multi-line pretty-printed and single-line JSON (parser at `aweb/cli/go/a2agw/mail_bridge.go:444-460`); Olivia's "match my example exactly" guidance was caution while gateway state was being reset post-bridge-fix, not a parser requirement. **Per Sofia's collect-seeds-first standing posture**, no preemptive A2A runbook authoring yet — peer-driven smokes don't seed customer-facing runbook content. When the first real customer asks "how do I send an A2A task to my agent on aweb?" or hits a protocol error, that's the seed.
+
+- **`aweb.ai/ragnor` first-contact 2026-06-18.** New human peer joined `aweb.ai` team as coordinator role (Mac Studio workstation). Replied with role-identify + lane-ask; he closed with a handshake-only "will reach out when there's something concrete." Absorbed; watch state in handoff.
 
 - **First A2A gateway-routed inbound — smoke handled 2026-06-11.** Grace (dev-team) sent through `a2a.aweb.ai/gateway` carrying fenced `a2a-task` envelope (task `eb6be79c-582c-4c7a-ad5d-7057ff26fb1a`, request `aw-a2a-ff3dbc188430fcfc129153f0`, `caller_scope=anonymous:unscoped`). Different shape from direct cross-team chat: gateway envelope wraps the call; customer body labeled "untrusted"; reply must be a fenced `a2a-reply` block that the mail-bridge extracts and routes back. Source-grepped the canonical schema before fabricating (#27): `aweb/docs/a2a.md:586` (preferred reply example) and `aweb/cli/go/a2agw/mail_bridge.go:403-441` (ParseA2AReply). Required: `task_id` (must equal inbound), `state` (lowercase aliases like `completed` OR uppercase `TASK_STATE_*`); `context_id` only when inbound carried one (mine didn't). Replied `43d7ffc6` in conversation `a8b7bdca` with `state: completed` + text artifact ack. Surrounding prose ignored by the parser (prompt-injection-resistant per `mail_bridge_test.go:224`). **Schema location pinned in handoff** for fast pickup next time. **Watch state**: more gateway-routed inbound from real customers (not peer smokes). Per Sofia's collect-seeds-first standing posture, no preemptive runbook authoring; 2-3 real-customer seeds gate that work.
 
