@@ -166,6 +166,40 @@ so the path is taken relative to ac root.
 Banked from 2026-06-18 ac-operations m3.2: they had to discover
 this because my SOP claimed `.env.production` lived at ac root.
 
+### Frontend Playwright browser cache thrashes when shared with @playwright/mcp
+
+ac `scripts/e2e-cloud-user-journey.sh` Phase C invokes
+`./node_modules/.bin/playwright install chromium` from
+`ac/frontend/`. If the system-default
+`~/Library/Caches/ms-playwright/` is also used by the
+`@playwright/mcp` server (which it is in Claude Code instances
+with the Playwright MCP plugin), version skew between the MCP's
+playwright and the frontend's pinned `@playwright/test` causes
+the install to REMOVE the cached browser and re-download. In
+non-interactive shells the re-download hangs (no TTY for the
+download progress prompt), Phase C blocks indefinitely, cache
+ends up empty.
+
+**Fix: isolate the browser cache per-project.**
+
+```sh
+export PLAYWRIGHT_BROWSERS_PATH="$HOME/prj/awebai/ac/.playwright-browsers"
+mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+cd ~/prj/awebai/ac/frontend
+./node_modules/.bin/playwright install chromium
+```
+
+Set `PLAYWRIGHT_BROWSERS_PATH` in shell init OR add the export
+near the top of the e2e-cloud-user-journey.sh wrapper so it's
+in scope when Phase C invokes playwright. Browser then lives at
+the isolated path, invisible to MCP cache; Phase C becomes a
+no-op.
+
+Banked from 2026-06-18 ac-operations m3.2 (conv 77285c86). My
+SOP previously said `cd backend && uv run playwright install
+chromium` — that's the BACKEND (Python) Playwright, not the
+FRONTEND (Node) one Phase C invokes. The SOP is corrected.
+
 ### ac `make release-ready` is deploy-safety, not test-correctness
 
 `make release-ready` composes ONLY the 4 `release-verify-*` targets

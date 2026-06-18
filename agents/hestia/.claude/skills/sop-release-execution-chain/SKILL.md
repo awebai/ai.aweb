@@ -155,17 +155,41 @@ actually resolves `.venv` to use the new pin. Skipping sync
 means `check_release_model` passes but the gate runs against
 stale `.venv` — banked PyPI cache-lag class.
 
-### Install Playwright BEFORE running tests
+### Install Playwright BEFORE running tests (isolated browser path)
 
-```sh
-cd ~/prj/awebai/ac/backend
-uv run playwright install chromium
-cd ..
+`scripts/e2e-cloud-user-journey.sh` Phase C invokes:
+
+```
+cd "$FRONTEND_DIR"
+./node_modules/.bin/playwright install chromium
 ```
 
-`cloud-user-journey` Phase C runs `playwright install chromium`
-mid-run. Non-interactive sessions hang at the install prompt.
-Pre-install once per checkout/env to skip the hang.
+This is the **frontend** Node Playwright (not backend Python).
+If the shared `~/Library/Caches/ms-playwright/` cache is also used
+by `@playwright/mcp` (Claude Code's MCP server), version skew can
+cause the install to REMOVE the cached browser and re-download,
+which hangs in non-interactive shells. Symptom: Phase C hangs at
+~100%, cache ends up empty.
+
+**Fix: isolate the browser cache per-project via
+`PLAYWRIGHT_BROWSERS_PATH`.** One-time pre-install:
+
+```sh
+export PLAYWRIGHT_BROWSERS_PATH="$HOME/prj/awebai/ac/.playwright-browsers"
+mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+cd ~/prj/awebai/ac/frontend
+./node_modules/.bin/playwright install chromium
+```
+
+For the variable to apply when Phase C runs, set it in shell init
+OR add the export near the top of
+`scripts/e2e-cloud-user-journey.sh` so it's in scope before the
+playwright install line. Once provisioned, Phase C is a no-op
+(browser already present at the isolated path).
+
+Banked from 2026-06-18 ac-operations m3.2 (conv 77285c86): the
+shared-cache thrash hits non-interactive shells hardest. The
+isolated path is invisible to the MCP cache; no thrash.
 
 ### ac gate: what `make release-ready` actually composes
 
