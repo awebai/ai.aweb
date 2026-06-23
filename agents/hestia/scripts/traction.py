@@ -130,17 +130,17 @@ async def _namespaces(conn) -> dict:
         "SELECT COUNT(*) FROM aweb_cloud.managed_namespaces WHERE deleted_at IS NULL"
     )
     members = await conn.fetchval(
-        "SELECT COUNT(*) FROM aweb_cloud.team_members WHERE deleted_at IS NULL"
+        "SELECT COUNT(*) FROM aweb_cloud.team_members"
     )
     return {"managed": managed, "team_members": members}
 
 
 async def _messages(conn, days: int) -> dict:
-    mail_total = await conn.fetchval("SELECT COUNT(*) FROM aweb.mail_messages")
+    mail_total = await conn.fetchval("SELECT COUNT(*) FROM aweb.messages")
     chat_total = await conn.fetchval("SELECT COUNT(*) FROM aweb.chat_messages")
     chat_sessions = await conn.fetchval("SELECT COUNT(*) FROM aweb.chat_sessions")
     mail_window = await conn.fetchval(
-        f"SELECT COUNT(*) FROM aweb.mail_messages WHERE created_at >= NOW() - INTERVAL '{days} days'"
+        f"SELECT COUNT(*) FROM aweb.messages WHERE created_at >= NOW() - INTERVAL '{days} days'"
     )
     chat_window = await conn.fetchval(
         f"SELECT COUNT(*) FROM aweb.chat_messages WHERE created_at >= NOW() - INTERVAL '{days} days'"
@@ -156,16 +156,16 @@ async def _messages(conn, days: int) -> dict:
 
 
 async def _billing(conn) -> dict:
-    rows = await conn.fetchval("SELECT COUNT(*) FROM aweb_cloud.billing_records")
+    rows = await conn.fetchval("SELECT COUNT(*) FROM aweb_cloud.billing")
     paid_active = await conn.fetchval(
         """
-        SELECT COUNT(*) FROM aweb_cloud.billing_records
-        WHERE tier_active IS TRUE
-          AND tier NOT IN ('free')
+        SELECT COUNT(*) FROM aweb_cloud.billing
+        WHERE tier != 'free'
+          AND (subscription_ends_at IS NULL OR subscription_ends_at > NOW())
         """
     )
     stripe_customers = await conn.fetchval(
-        "SELECT COUNT(DISTINCT stripe_customer_id) FROM aweb_cloud.billing_records WHERE stripe_customer_id IS NOT NULL"
+        "SELECT COUNT(DISTINCT stripe_customer_id) FROM aweb_cloud.billing WHERE stripe_customer_id IS NOT NULL"
     )
     return {
         "total_rows": rows,
@@ -176,10 +176,7 @@ async def _billing(conn) -> dict:
 
 async def _federation(conn) -> dict:
     cross_server = await conn.fetchval(
-        """
-        SELECT COUNT(*) FROM aweb.mail_messages
-        WHERE delivered_via_federation IS TRUE
-        """
+        "SELECT COUNT(*) FROM aweb.federated_message_deliveries"
     )
     return {"cross_server_deliveries": cross_server}
 
