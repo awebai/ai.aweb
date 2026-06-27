@@ -1,18 +1,24 @@
 """Traction rollup for Bertha/Eugenie/Juan investor- and product-style asks.
 
-Promoted from inline asyncpg probes after the question shape repeated
-3x: Bertha 2026-05-08, PearX/Eugenie 2026-06-13, Bertha-for-Eugenie
-2026-06-22.
+Promoted from inline asyncpg probes after the question shape repeated:
+Bertha 2026-05-08, PearX/Eugenie 2026-06-13, Bertha-for-Eugenie 2026-06-22.
+Extended 2026-06-27: --by-week (weekly buckets) + --external (filter internal
+team/Juan/atext) after week-bucketed and external-only asks each repeated.
 
 Usage:
-  uv run --with asyncpg python scripts/traction.py                 # default: full rollup
+  uv run --with asyncpg python scripts/traction.py                 # snapshot, full rollup
   uv run --with asyncpg python scripts/traction.py --quick         # users + past-7d signups only
   uv run --with asyncpg python scripts/traction.py --days 7        # window for "new" metrics
+  uv run --with asyncpg python scripts/traction.py --by-week       # weekly buckets, 3 months back
+  uv run --with asyncpg python scripts/traction.py --by-week --weeks 12
+  uv run --with asyncpg python scripts/traction.py --by-week --external  # external only
   uv run --with asyncpg python scripts/traction.py --json          # machine-readable
 
 Answers question shapes:
   - "how many active users right now?"
   - "how many signups in past N days?"
+  - "weekly activity for past 3 months?"
+  - "external-only activity (exclude internal team noise)?"
   - "what's the current state of the company in numbers?"
   - "give me figures for the [investor/accelerator/HN] read"
 
@@ -23,6 +29,13 @@ metrics where it matters (per daily-signup-export skill convention).
 PII discipline: internal team only. Don't paste raw output to
 external surfaces. Bertha mail is by-design authorized for
 outreach via daily-signup-export skill.
+
+Internal namespace filter (--external):
+  Excludes activity where the team_id's namespace part matches the
+  internal team, Juan-side, atext, or test/probe patterns. See
+  INTERNAL_NAMESPACES + TEST_NS_PATTERNS below for the exact list.
+  Banked 2026-06-27 from Juan's flag that totals were
+  internal-team-dominated.
 """
 
 from __future__ import annotations
@@ -38,6 +51,41 @@ sys.path.insert(0, str(Path(__file__).parent))
 import asyncpg
 
 from _db import resolve_database_url, INTERNAL_EMAILS
+
+
+# Namespace exclusion for --external mode. The team_id format on agents is
+# "<team-slug>:<namespace>", and the namespace is what tells us whether it's
+# internal team activity. Banked 2026-06-27 from Juan-flagged review.
+INTERNAL_NAMESPACES = (
+    "aweb.ai",                # team agents (sofia, athena, aida, iris, metis, bertha, ama, hestia, ...)
+    "juan.aweb.ai",           # Juan's personal team (grace, mia, olivia, rose, peter, dave, ...)
+    "atext.aweb.ai",          # ac instance team (ac-coordinator, ac-operations, ac-developer-*, ...)
+    "juanreyero.com",         # Juan's secondary domain
+    "london.juanreyero.com",  # Juan's other server
+    "pepe.aweb.ai",           # Juan-side internal
+    "team.aweb.ai",           # internal test/team
+)
+# Test/probe namespace patterns (SQL LIKE).
+TEST_NS_PATTERNS = (
+    "a2am-probe-%",
+    "preflight-%",
+    "wt%-%-athena.aweb.ai",  # Athena worktree spawns
+    "tpl-test-%",
+    "sandboxtester%",
+    "aweb-xan.aweb.ai",
+    "erp-2401f81c.aweb.ai",
+    "xdcloud-development.aweb.ai",
+)
+
+
+def _external_predicate(team_id_col: str) -> str:
+    """Returns SQL fragment for external-only filter on a given team_id column."""
+    parts = [
+        f"split_part({team_id_col},':',2) NOT IN ({','.join(repr(n) for n in INTERNAL_NAMESPACES)})"
+    ]
+    for p in TEST_NS_PATTERNS:
+        parts.append(f"split_part({team_id_col},':',2) NOT LIKE '{p}'")
+    return " AND ".join(parts)
 
 
 async def gather(days: int, quick: bool) -> dict:
@@ -181,6 +229,56 @@ async def _federation(conn) -> dict:
     return {"cross_server_deliveries": cross_server}
 
 
+async def gather_weekly(weeks: int, external: bool) -> dict:
+    """Weekly buckets for the past N weeks. Optionally external-only."""
+    db_url = resolve_database_url()
+    conn = await asyncpg.connect(db_url)
+    out: dict = {"weeks": weeks, "external": external, "rows": []}
+    try:
+        if external:
+            ep_a = _external_predicate("a.team_id")
+            ep_b = _external_predicate("team_id")
+            ns_in = ",".join(repr(n) for n in INTERNAL_NAMESPACES)
+            ns_like_excl = " AND ".join(
+                f"mn.domain NOT LIKE '{p}'" for p in TEST_NS_PATTERNS
+            )
+            mail_q = f"SELECT date_trunc('week', m.created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb.messages m JOIN aweb.agents a ON a.agent_id = m.from_agent_id WHERE m.created_at >= NOW() - INTERVAL '{weeks} weeks' AND ({ep_a}) GROUP BY w ORDER BY w"
+            chat_q = f"SELECT date_trunc('week', c.created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb.chat_messages c JOIN aweb.agents a ON a.agent_id = c.from_agent_id WHERE c.created_at >= NOW() - INTERVAL '{weeks} weeks' AND ({ep_a}) GROUP BY w ORDER BY w"
+            agents_q = f"SELECT date_trunc('week', created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb.agents WHERE created_at >= NOW() - INTERVAL '{weeks} weeks' AND ({ep_b}) GROUP BY w ORDER BY w"
+            ns_q = f"SELECT date_trunc('week', mn.created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb_cloud.managed_namespaces mn WHERE mn.created_at >= NOW() - INTERVAL '{weeks} weeks' AND mn.deleted_at IS NULL AND mn.domain NOT IN ({ns_in}) AND {ns_like_excl} GROUP BY w ORDER BY w"
+        else:
+            mail_q = f"SELECT date_trunc('week', created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb.messages WHERE created_at >= NOW() - INTERVAL '{weeks} weeks' GROUP BY w ORDER BY w"
+            chat_q = f"SELECT date_trunc('week', created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb.chat_messages WHERE created_at >= NOW() - INTERVAL '{weeks} weeks' GROUP BY w ORDER BY w"
+            agents_q = f"SELECT date_trunc('week', created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb.agents WHERE created_at >= NOW() - INTERVAL '{weeks} weeks' GROUP BY w ORDER BY w"
+            ns_q = f"SELECT date_trunc('week', created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb_cloud.managed_namespaces WHERE created_at >= NOW() - INTERVAL '{weeks} weeks' AND deleted_at IS NULL GROUP BY w ORDER BY w"
+
+        signups_q = f"SELECT date_trunc('week', created_at AT TIME ZONE 'UTC')::date AS w, COUNT(*) AS n FROM aweb_cloud.users WHERE created_at >= NOW() - INTERVAL '{weeks} weeks' GROUP BY w ORDER BY w"
+
+        buckets: dict[str, dict] = {}
+        for key, sql in [("mail", mail_q), ("chat", chat_q), ("agents_new", agents_q), ("namespaces_new", ns_q), ("signups", signups_q)]:
+            rows = await conn.fetch(sql)
+            for r in rows:
+                buckets.setdefault(str(r["w"]), {})[key] = r["n"]
+        for w in sorted(buckets):
+            out["rows"].append({"week_start": w, **buckets[w]})
+    finally:
+        await conn.close()
+    return out
+
+
+def _print_weekly(data: dict):
+    scope = "external-only" if data["external"] else "all activity"
+    print(f"=== weekly traction (past {data['weeks']} weeks, {scope}) ===")
+    if data["external"]:
+        print("Excluded namespaces:", ", ".join(INTERNAL_NAMESPACES))
+        print("Excluded test patterns:", ", ".join(TEST_NS_PATTERNS))
+    print()
+    cols = ["mail", "chat", "agents_new", "namespaces_new", "signups"]
+    print("week-start | " + " | ".join(f"{c:>14}" for c in cols))
+    for row in data["rows"]:
+        print(f"{row['week_start']} | " + " | ".join(f"{row.get(c, 0):>14}" for c in cols))
+
+
 def _print_text(data: dict, days: int):
     u = data["users"]
     s = data["signups_window"]
@@ -209,16 +307,26 @@ def _print_text(data: dict, days: int):
 
 def main():
     p = argparse.ArgumentParser(description="Traction rollup")
-    p.add_argument("--days", type=int, default=7, help="Window for new-metric counts (default 7)")
+    p.add_argument("--days", type=int, default=7, help="Window for new-metric counts (snapshot mode; default 7)")
     p.add_argument("--quick", action="store_true", help="Users + signups only (skip messages/billing/federation)")
+    p.add_argument("--by-week", action="store_true", help="Weekly buckets instead of snapshot")
+    p.add_argument("--weeks", type=int, default=13, help="Number of weeks back for --by-week (default 13 = ~3 months)")
+    p.add_argument("--external", action="store_true", help="With --by-week: exclude internal team / Juan / atext / test patterns")
     p.add_argument("--json", action="store_true", help="Machine-readable output")
     args = p.parse_args()
 
-    data = asyncio.run(gather(args.days, args.quick))
-    if args.json:
-        print(json.dumps(data, indent=2, default=str))
+    if args.by_week:
+        data = asyncio.run(gather_weekly(args.weeks, args.external))
+        if args.json:
+            print(json.dumps(data, indent=2, default=str))
+        else:
+            _print_weekly(data)
     else:
-        _print_text(data, args.days)
+        data = asyncio.run(gather(args.days, args.quick))
+        if args.json:
+            print(json.dumps(data, indent=2, default=str))
+        else:
+            _print_text(data, args.days)
 
 
 if __name__ == "__main__":
