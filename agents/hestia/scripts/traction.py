@@ -266,6 +266,106 @@ async def gather_weekly(weeks: int, external: bool) -> dict:
     return out
 
 
+async def gather_cli_funnel() -> dict:
+    """CLI-signup → activation → engagement conversion funnel.
+
+    Banked from 2026-06-30 Bertha-for-Eugenie ask. The non-obvious join:
+        users → organization_members.user_id → organizations.aweb_namespace_domain
+              → match aweb.agents.team_id (split_part on ':')
+
+    `aweb_cloud.principals.user_id` and `principals.agent_id` are NEVER both
+    set on the same row (polymorphic type table — human OR agent, never link).
+    `aweb.api_keys` had 0 rows for CLI users.
+    The org→namespace→team_id chain is the canonical path.
+    """
+    db_url = resolve_database_url()
+    conn = await asyncpg.connect(db_url)
+    try:
+        row = await conn.fetchrow(
+            """
+            WITH cli_users AS (
+                SELECT u.id, u.created_at,
+                       EXTRACT(EPOCH FROM (NOW() - u.created_at)) / 86400 AS days_since
+                FROM aweb_cloud.users u
+                WHERE u.signup_method = 'cli_signup' AND u.deleted_at IS NULL
+            ),
+            user_orgs AS (
+                SELECT cu.id AS user_id, cu.days_since, o.aweb_namespace_domain AS ns
+                FROM cli_users cu
+                LEFT JOIN aweb_cloud.organization_members om ON om.user_id = cu.id
+                LEFT JOIN aweb_cloud.organizations o ON o.id = om.organization_id AND o.deleted_at IS NULL
+            ),
+            user_agents AS (
+                SELECT uo.user_id, a.agent_id, a.created_at AS agent_at
+                FROM user_orgs uo
+                JOIN aweb.agents a ON split_part(a.team_id, ':', 2) = uo.ns AND a.deleted_at IS NULL
+            ),
+            mail_counts AS (
+                SELECT ua.user_id, COUNT(m.message_id) AS n, MAX(m.created_at) AS last
+                FROM user_agents ua LEFT JOIN aweb.messages m ON m.from_agent_id = ua.agent_id
+                GROUP BY ua.user_id
+            ),
+            chat_counts AS (
+                SELECT ua.user_id, COUNT(c.message_id) AS n, MAX(c.created_at) AS last
+                FROM user_agents ua LEFT JOIN aweb.chat_messages c ON c.from_agent_id = ua.agent_id
+                GROUP BY ua.user_id
+            ),
+            agent_counts AS (
+                SELECT user_id, COUNT(DISTINCT agent_id) AS n FROM user_agents GROUP BY user_id
+            ),
+            per_user AS (
+                SELECT cu.id, cu.days_since,
+                       COALESCE(ac.n, 0) AS agents,
+                       COALESCE(mc.n, 0) AS mail,
+                       COALESCE(cc.n, 0) AS chat,
+                       GREATEST(mc.last, cc.last) AS last_active
+                FROM cli_users cu
+                LEFT JOIN agent_counts ac ON ac.user_id = cu.id
+                LEFT JOIN mail_counts mc ON mc.user_id = cu.id
+                LEFT JOIN chat_counts cc ON cc.user_id = cu.id
+            )
+            SELECT
+                COUNT(*) AS cli_total,
+                COUNT(*) FILTER (WHERE agents > 0) AS with_agents,
+                COUNT(*) FILTER (WHERE mail + chat = 0) AS zero_msgs,
+                COUNT(*) FILTER (WHERE mail + chat BETWEEN 1 AND 5) AS bucket_1_5,
+                COUNT(*) FILTER (WHERE mail + chat BETWEEN 6 AND 50) AS bucket_6_50,
+                COUNT(*) FILTER (WHERE mail + chat > 50) AS bucket_50plus,
+                COUNT(*) FILTER (WHERE last_active >= NOW() - INTERVAL '14 days') AS active_14d,
+                COUNT(*) FILTER (WHERE last_active >= NOW() - INTERVAL '7 days') AS active_7d,
+                AVG(mail + chat)::int AS avg_msgs,
+                MAX(mail + chat) AS max_msgs,
+                AVG(days_since)::int AS avg_age_days
+            FROM per_user
+            """
+        )
+        return dict(row)
+    finally:
+        await conn.close()
+
+
+def _print_cli_funnel(data: dict):
+    print("=== CLI-signup → engagement funnel (all-time) ===")
+    total = data["cli_total"]
+    activated = data["with_agents"]
+    sent_any = total - data["zero_msgs"]
+    sent_6 = data["bucket_6_50"] + data["bucket_50plus"]
+    sent_50 = data["bucket_50plus"]
+
+    def pct(n):
+        return f"{100*n/total:.0f}%" if total else "—"
+
+    print(f"Signed up via CLI                      {total:>4}   100%")
+    print(f"└─ Activated (≥1 agent)                  {activated:>4}   {pct(activated)}")
+    print(f"   └─ Sent ≥1 message ever               {sent_any:>4}   {pct(sent_any)}")
+    print(f"      └─ Sent ≥6 messages (light)        {sent_6:>4}   {pct(sent_6)}")
+    print(f"         └─ Sent ≥50 messages (engaged)   {sent_50:>4}   {pct(sent_50)}")
+    print(f"            └─ Active in past 14 days     {data['active_14d']:>4}   {pct(data['active_14d'])}")
+    print(f"               └─ Active in past 7 days     {data['active_7d']:>4}   {pct(data['active_7d'])}")
+    print()
+    print(f"avg messages/user: {data['avg_msgs']}  |  max: {data['max_msgs']}  |  avg age (days): {data['avg_age_days']}")
+
+
 def _print_weekly(data: dict):
     scope = "external-only" if data["external"] else "all activity"
     print(f"=== weekly traction (past {data['weeks']} weeks, {scope}) ===")
@@ -312,8 +412,17 @@ def main():
     p.add_argument("--by-week", action="store_true", help="Weekly buckets instead of snapshot")
     p.add_argument("--weeks", type=int, default=13, help="Number of weeks back for --by-week (default 13 = ~3 months)")
     p.add_argument("--external", action="store_true", help="With --by-week: exclude internal team / Juan / atext / test patterns")
+    p.add_argument("--cli-funnel", action="store_true", help="CLI-signup → activation → engagement funnel (all-time)")
     p.add_argument("--json", action="store_true", help="Machine-readable output")
     args = p.parse_args()
+
+    if args.cli_funnel:
+        data = asyncio.run(gather_cli_funnel())
+        if args.json:
+            print(json.dumps(data, indent=2, default=str))
+        else:
+            _print_cli_funnel(data)
+        return
 
     if args.by_week:
         data = asyncio.run(gather_weekly(args.weeks, args.external))
